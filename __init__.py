@@ -50,6 +50,7 @@ from .cynthia_stairs import *
 # =======================================================
 
 class PropertyProxy(bpy.types.PropertyGroup):
+    name = StringProperty(default="Property")
     property_items = [
         ("FLOOPLAN", "Floorplan", "", 0),
         ("WINDOW", "Window", "", 1)
@@ -861,10 +862,12 @@ class FloorplanOperator(bpy.types.Operator):
         fp.build()
 
         # Add property list item
-        obj = context.object
-        prop = obj.property_list.add()
-        prop.id = len(obj.property_list)
-        prop.type = "FLOOPLAN"
+        # -- prop.id is optional, only useful for collectiontypes
+        obj         = context.object
+        prop        = obj.property_list.add()
+        prop.id     = len(obj.property_list)
+        prop.type   = "FLOOPLAN"
+        prop.name   = "Floorplan Property"
 
         obj.property_index = len(obj.property_list)-1
 
@@ -1105,9 +1108,7 @@ class RoofOperator(bpy.types.Operator):
 class PROP_items(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        split = layout.split(0.3)
-        split.label("Index: %d" % (index))
-        split.prop(item, "name", text="", emboss=False, translate=False, icon='BORDER_RECT')
+        layout.prop(item, "name", text="", emboss=False, translate=False, icon='SNAP_PEEL_OBJECT')
 
     def invoke(self, context, event):
         pass   
@@ -1159,9 +1160,15 @@ class CynthiaPanel(bpy.types.Panel):
 
 
             # draw  properties for active group
-            # -- floorplan
-            fp_props = obj.building.floorplan 
-            fp_props.draw(context, box)
+            active_index = obj.property_index
+            active_prop = obj.property_list[active_index]
+
+            if active_prop.type == 'FLOOPLAN':
+                fp_props = obj.building.floorplan 
+                fp_props.draw(context, box)
+            elif active_prop.type == 'WINDOW':
+                win_prop = obj.building.windows[active_prop.id]
+                win_prop.draw(context, box)
 
 
 # =======================================================
@@ -1197,5 +1204,5 @@ if __name__ == "__main__":
 
 
     # # optional run tests
-    from .tests import CynthiaTest
-    CynthiaTest.run_tests()
+    # from .tests import CynthiaTest
+    # CynthiaTest.run_tests()
