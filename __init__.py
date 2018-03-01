@@ -1143,9 +1143,13 @@ class CynthiaPanel(bpy.types.Panel):
 def register():     
     bpy.utils.register_module(__name__)
 
+    bpy.types.Object.building = PointerProperty(type=BuildingProperty)
+
 
 def unregister():
     bpy.utils.unregister_module(__name__)
+
+    del bpy.type.Object.building
 
 
 if __name__ == "__main__":
