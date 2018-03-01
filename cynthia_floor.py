@@ -1,9 +1,11 @@
+import bpy
 import bmesh
 from bmesh.types import BMVert, BMEdge, BMFace
 from .utils import (
     kwargs_from_props,
-    get_edit_mesh,
+    bm_from_obj,
     filter_geom,
+    bm_to_obj,
 )
 
 
@@ -25,21 +27,24 @@ class Floor:
     def check_planar(cls):
         """ Check to see in active mesh is planar """
 
-        # -- get current edit mesh
-        me = get_edit_mesh()
+        # -- get current object bmesh
+        obj = bpy.context.object
+        bm = bm_from_obj(obj)
 
         # -- check that all verts are on same z coordinate
-        if len(set([v.co.z for v in me.vertices])) == 1:
+        if len(set([v.co.z for v in bm.verts])) == 1:
+            bm_to_obj(bm, obj)
             return True
+        bm_to_obj(bm, obj)
         return False
 
     @classmethod
     def make_floors(cls, floor_count=1, floor_height=2, slab_thickness=.1, slab_outset=.1, **kwargs):
         """ Create a set of extrusions given a base plane (forms building block) """
 
-        # -- get current edit mesh
-        me = get_edit_mesh()
-        bm = bmesh.from_edit_mesh(me)
+        # -- get active object bmesh
+        obj = bpy.context.object
+        bm = bm_from_obj(obj)
 
         # -- find boundary edges
         edges = [e for e in bm.edges if e.is_boundary]
@@ -67,4 +72,4 @@ class Floor:
 
         # -- update normals and mesh
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-        bmesh.update_edit_mesh(me, True)
+        bm_to_obj(bm, obj)
