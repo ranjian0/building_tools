@@ -5,10 +5,12 @@ from .utils import (
         circle,
         link_obj,
         make_mesh,
+        bm_to_obj,
         make_object,
         bm_from_obj,
         filter_geom,
         calc_edge_median,
+        kwargs_from_props,
         filter_vertical_edges,
         filter_horizontal_edges,
     )
