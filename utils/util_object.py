@@ -18,9 +18,8 @@ def bm_from_obj(obj):
 
 def bm_to_obj(bm, obj):
     """ Write bmesh to object data"""
-    m = make_mesh("bm.gen_mesh")
-    bm.to_mesh(m)
-    obj.data = m
+    bm.to_mesh(obj.data)
+    bm.free()
 
 
 def link_obj(obj):
