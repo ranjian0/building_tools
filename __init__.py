@@ -53,10 +53,12 @@ class PropertyProxy(bpy.types.PropertyGroup):
     name = StringProperty(default="Property")
     property_items = [
         ("FLOOPLAN", "Floorplan", "", 0),
-        ("WINDOW", "Window", "", 1)
+        ("FLOOR", "Floor", "", 1),
+        ("WINDOW", "Window", "", 2)
     ]
     type = EnumProperty(items=property_items)
     id = IntProperty()
+
 
 class SplitProperty(bpy.types.PropertyGroup):
     amount = FloatVectorProperty(name="Split Amount", description="How much to split geometry", min=.01, max=3.0,
@@ -840,9 +842,10 @@ class RoofProperty(bpy.types.PropertyGroup):
 
 class BuildingProperty(bpy.types.PropertyGroup):
 
-    floorplan = PointerProperty(type=FloorplanProperty)
-    windows = CollectionProperty(type=WindowProperty)
-    doors = CollectionProperty(type=DoorProperty)
+    floorplan   = PointerProperty(type=FloorplanProperty)
+    floors      = PointerProperty(type=FloorProperty)
+    windows     = CollectionProperty(type=WindowProperty)
+    doors       = CollectionProperty(type=DoorProperty)
 
 # =======================================================
 #
@@ -887,9 +890,19 @@ class FloorOperator(bpy.types.Operator):
         return context.object is not None and context.object.mode == 'EDIT'
 
     def execute(self, context):
+        # Build geometry
+        floor = Floor()
+        floor.build(context)
 
-        floor = Floor(self.props)
-        floor.build()
+        # Add property list item
+        # -- prop.id is optional, only useful for collectiontypes
+        obj         = context.object
+        prop        = obj.property_list.add()
+        prop.id     = len(obj.property_list)
+        prop.type   = "FLOOR"
+        prop.name   = "Floor Property"
+
+        obj.property_index = len(obj.property_list)-1
 
         return {'FINISHED'}
 
@@ -1166,6 +1179,9 @@ class CynthiaPanel(bpy.types.Panel):
             if active_prop.type == 'FLOOPLAN':
                 fp_props = obj.building.floorplan 
                 fp_props.draw(context, box)
+            if active_prop.type == 'FLOOR':
+                floor_props = obj.building.floors
+                floor_props.draw(context, box)
             elif active_prop.type == 'WINDOW':
                 win_prop = obj.building.windows[active_prop.id]
                 win_prop.draw(context, box)
