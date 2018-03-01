@@ -18,45 +18,46 @@ from .utils import (
 
 class Floorplan:
 
-    def __init__(self):
-        self.object = None 
-
-    def build(self):
+    @classmethod
+    def build(cls):
         """ Build the floorplan from given properties """
 
         # -- create the floorplan object
-        self.object = make_object('floorplan', make_mesh('fp_mesh'))
-        building = self.object.building 
+        obj = make_object('floorplan', make_mesh('fp_mesh'))
+        building = obj.building 
 
         # -- get bmesh representation of object
-        bm = bm_from_obj(self.object)
+        bm = bm_from_obj(obj)
 
         # -- use properties to create geometry
         props = building.floorplan
         if props.type == 'RECTANGULAR':
-            self.make_rectangular(bm, **kwargs_from_props(props))
+            cls.make_rectangular(bm, **kwargs_from_props(props))
         elif props.type == 'CIRCULAR':
-            self.make_circular(bm, **kwargs_from_props(props))
+            cls.make_circular(bm, **kwargs_from_props(props))
         elif props.type == 'COMPOSITE':
-            self.make_composite(bm, **kwargs_from_props(props))
+            cls.make_composite(bm, **kwargs_from_props(props))
         elif props.type == 'H-SHAPED':
-            self.make_hshaped(bm, **kwargs_from_props(props))
+            cls.make_hshaped(bm, **kwargs_from_props(props))
 
         # -- write bmesh back into object
-        bm_to_obj(bm, self.object)
+        bm_to_obj(bm, obj)
 
         # -- link object to current scene
-        link_obj(self.object)
+        link_obj(obj)
 
-    def make_rectangular(self, bm, width=1, length=2, **kwargs):
+    @classmethod
+    def make_rectangular(cls, bm, width=1, length=2, **kwargs):
         """ Create a rectangular plane """
         plane(bm, width, length)
 
-    def make_circular(self, bm, radius=1, segs=32, cap_tris=False, **kwargs):
+    @classmethod
+    def make_circular(cls, bm, radius=1, segs=32, cap_tris=False, **kwargs):
         """ Create a circular plane """
         circle(bm, radius, segs, cap_tris)
 
-    def make_composite(self, bm, width=2, length=2, tl=1, tl1=1, tl2=1, tl3=1, **kwargs):
+    @classmethod
+    def make_composite(cls, bm, width=2, length=2, tl=1, tl1=1, tl2=1, tl3=1, **kwargs):
         """ Create a square face whose sides are extruded """
         base = plane(bm, width, length)
         ref = list(bm.faces)[-1].calc_center_median()
@@ -76,7 +77,8 @@ class Floorplan:
                 v.normalize()
                 bmesh.ops.translate(bm, verts=verts, vec=v * exts[idx])
 
-    def make_hshaped(self, bm, width=2, length=2, tw=1, tl=1, tw1=1, tl1=1, tw2=1, tl2=1, tw3=1, tl3=1, **kwargs):
+    @classmethod
+    def make_hshaped(cls, bm, width=2, length=2, tw=1, tl=1, tw1=1, tl1=1, tw2=1, tl2=1, tw3=1, tl3=1, **kwargs):
         """ Create a h-shaped flat plane """
 
         base = plane(bm, width, length)
