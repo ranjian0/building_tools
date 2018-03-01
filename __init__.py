@@ -847,17 +847,16 @@ class FloorplanOperator(bpy.types.Operator):
     bl_label = "Create Floorplan"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = PointerProperty(type=FloorplanProperty)
-
     def execute(self, context):
 
-        fp = Floorplan(self.props)
+        fp = Floorplan()
         fp.build()
 
         return {'FINISHED'}
 
     def draw(self, context):
-        self.props.draw(context, self.layout)
+        props = context.object.building.floorplan
+        props.draw(context, self.layout)
 
 
 class FloorOperator(bpy.types.Operator):
