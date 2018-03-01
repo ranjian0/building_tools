@@ -913,7 +913,7 @@ class FloorOperator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.object is not None and context.object.mode == 'EDIT'
+        return context.object is not None
 
     def execute(self, context):
         # Build geometry

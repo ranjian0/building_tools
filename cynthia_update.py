@@ -31,10 +31,6 @@ def update_building(self, context):
 
     # -- floors
     if obj.get('has_floors', False):
-        if context.mode == 'OBJECT':
-            bpy.ops.object.mode_set(mode='EDIT')
         Floor.build(context)
-        if context.mode == 'EDIT_MESH':
-            bpy.ops.object.mode_set(mode='OBJECT')
 
     return None 
