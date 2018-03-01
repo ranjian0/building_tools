@@ -829,6 +829,12 @@ class RoofProperty(bpy.types.PropertyGroup):
                 col.prop(self, 'dissolve_angle')
 
 
+class BuildingProperty(bpy.types.PropertyGroup):
+
+    floorplan = PointerProperty(type=FloorplanProperty)
+    windows = CollectionProperty(type=WindowProperty)
+    doors = CollectionProperty(type=DoorProperty)
+
 # =======================================================
 #
 #           OPERATORS
