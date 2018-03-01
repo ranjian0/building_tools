@@ -9,20 +9,20 @@ from .utils import (
 
 class Floor:
 
-    def __init__(self, properties):
-        self.props = properties
-
-    def build(self):
+    @classmethod
+    def build(cls, context):
         """ Create the floorplan based on a floorplan object """
 
         # -- ensure that edit mesh is a valid floorplan - (planar)
-        if not self.check_planar():
+        if not cls.check_planar():
             return
 
         # -- now we can create floors
-        self.make_floors(**kwargs_from_props(self.props))
+        props = context.object.building.floors
+        cls.make_floors(**kwargs_from_props(props))
 
-    def check_planar(self):
+    @classmethod
+    def check_planar(cls):
         """ Check to see in active mesh is planar """
 
         # -- get current edit mesh
@@ -33,7 +33,8 @@ class Floor:
             return True
         return False
 
-    def make_floors(self, floor_count=1, floor_height=2, slab_thickness=.1, slab_outset=.1, **kwargs):
+    @classmethod
+    def make_floors(cls, floor_count=1, floor_height=2, slab_thickness=.1, slab_outset=.1, **kwargs):
         """ Create a set of extrusions given a base plane (forms building block) """
 
         # -- get current edit mesh
