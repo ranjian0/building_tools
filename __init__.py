@@ -49,6 +49,14 @@ from .cynthia_stairs import *
 #
 # =======================================================
 
+class PropertyProxy(bpy.types.PropertyGroup):
+    property_items = [
+        ("FLOOPLAN", "Floorplan", "", 0),
+        ("WINDOW", "Window", "", 1)
+    ]
+    type = EnumProperty(items=property_items)
+    id = IntProperty()
+
 class SplitProperty(bpy.types.PropertyGroup):
     amount = FloatVectorProperty(name="Split Amount", description="How much to split geometry", min=.01, max=3.0,
                                  subtype='XYZ', size=2, default=(2.0, 2.0))
@@ -848,15 +856,19 @@ class FloorplanOperator(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-
+        # Build the geometry
         fp = Floorplan()
         fp.build()
 
-        return {'FINISHED'}
+        # Add property list item
+        obj = context.object
+        prop = obj.property_list.add()
+        prop.id = len(obj.property_list)
+        prop.type = "FLOOPLAN"
 
-    def draw(self, context):
-        props = context.object.building.floorplan
-        props.draw(context, self.layout)
+        obj.property_index = len(obj.property_list)-1
+
+        return {'FINISHED'}
 
 
 class FloorOperator(bpy.types.Operator):
@@ -1090,6 +1102,17 @@ class RoofOperator(bpy.types.Operator):
 #
 # =======================================================
 
+class PROP_items(bpy.types.UIList):
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        split = layout.split(0.3)
+        split.label("Index: %d" % (index))
+        split.prop(item, "name", text="", emboss=False, translate=False, icon='BORDER_RECT')
+
+    def invoke(self, context, event):
+        pass   
+
+
 class CynthiaPanel(bpy.types.Panel):
     """Docstring of CynthiaPanel"""
     bl_idname = "VIEW3D_PT_cynthia"
@@ -1127,10 +1150,18 @@ class CynthiaPanel(bpy.types.Panel):
 
         if active:
             box = col.box()
+            obj = context.object
 
             # Draw uilist for all property groups
+            rows = 2
+            row = box.row()
+            row.template_list("PROP_items", "", obj, "property_list", obj, "property_index", rows=rows)
+
 
             # draw  properties for active group
+            # -- floorplan
+            fp_props = obj.building.floorplan 
+            fp_props.draw(context, box)
 
 
 # =======================================================
@@ -1144,11 +1175,16 @@ def register():
 
     bpy.types.Object.building = PointerProperty(type=BuildingProperty)
 
+    bpy.types.Object.property_list = CollectionProperty(type=PropertyProxy)
+    bpy.types.Object.property_index = IntProperty()
+
 
 def unregister():
     bpy.utils.unregister_module(__name__)
 
     del bpy.type.Object.building
+    del bpy.types.Object.property_list
+    del bpy.types.Object.property_index
 
 
 if __name__ == "__main__":
