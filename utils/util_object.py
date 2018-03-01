@@ -29,3 +29,9 @@ def link_obj(obj):
     bpy.context.scene.objects.active = obj
     obj.select = True
     obj.location = bpy.context.scene.cursor_location
+
+def obj_clear_data(obj):
+    """ Removes mesh geometry data from obj """
+    bm = bm_from_obj(obj)
+    bmesh.ops.delete(bm, geom=list(bm.verts), context=1)
+    bm_to_obj(bm, obj)

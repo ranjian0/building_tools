@@ -41,7 +41,7 @@ from .cynthia_rails import *
 from .cynthia_roof import *
 from .cynthia_staircase import *
 from .cynthia_stairs import *
-
+from .cynthia_update import update_building
 
 # =======================================================
 #
@@ -69,49 +69,68 @@ class SplitProperty(bpy.types.PropertyGroup):
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):
-    fp_types = [("RECTANGULAR", "Rectangular", "", 0), ("CIRCULAR", "Circular", "", 1),
-                ("COMPOSITE", "Composite", "", 2), ("H-SHAPED", "H-Shaped", "", 3)]
-    type = EnumProperty(description="Type of floorplan",
-                        items=fp_types, default='RECTANGULAR')
+    fp_types = [
+        ("RECTANGULAR", "Rectangular", "", 0), 
+        ("CIRCULAR", "Circular", "", 1),
+        ("COMPOSITE", "Composite", "", 2), 
+        ("H-SHAPED", "H-Shaped", "", 3)
+    ]
 
-    width = FloatProperty(
-        name="Width", description="Base Width of floorplan", min=0.01, max=100.0, default=2)
+    type    = EnumProperty(
+        description="Type of floorplan", items=fp_types, default='RECTANGULAR', 
+        update=update_building)
 
-    length = FloatProperty(
-        name="Length", description="Base Length of floorplan", min=0.01, max=100.0, default=2)
+    width   = FloatProperty(
+        name="Width", description="Base Width of floorplan", min=0.01, max=100.0, default=2, 
+        update=update_building)
 
-    radius = FloatProperty(
-        name="Radius", description="Radius of circle", min=0.1, max=100.0, default=1.0)
+    length  = FloatProperty(
+        name="Length", description="Base Length of floorplan", min=0.01, max=100.0, default=2,
+        update=update_building)
 
-    segs = IntProperty(
-        name="Segments", description="Number of segments in the circle", min=3, max=100, default=32)
+    radius  = FloatProperty(
+        name="Radius", description="Radius of circle", min=0.1, max=100.0, default=1.0,
+        update=update_building)
 
-    tw = FloatProperty(
-        name="Tail Width", description="Width of floorplan segment", min=0.0, max=100.0, default=1)
+    segs    = IntProperty(
+        name="Segments", description="Number of segments in the circle", min=3, max=100, default=32,
+        update=update_building)
 
-    tl = FloatProperty(
-        name="Tail Length", description="Length of floorplan segment", min=0.0, max=100.0, default=1)
+    tw      = FloatProperty(
+        name="Tail Width", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tw1 = FloatProperty(
-        name="Tail Width 1", description="Width of floorplan segment", min=0.0, max=100.0, default=1)
+    tl      = FloatProperty(
+        name="Tail Length", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tl1 = FloatProperty(
-        name="Tail Length 1", description="Length of floorplan segment", min=0.0, max=100.0, default=1)
+    tw1     = FloatProperty(
+        name="Tail Width 1", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tw2 = FloatProperty(
-        name="Tail Width 2", description="Width of floorplan segment", min=0.0, max=100.0, default=1)
+    tl1     = FloatProperty(
+        name="Tail Length 1", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tl2 = FloatProperty(
-        name="Tail Length 2", description="Length of floorplan segment", min=0.0, max=100.0, default=1)
+    tw2     = FloatProperty(
+        name="Tail Width 2", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tw3 = FloatProperty(
-        name="Tail Width 3", description="Width of floorplan segment", min=0.0, max=100.0, default=1)
+    tl2     = FloatProperty(
+        name="Tail Length 2", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    tl3 = FloatProperty(
-        name="Tail Length 3", description="Length of floorplan segment", min=0.0, max=100.0, default=1)
+    tw3     = FloatProperty(
+        name="Tail Width 3", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
 
-    cap_tris = BoolProperty(
-        name='Cap Triangles', description='Set the fill type to triangles', default=False)
+    tl3     = FloatProperty(
+        name="Tail Length 3", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        update=update_building)
+
+    cap_tris= BoolProperty(
+        name='Cap Triangles', description='Set the fill type to triangles', default=False,
+        update=update_building)
 
     def draw(self, context, layout):
         row = layout.row()
@@ -163,17 +182,21 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
 
 class FloorProperty(bpy.types.PropertyGroup):
-    floor_count = IntProperty(
-        name="Floor Count", description="Number of floors", min=1, max=1000, default=1)
+    floor_count     = IntProperty(
+        name="Floor Count", description="Number of floors", min=1, max=1000, default=1, 
+        update=update_building)
 
-    floor_height = FloatProperty(name="Floor Height", description="Height of each floor", min=0.01, max=1000.0,
-                                 default=1.0)
+    floor_height    = FloatProperty(
+        name="Floor Height", description="Height of each floor", min=0.01, max=1000.0, default=1.0, 
+        update=update_building)
 
-    slab_thickness = FloatProperty(name="Slab Height", description="Thickness of each slab", min=0.01, max=1000.0,
-                                   default=0.15)
+    slab_thickness  = FloatProperty(
+        name="Slab Height", description="Thickness of each slab", min=0.01, max=1000.0, default=0.15, 
+        update=update_building)
 
-    slab_outset = FloatProperty(name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0,
-                                default=0.1)
+    slab_outset     = FloatProperty(
+        name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0, default=0.1, 
+        update=update_building)
 
     def draw(self, context, layout):
         box = layout.box()
@@ -874,6 +897,9 @@ class FloorplanOperator(bpy.types.Operator):
 
         obj.property_index = len(obj.property_list)-1
 
+        # Add flag to be used in update
+        obj['has_floorplan'] = True
+
         return {'FINISHED'}
 
 
@@ -903,6 +929,9 @@ class FloorOperator(bpy.types.Operator):
         prop.name   = "Floor Property"
 
         obj.property_index = len(obj.property_list)-1
+
+        # Add flag to be used in update
+        obj['has_floors'] = True
 
         return {'FINISHED'}
 
@@ -1174,6 +1203,8 @@ class CynthiaPanel(bpy.types.Panel):
 
             # draw  properties for active group
             active_index = obj.property_index
+            if not len(obj.property_list): 
+                return
             active_prop = obj.property_list[active_index]
 
             if active_prop.type == 'FLOOPLAN':

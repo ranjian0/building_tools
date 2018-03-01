@@ -1,9 +1,12 @@
 import bpy
 import bmesh 
+from bmesh.types import BMVert
+from mathutils import Vector
 from .utils import ( 
         plane,
         circle,
         link_obj,
+        condition,
         make_mesh,
         bm_to_obj,
         make_object,
@@ -19,11 +22,11 @@ from .utils import (
 class Floorplan:
 
     @classmethod
-    def build(cls):
+    def build(cls, update=False, _obj=None):
         """ Build the floorplan from given properties """
 
         # -- create the floorplan object
-        obj = make_object('floorplan', make_mesh('fp_mesh'))
+        obj = condition(update, _obj, make_object('floorplan', make_mesh('fp_mesh')))
         building = obj.building 
 
         # -- get bmesh representation of object
@@ -44,7 +47,8 @@ class Floorplan:
         bm_to_obj(bm, obj)
 
         # -- link object to current scene
-        link_obj(obj)
+        if not update:
+            link_obj(obj)
 
     @classmethod
     def make_rectangular(cls, bm, width=1, length=2, **kwargs):
