@@ -16,8 +16,7 @@ from .utils import (
 
 class Floorplan:
 
-    def __init__(self, properties):
-        self.props = properties
+    def __init__(self):
         self.object = None 
 
     def build(self):
@@ -25,20 +24,21 @@ class Floorplan:
 
         # -- create the floorplan object
         self.object = make_object('floorplan', make_mesh('fp_mesh'))
+        building = self.object.building 
 
         # -- get bmesh representation of object
         bm = bm_from_obj(self.object)
 
         # -- use properties to create geometry
-        props = self.props 
+        props = building.floorplan
         if props.type == 'RECTANGULAR':
-            self.make_rectangular(bm, **kwargs_from_props(self.props))
+            self.make_rectangular(bm, **kwargs_from_props(props))
         elif props.type == 'CIRCULAR':
-            self.make_circular(bm, **kwargs_from_props(self.props))
+            self.make_circular(bm, **kwargs_from_props(props))
         elif props.type == 'COMPOSITE':
-            self.make_composite(bm, **kwargs_from_props(self.props))
+            self.make_composite(bm, **kwargs_from_props(props))
         elif props.type == 'H-SHAPED':
-            self.make_hshaped(bm, **kwargs_from_props(self.props))
+            self.make_hshaped(bm, **kwargs_from_props(props))
 
         # -- write bmesh back into object
         bm_to_obj(bm, self.object)
