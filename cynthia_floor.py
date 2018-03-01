@@ -6,6 +6,10 @@ from .utils import (
     bm_from_obj,
     filter_geom,
     bm_to_obj,
+    material_set_faces,
+    floor_mat_slab,
+    floor_mat_wall,
+    select
 )
 
 
@@ -41,13 +45,20 @@ class Floor:
     @classmethod
     def make_floors(cls, floor_count=1, floor_height=2, slab_thickness=.1, slab_outset=.1, **kwargs):
         """ Create a set of extrusions given a base plane (forms building block) """
+        obj = bpy.context.object
+
+        # -- make/get materials
+        slab_mat, wall_mat = floor_mat_slab(obj), floor_mat_wall(obj)
+        mslab_faces, mfloor_faces = [], []
 
         # -- get active object bmesh
-        obj = bpy.context.object
         bm = bm_from_obj(obj)
 
         # -- find boundary edges
         edges = [e for e in bm.edges if e.is_boundary]
+
+        # -- floorplan faces are alsb material
+        mslab_faces.extend([f for f in bm.faces])
 
         # -- extrude floor and slabs
         for i in range(floor_count):
@@ -60,12 +71,22 @@ class Floor:
 
             # Extrude floor
             floor_ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
+            floor_faces = filter_geom(floor_ext['geom'], BMFace)
             verts = filter_geom(floor_ext['geom'], BMVert)
             edges = filter_geom(floor_ext['geom'], BMEdge)
             bmesh.ops.translate(bm, vec=(0, 0, floor_height), verts=verts)
 
             # Offset Slab
-            bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
+            ret = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
+
+            # Material faces
+            mslab_faces.extend(slab_faces)#+ret['faces'])
+            mfloor_faces.extend(floor_faces)
+
+        # Set materials
+        unique = lambda lst : list(set(lst))
+        material_set_faces(obj, slab_mat, unique(mslab_faces))
+        material_set_faces(obj, wall_mat, unique(mfloor_faces))
 
         # -- fill top face
         bmesh.ops.contextual_create(bm, geom=edges)

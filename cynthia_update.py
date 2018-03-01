@@ -1,7 +1,7 @@
 import bpy
-from .utils import obj_clear_data
 from .cynthia_floorplan import Floorplan
 from .cynthia_floor import Floor
+from .utils import obj_clear_data
 
 
 def update_building(self, context):

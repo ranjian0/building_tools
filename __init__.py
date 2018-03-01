@@ -1242,6 +1242,8 @@ def unregister():
 
 
 if __name__ == "__main__":
+    import os
+    os.system("clear")
     # useful for continuous updates
     try:
         unregister()
