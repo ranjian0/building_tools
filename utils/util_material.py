@@ -13,6 +13,10 @@ def set_defaults(mat, diffuse, diff_int, specular, spec_int):
 	mat.specular_intensity = spec_int
 
 def material_set_faces(obj, mat, faces):
+	# if the material is not in obj.materials, append it
+	if not mat: return
+	if mat.name not in obj.data.materials:
+		link_mat(obj, mat)
 	mat_index = list(obj.data.materials).index(mat)
 	for face in faces:
 		face.material_index = mat_index

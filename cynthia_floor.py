@@ -16,14 +16,15 @@ from .utils import (
 class Floor:
 
     @classmethod
-    def build(cls, context):
-        """ Create the floorplan based on a floorplan object """
+    def build(cls, context, update=False):
+        """ Build floorplan geomerty from properties """
 
-        # -- ensure that edit mesh is a valid floorplan - (planar)
+        # -- ensure that the mesh is a valid floorplan - (planar)
         if not cls.check_planar():
             return
 
-        # -- now we can create floors
+        # -- create geometry
+        setattr(cls, "update", update)
         props = context.object.building.floors
         cls.make_floors(**kwargs_from_props(props))
 
@@ -48,7 +49,15 @@ class Floor:
         obj = bpy.context.object
 
         # -- make/get materials
-        slab_mat, wall_mat = floor_mat_slab(obj), floor_mat_wall(obj)
+        if not cls.update:
+            slab_mat = floor_mat_slab(obj)
+            obj.building.floors.mat_slab = slab_mat
+            wall_mat = floor_mat_wall(obj)
+            obj.building.floors.mat_wall = wall_mat
+        else:
+            slab_mat = kwargs.get("mat_slab")
+            wall_mat = kwargs.get("mat_wall")
+
         mslab_faces, mfloor_faces = [], []
 
         # -- get active object bmesh
@@ -80,16 +89,17 @@ class Floor:
             ret = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
 
             # Material faces
-            mslab_faces.extend(slab_faces)#+ret['faces'])
+            mslab_faces.extend(slab_faces+ret['faces'])
             mfloor_faces.extend(floor_faces)
+
+        # -- fill top face
+        ret = bmesh.ops.contextual_create(bm, geom=edges)
+        mslab_faces.extend(ret['faces'])
 
         # Set materials
         unique = lambda lst : list(set(lst))
         material_set_faces(obj, slab_mat, unique(mslab_faces))
         material_set_faces(obj, wall_mat, unique(mfloor_faces))
-
-        # -- fill top face
-        bmesh.ops.contextual_create(bm, geom=edges)
 
         # -- update normals and mesh
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces)

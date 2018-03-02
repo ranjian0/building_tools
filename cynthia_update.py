@@ -31,6 +31,6 @@ def update_building(self, context):
 
     # -- floors
     if obj.get('has_floors', False):
-        Floor.build(context)
+        Floor.build(context, True)
 
     return None 
