@@ -14,17 +14,23 @@ def ifeven(num, val1, val2):
 
 def kwargs_from_props(props):
     """ Converts all properties in a props into dict """
+    valid_types = (
+        int, float, str, tuple, bool, Vector,
+        bpy.types.Material,
+        bpy.types.Object
+        )
+
     result = {}
     for p in dir(props):
-        if p.startswith('__'):
+        if p.startswith('__') or p in ['rna_type', 'bl_rna']:
             continue
         prop = getattr(props, p)
-        if isinstance(prop, (int, float, str, tuple, bool, Vector)):
+
+        if isinstance(prop, valid_types):
             result[p] = prop
         elif isinstance(prop, bpy.types.PropertyGroup) and not isinstance(prop, type(props)):
             # property group within this property
             result.update(kwargs_from_props(prop))
-
     return result
 
 

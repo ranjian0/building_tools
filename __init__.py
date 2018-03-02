@@ -198,6 +198,11 @@ class FloorProperty(bpy.types.PropertyGroup):
         name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0, default=0.1, 
         update=update_building)
 
+    mat_slab        = PointerProperty(type=bpy.types.Material,
+        name="Slab Material", description="Material for slab faces", update=update_building) 
+    mat_wall        = PointerProperty(type=bpy.types.Material,
+        name="Wall Material", description="Material for wall faces", update=update_building)
+
     def draw(self, context, layout):
         box = layout.box()
 
@@ -209,6 +214,9 @@ class FloorProperty(bpy.types.PropertyGroup):
         col.prop(self, "slab_thickness")
         col.prop(self, "slab_outset")
 
+        col = box.column(align=True)
+        col.prop(self, "mat_slab")
+        col.prop(self, "mat_wall")
 
 class WindowProperty(bpy.types.PropertyGroup):
     win_types = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
@@ -880,7 +888,7 @@ class FloorplanOperator(bpy.types.Operator):
     """ Create a floorplan object """
     bl_idname = "cynthia.add_floorplan"
     bl_label = "Create Floorplan"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'REGISTER'}
 
     def execute(self, context):
         # Build the geometry
@@ -906,10 +914,8 @@ class FloorplanOperator(bpy.types.Operator):
 class FloorOperator(bpy.types.Operator):
     """ Creates floors from active floorplan object """
     bl_idname = "cynthia.add_floors"
-    bl_label = "Add Floors"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    props = PointerProperty(type=FloorProperty)
+    bl_label = "Create Floors"
+    bl_options = {'REGISTER'}
 
     @classmethod
     def poll(cls, context):
@@ -934,9 +940,6 @@ class FloorOperator(bpy.types.Operator):
         obj['has_floors'] = True
 
         return {'FINISHED'}
-
-    def draw(self, context):
-        self.props.draw(context, self.layout)
 
 
 class WindowOperator(bpy.types.Operator):
@@ -1210,7 +1213,7 @@ class CynthiaPanel(bpy.types.Panel):
             if active_prop.type == 'FLOOPLAN':
                 fp_props = obj.building.floorplan 
                 fp_props.draw(context, box)
-            if active_prop.type == 'FLOOR':
+            elif active_prop.type == 'FLOOR':
                 floor_props = obj.building.floors
                 floor_props.draw(context, box)
             elif active_prop.type == 'WINDOW':
@@ -1236,7 +1239,7 @@ def register():
 def unregister():
     bpy.utils.unregister_module(__name__)
 
-    del bpy.type.Object.building
+    del bpy.types.Object.building
     del bpy.types.Object.property_list
     del bpy.types.Object.property_index
 
@@ -1247,11 +1250,23 @@ if __name__ == "__main__":
     # useful for continuous updates
     try:
         unregister()
-    except:
-        print("UNREGISTERED MODULE .. FAIL")
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        print("UNREGISTERED MODULE .. FAIL", e)
     register()
 
 
     # # optional run tests
     # from .tests import CynthiaTest
     # CynthiaTest.run_tests()
+
+    # Dev --init workspace
+    # --clear
+    bpy.ops.object.select_all(action="SELECT")
+    bpy.ops.object.delete(use_global=False)
+    for mat in bpy.data.materials:
+        bpy.data.materials.remove(mat)    
+    # -- add 
+    bpy.ops.cynthia.add_floorplan()
+    bpy.ops.cynthia.add_floors()
+    bpy.context.object.building.floors.floor_count = 3
