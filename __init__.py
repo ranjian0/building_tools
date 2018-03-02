@@ -218,6 +218,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         col.prop(self, "mat_slab")
         col.prop(self, "mat_wall")
 
+
 class WindowProperty(bpy.types.PropertyGroup):
     win_types = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
     type = EnumProperty(description="Type of window",
@@ -802,8 +803,10 @@ class StaircaseProperty(bpy.types.PropertyGroup):
 
 
 class RoofProperty(bpy.types.PropertyGroup):
-    r_types = [("FLAT", "Flat", "", 0), ("GABLE", "Gable", "", 1),
-               ("HIP", "Hip", "", 2), ]
+    r_types = [
+        ("FLAT", "Flat", "", 0), 
+        ("GABLE", "Gable", "", 1),
+    ]
     type = EnumProperty(description="Type of roof",
                         items=r_types, default='FLAT')
 
@@ -820,20 +823,6 @@ class RoofProperty(bpy.types.PropertyGroup):
     orient = EnumProperty(description="Orientation of gable",
                           items=o_types, default='LEFT')
 
-    hip_amount = FloatProperty(
-        name="Hip Amount", description="Height of entire roof", min=0.01, max=100.0, default=50)
-
-    hip_region = BoolProperty(
-        name="Region", description="Is hip roof region", default=True)
-
-    hip_percent = BoolProperty(
-        name="As Percent", description="Calculate hip amount as percent", default=True)
-
-    dissolve = BoolProperty(
-        name="Dissolve", description="Dissolve geometry", default=False)
-
-    dissolve_angle = IntProperty(name="Limit Angle", description="Angle to limit geometry dissolve", min=0, max=360,
-                                 default=2)
 
     def draw(self, context, layout):
         layout.prop(self, 'type', text="")
@@ -852,23 +841,6 @@ class RoofProperty(bpy.types.PropertyGroup):
 
             row = box.row(align=True)
             row.prop(self, 'orient', expand=True)
-
-        else:
-            col = box.column()
-            col.prop(self, 'thick')
-            col.prop(self, 'outset')
-
-            col.prop(self, 'height')
-            col.prop(self, 'hip_amount')
-
-            row = col.row(align=True)
-            row.prop(self, 'hip_region', toggle=True)
-            row.prop(self, 'hip_percent', toggle=True)
-
-            col.separator()
-            col.prop(self, 'dissolve')
-            if self.dissolve:
-                col.prop(self, 'dissolve_angle')
 
 
 class BuildingProperty(bpy.types.PropertyGroup):
