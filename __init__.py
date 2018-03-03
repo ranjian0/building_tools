@@ -218,6 +218,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         col.prop(self, "mat_slab")
         col.prop(self, "mat_wall")
 
+
 class WindowProperty(bpy.types.PropertyGroup):
     win_types = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
     type = EnumProperty(description="Type of window",
@@ -841,13 +842,6 @@ class RoofProperty(bpy.types.PropertyGroup):
             row = box.row(align=True)
             row.prop(self, 'orient', expand=True)
 
-
-class BuildingProperty(bpy.types.PropertyGroup):
-
-    floorplan   = PointerProperty(type=FloorplanProperty)
-    floors      = PointerProperty(type=FloorProperty)
-    windows     = CollectionProperty(type=WindowProperty)
-    doors       = CollectionProperty(type=DoorProperty)
 
 class BuildingProperty(bpy.types.PropertyGroup):
 
