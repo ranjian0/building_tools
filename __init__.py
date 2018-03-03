@@ -42,6 +42,7 @@ from .cynthia_roof import *
 from .cynthia_staircase import *
 from .cynthia_stairs import *
 from .cynthia_update import update_building
+from .utils import ray_cast_modal, select_face_callback, hover_face_callback, facedata_from_index
 
 # =======================================================
 #
@@ -50,22 +51,27 @@ from .cynthia_update import update_building
 # =======================================================
 
 class PropertyProxy(bpy.types.PropertyGroup):
-    name = StringProperty(default="Property")
     property_items = [
         ("FLOOPLAN", "Floorplan", "", 0),
         ("FLOOR", "Floor", "", 1),
         ("WINDOW", "Window", "", 2)
     ]
-    type = EnumProperty(items=property_items)
-    id = IntProperty()
+    type    = EnumProperty(items=property_items)
+
+    name    = StringProperty(default="Property")
+    id      = IntProperty()
 
 
 class SplitProperty(bpy.types.PropertyGroup):
-    amount = FloatVectorProperty(name="Split Amount", description="How much to split geometry", min=.01, max=3.0,
-                                 subtype='XYZ', size=2, default=(2.0, 2.0))
+    amount  = FloatVectorProperty(
+        name="Split Amount", description="How much to split geometry", min=.01, max=3.0, 
+        subtype='XYZ', size=2, default=(2.0, 2.0),
+        update=update_building)
 
-    off = FloatVectorProperty(name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0,
-                              subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0))
+    off     = FloatVectorProperty(
+        name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0, 
+        subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
+        update=update_building)
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):
@@ -220,55 +226,68 @@ class FloorProperty(bpy.types.PropertyGroup):
 
 
 class WindowProperty(bpy.types.PropertyGroup):
-    win_types = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
-    type = EnumProperty(description="Type of window",
-                        items=win_types, default='BASIC')
+    win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
+    type        = EnumProperty(
+        description="Type of window", items=win_types, default='BASIC',
+        update=update_building)
 
-    fill_type = [("BAR", "Bar", "", 0), ("PANE", "Pane", "", 1)]
-    fill = EnumProperty(description="Type of fill for window",
-                        items=fill_type, default='BAR')
+    fill_type   = [("BAR", "Bar", "", 0), ("PANE", "Pane", "", 1)]
+    fill        = EnumProperty(
+        description="Type of fill for window",items=fill_type, default='BAR',
+        update=update_building)
 
-    ft = FloatProperty(name="Frame Thickness", description="Thickness of window Frame", min=0.01, max=100.0,
-                       default=0.1)
+    ft          = FloatProperty(
+        name="Frame Thickness", description="Thickness of window Frame", min=0.01, max=100.0, default=0.1,
+        update=update_building)
 
-    fd = FloatProperty(
-        name="Frame Depth", description="Depth of window Frame", min=0.0, max=100.0, default=0.1)
+    fd          = FloatProperty(
+        name="Frame Depth", description="Depth of window Frame", min=0.0, max=100.0, default=0.1,
+        update=update_building)
 
-    px = IntProperty(name="Horizontal Panes",
-                     description="Number of horizontal frames", min=0, max=100, default=1)
+    px          = IntProperty(
+        name="Horizontal Panes", description="Number of horizontal frames", min=0, max=100, default=1,
+        update=update_building)
 
-    py = IntProperty(name="Vertical Panes",
-                     description="Number of vertical frames", min=0, max=100, default=1)
+    py          = IntProperty(
+        name="Vertical Panes", description="Number of vertical frames", min=0, max=100, default=1,
+        update=update_building)
 
-    pt = FloatProperty(name="Pane Frame Thickness", description="Thickness of window pane frame", min=0.01, max=100.0,
-                       default=0.1)
+    pt          = FloatProperty(
+        name="Pane Frame Thickness", description="Thickness of window pane frame", min=0.01, max=100.0, default=0.1,
+        update=update_building)
 
-    pd = FloatProperty(name="Pane Frame Depth", description="Depth of window pane frame", min=0.01, max=100.0,
-                       default=0.01)
+    pd          = FloatProperty(
+        name="Pane Frame Depth", description="Depth of window pane frame", min=0.01, max=100.0, default=0.01,
+        update=update_building)
 
+    ares        = IntProperty(
+        name="Arc Resolution", description="Number of segements for the arc", min=0, max=1000, default=5,
+        update=update_building)
 
-    ares = IntProperty(name="Arc Resolution",
-                       description="Number of segements for the arc", min=0, max=1000, default=5)
+    aoff        = FloatProperty(
+        name="Arc Offset", description="How far arc is from top", min=0.01, max=1.0, default=0.5,
+        update=update_building)
 
-    aoff = FloatProperty(
-        name="Arc Offset", description="How far arc is from top", min=0.01, max=1.0, default=0.5)
+    aheight     = FloatProperty(
+        name="Arc Height", description="Radius of the arc", min=0.01, max=100.0, default=0.5,
+        update=update_building)
 
-    aheight = FloatProperty(
-        name="Arc Height", description="Radius of the arc", min=0.01, max=100.0, default=0.5)
+    adetail     = BoolProperty(
+        name="Arc Detail", description="Whether to add detail to arc", default=False,
+        update=update_building)
 
-    adetail = BoolProperty(
-        name="Arc Detail", description="Whether to add detail to arc", default=False)
+    dthick      = FloatProperty(
+        name="Arc Detail Size", description="Size of arc details", min=0.01, max=100.0, default=0.02,
+        update=update_building)
 
-    dthick= FloatProperty(
-        name="Arc Detail Size", description="Size of arc details", min=0.01, max=100.0, default=0.02)
-    ddepth= FloatProperty(
-        name="Arc Detail Depth", description="Depth of arc details", min=0.01, max=100.0, default=0.02)
+    ddepth      = FloatProperty(
+        name="Arc Detail Depth", description="Depth of arc details", min=0.01, max=100.0, default=0.02,
+        update=update_building)
 
-
-
-    # Window Split Options
     has_split = BoolProperty(
-        name="Add Split", description="Whether to split the window face", default=False)
+        name="Add Split", description="Whether to split the window face", default=False,
+        update=update_building)
+
     split = PointerProperty(type=SplitProperty)
 
     def draw(self, context, layout):
@@ -886,7 +905,7 @@ class FloorplanOperator(bpy.types.Operator):
 class FloorOperator(bpy.types.Operator):
     """ Creates floors from active floorplan object """
     bl_idname = "cynthia.add_floors"
-    bl_label = "Create Floors"
+    bl_label = "Add Floors"
     bl_options = {'REGISTER'}
 
     @classmethod
@@ -920,32 +939,74 @@ class WindowOperator(bpy.types.Operator):
     bl_label = "Add Window"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = PointerProperty(type=WindowProperty)
-
     @classmethod
     def poll(cls, context):
-        return context.object is not None and context.object.mode == 'EDIT'
+        return context.object is not None
 
-    def execute(self, context):
-        # props = self.props
-        # sp = props.split
+    def modal(self, context, event):
+        context.area.tag_redraw()
+        if event.type in {'MIDDLEMOUSE', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
+            return {'PASS_THROUGH'}
+        elif event.type == 'MOUSEMOVE':
+            bpy.context.window.cursor_set("HAND")
+            ray_cast_modal(self, context, event)
+            return {'RUNNING_MODAL'}
+        elif event.type == 'LEFTMOUSE' and event.value == 'PRESS':
+            self.selected_faces.append(self.face_index)
 
-        # if props.type == 'TYPE_1':
-        #     window_type1(props.ft, props.fd, props.px, props.py, props.pt, props.pd, sp.amount[0], sp.amount[1],
-        #                  sp.off[0], sp.off[1], sp.off[2], props.has_split)
+            # Add window property
+            obj     = context.object
+            prop    = obj.property_list[obj.property_index]
 
-        # elif props.type == 'TYPE_2':
-        #     window_type2(props.st, props.sd, props.ft, props.fd, props.pt, props.ares, props.aslope, props.aheight,
-        #                  props.px, props.py, props.harc, sp.amount[
-        #                      0], sp.amount[1], sp.off[0], sp.off[1], sp.off[2],
-        #                  props.has_split)
-        w = Window(self.props)
-        w.build()
+            data = obj['window_groups'][str(prop.id)]
+            if not isinstance(data, list):
+                data = data.to_list()
+            face_data = facedata_from_index(obj, self.face_index)
+            data.append(face_data)
+            obj['window_groups'][str(prop.id)] = data
 
-        return {'FINISHED'}
+            # Create geometry
+            Window.build(context, [self.face_index])
 
-    def draw(self, context):
-        self.props.draw(context, self.layout)
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            bpy.context.window.cursor_set("DEFAULT")
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle2, 'WINDOW')
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        if context.space_data.type == 'VIEW_3D':
+            # Add modal callbacks
+            args            = (self, context)
+            self._handle    = bpy.types.SpaceView3D.draw_handler_add(hover_face_callback, args, 'WINDOW', 'POST_PIXEL')
+            self._handle2   = bpy.types.SpaceView3D.draw_handler_add(select_face_callback, args, 'WINDOW', 'POST_PIXEL')
+
+            # Face selection states
+            self.face_index     = -1
+            self.selected_faces = []
+
+            # Add property proxy
+            obj         = context.object
+            prop        = obj.property_list.add()
+            win         = obj.building.windows.add()
+            prop.type   = "WINDOW"
+            prop.id     = len(obj.building.windows)-1
+            prop.name   = "Window Property {}".format(len(obj.building.windows))
+            obj.property_index          = len(obj.property_list)-1
+            
+            # Store face indices for each window property
+            obj['window_groups']                = dict()
+            obj['window_groups'][str(prop.id)]  = list()
+
+            obj['has_windows'] = True
+            
+            context.window_manager.modal_handler_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            self.report({'WARNING'}, "Active space must be a View3d")
+            return {'CANCELLED'}
 
 
 class DoorOperator(bpy.types.Operator):
@@ -1146,19 +1207,21 @@ class CynthiaPanel(bpy.types.Panel):
 
         # Draw the operators
         col = layout.column(align=True)
-        col.operator("cynthia.add_floorplan")
-        col.operator("cynthia.add_floors")
 
+        row = col.row(align=True)
+        row.operator("cynthia.add_floorplan")
+        row.operator("cynthia.add_floors")
 
-        col.operator("cynthia.add_window")
-        col.operator("cynthia.add_door")
+        row = col.row(align=True)
+        row.operator("cynthia.add_window")
+        row.operator("cynthia.add_door")
 
         row = col.row(align=True)
         row.operator("cynthia.add_balcony")
         row.operator("cynthia.add_railing")
 
         col.operator("cynthia.add_stairs")
-        col.operator("cynthia.add_staircase")
+        # col.operator("cynthia.add_staircase")
 
         col.operator("cynthia.add_roof")
 
@@ -1239,6 +1302,6 @@ if __name__ == "__main__":
     for mat in bpy.data.materials:
         bpy.data.materials.remove(mat)    
     # -- add 
-    bpy.ops.cynthia.add_floorplan()
-    bpy.ops.cynthia.add_floors()
-    bpy.context.object.building.floors.floor_count = 3
+    # bpy.ops.cynthia.add_floorplan()
+    # bpy.ops.cynthia.add_floors()
+    # bpy.context.object.building.floors.floor_count = 3

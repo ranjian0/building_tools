@@ -14,6 +14,9 @@ from .utils import (
         kwargs_from_props,
         square_face,
         select,
+        bm_from_obj,
+        bm_to_obj,
+        index_from_facedata
     )
 
 """
@@ -23,49 +26,63 @@ TODO:
 
 class Window:
 
-    def __init__(self, properties):
-        self.props = properties
-
-    def build(self):
+    @classmethod
+    def build(cls, context, facedata_list=[], update=False):
         """ Create window geometry from selected faces """
-        if self.props.type == 'BASIC':
-            self.generate_type_basic(**kwargs_from_props(self.props))
-        else:
-            self.generate_type_arched(**kwargs_from_props(self.props))
 
-    def generate_type_basic(self, **kwargs):
+        obj = context.object
+        prop_id = obj.property_list[obj.property_index].id
+        props = obj.building.windows[prop_id]
+
+        cls.facedata_list = facedata_list
+        cls.update = update
+        if props.type == 'BASIC':
+            cls.generate_type_basic(**kwargs_from_props(props))
+        else:
+            cls.generate_type_arched(**kwargs_from_props(props))
+
+    @classmethod
+    def generate_type_basic(cls, **kwargs):
         """ Generic window with inset panes """
 
         # Get active mesh
-        me = bpy.context.edit_object.data
-        bm = bmesh.from_edit_mesh(me)
+        obj = bpy.context.object
 
-        # Find selected faces
-        faces = [f for f in bm.faces if f.select]
+        bm = bm_from_obj(obj)
+
+        if cls.update:
+            # Find face with corresponding facedata
+            indices = [index_from_facedata(obj, bm, fd) for fd in cls.facedata_list]
+
+            # Find faces with given indices
+            faces = [f for f in bm.faces if f.index in indices]
+        else:
+            faces = [f for f in bm.faces if f.index in cls.facedata_list]
 
         for face in faces:
-            face.select = False
 
             # -- add a split
-            face = self.make_window_split(bm, face, **kwargs)
+            face = cls.make_window_split(bm, face, **kwargs)
 
             # -- check that split was successful
             if not face: 
                 return
 
             # -- create window frame
-            face = self.make_window_frame(bm, face, **kwargs)
+            face = cls.make_window_frame(bm, face, **kwargs)
 
             # -- add some window panes/bars
             fill = kwargs.get('fill')
             if fill == 'BAR':
-                self.make_window_bars(bm, face, **kwargs)
+                cls.make_window_bars(bm, face, **kwargs)
             else:
-                self.make_window_panes(bm, face, **kwargs)
+                cls.make_window_panes(bm, face, **kwargs)
 
-        bmesh.update_edit_mesh(me, True)
+        # bmesh.update_edit_mesh(me, True)
+        bm_to_obj(bm, obj)
 
-    def generate_type_arched(self, **kwargs):
+    @classmethod
+    def generate_type_arched(cls, **kwargs):
         """ Generic window with an arch top and panes """
 
         # Get active mesh
@@ -79,7 +96,7 @@ class Window:
             face.select = False
 
             # -- add a split
-            face = self.make_window_split(bm, face, **kwargs)
+            face = cls.make_window_split(bm, face, **kwargs)
 
             # -- check that split was successful
             if not face: 
@@ -94,33 +111,34 @@ class Window:
             lower_face = list(set(nedge.link_faces).difference([upper_face]))[-1]
 
             # -- make upperface arch
-            self.make_window_arch(bm, upper_face, **kwargs)
+            cls.make_window_arch(bm, upper_face, **kwargs)
 
             # create window frame
-            upper_face = self.make_window_frame(bm, upper_face, **kwargs)
+            upper_face = cls.make_window_frame(bm, upper_face, **kwargs)
 
             # Arch detail
-            self.make_window_arch_detail(bm, upper_face, **kwargs)
+            cls.make_window_arch_detail(bm, upper_face, **kwargs)
 
             # -- make lowerface panes/bars
-            lower_face = self.make_window_frame(bm, lower_face, **kwargs)
+            lower_face = cls.make_window_frame(bm, lower_face, **kwargs)
 
             fill = kwargs.get('fill')
             if fill == 'BAR':
-                self.make_window_bars(bm, lower_face, **kwargs)
+                cls.make_window_bars(bm, lower_face, **kwargs)
             else:
-                self.make_window_panes(bm, lower_face, **kwargs)
+                cls.make_window_panes(bm, lower_face, **kwargs)
 
         bmesh.update_edit_mesh(me, True)
             
-
-    def make_window_split(self, bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
+    @classmethod
+    def make_window_split(cls, bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
         """ Basically scales down the face given based on parameters """
         if has_split:
             return split(bm, face, amount.y, amount.x, off.x, off.y, off.z)
         return face
 
-    def make_window_frame(self, bm, face, ft=0.05, fd=0.05, **kwargs):
+    @classmethod
+    def make_window_frame(cls, bm, face, ft=0.05, fd=0.05, **kwargs):
         """ Inset and extrude to create a frame """
 
         # if there any double vertices we're in trouble
@@ -140,7 +158,8 @@ class Window:
             return f
         return face
 
-    def make_window_panes(self, bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
+    @classmethod
+    def make_window_panes(cls, bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         """ Create some window panes """
 
         n = face.normal
@@ -174,7 +193,8 @@ class Window:
 
         pass
 
-    def make_window_bars(self, bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
+    @classmethod
+    def make_window_bars(cls, bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         """ Create window bars """
 
         # Calculate center, width and height of face
@@ -241,7 +261,8 @@ class Window:
             ext = bmesh.ops.extrude_edge_only(bm, edges=ext_edges)
             bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * ((fd / 2) - eps))
 
-    def make_window_arch(self, bm, face, ares=3, aoff=.5, aheight=.4, **kwargs):
+    @classmethod
+    def make_window_arch(cls, bm, face, ares=3, aoff=.5, aheight=.4, **kwargs):
         """ Arc the top edge of a face """
 
         #bmesh.ops.inset_individual(bm, faces=[face], thickness= aheight / ares)
@@ -265,7 +286,8 @@ class Window:
             v.co.z -= aoff
             v.co.z += off 
 
-    def make_window_arch_detail(self, bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
+    @classmethod
+    def make_window_arch_detail(cls, bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
         """ Create detail in the arched face """
         if not adetail:
             return

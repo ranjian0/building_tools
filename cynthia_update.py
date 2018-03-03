@@ -1,6 +1,7 @@
 import bpy
 from .cynthia_floorplan import Floorplan
 from .cynthia_floor import Floor
+from .cynthia_window import Window
 from .utils import obj_clear_data
 
 
@@ -32,5 +33,13 @@ def update_building(self, context):
     # -- floors
     if obj.get('has_floors', False):
         Floor.build(context, True)
+
+    # -- windows
+    if obj.get('has_windows', False):
+        # Update all window property groups
+        for prop in obj.property_list:
+            if prop.type == 'WINDOW':
+                face_indices = obj['window_groups'][str(prop.id)]
+                Window.build(context, face_indices, True)
 
     return None 

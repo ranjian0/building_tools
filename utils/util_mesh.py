@@ -233,3 +233,88 @@ def split(bm, face, svertical=2, shorizontal=2, offx=0, offy=0, offz=0):
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
 
     return face
+
+
+def facedata_from_index(obj, index):
+    """ Determine unique properties of the face with the given index """
+
+    properties = {}
+
+    face = obj.data.polygons[index]
+
+    # -- normal
+    properties['normal'] = face.normal 
+
+    # -- floor
+    fcount = obj.building.floors.floor_count
+    pos = round(face.center[2], 2)
+    fheight = obj.building.floors.floor_height
+    sthick = obj.building.floors.slab_thickness
+
+    for i in range(fcount):
+        current_slab = sthick/2 + (i * fheight) + (i * (sthick/2))
+        current_floor = fheight/2 + ((i+1) * sthick) + (i * fheight)
+
+        if pos == round(current_slab, 2):
+            properties['type'] = 'SLAB'
+            properties['floor'] = i 
+            break
+        elif pos == round(current_floor, 2):
+            properties['type'] = 'FLOOR'
+            properties['floor'] = i 
+            break
+
+    # -- floor index
+    # if the floor has multiple faces in a given normal direction,
+    # floor index is the clockwise id of the face
+    polys = [p for p in obj.data.polygons if 
+        p.normal == face.normal and p.center[2] == face.center[2]    
+    ]
+    if polys:
+        polys = sorted(polys, key=lambda p : p.center[0])
+        polys = sorted(polys, key=lambda p : p.center[1])
+        polys = sorted(polys, key=lambda p : p.center[2])
+
+        index = [idx for idx, p in enumerate(polys) if p == face][-1]
+    else:
+        index = 0
+    properties['floor_index'] = index
+
+    return properties
+
+def index_from_facedata(obj, bm, face_data):
+    """ Determine the index of a face give some face data """
+    all_faces = bm.faces
+
+    # -- filter the faces with normal
+    normal = face_data.get("normal")
+    all_faces = filter(lambda f : f.normal.to_tuple(1) == tuple(normal),
+                        all_faces)
+
+    # -- filter faces with the floor number and type
+    fheight = obj.building.floors.floor_height
+    sthick = obj.building.floors.slab_thickness
+
+    floor = face_data.get('floor')
+    if face_data.get('type') == 'SLAB':
+        target_height = sthick/2 + (floor * fheight) + (floor * (sthick/2))
+    elif face_data.get('type') == 'FLOOR':
+        target_height = fheight/2 + ((floor+1) * sthick) + (floor * fheight)
+
+
+    _all_faces = []
+    for face in all_faces:
+        center = round(face.calc_center_median().z, 2)
+        target = round(target_height, 2)
+        if center == target:
+            _all_faces.append(face)
+
+    # -- filter faces with floor index
+    all_faces = sorted(_all_faces, key=lambda f : f.calc_center_median().x)
+    all_faces = sorted(all_faces, key=lambda f : f.calc_center_median().y)
+    all_faces = sorted(all_faces, key=lambda f : f.calc_center_median().z)
+
+    index = face_data.get('floor_index')
+    ret = all_faces[index]
+
+    return ret.index
