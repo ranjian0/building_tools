@@ -27,11 +27,11 @@ TODO:
 class Window:
 
     @classmethod
-    def build(cls, context, facedata_list=[], update=False):
+    def build(cls, context, facedata_list=[], update=False, id=0):
         """ Create window geometry from selected faces """
 
         obj = context.object
-        prop_id = obj.property_list[obj.property_index].id
+        prop_id = id if update else obj.property_list[obj.property_index].id
         props = obj.building.windows[prop_id]
 
         cls.facedata_list = facedata_list

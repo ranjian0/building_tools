@@ -41,6 +41,6 @@ def update_building(self, context):
         for prop in obj.property_list:
             if prop.type == 'WINDOW':
                 face_indices = obj['window_groups'][str(prop.id)]
-                Window.build(context, face_indices, True)
+                Window.build(context, face_indices, True, prop.id)
 
     return None 
