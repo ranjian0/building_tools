@@ -963,7 +963,7 @@ class WindowOperator(bpy.types.Operator):
                 data = data.to_list()
             face_data = facedata_from_index(obj, self.face_index)
             data.append(face_data)
-            obj['window_groups'][str(prop.id)] = data
+            obj['window_groups'].update({str(prop.id) : data})
 
             # Create geometry
             Window.build(context, [self.face_index])
@@ -997,7 +997,8 @@ class WindowOperator(bpy.types.Operator):
             obj.property_index          = len(obj.property_list)-1
             
             # Store face indices for each window property
-            obj['window_groups']                = dict()
+            if not obj.get('window_groups'):
+                obj['window_groups']            = dict()
             obj['window_groups'][str(prop.id)]  = list()
 
             obj['has_windows'] = True
@@ -1302,6 +1303,7 @@ if __name__ == "__main__":
     for mat in bpy.data.materials:
         bpy.data.materials.remove(mat)    
     # -- add 
-    # bpy.ops.cynthia.add_floorplan()
-    # bpy.ops.cynthia.add_floors()
-    # bpy.context.object.building.floors.floor_count = 3
+    bpy.ops.cynthia.add_floorplan()
+    bpy.ops.cynthia.add_floors()
+    bpy.context.object.building.floors.floor_count = 3
+    bpy.context.object.building.floors.floor_height = 3

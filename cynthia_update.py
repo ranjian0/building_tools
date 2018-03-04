@@ -2,9 +2,10 @@ import bpy
 from .cynthia_floorplan import Floorplan
 from .cynthia_floor import Floor
 from .cynthia_window import Window
-from .utils import obj_clear_data
+from .utils import obj_clear_data, Logger
 
 
+LG = Logger(__name__)
 def update_building(self, context):
     """Update building geometry
     
