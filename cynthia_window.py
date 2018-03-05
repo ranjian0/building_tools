@@ -182,7 +182,7 @@ class Window:
     def make_window_panes(cls, bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         """ Create some window panes """
 
-        # -- make/get frame materials
+        # -- make/get pane materials
         obj = bpy.context.object
         pane_mat = kwargs.get("mat_pane")
         if not pane_mat:
@@ -230,6 +230,16 @@ class Window:
     def make_window_bars(cls, bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         """ Create window bars """
 
+        # -- make/get bar materials
+        obj = bpy.context.object
+        bar_mat = kwargs.get("mat_bar")
+        if not bar_mat:
+            bar_mat = window_mat_bars(obj)
+            win_index = obj.property_list[obj.property_index].id
+            obj.building.windows[win_index].mat_bar = bar_mat
+        mbar_faces = []
+
+
         # Calculate center, width and height of face
         width, height = calc_face_dimensions(face)
         fc = face.calc_center_median()
@@ -242,6 +252,10 @@ class Window:
             ret = bmesh.ops.duplicate(bm, geom=[face])
             square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
             verts = filter_geom(ret['geom'], BMVert)
+
+            # Material
+            mbar_faces.extend(filter_geom(ret['geom'], BMFace))
+            material_set_faces(obj, bar_mat, mbar_faces)
 
             # Scale and translate
             bmesh.ops.scale(bm, verts=verts, vec=(1, 1, pt), space=Matrix.Translation(-fc))
@@ -260,6 +274,10 @@ class Window:
             # Duplicate
             ret = bmesh.ops.duplicate(bm, geom=[face])
             verts = filter_geom(ret['geom'], BMVert)
+
+            # Material
+            mbar_faces.extend(filter_geom(ret['geom'], BMFace))
+            material_set_faces(obj, bar_mat, mbar_faces)
 
             # Scale and Translate
             bmesh.ops.scale(bm, verts=verts, vec=(pt, pt, 1), space=Matrix.Translation(-fc))
