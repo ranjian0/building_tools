@@ -144,15 +144,22 @@ class Window:
     def make_window_frame(cls, bm, face, ft=0.05, fd=0.05, **kwargs):
         """ Inset and extrude to create a frame """
 
-        # -- make/get frame materials
+        # -- make/get materials
         obj = bpy.context.object
         frame_mat = kwargs.get("mat_frame")
+        glass_mat = kwargs.get("mat_glass")
         if not frame_mat:
             frame_mat = window_mat_frame(obj)
             win_index = obj.property_list[obj.property_index].id
             obj.building.windows[win_index].mat_frame = frame_mat
+        if not glass_mat:
+            glass_mat = window_mat_glass(obj)
+            win_index = obj.property_list[obj.property_index].id
+            obj.building.windows[win_index].mat_glass = glass_mat
             
-        frame_faces = []
+        frame_faces, glass_faces = [], []
+        glass_faces.append(face)
+        material_set_faces(obj, glass_mat, glass_faces)
 
         # if there any double vertices we're in trouble
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
