@@ -47,7 +47,6 @@ class Window:
 
         # Get active mesh
         obj = bpy.context.object
-
         bm = bm_from_obj(obj)
 
         if cls.update:
@@ -78,7 +77,6 @@ class Window:
             else:
                 cls.make_window_panes(bm, face, **kwargs)
 
-        # bmesh.update_edit_mesh(me, True)
         bm_to_obj(bm, obj)
 
     @classmethod
@@ -86,8 +84,8 @@ class Window:
         """ Generic window with an arch top and panes """
 
         # Get active mesh
-        me = bpy.context.edit_object.data
-        bm = bmesh.from_edit_mesh(me)
+        obj = bpy.context.object
+        bm = bm_from_obj(obj)
 
         # Find selected faces
         faces = [f for f in bm.faces if f.select]
@@ -128,7 +126,7 @@ class Window:
             else:
                 cls.make_window_panes(bm, lower_face, **kwargs)
 
-        bmesh.update_edit_mesh(me, True)
+        bm_to_obj(bm, obj)
             
     @classmethod
     def make_window_split(cls, bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
