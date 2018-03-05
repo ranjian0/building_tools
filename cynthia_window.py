@@ -38,7 +38,7 @@ class Window:
         cls.update = update
         if props.type == 'BASIC':
             cls.generate_type_basic(**kwargs_from_props(props))
-        else:
+        elif props.type == 'ARCHED':
             cls.generate_type_arched(**kwargs_from_props(props))
 
     @classmethod
