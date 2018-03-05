@@ -49,14 +49,14 @@ class Floor:
         obj = bpy.context.object
 
         # -- make/get materials
-        if not cls.update:
+        slab_mat = kwargs.get("mat_slab")
+        wall_mat = kwargs.get("mat_wall")
+        if not slab_mat
             slab_mat = floor_mat_slab(obj)
             obj.building.floors.mat_slab = slab_mat
+        if not wall_mat:
             wall_mat = floor_mat_wall(obj)
             obj.building.floors.mat_wall = wall_mat
-        else:
-            slab_mat = kwargs.get("mat_slab")
-            wall_mat = kwargs.get("mat_wall")
 
         mslab_faces, mfloor_faces = [], []
 

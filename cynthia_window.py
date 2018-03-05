@@ -146,12 +146,12 @@ class Window:
 
         # -- make/get frame materials
         obj = bpy.context.object
-        if not cls.update:
+        frame_mat = kwargs.get("mat_frame")
+        if not frame_mat:
             frame_mat = window_mat_frame(obj)
             win_index = obj.property_list[obj.property_index].id
             obj.building.windows[win_index].mat_frame = frame_mat
-        else:
-            frame_mat = kwargs.get("mat_frame")
+            
         frame_faces = []
 
         # if there any double vertices we're in trouble
