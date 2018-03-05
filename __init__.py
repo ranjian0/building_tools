@@ -284,11 +284,23 @@ class WindowProperty(bpy.types.PropertyGroup):
         name="Arc Detail Depth", description="Depth of arc details", min=0.01, max=100.0, default=0.02,
         update=update_building)
 
-    has_split = BoolProperty(
+    has_split   = BoolProperty(
         name="Add Split", description="Whether to split the window face", default=False,
         update=update_building)
 
-    split = PointerProperty(type=SplitProperty)
+    split       = PointerProperty(type=SplitProperty)
+
+    mat_bar     = PointerProperty(type=bpy.types.Material,
+        name="Bar Material", description="Material for window bars", update=update_building) 
+
+    mat_frame   = PointerProperty(type=bpy.types.Material,
+        name="Frame Material", description="Material for window frame", update=update_building)
+
+    mat_pane    = PointerProperty(type=bpy.types.Material,
+        name="Pane Material", description="Material for window panes", update=update_building)
+
+    mat_glass   = PointerProperty(type=bpy.types.Material,
+        name="Glass Material", description="Material for window glass", update=update_building)
 
     def draw(self, context, layout):
         row = layout.row()
@@ -351,6 +363,16 @@ class WindowProperty(bpy.types.PropertyGroup):
 
             col = box.column(align=True)
             col.prop(self.split, 'off')
+
+        box = layout.box()
+        box.label("Materials")
+        col = box.column(align=True)
+        col.prop(self, "mat_frame")
+        if self.fill == 'BAR':
+            col.prop(self, "mat_bar")
+        else:
+            col.prop(self, "mat_pane")
+        col.prop(self, "mat_glass")
 
 
 class DoorProperty(bpy.types.PropertyGroup):

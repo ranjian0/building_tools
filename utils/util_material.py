@@ -63,3 +63,14 @@ def floor_mat_wall(obj):
 				'specular'			: (1, 1, 1),
 				'specular_intensity': 0
 			})
+
+# WINDOW MATERIALS
+
+def window_mat_frame(obj):
+	pass
+
+def window_mat_pane(obj):
+	pass
+
+def window_mat_glass(obj):
+	pass
