@@ -24,29 +24,42 @@ def material_set_faces(obj, mat, faces):
 def has_material(obj, name):
 	return name in obj.data.materials.keys()
 
+def template_create_materials(obj, name, defaults):
+	mat_name = name
+	if has_material(obj, mat_name):
+		mat = obj.data.materials[mat_name]
+	else:
+		mat = create_mat(mat_name)
+		link_mat(obj, mat)
+
+		# set some material defaults
+		diffuse 	= defaults.get('diffuse')
+		diff_int 	= defaults.get('diffuse_intensity')
+		specular 	= defaults.get('specular')
+		spec_int 	= defaults.get('specular_intensity')
+		set_defaults(mat, diffuse, diff_int, specular, spec_int)
+	return mat
+
 
 # FLOOR MATERIALS
 
 def floor_mat_slab(obj):
-	mat_name = "material_slab"
-	if has_material(obj, mat_name):
-		mat = obj.data.materials[mat_name]
-	else:
-		mat = create_mat(mat_name)
-		link_mat(obj, mat)
+	return template_create_materials(obj, 
+			"material_slab", 
+			{
+				'diffuse' 			: (.4, .35, .3),
+				'diffuse_intensity' : .8,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
 
-		# set some material defaults
-		set_defaults(mat, (.4, .35, .3), .8, (1, 1, 1), 0)
-	return mat
 
 def floor_mat_wall(obj):
-	mat_name = "material_wall"
-	if has_material(obj, mat_name):
-		mat = obj.data.materials[mat_name]
-	else:
-		mat = create_mat(mat_name)
-		link_mat(obj, mat)
-
-		# set some material defaults
-		set_defaults(mat, (.3, .25, .13), .8, (1, 1, 1), 0)
-	return mat
+	return template_create_materials(obj, 
+			"material_wall", 
+			{
+				'diffuse' 			: (.3, .25, .13),
+				'diffuse_intensity' : .8,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
