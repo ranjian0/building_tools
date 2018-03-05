@@ -67,7 +67,14 @@ def floor_mat_wall(obj):
 # WINDOW MATERIALS
 
 def window_mat_frame(obj):
-	pass
+	return template_create_materials(obj, 
+			"material_frame", 
+			{
+				'diffuse' 			: (.8, .8, .8),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
 
 def window_mat_pane(obj):
 	pass

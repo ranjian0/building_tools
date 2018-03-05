@@ -16,7 +16,9 @@ from .utils import (
         select,
         bm_from_obj,
         bm_to_obj,
-        index_from_facedata
+        index_from_facedata,
+        material_set_faces,
+        window_mat_frame
     )
 
 
@@ -139,20 +141,37 @@ class Window:
     def make_window_frame(cls, bm, face, ft=0.05, fd=0.05, **kwargs):
         """ Inset and extrude to create a frame """
 
+        # -- make/get frame materials
+        obj = bpy.context.object
+        if not cls.update:
+            frame_mat = window_mat_frame(obj)
+            win_index = obj.property_list[obj.property_index].id
+            obj.building.windows[win_index].mat_frame = frame_mat
+        else:
+            frame_mat = kwargs.get("mat_frame")
+        frame_faces = []
+
         # if there any double vertices we're in trouble
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
 
         # Make frame inset - frame thickness
         if ft > 0:
-            bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
+            res = bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
+            frame_faces.extend(res['faces'])
+
 
         # Make frame extrude - frame depth
-        # --fucking normals
         bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
         if fd > 0:
+            current_faces = list(bm.faces)
             ret = bmesh.ops.extrude_discrete_faces(bm, faces=[face])
             f = ret['faces'][0]
             bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
+
+            current_faces.append(f)
+            new_faces = set(list(bm.faces)).difference(current_faces)
+            frame_faces.extend(list(new_faces))
+            material_set_faces(obj, frame_mat, frame_faces)
             return f
         return face
 
