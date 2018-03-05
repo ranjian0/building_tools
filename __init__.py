@@ -42,7 +42,12 @@ from .cynthia_roof import *
 from .cynthia_staircase import *
 from .cynthia_stairs import *
 from .cynthia_update import update_building
-from .utils import ray_cast_modal, select_face_callback, hover_face_callback, facedata_from_index
+from .utils import (
+        ray_cast_modal, 
+        select_face_callback, 
+        hover_face_callback, 
+        facedata_from_index, 
+        Template_Modal_OP)
 
 # =======================================================
 #
@@ -955,81 +960,45 @@ class FloorOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class WindowOperator(bpy.types.Operator):
+class WindowOperator(Template_Modal_OP):
     """ Creates windows on selected mesh faces """
     bl_idname = "cynthia.add_window"
     bl_label = "Add Window"
     bl_options = {'REGISTER', 'UNDO'}
 
-    @classmethod
-    def poll(cls, context):
-        return context.object is not None
+    def modal_setup(self, context, event):
 
-    def modal(self, context, event):
-        context.area.tag_redraw()
-        if event.type in {'MIDDLEMOUSE', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
-            return {'PASS_THROUGH'}
-        elif event.type == 'MOUSEMOVE':
-            bpy.context.window.cursor_set("HAND")
-            ray_cast_modal(self, context, event)
-            return {'RUNNING_MODAL'}
-        elif event.type == 'LEFTMOUSE' and event.value == 'PRESS':
-            self.selected_faces.append(self.face_index)
+        # Add window property
+        obj     = context.object
+        prop    = obj.property_list[obj.property_index]
 
-            # Add window property
-            obj     = context.object
-            prop    = obj.property_list[obj.property_index]
+        data = obj['window_groups'][str(prop.id)]
+        if not isinstance(data, list):
+            data = data.to_list()
+        face_data = facedata_from_index(obj, self.face_index)
+        data.append(face_data)
+        obj['window_groups'].update({str(prop.id) : data})
 
-            data = obj['window_groups'][str(prop.id)]
-            if not isinstance(data, list):
-                data = data.to_list()
-            face_data = facedata_from_index(obj, self.face_index)
-            data.append(face_data)
-            obj['window_groups'].update({str(prop.id) : data})
+        # Create geometry
+        Window.build(context, [self.face_index])
 
-            # Create geometry
-            Window.build(context, [self.face_index])
+    def invoke_setup(self, context, event):
 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
-            bpy.context.window.cursor_set("DEFAULT")
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle2, 'WINDOW')
-            return {'CANCELLED'}
+        # Add property proxy
+        obj         = context.object
+        prop        = obj.property_list.add()
+        win         = obj.building.windows.add()
+        prop.type   = "WINDOW"
+        prop.id     = len(obj.building.windows)-1
+        prop.name   = "Window Property {}".format(len(obj.building.windows))
+        obj.property_index          = len(obj.property_list)-1
+        
+        # Store face indices for each window property
+        if not obj.get('window_groups'):
+            obj['window_groups']            = dict()
+        obj['window_groups'][str(prop.id)]  = list()
 
-        return {'RUNNING_MODAL'}
-
-    def invoke(self, context, event):
-        if context.space_data.type == 'VIEW_3D':
-            # Add modal callbacks
-            args            = (self, context)
-            self._handle    = bpy.types.SpaceView3D.draw_handler_add(hover_face_callback, args, 'WINDOW', 'POST_PIXEL')
-            self._handle2   = bpy.types.SpaceView3D.draw_handler_add(select_face_callback, args, 'WINDOW', 'POST_PIXEL')
-
-            # Face selection states
-            self.face_index     = -1
-            self.selected_faces = []
-
-            # Add property proxy
-            obj         = context.object
-            prop        = obj.property_list.add()
-            win         = obj.building.windows.add()
-            prop.type   = "WINDOW"
-            prop.id     = len(obj.building.windows)-1
-            prop.name   = "Window Property {}".format(len(obj.building.windows))
-            obj.property_index          = len(obj.property_list)-1
-            
-            # Store face indices for each window property
-            if not obj.get('window_groups'):
-                obj['window_groups']            = dict()
-            obj['window_groups'][str(prop.id)]  = list()
-
-            obj['has_windows'] = True
-            
-            context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
-        else:
-            self.report({'WARNING'}, "Active space must be a View3d")
-            return {'CANCELLED'}
+        obj['has_windows'] = True
 
 
 class DoorOperator(bpy.types.Operator):

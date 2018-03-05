@@ -146,3 +146,52 @@ def ray_cast_modal(self, context, event):
         if hit_face is None: 
             hit_face = -1
     self.face_index = hit_face
+
+class Template_Modal_OP(bpy.types.Operator):
+
+    def modal_setup(self, context, event):
+        pass
+
+    def invoke_setup(self, context, event):
+        pass
+
+    @classmethod
+    def poll(cls, context):
+        return context.object is not None
+
+    def modal(self, context, event):
+        context.area.tag_redraw()
+        if event.type in {'MIDDLEMOUSE', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
+            return {'PASS_THROUGH'}
+        elif event.type == 'MOUSEMOVE':
+            bpy.context.window.cursor_set("HAND")
+            ray_cast_modal(self, context, event)
+            return {'RUNNING_MODAL'}
+        elif event.type == 'LEFTMOUSE' and event.value == 'PRESS':
+            self.selected_faces.append(self.face_index)
+            self.modal_setup(context, event)
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            bpy.context.window.cursor_set("DEFAULT")
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle2, 'WINDOW')
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        if context.space_data.type == 'VIEW_3D':
+            # Add modal callbacks
+            args            = (self, context)
+            self._handle    = bpy.types.SpaceView3D.draw_handler_add(hover_face_callback, args, 'WINDOW', 'POST_PIXEL')
+            self._handle2   = bpy.types.SpaceView3D.draw_handler_add(select_face_callback, args, 'WINDOW', 'POST_PIXEL')
+
+            # Face selection states
+            self.face_index     = -1
+            self.selected_faces = []
+            
+            self.invoke_setup(context, event)
+            context.window_manager.modal_handler_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            self.report({'WARNING'}, "Active space must be a View3d")
+            return {'CANCELLED'}
