@@ -87,12 +87,16 @@ class Window:
         obj = bpy.context.object
         bm = bm_from_obj(obj)
 
-        # Find selected faces
-        faces = [f for f in bm.faces if f.select]
+        if cls.update:
+            # Find face with corresponding facedata
+            indices = [index_from_facedata(obj, bm, fd) for fd in cls.facedata_list]
+
+            # Find faces with given indices
+            faces = [f for f in bm.faces if f.index in indices]
+        else:
+            faces = [f for f in bm.faces if f.index in cls.facedata_list]
 
         for face in faces:
-            face.select = False
-
             # -- add a split
             face = cls.make_window_split(bm, face, **kwargs)
 
