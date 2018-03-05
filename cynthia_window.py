@@ -347,6 +347,15 @@ class Window:
     @classmethod
     def make_window_arch_detail(cls, bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
         """ Create detail in the arched face """
+
+        obj = bpy.context.object
+        pane_mat = kwargs.get("mat_pane")
+        if not pane_mat:
+            pane_mat = window_mat_pane(obj)
+            win_index = obj.property_list[obj.property_index].id
+            obj.building.windows[win_index].mat_pane = pane_mat
+        mpane_faces = []
+
         if not adetail:
             return
 
@@ -358,6 +367,9 @@ class Window:
         if dthick > 0:
             ret = bmesh.ops.inset_individual(bm, faces=res['faces'], thickness=dthick)
             bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+
+            mpane_faces.extend((ret['faces']))
+            material_set_faces(obj, pane_mat, mpane_faces)
     
             ret = bmesh.ops.extrude_discrete_faces(bm, faces=res['faces'])
             verts = [v for f in ret['faces'] for v in f.verts]
