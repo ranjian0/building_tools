@@ -77,7 +77,31 @@ def window_mat_frame(obj):
 			})
 
 def window_mat_pane(obj):
-	pass
+	return template_create_materials(obj, 
+			"material_pane", 
+			{
+				'diffuse' 			: (0, .6, 0),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
+
+def window_mat_bars(obj):
+	return template_create_materials(obj, 
+			"material_bar", 
+			{
+				'diffuse' 			: (0, .6, .0),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
 
 def window_mat_glass(obj):
-	pass
+	return template_create_materials(obj, 
+			"material_glass", 
+			{
+				'diffuse' 			: (0, .1, .6),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})

@@ -18,7 +18,10 @@ from .utils import (
         bm_to_obj,
         index_from_facedata,
         material_set_faces,
-        window_mat_frame
+        window_mat_frame,
+        window_mat_pane,
+        window_mat_bars,
+        window_mat_glass,
     )
 
 
@@ -179,6 +182,16 @@ class Window:
     def make_window_panes(cls, bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         """ Create some window panes """
 
+        # -- make/get frame materials
+        obj = bpy.context.object
+        pane_mat = kwargs.get("mat_pane")
+        if not pane_mat:
+            pane_mat = window_mat_pane(obj)
+            win_index = obj.property_list[obj.property_index].id
+            obj.building.windows[win_index].mat_pane = pane_mat
+        mpane_faces = []
+
+
         n = face.normal
         v_edges = filter_vertical_edges(face.edges, n)
         h_edges = filter_horizontal_edges(face.edges, n)
@@ -204,6 +217,9 @@ class Window:
         if do_panes:
             pane_faces = list({f for ed in e for f in ed.link_faces})
             panes = bmesh.ops.inset_individual(bm, faces=pane_faces, thickness=pt)
+
+            mpane_faces.extend((panes['faces']))
+            material_set_faces(obj, pane_mat, mpane_faces)
 
             for f in pane_faces:
                 bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pd)
