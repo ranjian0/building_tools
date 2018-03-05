@@ -19,10 +19,6 @@ from .utils import (
         index_from_facedata
     )
 
-"""
-TODO:
-    - Remove split edge in the arched window
-"""
 
 class Window:
 
