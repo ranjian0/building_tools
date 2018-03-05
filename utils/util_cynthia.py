@@ -147,6 +147,7 @@ def ray_cast_modal(self, context, event):
             hit_face = -1
     self.face_index = hit_face
 
+
 class Template_Modal_OP(bpy.types.Operator):
 
     def modal_setup(self, context, event):

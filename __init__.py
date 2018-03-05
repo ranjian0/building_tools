@@ -57,7 +57,7 @@ from .utils import (
 
 class PropertyProxy(bpy.types.PropertyGroup):
     property_items = [
-        ("FLOOPLAN", "Floorplan", "", 0),
+        ("FLOORPLAN", "Floorplan", "", 0),
         ("FLOOR", "Floor", "", 1),
         ("WINDOW", "Window", "", 2)
     ]
@@ -918,7 +918,7 @@ class FloorplanOperator(bpy.types.Operator):
         obj         = context.object
         prop        = obj.property_list.add()
         prop.id     = len(obj.property_list)
-        prop.type   = "FLOOPLAN"
+        prop.type   = "FLOORPLAN"
         prop.name   = "Floorplan Property"
 
         obj.property_index = len(obj.property_list)-1
@@ -955,7 +955,7 @@ class FloorOperator(bpy.types.Operator):
         obj.property_index = len(obj.property_list)-1
 
         # Add flag to be used in update
-        obj['has_floors'] = True
+        obj['has_floor'] = True
 
         return {'FINISHED'}
 
@@ -1169,6 +1169,27 @@ class RoofOperator(bpy.types.Operator):
         self.props.draw(context, self.layout)
 
 
+class RemovePropertyOperator(bpy.types.Operator):
+    """ Create roof on selected mesh faces """
+    bl_idname = "cynthia.remove_property"
+    bl_label = "Remove Property"
+    bl_options = {'REGISTER'}
+
+    def execute(self, context):
+        obj = context.object 
+
+        # remove property
+        idx = obj.property_index
+        obj.property_index -= 1 
+        obj.property_list.remove(idx)
+
+        # Update building
+        update_building(self, context)
+        context.area.tag_redraw()
+
+        return {'FINISHED'}
+
+
 # =======================================================
 #
 #           PANEL UI
@@ -1178,7 +1199,9 @@ class RoofOperator(bpy.types.Operator):
 class PROP_items(bpy.types.UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        layout.prop(item, "name", text="", emboss=False, translate=False, icon='SNAP_PEEL_OBJECT')
+        sp = layout.split(percentage=.9)
+        sp.prop(item, "name", text="", emboss=False, translate=False, icon='SNAP_PEEL_OBJECT')
+        sp.operator("cynthia.remove_property", text="", emboss=False, icon="X")
 
     def invoke(self, context, event):
         pass   

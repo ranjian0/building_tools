@@ -53,7 +53,6 @@ def floor_mat_slab(obj):
 				'specular_intensity': 0
 			})
 
-
 def floor_mat_wall(obj):
 	return template_create_materials(obj, 
 			"material_wall", 

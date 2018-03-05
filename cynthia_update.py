@@ -26,21 +26,16 @@ def update_building(self, context):
     obj = context.object
     obj_clear_data(obj)
 
-    # Regenerate
-    # --floorplan
-    if obj.get('has_floorplan', False):
-        Floorplan.build(True, obj)
+    properties = obj.property_list
+    for prop in properties:
+        if prop.type == 'FLOORPLAN':
+            Floorplan.build(True, obj)
 
-    # -- floors
-    if obj.get('has_floors', False):
-        Floor.build(context, True)
+        elif prop.type == 'FLOOR':
+            Floor.build(context, True)
 
-    # -- windows
-    if obj.get('has_windows', False):
-        # Update all window property groups
-        for prop in obj.property_list:
-            if prop.type == 'WINDOW':
-                face_indices = obj['window_groups'][str(prop.id)]
-                Window.build(context, face_indices, True, prop.id)
+        elif prop.type == 'WINDOW':
+            face_indices = obj['window_groups'][str(prop.id)]
+            Window.build(context, face_indices, True, prop.id)
 
     return None 
