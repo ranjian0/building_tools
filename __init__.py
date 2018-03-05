@@ -43,9 +43,6 @@ from .cynthia_staircase import *
 from .cynthia_stairs import *
 from .cynthia_update import update_building
 from .utils import (
-        ray_cast_modal, 
-        select_face_callback, 
-        hover_face_callback, 
         facedata_from_index, 
         Template_Modal_OP)
 
