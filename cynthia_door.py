@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from bmesh.types import BMEdge, BMVert
 from mathutils import Vector
-from .utils import ( 
+from .utils import (
         split,
         filter_geom,
         filter_vertical_edges,
@@ -119,7 +119,7 @@ class Door:
 
     @classmethod
     def make_door_panes(cls, bm, face, panned=False, px=2, py=2, pt=.01, pd=.01, offset=0.5, width=.7, **kwargs):
-        if not panned: 
+        if not panned:
             return face
 
         n = face.normal

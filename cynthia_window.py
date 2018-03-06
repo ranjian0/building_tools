@@ -65,7 +65,7 @@ class Window:
             face = cls.make_window_split(bm, face, **kwargs)
 
             # -- check that split was successful
-            if not face: 
+            if not face:
                 return
 
             # -- create window frame
@@ -102,7 +102,7 @@ class Window:
             face = cls.make_window_split(bm, face, **kwargs)
 
             # -- check that split was successful
-            if not face: 
+            if not face:
                 return
 
             # subdivide the face horizontally
@@ -110,7 +110,7 @@ class Window:
             res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=1)
             nedge = filter_geom(res['geom_inner'], BMEdge)[-1]
 
-            upper_face = face 
+            upper_face = face
             lower_face = list(set(nedge.link_faces).difference([upper_face]))[-1]
 
             # -- make upperface arch
@@ -132,7 +132,7 @@ class Window:
                 cls.make_window_panes(bm, lower_face, **kwargs)
 
         bm_to_obj(bm, obj)
-            
+
     @classmethod
     def make_window_split(cls, bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
         """ Basically scales down the face given based on parameters """
@@ -156,7 +156,7 @@ class Window:
             glass_mat = window_mat_glass(obj)
             win_index = obj.property_list[obj.property_index].id
             obj.building.windows[win_index].mat_glass = glass_mat
-            
+
         frame_faces, glass_faces = [], []
         glass_faces.append(face)
         material_set_faces(obj, glass_mat, glass_faces)
@@ -342,7 +342,7 @@ class Window:
         for idx, v in enumerate(verts):
             off = sin(angle*idx) * aheight
             v.co.z -= aoff
-            v.co.z += off 
+            v.co.z += off
 
     @classmethod
     def make_window_arch_detail(cls, bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
@@ -370,7 +370,7 @@ class Window:
 
             mpane_faces.extend((ret['faces']))
             material_set_faces(obj, pane_mat, mpane_faces)
-    
+
             ret = bmesh.ops.extrude_discrete_faces(bm, faces=res['faces'])
             verts = [v for f in ret['faces'] for v in f.verts]
             bmesh.ops.translate(bm, verts=verts, vec=-fn * ddepth)

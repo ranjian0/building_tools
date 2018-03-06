@@ -44,8 +44,8 @@ def template_create_materials(obj, name, defaults):
 # FLOOR MATERIALS
 
 def floor_mat_slab(obj):
-	return template_create_materials(obj, 
-			"material_slab", 
+	return template_create_materials(obj,
+			"material_slab",
 			{
 				'diffuse' 			: (.4, .35, .3),
 				'diffuse_intensity' : .8,
@@ -54,8 +54,8 @@ def floor_mat_slab(obj):
 			})
 
 def floor_mat_wall(obj):
-	return template_create_materials(obj, 
-			"material_wall", 
+	return template_create_materials(obj,
+			"material_wall",
 			{
 				'diffuse' 			: (.3, .25, .13),
 				'diffuse_intensity' : .8,
@@ -66,8 +66,8 @@ def floor_mat_wall(obj):
 # WINDOW MATERIALS
 
 def window_mat_frame(obj):
-	return template_create_materials(obj, 
-			"material_frame", 
+	return template_create_materials(obj,
+			"material_frame",
 			{
 				'diffuse' 			: (.8, .8, .8),
 				'diffuse_intensity' : 1,
@@ -76,8 +76,8 @@ def window_mat_frame(obj):
 			})
 
 def window_mat_pane(obj):
-	return template_create_materials(obj, 
-			"material_pane", 
+	return template_create_materials(obj,
+			"material_pane",
 			{
 				'diffuse' 			: (0, .6, 0),
 				'diffuse_intensity' : 1,
@@ -86,8 +86,8 @@ def window_mat_pane(obj):
 			})
 
 def window_mat_bars(obj):
-	return template_create_materials(obj, 
-			"material_bar", 
+	return template_create_materials(obj,
+			"material_bar",
 			{
 				'diffuse' 			: (0, .6, .0),
 				'diffuse_intensity' : 1,
@@ -96,8 +96,8 @@ def window_mat_bars(obj):
 			})
 
 def window_mat_glass(obj):
-	return template_create_materials(obj, 
-			"material_glass", 
+	return template_create_materials(obj,
+			"material_glass",
 			{
 				'diffuse' 			: (0, .1, .6),
 				'diffuse_intensity' : 1,

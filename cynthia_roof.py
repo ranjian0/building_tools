@@ -9,7 +9,7 @@
 def make_flat_roof(bm, thickness=.1, outset=.1):
     """ Create a flat extrusion on selected faces """
 
-    # -- get selected edges    
+    # -- get selected edges
     edges = [e for e in bm.edges if e.select]
 
     # -- extrude edges and scale outwards

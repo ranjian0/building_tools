@@ -242,7 +242,7 @@ def facedata_from_index(obj, index):
     face = obj.data.polygons[index]
 
     # -- normal
-    properties['normal'] = face.normal 
+    properties['normal'] = face.normal
 
     # -- floor
     fcount = obj.building.floors.floor_count
@@ -256,18 +256,18 @@ def facedata_from_index(obj, index):
 
         if pos == round(current_slab, 2):
             properties['type'] = 'SLAB'
-            properties['floor'] = i 
+            properties['floor'] = i
             break
         elif pos == round(current_floor, 2):
             properties['type'] = 'FLOOR'
-            properties['floor'] = i 
+            properties['floor'] = i
             break
 
     # -- floor index
     # if the floor has multiple faces in a given normal direction,
     # floor index is the clockwise id of the face
-    polys = [p for p in obj.data.polygons if 
-        p.normal == face.normal and p.center[2] == face.center[2]    
+    polys = [p for p in obj.data.polygons if
+        p.normal == face.normal and p.center[2] == face.center[2]
     ]
     if polys:
         polys = sorted(polys, key=lambda p : p.center[0])

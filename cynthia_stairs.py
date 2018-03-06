@@ -67,7 +67,7 @@ def make_stairs_type1(step_count=6, step_width=.5, scale=0, bottom_faces=False):
                     'vert']
                 cverts = list(set(rvert + dverts))
 
-                # Fill a face 
+                # Fill a face
                 bmesh.ops.contextual_create(bm, geom=cverts)
 
                 # Update vertices for contextual fill

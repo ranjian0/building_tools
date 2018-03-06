@@ -87,7 +87,7 @@ def select_face_callback(self, context):
 
 def hover_face_callback(self, context):
     """ Draw an overlay on the face the mouse cursor is over """
-    if self.face_index < 0: return     
+    if self.face_index < 0: return
     obj = context.object
     face = obj.data.polygons[self.face_index]
     vertices = obj.data.vertices
@@ -143,7 +143,7 @@ def ray_cast_modal(self, context, event):
     if obj.type == 'MESH':
         matrix = obj.matrix_world.copy()
         hit, normal, hit_face = obj_ray_cast(obj, matrix)
-        if hit_face is None: 
+        if hit_face is None:
             hit_face = -1
     self.face_index = hit_face
 
@@ -189,7 +189,7 @@ class Template_Modal_OP(bpy.types.Operator):
             # Face selection states
             self.face_index     = -1
             self.selected_faces = []
-            
+
             self.invoke_setup(context, event)
             context.window_manager.modal_handler_add(self)
             return {'RUNNING_MODAL'}

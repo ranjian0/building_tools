@@ -29,11 +29,11 @@ bl_info = {
     "category": "Add Mesh"
 }
 
-import bpy 
+import bpy
 from bpy.props import *
 
 from .cynthia_floorplan import Floorplan
-from .cynthia_floor import Floor 
+from .cynthia_floor import Floor
 from .cynthia_window import Window
 from .cynthia_door import Door
 from .cynthia_balcony import *
@@ -43,7 +43,7 @@ from .cynthia_staircase import *
 from .cynthia_stairs import *
 from .cynthia_update import update_building
 from .utils import (
-        facedata_from_index, 
+        facedata_from_index,
         Template_Modal_OP)
 
 # =======================================================
@@ -72,20 +72,20 @@ class SplitProperty(bpy.types.PropertyGroup):
         update=update_building)
 
     off     = FloatVectorProperty(
-        name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0, 
+        name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0,
         subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
         update=update_building)
 
     collapsed = BoolProperty()
 
-    def draw(self, context, layout, parent):        
+    def draw(self, context, layout, parent):
         box = layout.box()
         if parent.has_split:
             row = box.row(align=True)
             row.prop(parent, 'has_split', toggle=True)
             _icon = 'INLINK' if not self.collapsed else 'LINK'
             row.prop(self, 'collapsed', text="", icon=_icon)
-     
+
             if not self.collapsed:
                 col = box.column(align=True)
                 col.prop(self, 'amount', slider=True)
@@ -99,18 +99,18 @@ class SplitProperty(bpy.types.PropertyGroup):
 
 class FloorplanProperty(bpy.types.PropertyGroup):
     fp_types = [
-        ("RECTANGULAR", "Rectangular", "", 0), 
+        ("RECTANGULAR", "Rectangular", "", 0),
         ("CIRCULAR", "Circular", "", 1),
-        ("COMPOSITE", "Composite", "", 2), 
+        ("COMPOSITE", "Composite", "", 2),
         ("H-SHAPED", "H-Shaped", "", 3)
     ]
 
     type    = EnumProperty(
-        description="Type of floorplan", items=fp_types, default='RECTANGULAR', 
+        description="Type of floorplan", items=fp_types, default='RECTANGULAR',
         update=update_building)
 
     width   = FloatProperty(
-        name="Width", description="Base Width of floorplan", min=0.01, max=100.0, default=2, 
+        name="Width", description="Base Width of floorplan", min=0.01, max=100.0, default=2,
         update=update_building)
 
     length  = FloatProperty(
@@ -212,23 +212,23 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
 class FloorProperty(bpy.types.PropertyGroup):
     floor_count     = IntProperty(
-        name="Floor Count", description="Number of floors", min=1, max=1000, default=1, 
+        name="Floor Count", description="Number of floors", min=1, max=1000, default=1,
         update=update_building)
 
     floor_height    = FloatProperty(
-        name="Floor Height", description="Height of each floor", min=0.01, max=1000.0, default=1.0, 
+        name="Floor Height", description="Height of each floor", min=0.01, max=1000.0, default=1.0,
         update=update_building)
 
     slab_thickness  = FloatProperty(
-        name="Slab Height", description="Thickness of each slab", min=0.01, max=1000.0, default=0.15, 
+        name="Slab Height", description="Thickness of each slab", min=0.01, max=1000.0, default=0.15,
         update=update_building)
 
     slab_outset     = FloatProperty(
-        name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0, default=0.1, 
+        name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0, default=0.1,
         update=update_building)
 
     mat_slab        = PointerProperty(type=bpy.types.Material,
-        name="Slab Material", description="Material for slab faces", update=update_building) 
+        name="Slab Material", description="Material for slab faces", update=update_building)
     mat_wall        = PointerProperty(type=bpy.types.Material,
         name="Wall Material", description="Material for wall faces", update=update_building)
 
@@ -314,7 +314,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     split       = PointerProperty(type=SplitProperty)
 
     mat_bar     = PointerProperty(type=bpy.types.Material,
-        name="Bar Material", description="Material for window bars", update=update_building) 
+        name="Bar Material", description="Material for window bars", update=update_building)
 
     mat_frame   = PointerProperty(type=bpy.types.Material,
         name="Frame Material", description="Material for window frame", update=update_building)
@@ -865,7 +865,7 @@ class StaircaseProperty(bpy.types.PropertyGroup):
 
 class RoofProperty(bpy.types.PropertyGroup):
     r_types = [
-        ("FLAT", "Flat", "", 0), 
+        ("FLAT", "Flat", "", 0),
         ("GABLE", "Gable", "", 1),
     ]
     type = EnumProperty(description="Type of roof",
@@ -1007,7 +1007,7 @@ class WindowOperator(Template_Modal_OP):
         prop.id     = len(obj.building.windows)-1
         prop.name   = "Window Property {}".format(len(obj.building.windows))
         obj.property_index          = len(obj.property_list)-1
-        
+
         # Store face indices for each window property
         if not obj.get('window_groups'):
             obj['window_groups']            = dict()
@@ -1046,7 +1046,7 @@ class DoorOperator(Template_Modal_OP):
         prop.id     = len(obj.building.doors)-1
         prop.name   = "Door Property {}".format(len(obj.building.doors))
         obj.property_index          = len(obj.property_list)-1
-        
+
         # Store face indices for each door property
         if not obj.get('door_groups'):
             obj['door_groups']            = dict()
@@ -1205,11 +1205,11 @@ class RemovePropertyOperator(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        obj = context.object 
+        obj = context.object
 
         # remove property
         idx = obj.property_index
-        obj.property_index -= 1 
+        obj.property_index -= 1
         obj.property_list.remove(idx)
 
         # Update building
@@ -1233,7 +1233,7 @@ class PROP_items(bpy.types.UIList):
         sp.operator("cynthia.remove_property", text="", emboss=False, icon="X")
 
     def invoke(self, context, event):
-        pass   
+        pass
 
 
 class CynthiaPanel(bpy.types.Panel):
@@ -1285,12 +1285,12 @@ class CynthiaPanel(bpy.types.Panel):
 
             # draw  properties for active group
             active_index = obj.property_index
-            if not len(obj.property_list): 
+            if not len(obj.property_list):
                 return
             active_prop = obj.property_list[active_index]
 
             if active_prop.type     == 'FLOOPLAN':
-                fp_props = obj.building.floorplan 
+                fp_props = obj.building.floorplan
                 fp_props.draw(context, box)
             elif active_prop.type   == 'FLOOR':
                 floor_props = obj.building.floors
@@ -1309,7 +1309,7 @@ class CynthiaPanel(bpy.types.Panel):
 #
 # =======================================================
 
-def register():     
+def register():
     bpy.utils.register_module(__name__)
 
     bpy.types.Object.building = PointerProperty(type=BuildingProperty)
@@ -1347,8 +1347,8 @@ if __name__ == "__main__":
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
     for mat in bpy.data.materials:
-        bpy.data.materials.remove(mat)    
-    # -- add 
+        bpy.data.materials.remove(mat)
+    # -- add
     bpy.ops.cynthia.add_floorplan()
     bpy.ops.cynthia.add_floors()
     bpy.context.object.building.floors.floor_count = 3

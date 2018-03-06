@@ -1,8 +1,8 @@
 import bpy
-import bmesh 
+import bmesh
 from bmesh.types import BMVert
 from mathutils import Vector
-from .utils import ( 
+from .utils import (
         plane,
         circle,
         link_obj,
@@ -27,7 +27,7 @@ class Floorplan:
 
         # -- create the floorplan object
         obj = condition(update, _obj, make_object('floorplan', make_mesh('fp_mesh')))
-        building = obj.building 
+        building = obj.building
 
         # -- get bmesh representation of object
         bm = bm_from_obj(obj)

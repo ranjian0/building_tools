@@ -9,16 +9,16 @@ from .utils import obj_clear_data, Logger
 LG = Logger(__name__)
 def update_building(self, context):
     """Update building geometry
-    
-    This function is used by all properties as an update callback. 
+
+    This function is used by all properties as an update callback.
     It must handle all the update and regeneration of active building object
     geometry
-    
+
     Arguments:
-        self     -- the property group containing the property that 
+        self     -- the property group containing the property that
                     was changed/updated
         context  -- current blender context
-    
+
     Returns:
         None
     """
@@ -44,4 +44,4 @@ def update_building(self, context):
             Door.build(context, face_indices, True, prop.id)
 
 
-    return None 
+    return None

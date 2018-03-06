@@ -191,7 +191,7 @@ def landing_rails(bm, land, _dir, rail_width, post_height, post_width, post_dens
         # Rails
         # '''''
 
-        # Calculate size and offsets        
+        # Calculate size and offsets
         cen = calc_edge_median(e)
         if len(set([v.co.x for v in e.verts])) == 1:
             # edge along y-axis
