@@ -367,7 +367,6 @@ class WindowProperty(bpy.types.PropertyGroup):
             col.prop(self.split, 'off')
 
         box = layout.box()
-        box.label("Materials")
         col = box.column(align=True)
         col.prop(self, "mat_frame")
         if self.fill == 'BAR':
