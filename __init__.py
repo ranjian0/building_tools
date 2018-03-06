@@ -67,8 +67,8 @@ class PropertyProxy(bpy.types.PropertyGroup):
 
 class SplitProperty(bpy.types.PropertyGroup):
     amount  = FloatVectorProperty(
-        name="Split Amount", description="How much to split geometry", min=.01, max=3.0, 
-        subtype='XYZ', size=2, default=(2.0, 2.0),
+        name="Split Amount", description="How much to split geometry", min=.01, max=2.99,
+        subtype='XYZ', size=2, default=(2.0, 2.7),
         update=update_building)
 
     off     = FloatVectorProperty(
@@ -462,7 +462,7 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     # Door Split Options
     has_split   = BoolProperty(
-        name="Add Split", description="Whether to split the door face", default=False,
+        name="Add Split", description="Whether to split the door face", default=True,
         update=update_building)
 
     split   = PointerProperty(type=SplitProperty)
@@ -481,14 +481,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         col.prop(self, 'ifd')
 
         # Split
-        box = layout.box()
-        box.prop(self, 'has_split', toggle=True)
-        if self.has_split:
-            col = box.column(align=True)
-            col.prop(self.split, 'amount', slider=True)
-
-            col = box.column(align=True)
-            col.prop(self.split, 'off')
+        self.split.draw(context, layout, self)
 
         # Panned
         box = layout.box()
