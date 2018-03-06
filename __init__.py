@@ -76,6 +76,26 @@ class SplitProperty(bpy.types.PropertyGroup):
         subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
         update=update_building)
 
+    collapsed = BoolProperty()
+
+    def draw(self, context, layout, parent):        
+        box = layout.box()
+        if parent.has_split:
+            row = box.row(align=True)
+            row.prop(parent, 'has_split', toggle=True)
+            _icon = 'INLINK' if not self.collapsed else 'LINK'
+            row.prop(self, 'collapsed', text="", icon=_icon)
+     
+            if not self.collapsed:
+                col = box.column(align=True)
+                col.prop(self, 'amount', slider=True)
+
+                col = box.column(align=True)
+                col.prop(self, 'off')
+        else:
+            box.prop(parent, 'has_split', toggle=True)
+
+
 
 class FloorplanProperty(bpy.types.PropertyGroup):
     fp_types = [
@@ -347,15 +367,8 @@ class WindowProperty(bpy.types.PropertyGroup):
         if self.fill == 'PANE':
             col.prop(self, 'pd')
 
-
-        box = layout.box()
-        box.prop(self, 'has_split', toggle=True)
-        if self.has_split:
-            col = box.column(align=True)
-            col.prop(self.split, 'amount', slider=True)
-
-            col = box.column(align=True)
-            col.prop(self.split, 'off')
+        # -- draw split property
+        self.split.draw(context, layout, self)
 
         box = layout.box()
         col = box.column(align=True)
