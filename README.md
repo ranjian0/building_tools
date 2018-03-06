@@ -8,6 +8,14 @@ CYNTHIA BLENDER ADDON
 
 -Features:
 
-	~Create Floorplan 	:: 
+	~Create Floorplan 	::
+		* Provide a set of basic floorplan shapes to build geometry from 
 	
 	~Create Floors		::
+		* Extrude floorplan shapes to create walls
+
+	-Add Windows		::
+		* Add window geometry to walls
+
+	-Add Doors			::
+		* Add door geometry to walls
