@@ -238,8 +238,7 @@ def split(bm, face, svertical=2, shorizontal=2, offx=0, offy=0, offz=0):
 def facedata_from_index(obj, index):
     """ Determine unique properties of the face with the given index """
 
-    properties = {}
-
+    properties = dict()
     face = obj.data.polygons[index]
 
     # -- normal
@@ -247,9 +246,9 @@ def facedata_from_index(obj, index):
 
     # -- floor
     fcount = obj.building.floors.floor_count
-    pos = round(face.center[2], 2)
     fheight = obj.building.floors.floor_height
     sthick = obj.building.floors.slab_thickness
+    pos = round(face.center[2], 2)
 
     for i in range(fcount):
         current_slab = sthick/2 + (i * fheight) + (i * (sthick/2))
