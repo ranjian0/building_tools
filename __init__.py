@@ -287,7 +287,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         update=update_building)
 
     has_split   = BoolProperty(
-        name="Add Split", description="Whether to split the window face", default=False,
+        name="Add Split", description="Whether to split the window face", default=True,
         update=update_building)
 
     split       = PointerProperty(type=SplitProperty)
@@ -310,21 +310,7 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         if self.type == 'BASIC':
-            row = box.row(align=True)
-            row.prop(self, 'fill', expand=True)
-
-            col = box.column(align=True)
-            col.prop(self, 'ft')
-            col.prop(self, 'fd')
-
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.prop(self, 'px')
-            row.prop(self, 'py')
-
-            col.prop(self, 'pt')
-            if self.fill == 'PANE':
-                col.prop(self, 'pd')
+            pass
 
         elif self.type == 'ARCHED':
             # -- arch
@@ -341,20 +327,24 @@ class WindowProperty(bpy.types.PropertyGroup):
 
             # -- lower panes/bars
             box.separator()
-            row = box.row(align=True)
-            row.prop(self, 'fill', expand=True)
-            col = box.column(align=True)
-            col.prop(self, 'ft')
-            col.prop(self, 'fd')
 
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.prop(self, 'px')
-            row.prop(self, 'py')
+        row = box.row(align=True)
+        row.prop(self, 'fill', expand=True)
+        col = box.column(align=True)
+        col.prop(self, 'ft')
+        col.prop(self, 'fd')
 
-            col.prop(self, 'pt')
-            if self.fill == 'PANE':
-                col.prop(self, 'pd')
+        col = box.column(align=True)
+        row = col.row(align=True)
+
+        txt_type = "Panes" if self.fill=='PANE' else "Bars"
+        row.prop(self, 'px', text="Horizontal " + txt_type)
+        row.prop(self, 'py', text="Vertical " + txt_type)
+
+        txt = "Pane Thickness" if self.fill=='PANE' else 'Bar Thickness'
+        col.prop(self, 'pt', text=txt)
+        if self.fill == 'PANE':
+            col.prop(self, 'pd')
 
 
         box = layout.box()
