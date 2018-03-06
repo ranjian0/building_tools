@@ -281,6 +281,7 @@ def facedata_from_index(obj, index):
 
     return properties
 
+
 def index_from_facedata(obj, bm, face_data):
     """ Determine the index of a face give some face data """
     all_faces = bm.faces

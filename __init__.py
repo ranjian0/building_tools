@@ -35,7 +35,7 @@ from bpy.props import *
 from .cynthia_floorplan import Floorplan
 from .cynthia_floor import Floor 
 from .cynthia_window import Window
-from .cynthia_door import *
+from .cynthia_door import Door
 from .cynthia_balcony import *
 from .cynthia_rails import *
 from .cynthia_roof import *
@@ -56,7 +56,8 @@ class PropertyProxy(bpy.types.PropertyGroup):
     property_items = [
         ("FLOORPLAN", "Floorplan", "", 0),
         ("FLOOR", "Floor", "", 1),
-        ("WINDOW", "Window", "", 2)
+        ("WINDOW", "Window", "", 2),
+        ("DOOR", "Door", "", 3)
     ]
     type    = EnumProperty(items=property_items)
 
@@ -367,70 +368,92 @@ class WindowProperty(bpy.types.PropertyGroup):
 
 
 class DoorProperty(bpy.types.PropertyGroup):
-    oft = FloatProperty(name="OuterFrame Thickness", description="Thickness of outer door Frame", min=0.0, max=100.0,
-                        default=0.0)
+    oft     = FloatProperty(
+        name="OuterFrame Thickness", description="Thickness of outer door Frame", min=0.0, max=100.0, default=0.0,
+        update=update_building)
 
-    ofd = FloatProperty(name="OuterFrame Depth", description="Depth of outer door Frame", min=0.0, max=100.0,
-                        default=0.0)
+    ofd     = FloatProperty(
+        name="OuterFrame Depth", description="Depth of outer door Frame", min=0.0, max=100.0, default=0.0,
+        update=update_building)
 
-    ift = FloatProperty(name="InnerFrame Thickness", description="Thickness of inner door Frame", min=0.0, max=100.0,
-                        default=0.1)
+    ift     = FloatProperty(
+        name="InnerFrame Thickness", description="Thickness of inner door Frame", min=0.0, max=100.0, default=0.1,
+        update=update_building)
 
-    ifd = FloatProperty(name="InnerFrame Depth", description="Depth of inner door Frame", min=0.0, max=100.0,
-                        default=0.1, step=1)
-
-    # Door Split Options
-    has_split = BoolProperty(
-        name="Add Split", description="Whether to split the door face", default=False)
-    split = PointerProperty(type=SplitProperty)
+    ifd     = FloatProperty(
+        name="InnerFrame Depth", description="Depth of inner door Frame", min=0.0, max=100.0, default=0.1, step=1,
+        update=update_building)
 
     # Window Panes
-    px = IntProperty(name="Horizontal Panes", description="Number of horizontal window panes", min=0, max=100,
-                     default=1)
+    px      = IntProperty(
+        name="Horizontal Panes", description="Number of horizontal window panes", min=0, max=100, default=1,
+        update=update_building)
 
-    py = IntProperty(name="Vertical Panes",
-                     description="Number of vertical window panes", min=0, max=100, default=1)
+    py      = IntProperty(
+        name="Vertical Panes", description="Number of vertical window panes", min=0, max=100, default=1,
+        update=update_building)
 
-    pt = FloatProperty(name="Pane Thickness", description="Thickness of window panes", min=0.01, max=100.0,
-                       default=0.05)
+    pt      = FloatProperty(
+        name="Pane Thickness", description="Thickness of window panes", min=0.01, max=100.0, default=0.05,
+        update=update_building)
 
-    pd = FloatProperty(name="Pane Depth", description="Depth of window panes", min=0.01, max=100.0, default=0.01,
-                       step=1)
+    pd      = FloatProperty(
+        name="Pane Depth", description="Depth of window panes", min=0.01, max=100.0, default=0.01, step=1,
+        update=update_building)
 
-    offset = FloatProperty(
-        name="Pane Offset", description="Offset of window panes", min=-1.0, max=1.0, default=1.0)
+    offset  = FloatProperty(
+        name="Pane Offset", description="Offset of window panes", min=-1.0, max=1.0, default=1.0,
+        update=update_building)
 
-    width = FloatProperty(
-        name="Pane Width", description="Width of window panes", min=0.0, max=100.0, default=0.5)
+    width   = FloatProperty(
+        name="Pane Width", description="Width of window panes", min=0.0, max=100.0, default=0.5,
+        update=update_building)
 
     # Grooves
-    gx = IntProperty(name="Horizontal Grooves",
-                     description="Number of horizontal grooves", min=0, max=100, default=1)
+    gx      = IntProperty(
+        name="Horizontal Grooves", description="Number of horizontal grooves", min=0, max=100, default=1,
+        update=update_building)
 
-    gy = IntProperty(name="Vertical Grooves",
-                     description="Number of vertical grooves", min=0, max=100, default=1)
+    gy      = IntProperty(
+        name="Vertical Grooves", description="Number of vertical grooves", min=0, max=100, default=1,
+        update=update_building)
 
-    gt = FloatProperty(name="Groove Thickness",
-                       description="Thickness of groove", min=0.01, max=100.0, default=0.05)
+    gt      = FloatProperty(
+        name="Groove Thickness", description="Thickness of groove", min=0.01, max=100.0, default=0.05,
+        update=update_building)
 
-    gd = FloatProperty(name="Groove Depth", description="Depth of groove",
-                       min=0.01, max=100.0, default=0.01, step=1)
+    gd      = FloatProperty(
+        name="Groove Depth", description="Depth of groove", min=0.01, max=100.0, default=0.01, step=1,
+        update=update_building)
 
-    gw = FloatProperty(
-        name="Groove Width", description="Width of grooves", min=0.01, max=1.0, default=1.0)
+    gw      = FloatProperty(
+        name="Groove Width", description="Width of grooves", min=0.01, max=1.0, default=1.0,
+        update=update_building)
 
-    goff = FloatProperty(
-        name="Groove Offset", description="Offset of grooves", min=-1.0, max=1.0, default=0.0)
+    goff    = FloatProperty(
+        name="Groove Offset", description="Offset of grooves", min=-1.0, max=1.0, default=0.0,
+        update=update_building)
 
     # Options
-    hdd = BoolProperty(name='Double Door',
-                       description="If the door is split", default=False)
+    hdd     = BoolProperty(
+        name='Double Door', description="If the door is split", default=False,
+        update=update_building)
 
-    grov = BoolProperty(
-        name='Grooved', description='Door has grooves', default=False)
+    grov    = BoolProperty(
+        name='Grooved', description='Door has grooves', default=False,
+        update=update_building)
 
-    panned = BoolProperty(name='Window Panes',
-                          description='Door has window panes', default=False)
+    panned  = BoolProperty(
+        name='Window Panes', description='Door has window panes', default=False,
+        update=update_building)
+
+    # Door Split Options
+    has_split   = BoolProperty(
+        name="Add Split", description="Whether to split the door face", default=False,
+        update=update_building)
+
+    split   = PointerProperty(type=SplitProperty)
+
 
     def draw(self, context, layout):
         box = layout.box()
@@ -950,7 +973,7 @@ class WindowOperator(Template_Modal_OP):
     """ Creates windows on selected mesh faces """
     bl_idname = "cynthia.add_window"
     bl_label = "Add Window"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'REGISTER'}
 
     def modal_setup(self, context, event):
 
@@ -984,30 +1007,44 @@ class WindowOperator(Template_Modal_OP):
             obj['window_groups']            = dict()
         obj['window_groups'][str(prop.id)]  = list()
 
-        obj['has_windows'] = True
 
-
-class DoorOperator(bpy.types.Operator):
+class DoorOperator(Template_Modal_OP):
     """ Creates doors on selected mesh faces """
     bl_idname = "cynthia.add_door"
     bl_label = "Add Door"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {'REGISTER'}
 
-    props = PointerProperty(type=DoorProperty)
+    def modal_setup(self, context, event):
 
-    @classmethod
-    def poll(cls, context):
-        return context.object is not None and context.object.mode == 'EDIT'
+        # Add window property
+        obj     = context.object
+        prop    = obj.property_list[obj.property_index]
 
-    def execute(self, context):
+        data = obj['door_groups'][str(prop.id)]
+        if not isinstance(data, list):
+            data = data.to_list()
+        face_data = facedata_from_index(obj, self.face_index)
+        data.append(face_data)
+        obj['door_groups'].update({str(prop.id) : data})
 
-        d = Door(self.props)
-        d.build()
+        # Create geometry
+        Door.build(context, [self.face_index])
 
-        return {'FINISHED'}
+    def invoke_setup(self, context, event):
 
-    def draw(self, context):
-        self.props.draw(context, self.layout)
+        # Add property proxy
+        obj         = context.object
+        prop        = obj.property_list.add()
+        door        = obj.building.doors.add()
+        prop.type   = "DOOR"
+        prop.id     = len(obj.building.doors)-1
+        prop.name   = "Door Property {}".format(len(obj.building.doors))
+        obj.property_index          = len(obj.property_list)-1
+        
+        # Store face indices for each door property
+        if not obj.get('door_groups'):
+            obj['door_groups']            = dict()
+        obj['door_groups'][str(prop.id)]  = list()
 
 
 class BalconyOperator(bpy.types.Operator):
@@ -1246,15 +1283,18 @@ class CynthiaPanel(bpy.types.Panel):
                 return
             active_prop = obj.property_list[active_index]
 
-            if active_prop.type == 'FLOOPLAN':
+            if active_prop.type     == 'FLOOPLAN':
                 fp_props = obj.building.floorplan 
                 fp_props.draw(context, box)
-            elif active_prop.type == 'FLOOR':
+            elif active_prop.type   == 'FLOOR':
                 floor_props = obj.building.floors
                 floor_props.draw(context, box)
-            elif active_prop.type == 'WINDOW':
+            elif active_prop.type   == 'WINDOW':
                 win_prop = obj.building.windows[active_prop.id]
                 win_prop.draw(context, box)
+            elif active_prop.type   == 'DOOR':
+                door_prop = obj.building.doors[active_prop.id]
+                door_prop.draw(context, box)
 
 
 # =======================================================

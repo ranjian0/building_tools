@@ -2,6 +2,7 @@ import bpy
 from .cynthia_floorplan import Floorplan
 from .cynthia_floor import Floor
 from .cynthia_window import Window
+from .cynthia_door import Door
 from .utils import obj_clear_data, Logger
 
 
@@ -37,5 +38,10 @@ def update_building(self, context):
         elif prop.type == 'WINDOW':
             face_indices = obj['window_groups'][str(prop.id)]
             Window.build(context, face_indices, True, prop.id)
+
+        elif prop.type == 'DOOR':
+            face_indices = obj['door_groups'][str(prop.id)]
+            Door.build(context, face_indices, True, prop.id)
+
 
     return None 
