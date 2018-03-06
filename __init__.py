@@ -78,7 +78,6 @@ class SplitProperty(bpy.types.PropertyGroup):
             box.prop(parent, 'has_split', toggle=True)
 
 
-
 class FloorplanProperty(bpy.types.PropertyGroup):
     fp_types = [
         ("RECTANGULAR", "Rectangular", "", 0),
@@ -449,6 +448,18 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     split   = PointerProperty(type=SplitProperty)
 
+    mat_groov   = PointerProperty(type=bpy.types.Material,
+        name="Groove Material", description="Material for door grooves", update=update_building)
+
+    mat_frame   = PointerProperty(type=bpy.types.Material,
+        name="Frame Material", description="Material for door frame", update=update_building)
+
+    mat_pane    = PointerProperty(type=bpy.types.Material,
+        name="Pane Material", description="Material for door panes", update=update_building)
+
+    mat_glass   = PointerProperty(type=bpy.types.Material,
+        name="Glass Material", description="Material for door glass", update=update_building)
+
 
     def draw(self, context, layout):
         box = layout.box()
@@ -494,6 +505,16 @@ class DoorProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, 'goff')
             col.prop(self, 'gw')
+
+        box = layout.box()
+        col = box.column(align=True)
+        col.prop(self, "mat_frame")
+        if self.panned:
+            col.prop(self, "mat_pane")
+        if self.grov:
+            col.prop(self, "mat_groov")
+        col.prop(self, "mat_glass")
+
 
 
 class BalconyProperty(bpy.types.PropertyGroup):

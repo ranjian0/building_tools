@@ -67,7 +67,7 @@ def floor_mat_wall(obj):
 
 def window_mat_frame(obj):
 	return template_create_materials(obj,
-			"material_frame",
+			"material_window_frame",
 			{
 				'diffuse' 			: (.8, .8, .8),
 				'diffuse_intensity' : 1,
@@ -77,7 +77,7 @@ def window_mat_frame(obj):
 
 def window_mat_pane(obj):
 	return template_create_materials(obj,
-			"material_pane",
+			"material_window_pane",
 			{
 				'diffuse' 			: (0, .6, 0),
 				'diffuse_intensity' : 1,
@@ -87,7 +87,7 @@ def window_mat_pane(obj):
 
 def window_mat_bars(obj):
 	return template_create_materials(obj,
-			"material_bar",
+			"material_window_bar",
 			{
 				'diffuse' 			: (0, .6, .0),
 				'diffuse_intensity' : 1,
@@ -97,7 +97,49 @@ def window_mat_bars(obj):
 
 def window_mat_glass(obj):
 	return template_create_materials(obj,
-			"material_glass",
+			"material_window_glass",
+			{
+				'diffuse' 			: (0, .1, .6),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
+
+# DOOR MATERIALS
+
+def door_mat_frame(obj):
+	return template_create_materials(obj,
+			"material_door_frame",
+			{
+				'diffuse' 			: (.8, .8, .8),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
+
+def door_mat_pane(obj):
+	return template_create_materials(obj,
+			"material_door_pane",
+			{
+				'diffuse' 			: (.13, .05, 0),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
+
+def door_mat_groove(obj):
+	return template_create_materials(obj,
+			"material_door_groove",
+			{
+				'diffuse' 			: (.13, .05, 0),
+				'diffuse_intensity' : 1,
+				'specular'			: (1, 1, 1),
+				'specular_intensity': 0
+			})
+
+def door_mat_glass(obj):
+	return template_create_materials(obj,
+			"material_door_glass",
 			{
 				'diffuse' 			: (0, .1, .6),
 				'diffuse_intensity' : 1,
