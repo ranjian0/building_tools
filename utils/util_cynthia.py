@@ -174,7 +174,7 @@ class Template_Modal_OP(bpy.types.Operator):
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
             bpy.context.window.cursor_set("DEFAULT")
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle2, 'WINDOW')
+            # bpy.types.SpaceView3D.draw_handler_remove(self._handle2, 'WINDOW')
             return {'CANCELLED'}
 
         return {'RUNNING_MODAL'}
@@ -184,7 +184,7 @@ class Template_Modal_OP(bpy.types.Operator):
             # Add modal callbacks
             args            = (self, context)
             self._handle    = bpy.types.SpaceView3D.draw_handler_add(hover_face_callback, args, 'WINDOW', 'POST_PIXEL')
-            self._handle2   = bpy.types.SpaceView3D.draw_handler_add(select_face_callback, args, 'WINDOW', 'POST_PIXEL')
+            # self._handle2   = bpy.types.SpaceView3D.draw_handler_add(select_face_callback, args, 'WINDOW', 'POST_PIXEL')
 
             # Face selection states
             self.face_index     = -1
