@@ -66,7 +66,7 @@ class Floor:
         # -- find boundary edges
         edges = [e for e in bm.edges if e.is_boundary]
 
-        # -- floorplan faces are alsb material
+        # -- floorplan faces are slab material
         mslab_faces.extend([f for f in bm.faces])
 
         # -- extrude floor and slabs
