@@ -79,8 +79,8 @@ def select_face_callback(self, context):
         face = obj.data.polygons[fidx]
         bgl.glBegin(bgl.GL_LINE_LOOP)
         for idx in face.vertices:
-            coord = vertices[idx]
-            screen_pos = view3d_utils.location_3d_to_region_2d(region, rv3d, coord.co)
+            coord = vertices[idx].co + obj.location
+            screen_pos = view3d_utils.location_3d_to_region_2d(region, rv3d, coord)
             bgl.glVertex2f(*screen_pos.to_tuple())
         bgl.glEnd()
 
