@@ -516,7 +516,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         col.prop(self, "mat_glass")
 
 
-
 class BalconyProperty(bpy.types.PropertyGroup):
     # Balcony Options
     width = FloatProperty(
@@ -1280,7 +1279,7 @@ class CynthiaPanel(bpy.types.Panel):
             box = col.box()
             obj = context.object
 
-            # Draw uilist for all property groups
+            # Draw UIlist for all property groups
             rows = 2
             row = box.row()
             row.template_list("PROP_items", "", obj, "property_list", obj, "property_index", rows=rows)
