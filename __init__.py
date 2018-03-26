@@ -1291,7 +1291,7 @@ class CynthiaPanel(bpy.types.Panel):
                 return
             active_prop = obj.property_list[active_index]
 
-            if active_prop.type     == 'FLOOPLAN':
+            if active_prop.type     == 'FLOORPLAN':
                 fp_props = obj.building.floorplan
                 fp_props.draw(context, box)
             elif active_prop.type   == 'FLOOR':
