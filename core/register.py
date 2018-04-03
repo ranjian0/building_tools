@@ -3,12 +3,14 @@ from bpy.props import PointerProperty, CollectionProperty, IntProperty
 
 from .floor     import FloorOperator, FloorProperty
 from .floorplan import FloorplanOperator, FloorplanProperty
+from .door      import DoorOperator, DoorProperty
 
 from .generic import PropertyProxy, BuildingProperty
 
 classes = [
     FloorOperator , FloorProperty,
     FloorplanOperator, FloorplanProperty,
+    DoorOperator, DoorProperty,
 
     BuildingProperty, PropertyProxy
 ]
@@ -19,7 +21,6 @@ def register_core():
         bpy.utils.register_class(cls)
 
     bpy.types.Object.building       = PointerProperty(type=BuildingProperty)
-
     bpy.types.Object.property_list  = CollectionProperty(type=PropertyProxy)
     bpy.types.Object.property_index = IntProperty()
 
