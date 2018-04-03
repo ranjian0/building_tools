@@ -106,20 +106,21 @@ class CynthiaPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(CynthiaPanel)
+    bpy.utils.register_class(PROP_items)
     register_core()
 
 
 def unregister():
     bpy.utils.unregister_class(CynthiaPanel)
+    bpy.utils.unregister_class(PROP_items)
     unregister_core()
 
 if __name__ == "__main__":
-    import os
-    os.system("clear")
-    # useful for continuous updates
+    # -- continuos updates with script watcher
+    import os; os.system("clear")
     try:
         unregister()
-    except Exception as e:
+    except RuntimeError as e:
         import traceback; traceback.print_exc()
         print("UNREGISTERED MODULE .. FAIL", e)
     register()
