@@ -11,14 +11,18 @@ from .floorplan import FloorplanOperator, FloorplanProperty
 from .door      import DoorOperator, DoorProperty
 from .window    import WindowOperator, WindowProperty
 
+
+# -- take care here -- ORDER MATTERS !!!
 classes = [
+    SplitProperty,
+
     FloorOperator , FloorProperty,
     FloorplanOperator, FloorplanProperty,
     DoorOperator, DoorProperty,
     WindowOperator, WindowProperty,
 
     BuildingProperty, PropertyProxy,
-    SplitProperty, RemovePropertyOperator
+    RemovePropertyOperator,
 ]
 
 
