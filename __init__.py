@@ -14,8 +14,7 @@ bl_info = {
 import bpy
 from bpy.props import *
 
-from .cynthia_floorplan import Floorplan
-from .cynthia_floor import Floor
+from .core import register_core, unregister_core
 from .cynthia_window import Window
 from .cynthia_door import Door
 from .cynthia_balcony import *
@@ -1054,19 +1053,21 @@ class CynthiaPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_module(__name__)
+    register_core()
 
-    bpy.types.Object.building = PointerProperty(type=BuildingProperty)
+    # bpy.types.Object.building = PointerProperty(type=BuildingProperty)
 
-    bpy.types.Object.property_list = CollectionProperty(type=PropertyProxy)
-    bpy.types.Object.property_index = IntProperty()
+    # bpy.types.Object.property_list = CollectionProperty(type=PropertyProxy)
+    # bpy.types.Object.property_index = IntProperty()
 
 
 def unregister():
     bpy.utils.unregister_module(__name__)
+    unregister_core()
 
-    del bpy.types.Object.building
-    del bpy.types.Object.property_list
-    del bpy.types.Object.property_index
+    # del bpy.types.Object.building
+    # del bpy.types.Object.property_list
+    # del bpy.types.Object.property_index
 
 
 if __name__ == "__main__":

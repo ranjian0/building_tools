@@ -12,7 +12,7 @@ classes = [
 ]
 
 
-def register():
+def register_core():
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -22,7 +22,7 @@ def register():
     bpy.types.Object.property_index = IntProperty()
 
 
-def unregister():
+def unregister_core():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 

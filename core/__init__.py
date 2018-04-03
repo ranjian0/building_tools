@@ -1,1 +1,1 @@
-from .register import register, unregister
+from .register import register_core, unregister_core
