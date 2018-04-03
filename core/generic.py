@@ -3,6 +3,8 @@ from bpy.props import *
 
 from .floor import FloorProperty
 from .floorplan import FloorplanProperty
+from .door import DoorProperty
+from .window import WindowProperty
 
 from .update import update_building
 
@@ -54,5 +56,26 @@ class BuildingProperty(bpy.types.PropertyGroup):
 
     floorplan   = PointerProperty(type=FloorplanProperty)
     floors      = PointerProperty(type=FloorProperty)
-    # windows     = CollectionProperty(type=WindowProperty)
-    # doors       = CollectionProperty(type=DoorProperty)
+    windows     = CollectionProperty(type=WindowProperty)
+    doors       = CollectionProperty(type=DoorProperty)
+
+
+class RemovePropertyOperator(bpy.types.Operator):
+    """ Create roof on selected mesh faces """
+    bl_idname = "cynthia.remove_property"
+    bl_label = "Remove Property"
+    bl_options = {'REGISTER'}
+
+    def execute(self, context):
+        obj = context.object
+
+        # remove property
+        idx = obj.property_index
+        obj.property_index -= 1
+        obj.property_list.remove(idx)
+
+        # Update building
+        update_building(self, context)
+        context.area.tag_redraw()
+
+        return {'FINISHED'}
