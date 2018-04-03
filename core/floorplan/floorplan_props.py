@@ -1,6 +1,8 @@
 import bpy
 from bpy.props import *
 
+from ..update import update_building
+
 class FloorplanProperty(bpy.types.PropertyGroup):
     fp_types = [
         ("RECTANGULAR", "Rectangular", "", 0),

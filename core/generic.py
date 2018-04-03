@@ -4,6 +4,8 @@ from bpy.props import *
 from .floor import FloorProperty
 from .floorplan import FloorplanProperty
 
+from .update import update_building
+
 class PropertyProxy(bpy.types.PropertyGroup):
     property_items = [
         ("FLOORPLAN", "Floorplan", "", 0),
@@ -52,5 +54,5 @@ class BuildingProperty(bpy.types.PropertyGroup):
 
     floorplan   = PointerProperty(type=FloorplanProperty)
     floors      = PointerProperty(type=FloorProperty)
-    windows     = CollectionProperty(type=WindowProperty)
-    doors       = CollectionProperty(type=DoorProperty)
+    # windows     = CollectionProperty(type=WindowProperty)
+    # doors       = CollectionProperty(type=DoorProperty)

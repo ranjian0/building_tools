@@ -1,4 +1,5 @@
 import bpy
+from .floorplan import Floorplan
 
 
 class FloorplanOperator(bpy.types.Operator):

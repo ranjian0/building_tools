@@ -1,9 +1,6 @@
 import bpy
-from .floor import Floor
-from .floorplan import Floorplan
-# from .cynthia_window import Window
-# from .cynthia_door import Door
-from ...utils import obj_clear_data, Logger
+
+from ..utils import obj_clear_data, Logger
 
 
 LG = Logger(__name__)
@@ -23,6 +20,10 @@ def update_building(self, context):
         None
     """
 
+    # Hack for cyclic import
+    from .floor import Floor
+    from .floorplan import Floorplan
+
     # Clear mesh data from active object
     obj = context.object
     obj_clear_data(obj)
@@ -35,13 +36,13 @@ def update_building(self, context):
         elif prop.type == 'FLOOR':
             Floor.build(context, True)
 
-        elif prop.type == 'WINDOW':
-            face_indices = obj['window_groups'][str(prop.id)]
-            Window.build(context, face_indices, True, prop.id)
+        # elif prop.type == 'WINDOW':
+        #     face_indices = obj['window_groups'][str(prop.id)]
+        #     cls.build(context, face_indices, True, prop.id)
 
-        elif prop.type == 'DOOR':
-            face_indices = obj['door_groups'][str(prop.id)]
-            Door.build(context, face_indices, True, prop.id)
+        # elif prop.type == 'DOOR':
+        #     face_indices = obj['door_groups'][str(prop.id)]
+        #     cls.build(context, face_indices, True, prop.id)
 
 
     return None

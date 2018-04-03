@@ -33,6 +33,36 @@ from .utils import (
 #
 # =======================================================
 
+class SplitProperty(bpy.types.PropertyGroup):
+    amount  = FloatVectorProperty(
+        name="Split Amount", description="How much to split geometry", min=.01, max=2.99,
+        subtype='XYZ', size=2, default=(2.0, 2.7),
+        update=update_building)
+
+    off     = FloatVectorProperty(
+        name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0,
+        subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
+        update=update_building)
+
+    collapsed = BoolProperty()
+
+    def draw(self, context, layout, parent):
+        box = layout.box()
+        if parent.has_split:
+            row = box.row(align=True)
+            row.prop(parent, 'has_split', toggle=True)
+            _icon = 'INLINK' if not self.collapsed else 'LINK'
+            row.prop(self, 'collapsed', text="", icon=_icon)
+
+            if not self.collapsed:
+                col = box.column(align=True)
+                col.prop(self, 'amount', slider=True)
+
+                col = box.column(align=True)
+                col.prop(self, 'off')
+        else:
+            box.prop(parent, 'has_split', toggle=True)
+
 
 class WindowProperty(bpy.types.PropertyGroup):
     win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
@@ -1052,23 +1082,11 @@ class CynthiaPanel(bpy.types.Panel):
 # =======================================================
 
 def register():
-    bpy.utils.register_module(__name__)
     register_core()
-
-    # bpy.types.Object.building = PointerProperty(type=BuildingProperty)
-
-    # bpy.types.Object.property_list = CollectionProperty(type=PropertyProxy)
-    # bpy.types.Object.property_index = IntProperty()
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
     unregister_core()
-
-    # del bpy.types.Object.building
-    # del bpy.types.Object.property_list
-    # del bpy.types.Object.property_index
-
 
 if __name__ == "__main__":
     import os
@@ -1088,12 +1106,12 @@ if __name__ == "__main__":
 
     # Dev --init workspace
     # --clear
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.ops.object.delete(use_global=False)
-    for mat in bpy.data.materials:
-        bpy.data.materials.remove(mat)
-    # -- add
-    bpy.ops.cynthia.add_floorplan()
-    bpy.ops.cynthia.add_floors()
-    bpy.context.object.building.floors.floor_count = 3
-    bpy.context.object.building.floors.floor_height = 3
+    # bpy.ops.object.select_all(action="SELECT")
+    # bpy.ops.object.delete(use_global=False)
+    # for mat in bpy.data.materials:
+    #     bpy.data.materials.remove(mat)
+    # # -- add
+    # bpy.ops.cynthia.add_floorplan()
+    # bpy.ops.cynthia.add_floors()
+    # bpy.context.object.building.floors.floor_count = 3
+    # bpy.context.object.building.floors.floor_height = 3

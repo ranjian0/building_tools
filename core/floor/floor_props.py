@@ -1,6 +1,9 @@
 import bpy
 from bpy.props import *
 
+from ..update import update_building
+
+
 class FloorProperty(bpy.types.PropertyGroup):
     floor_count     = IntProperty(
         name="Floor Count", description="Number of floors", min=1, max=1000, default=1,
