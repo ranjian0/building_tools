@@ -20,12 +20,6 @@ def update_building(self, context):
         None
     """
 
-    # Hack for cyclic import
-    from .floor import Floor
-    from .floorplan import Floorplan
-    from .door import Door
-    from .window import Window
-
     # Clear mesh data from active object
     obj = context.object
     obj_clear_data(obj)
@@ -33,18 +27,22 @@ def update_building(self, context):
     properties = obj.property_list
     for prop in properties:
         if prop.type == 'FLOORPLAN':
+            from .floorplan import Floorplan
             Floorplan.build(True, obj)
 
         elif prop.type == 'FLOOR':
+            from .floor import Floor
             Floor.build(context, True)
 
         elif prop.type == 'WINDOW':
+            from .window import Window
             face_indices = obj['window_groups'][str(prop.id)]
-            cls.build(context, face_indices, True, prop.id)
+            Window.build(context, face_indices, True, prop.id)
 
         elif prop.type == 'DOOR':
+            from .door import Door
             face_indices = obj['door_groups'][str(prop.id)]
-            cls.build(context, face_indices, True, prop.id)
+            Door.build(context, face_indices, True, prop.id)
 
 
     return None
