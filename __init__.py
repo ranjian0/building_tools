@@ -12,7 +12,6 @@ bl_info = {
 }
 
 import bpy
-from bpy.props import *
 from .core import register_core, unregister_core
 
 # =======================================================
@@ -106,10 +105,12 @@ class CynthiaPanel(bpy.types.Panel):
 # =======================================================
 
 def register():
+    bpy.utils.register_class(CynthiaPanel)
     register_core()
 
 
 def unregister():
+    bpy.utils.unregister_class(CynthiaPanel)
     unregister_core()
 
 if __name__ == "__main__":
