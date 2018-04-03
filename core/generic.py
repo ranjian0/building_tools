@@ -1,11 +1,6 @@
 import bpy
 from bpy.props import *
 
-from .floor import FloorProperty
-from .floorplan import FloorplanProperty
-from .door import DoorProperty
-from .window import WindowProperty
-
 from .update import update_building
 
 class PropertyProxy(bpy.types.PropertyGroup):
@@ -50,14 +45,6 @@ class SplitProperty(bpy.types.PropertyGroup):
                 col.prop(self, 'off')
         else:
             box.prop(parent, 'has_split', toggle=True)
-
-
-class BuildingProperty(bpy.types.PropertyGroup):
-
-    floorplan   = PointerProperty(type=FloorplanProperty)
-    floors      = PointerProperty(type=FloorProperty)
-    windows     = CollectionProperty(type=WindowProperty)
-    doors       = CollectionProperty(type=DoorProperty)
 
 
 class RemovePropertyOperator(bpy.types.Operator):

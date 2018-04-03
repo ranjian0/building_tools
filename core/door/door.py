@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from bmesh.types import BMEdge, BMVert
 from mathutils import Vector
-from .utils import (
+from ...utils import (
         split,
         filter_geom,
         filter_vertical_edges,
