@@ -1,4 +1,5 @@
 import bpy
+from .floor import Floor
 
 class FloorOperator(bpy.types.Operator):
     """ Creates floors from active floorplan object """
