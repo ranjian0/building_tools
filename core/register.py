@@ -2,9 +2,9 @@ import bpy
 from bpy.props import (PointerProperty,
     CollectionProperty, IntProperty)
 
+from .building import BuildingProperty
 from .generic import (PropertyProxy,
-    BuildingProperty, SplitProperty,
-    RemovePropertyOperator)
+    SplitProperty,RemovePropertyOperator)
 
 from .floor     import FloorOperator, FloorProperty
 from .floorplan import FloorplanOperator, FloorplanProperty
