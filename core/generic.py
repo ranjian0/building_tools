@@ -34,8 +34,8 @@ class SplitProperty(bpy.types.PropertyGroup):
         if parent.has_split:
             row = box.row(align=True)
             row.prop(parent, 'has_split', toggle=True)
-            _icon = 'INLINK' if not self.collapsed else 'LINK'
-            row.prop(self, 'collapsed', text="", icon=_icon)
+            row.prop(self, 'collapsed', text="",
+                icon='INLINK' if not self.collapsed else 'LINK')
 
             if not self.collapsed:
                 col = box.column(align=True)
