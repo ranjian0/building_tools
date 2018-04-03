@@ -1,6 +1,9 @@
 import bpy
 from bpy.props import *
 
+from .floor import FloorProperty
+from .floorplan import FloorplanProperty
+
 class PropertyProxy(bpy.types.PropertyGroup):
     property_items = [
         ("FLOORPLAN", "Floorplan", "", 0),
