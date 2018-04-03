@@ -1,21 +1,21 @@
 
-CYNTHIA BLENDER ADDON
+# CYNTHIA BUILDING GENERATOR
 
--Purpose:
+## Purpose:
 
-	~Provide a quick way to generate buildings in blender
+> Provide a quick way to model buildings in blender
 
 
--Features:
+## Features:
 
-	~Create Floorplan 	::
-		* Provide a set of basic floorplan shapes to build geometry from 
-	
-	~Create Floors		::
-		* Extrude floorplan shapes to create walls
+1. Create Floorplan
+	* Provide a set of basic floorplan shapes to build geometry from
 
-	-Add Windows		::
-		* Add window geometry to walls
+2. Create Floors
+	* Extrude floorplan shapes to create walls
 
-	-Add Doors			::
-		* Add door geometry to walls
+3. Add Windows
+	* Add window geometry to walls
+
+4. Add Doors
+	* Add door geometry to walls
