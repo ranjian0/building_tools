@@ -4,6 +4,7 @@ from bpy.props import PointerProperty, CollectionProperty, IntProperty
 from .floor     import FloorOperator, FloorProperty
 from .floorplan import FloorplanOperator, FloorplanProperty
 from .door      import DoorOperator, DoorProperty
+from .window    import WindowOperator, WindowProperty
 
 from .generic import PropertyProxy, BuildingProperty
 
@@ -11,6 +12,7 @@ classes = [
     FloorOperator , FloorProperty,
     FloorplanOperator, FloorplanProperty,
     DoorOperator, DoorProperty,
+    WindowOperator, WindowProperty,
 
     BuildingProperty, PropertyProxy
 ]

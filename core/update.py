@@ -24,6 +24,7 @@ def update_building(self, context):
     from .floor import Floor
     from .floorplan import Floorplan
     from .door import Door
+    from .window import Window
 
     # Clear mesh data from active object
     obj = context.object
@@ -37,9 +38,9 @@ def update_building(self, context):
         elif prop.type == 'FLOOR':
             Floor.build(context, True)
 
-        # elif prop.type == 'WINDOW':
-        #     face_indices = obj['window_groups'][str(prop.id)]
-        #     cls.build(context, face_indices, True, prop.id)
+        elif prop.type == 'WINDOW':
+            face_indices = obj['window_groups'][str(prop.id)]
+            cls.build(context, face_indices, True, prop.id)
 
         elif prop.type == 'DOOR':
             face_indices = obj['door_groups'][str(prop.id)]
