@@ -36,7 +36,7 @@ def update_building(self, context):
 
         elif prop.type == 'FLOOR':
             from .floor import Floor
-            Floor.build(context, True)
+            Floor.build(context)
 
         elif prop.type == 'WINDOW':
             from .window import Window
