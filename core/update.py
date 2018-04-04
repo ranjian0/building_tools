@@ -32,7 +32,7 @@ def update_building(self, context):
     for prop in properties:
         if prop.type == 'FLOORPLAN':
             from .floorplan import Floorplan
-            Floorplan.build(True, obj)
+            Floorplan.build(obj, True)
 
         elif prop.type == 'FLOOR':
             from .floor import Floor

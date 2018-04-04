@@ -24,7 +24,7 @@ from ...utils import (
 class Floorplan:
 
     @classmethod
-    def build(cls, update=False, _obj=None):
+    def build(cls, _obj=None, update=False):
         """ Build the floorplan from given properties """
 
         # -- create the floorplan object
