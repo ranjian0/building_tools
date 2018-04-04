@@ -5,10 +5,10 @@ from .update import update_building
 
 class PropertyProxy(bpy.types.PropertyGroup):
     property_items = [
-        ("FLOORPLAN", "Floorplan", "", 0),
-        ("FLOOR", "Floor", "", 1),
-        ("WINDOW", "Window", "", 2),
-        ("DOOR", "Door", "", 3)
+        ("FLOORPLAN",   "Floorplan",    "", 0),
+        ("FLOOR",       "Floor",        "", 1),
+        ("WINDOW",      "Window",       "", 2),
+        ("DOOR",        "Door",         "", 3)
     ]
     type    = EnumProperty(items=property_items)
 

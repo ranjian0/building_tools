@@ -24,6 +24,12 @@ def update_building(self, context):
     obj = context.object
     obj_clear_data(obj)
 
+    # CAUTION!
+    # - property_list always contains at least one prop in a valid building, this means atleast one of the
+    #   if-else block will be executed.
+    # - Blocks that are lower in the if-else block require that all blocks above them
+    #   are executed first. eg if
+
     properties = obj.property_list
     for prop in properties:
         if prop.type == 'FLOORPLAN':
