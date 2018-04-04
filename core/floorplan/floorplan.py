@@ -48,7 +48,6 @@ class Floorplan:
             fp_composite(bm, **kwargs)
 
         elif props.type == 'H-SHAPED':
-            print("Done")
             fp_hshaped(bm, **kwargs)
 
         # -- write bmesh back into object
