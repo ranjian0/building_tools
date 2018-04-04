@@ -77,11 +77,17 @@ class RemovePropertyOperator(bpy.types.Operator):
         obj = context.object
 
         # remove property
-        idx = obj.property_index
+        idx     = obj.property_index
+        ptype   = obj.property_list[idx].type
+
         obj.property_index -= 1
         obj.property_list.remove(idx)
 
         # Update building
         update_building(self, context)
+
+        # if the property is floorplan, delete object
+        if ptype == "FLOORPLAN":
+            bpy.ops.object.delete(use_global=False)
 
         return {'FINISHED'}
