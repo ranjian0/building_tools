@@ -119,8 +119,7 @@ if __name__ == "__main__":
     try:
         unregister()
     except RuntimeError as e:
-        import traceback; traceback.print_exc()
-        print("UNREGISTERED MODULE .. FAIL", e)
+        pass
     register()
 
 
