@@ -36,42 +36,42 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Number of segments in the circle",
         update=update_building)
 
-    tw      = FloatProperty(
+    tw1     = FloatProperty(
         name="Tail Width", min=0.0, max=100.0, default=1,
         description="Width of floorplan segment",
         update=update_building)
 
-    tl      = FloatProperty(
+    tl1     = FloatProperty(
         name="Tail Length", min=0.0, max=100.0, default=1,
         description="Length of floorplan segment",
         update=update_building)
 
-    tw1     = FloatProperty(
+    tw2     = FloatProperty(
         name="Tail Width 1", min=0.0, max=100.0, default=1,
         description="Width of floorplan segment",
         update=update_building)
 
-    tl1     = FloatProperty(
+    tl2     = FloatProperty(
         name="Tail Length 1", min=0.0, max=100.0, default=1,
         description="Length of floorplan segment",
         update=update_building)
 
-    tw2     = FloatProperty(
+    tw3     = FloatProperty(
         name="Tail Width 2", min=0.0, max=100.0, default=1,
         description="Width of floorplan segment",
         update=update_building)
 
-    tl2     = FloatProperty(
+    tl3     = FloatProperty(
         name="Tail Length 2", min=0.0, max=100.0, default=1,
         description="Length of floorplan segment",
         update=update_building)
 
-    tw3     = FloatProperty(
+    tw4     = FloatProperty(
         name="Tail Width 3", min=0.0, max=100.0, default=1,
         description="Width of floorplan segment",
         update=update_building)
 
-    tl3     = FloatProperty(
+    tl4     = FloatProperty(
         name="Tail Length 3", min=0.0, max=100.0, default=1,
         description="Length of floorplan segment",
         update=update_building)
@@ -105,10 +105,10 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             row.prop(self, 'length')
 
             col = box.column(align=True)
-            col.prop(self, 'tl')
             col.prop(self, 'tl1')
             col.prop(self, 'tl2')
             col.prop(self, 'tl3')
+            col.prop(self, 'tl4')
 
         elif self.type == 'H-SHAPED':
             row = box.row(align=True)
@@ -118,13 +118,13 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             row = box.row(align=True)
 
             col = row.column(align=True)
-            col.prop(self, 'tw')
             col.prop(self, 'tw1')
             col.prop(self, 'tw2')
             col.prop(self, 'tw3')
+            col.prop(self, 'tw4')
 
             col = row.column(align=True)
-            col.prop(self, 'tl')
             col.prop(self, 'tl1')
             col.prop(self, 'tl2')
             col.prop(self, 'tl3')
+            col.prop(self, 'tl4')

@@ -14,6 +14,10 @@ def ifeven(num, val1, val2):
     return condition(num % 2 == 0, val1, val2)
 
 
+def args_from_props(props, names):
+    """ returns a tuple with the properties in props for the given names """
+    return tuple(getattr(props, name) for name in names)
+
 def kwargs_from_props(props):
     """ Converts all properties in a props into dict """
     valid_types = (
