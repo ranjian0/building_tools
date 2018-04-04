@@ -83,6 +83,5 @@ class RemovePropertyOperator(bpy.types.Operator):
 
         # Update building
         update_building(self, context)
-        context.area.tag_redraw()
 
         return {'FINISHED'}

@@ -48,5 +48,5 @@ def update_building(self, context):
             face_indices = obj['door_groups'][str(prop.id)]
             Door.build(context, face_indices, True, prop.id)
 
-
+    context.area.tag_redraw()
     return None
