@@ -7,64 +7,79 @@ from ..generic import SplitProperty
 class WindowProperty(bpy.types.PropertyGroup):
     win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
     type        = EnumProperty(
-        description="Type of window", items=win_types, default='BASIC',
+        items=win_types, default='BASIC',
+        description="Type of window",
         update=update_building)
 
     fill_type   = [("BAR", "Bar", "", 0), ("PANE", "Pane", "", 1)]
     fill        = EnumProperty(
-        description="Type of fill for window",items=fill_type, default='BAR',
+        items=fill_type, default='BAR',
+        description="Type of fill for window",
         update=update_building)
 
     ft          = FloatProperty(
-        name="Frame Thickness", description="Thickness of window Frame", min=0.01, max=100.0, default=0.1,
+        name="Frame Thickness", min=0.01, max=100.0, default=0.1,
+        description="Thickness of window Frame",
         update=update_building)
 
     fd          = FloatProperty(
-        name="Frame Depth", description="Depth of window Frame", min=0.0, max=100.0, default=0.1,
+        name="Frame Depth", min=0.0, max=100.0, default=0.1,
+        description="Depth of window Frame",
         update=update_building)
 
     px          = IntProperty(
-        name="Horizontal Panes", description="Number of horizontal frames", min=0, max=100, default=1,
+        name="Horizontal Panes", min=0, max=100, default=1,
+        description="Number of horizontal frames",
         update=update_building)
 
     py          = IntProperty(
-        name="Vertical Panes", description="Number of vertical frames", min=0, max=100, default=1,
+        name="Vertical Panes", min=0, max=100, default=1,
+        description="Number of vertical frames",
         update=update_building)
 
     pt          = FloatProperty(
-        name="Pane Frame Thickness", description="Thickness of window pane frame", min=0.01, max=100.0, default=0.1,
+        name="Pane Frame Thickness", min=0.01, max=100.0, default=0.1,
+        description="Thickness of window pane frame",
         update=update_building)
 
     pd          = FloatProperty(
-        name="Pane Frame Depth", description="Depth of window pane frame", min=0.01, max=100.0, default=0.01,
+        name="Pane Frame Depth", min=0.01, max=100.0, default=0.01,
+        description="Depth of window pane frame",
         update=update_building)
 
     ares        = IntProperty(
-        name="Arc Resolution", description="Number of segements for the arc", min=0, max=1000, default=5,
+        name="Arc Resolution", min=0, max=1000, default=5,
+        description="Number of segements for the arc",
         update=update_building)
 
     aoff        = FloatProperty(
-        name="Arc Offset", description="How far arc is from top", min=0.01, max=1.0, default=0.5,
+        name="Arc Offset", min=0.01, max=1.0, default=0.5,
+        description="How far arc is from top",
         update=update_building)
 
     aheight     = FloatProperty(
-        name="Arc Height", description="Radius of the arc", min=0.01, max=100.0, default=0.5,
+        name="Arc Height", min=0.01, max=100.0, default=0.5,
+        description="Radius of the arc",
         update=update_building)
 
     adetail     = BoolProperty(
-        name="Arc Detail", description="Whether to add detail to arc", default=False,
+        name="Arc Detail", default=False,
+        description="Whether to add detail to arc",
         update=update_building)
 
     dthick      = FloatProperty(
-        name="Arc Detail Size", description="Size of arc details", min=0.01, max=100.0, default=0.02,
+        name="Arc Detail Size", min=0.01, max=100.0, default=0.02,
+        description="Size of arc details",
         update=update_building)
 
     ddepth      = FloatProperty(
-        name="Arc Detail Depth", description="Depth of arc details", min=0.01, max=100.0, default=0.02,
+        name="Arc Detail Depth", min=0.01, max=100.0, default=0.02,
+        description="Depth of arc details",
         update=update_building)
 
     has_split   = BoolProperty(
-        name="Add Split", description="Whether to split the window face", default=True,
+        name="Add Split", default=True,
+        description="Whether to split the window face",
         update=update_building)
 
     split       = PointerProperty(type=SplitProperty)

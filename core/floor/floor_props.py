@@ -6,19 +6,23 @@ from ..update import update_building
 
 class FloorProperty(bpy.types.PropertyGroup):
     floor_count     = IntProperty(
-        name="Floor Count", description="Number of floors", min=1, max=1000, default=1,
+        name="Floor Count", min=1, max=1000, default=1,
+        description="Number of floors",
         update=update_building)
 
     floor_height    = FloatProperty(
-        name="Floor Height", description="Height of each floor", min=0.01, max=1000.0, default=1.0,
+        name="Floor Height", min=0.01, max=1000.0, default=1.0,
+        description="Height of each floor",
         update=update_building)
 
     slab_thickness  = FloatProperty(
-        name="Slab Height", description="Thickness of each slab", min=0.01, max=1000.0, default=0.15,
+        name="Slab Height", min=0.01, max=1000.0, default=0.15,
+        description="Thickness of each slab",
         update=update_building)
 
     slab_outset     = FloatProperty(
-        name="Slab Outset", description="Outset of each slab", min=0.01, max=1000.0, default=0.1,
+        name="Slab Outset", min=0.01, max=1000.0, default=0.1,
+        description="Outset of each slab",
         update=update_building)
 
     mat_slab        = PointerProperty(type=bpy.types.Material,

@@ -21,6 +21,7 @@ from .core import register_core, unregister_core
 # =======================================================
 
 class PROP_items(bpy.types.UIList):
+    """UIList for property groups"""
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         sp = layout.split(percentage=.9)
@@ -32,7 +33,8 @@ class PROP_items(bpy.types.UIList):
 
 
 class CynthiaPanel(bpy.types.Panel):
-    """Docstring of CynthiaPanel"""
+    """UI panel for building operators and properties"""
+
     bl_idname = "VIEW3D_PT_cynthia"
     bl_label = "Cynthia Building Tools"
 
@@ -44,7 +46,8 @@ class CynthiaPanel(bpy.types.Panel):
         layout = self.layout
         active = context.object
 
-        # Draw the operators
+        # Draw Operators
+        # ``````````````
         col = layout.column(align=True)
 
         row = col.row(align=True)
@@ -55,16 +58,8 @@ class CynthiaPanel(bpy.types.Panel):
         row.operator("cynthia.add_window")
         row.operator("cynthia.add_door")
 
-        row = col.row(align=True)
-        row.operator("cynthia.add_balcony")
-        row.operator("cynthia.add_railing")
-
-        col.operator("cynthia.add_stairs")
-        # col.operator("cynthia.add_staircase")
-
-        col.operator("cynthia.add_roof")
-
         # Draw Properties
+        # ```````````````
         col = layout.column(align=True)
         col.box().label("Properties")
 
@@ -72,27 +67,30 @@ class CynthiaPanel(bpy.types.Panel):
             box = col.box()
             obj = context.object
 
-            # Draw UIlist for all property groups
+            # -- draw UIlist for property groups
             rows = 2
             row = box.row()
             row.template_list("PROP_items", "", obj, "property_list", obj, "property_index", rows=rows)
 
 
-            # draw  properties for active group
-            active_index = obj.property_index
+            # -- draw  properties for active prop-group
             if not len(obj.property_list):
                 return
-            active_prop = obj.property_list[active_index]
+            active_index    = obj.property_index
+            active_prop     = obj.property_list[active_index]
 
             if active_prop.type     == 'FLOORPLAN':
                 fp_props = obj.building.floorplan
                 fp_props.draw(context, box)
+
             elif active_prop.type   == 'FLOOR':
                 floor_props = obj.building.floors
                 floor_props.draw(context, box)
+
             elif active_prop.type   == 'WINDOW':
                 win_prop = obj.building.windows[active_prop.id]
                 win_prop.draw(context, box)
+
             elif active_prop.type   == 'DOOR':
                 door_prop = obj.building.doors[active_prop.id]
                 door_prop.draw(context, box)

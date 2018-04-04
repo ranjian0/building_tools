@@ -12,59 +12,73 @@ class FloorplanProperty(bpy.types.PropertyGroup):
     ]
 
     type    = EnumProperty(
-        description="Type of floorplan", items=fp_types, default='RECTANGULAR',
+        items=fp_types, default='RECTANGULAR',
+        description="Type of floorplan",
         update=update_building)
 
     width   = FloatProperty(
-        name="Width", description="Base Width of floorplan", min=0.01, max=100.0, default=2,
+        name="Width", min=0.01, max=100.0, default=2,
+        description="Base Width of floorplan",
         update=update_building)
 
     length  = FloatProperty(
-        name="Length", description="Base Length of floorplan", min=0.01, max=100.0, default=2,
+        name="Length", min=0.01, max=100.0, default=2,
+        description="Base Length of floorplan",
         update=update_building)
 
     radius  = FloatProperty(
-        name="Radius", description="Radius of circle", min=0.1, max=100.0, default=1.0,
+        name="Radius", min=0.1, max=100.0, default=1.0,
+        description="Radius of circle",
         update=update_building)
 
     segs    = IntProperty(
-        name="Segments", description="Number of segments in the circle", min=3, max=100, default=32,
+        name="Segments", min=3, max=100, default=32,
+        description="Number of segments in the circle",
         update=update_building)
 
     tw      = FloatProperty(
-        name="Tail Width", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Width", min=0.0, max=100.0, default=1,
+        description="Width of floorplan segment",
         update=update_building)
 
     tl      = FloatProperty(
-        name="Tail Length", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Length", min=0.0, max=100.0, default=1,
+        description="Length of floorplan segment",
         update=update_building)
 
     tw1     = FloatProperty(
-        name="Tail Width 1", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Width 1", min=0.0, max=100.0, default=1,
+        description="Width of floorplan segment",
         update=update_building)
 
     tl1     = FloatProperty(
-        name="Tail Length 1", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Length 1", min=0.0, max=100.0, default=1,
+        description="Length of floorplan segment",
         update=update_building)
 
     tw2     = FloatProperty(
-        name="Tail Width 2", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Width 2", min=0.0, max=100.0, default=1,
+        description="Width of floorplan segment",
         update=update_building)
 
     tl2     = FloatProperty(
-        name="Tail Length 2", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Length 2", min=0.0, max=100.0, default=1,
+        description="Length of floorplan segment",
         update=update_building)
 
     tw3     = FloatProperty(
-        name="Tail Width 3", description="Width of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Width 3", min=0.0, max=100.0, default=1,
+        description="Width of floorplan segment",
         update=update_building)
 
     tl3     = FloatProperty(
-        name="Tail Length 3", description="Length of floorplan segment", min=0.0, max=100.0, default=1,
+        name="Tail Length 3", min=0.0, max=100.0, default=1,
+        description="Length of floorplan segment",
         update=update_building)
 
     cap_tris= BoolProperty(
-        name='Cap Triangles', description='Set the fill type to triangles', default=False,
+        name='Cap Triangles', default=False,
+        description='Set the fill type to triangles',
         update=update_building)
 
     def draw(self, context, layout):

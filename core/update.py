@@ -5,22 +5,19 @@ from ..utils import obj_clear_data, Logger
 
 LG = Logger(__name__)
 def update_building(self, context):
-    """Update building geometry
+    """
+    Called when a property is changed by the user.
+    Updates building geometry of active object.
 
-    This function is used by all properties as an update callback.
-    It must handle all the update and regeneration of active building object
-    geometry
-
-    Arguments:
-        self     -- the property group containing the property that
-                    was changed/updated
-        context  -- current blender context
+    Args:
+        self    (bpy.types.PropertyGroup): PropertyGroup of the property that was updated
+        context (bpy.types.Context): Current blender Context
 
     Returns:
-        None
+        None:
     """
 
-    # Clear mesh data from active object
+    # -- clear mesh data
     obj = context.object
     obj_clear_data(obj)
 
@@ -30,6 +27,7 @@ def update_building(self, context):
     # - Blocks that are lower in the if-else block require that all blocks above them
     #   are executed first. eg if
 
+    # -- rebuild mesh
     properties = obj.property_list
     for prop in properties:
         if prop.type == 'FLOORPLAN':

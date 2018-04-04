@@ -4,6 +4,17 @@ from bpy.props import *
 from .update import update_building
 
 class PropertyProxy(bpy.types.PropertyGroup):
+    """Stores the type and id of a PropertyGroup
+
+    -Is currently registered as a collection to bpy.types.Object.
+    -Allows us to get the corresponding PropertyGroup in bpy.types.Object.building
+     where:
+        * type is the PropertyGroup class
+            AND
+        * id is the index of a Property in a collection.
+    - Name is used in the UI for user convinience
+    """
+
     property_items = [
         ("FLOORPLAN",   "Floorplan",    "", 0),
         ("FLOOR",       "Floor",        "", 1),
@@ -17,6 +28,12 @@ class PropertyProxy(bpy.types.PropertyGroup):
 
 
 class SplitProperty(bpy.types.PropertyGroup):
+    """ Convinience PropertyGroup used for reqular Quad Inset
+
+    TODO: rename this, Split implies dividing in half
+    TODO: rename properties to size and position
+    TODO: Clamp amount factor to between 0.0 and 1.0. (0.0 - 3.0 is confusing)
+    """
     amount  = FloatVectorProperty(
         name="Split Amount", description="How much to split geometry", min=.01, max=2.99,
         subtype='XYZ', size=2, default=(2.0, 2.7),
@@ -48,7 +65,10 @@ class SplitProperty(bpy.types.PropertyGroup):
 
 
 class RemovePropertyOperator(bpy.types.Operator):
-    """ Create roof on selected mesh faces """
+    """ Remove the active Property in current object's property_list
+        Called via 'X' button in PROP_items(bpy.types.UIList)
+    """
+
     bl_idname = "cynthia.remove_property"
     bl_label = "Remove Property"
     bl_options = {'REGISTER'}

@@ -37,10 +37,7 @@ def register_core():
 
 def unregister_core():
     for cls in classes:
-        try:
-            bpy.utils.unregister_class(cls)
-        except Exception as e:
-            print(cls.__name__, " :: --> ", e)
+        bpy.utils.unregister_class(cls)
 
     del bpy.types.Object.building
     del bpy.types.Object.property_list
