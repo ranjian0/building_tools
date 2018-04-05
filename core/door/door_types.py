@@ -4,17 +4,17 @@ from bmesh.types import BMEdge, BMVert
 from mathutils import Vector
 from ...utils import (
         split,
+        bm_to_obj,
+        bm_from_obj,
         filter_geom,
+        door_mat_pane,
+        door_mat_glass
+        door_mat_frame,
+        door_mat_groove,
+        material_set_faces,
+        index_from_facedata,
         filter_vertical_edges,
         filter_horizontal_edges,
-        index_from_facedata,
-        bm_from_obj,
-        bm_to_obj,
-        material_set_faces,
-        door_mat_frame,
-        door_mat_pane,
-        door_mat_groove,
-        door_mat_glass
     )
 
 def door_basic(cls, **kwargs):
