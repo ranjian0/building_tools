@@ -8,13 +8,13 @@ from ...utils import (
         bm_from_obj,
         filter_geom,
         door_mat_pane,
-        door_mat_glass
+        door_mat_glass,
         door_mat_frame,
         door_mat_groove,
         material_set_faces,
         index_from_facedata,
         filter_vertical_edges,
-        filter_horizontal_edges,
+        filter_horizontal_edges
     )
 
 def door_basic(cls, **kwargs):
