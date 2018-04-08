@@ -108,11 +108,9 @@ def win_arched(cls, **kwargs):
 
     bmesh.update_edit_mesh(me, True)
 
-def make_window_split(bm, face, size, off, has_split, **kwargs):
+def make_window_split(bm, face, size, off, **kwargs):
     """ Basically scales down the face given based on parameters """
-    if has_split:
-        return split(bm, face, size.y, size.x, off.x, off.y, off.z)
-    return face
+    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 def make_window_frame(bm, face, ft, fd, **kwargs):
     """ Inset and extrude to create a frame """

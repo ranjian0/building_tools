@@ -10,24 +10,24 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     TODO: Clamp amount factor to between 0.0 and 1.0. (0.0 - 3.0 is confusing)
     """
     size  = FloatVectorProperty(
-        name="Size", min=.01, max=1.0, subtype='XYZ', size=2, default=(0.5, 0.7),
+        name="Size", min=.01, max=0.99, subtype='XYZ', size=2, default=(0.5, 0.7),
         description="Size of geometry")
 
     off     = FloatVectorProperty(
         name="Offset", min=-1000.0, max=1000.0, subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
         description="How much to offset geometry")
 
-    collapsed = BoolProperty()
+    collapsed = BoolProperty(default=True)
 
     def draw(self, context, layout):
         box = layout.box()
-        row = box.row(align=True)
+        box.prop(self, 'collapsed', text="Size and Offset", toggle=True)
 
-        row.prop(self, 'collapsed', text="",
-            icon='INLINK' if not self.collapsed else 'LINK')
         if not self.collapsed:
-            col = box.column(align=True)
+            row = box.row(align=False)
+
+            col = row.column(align=True)
             col.prop(self, 'size', slider=True)
 
-            col = box.column(align=True)
+            col = row.column(align=True)
             col.prop(self, 'off')

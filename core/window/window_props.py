@@ -65,7 +65,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     soff        = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
-        self.soff.draw(context, layout, self)
+        self.soff.draw(context, layout)
 
         row = layout.row()
         row.prop(self, "type", text="")

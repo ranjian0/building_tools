@@ -48,10 +48,8 @@ def door_basic(cls, **kwargs):
 
     bmesh.update_edit_mesh(me, True)
 
-def make_door_split(bm, face, size, off, has_split, **kwargs):
-    if has_split:
-        return split(bm, face, size.y, size.x, off.x, off.y, off.z)
-    return face
+def make_door_split(bm, face, size, off, **kwargs):
+    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 def make_door_frame(bm, face, oft, ofd, **kwargs):
 
