@@ -58,27 +58,9 @@ class CynthiaPanel(bpy.types.Panel):
 
 
             # -- draw  properties for active prop-group
-            if not len(obj.property_list):
-                return
-            active_index    = obj.property_index
-            active_prop     = obj.property_list[active_index]
-
-            if active_prop.type     == 'FLOORPLAN':
-                fp_props = obj.building.floorplan
-                fp_props.draw(context, box)
-
-            elif active_prop.type   == 'FLOOR':
-                floor_props = obj.building.floors
-                floor_props.draw(context, box)
-
-            elif active_prop.type   == 'WINDOW':
-                win_prop = obj.building.windows[active_prop.id]
-                win_prop.draw(context, box)
-
-            elif active_prop.type   == 'DOOR':
-                door_prop = obj.building.doors[active_prop.id]
-                door_prop.draw(context, box)
-
+            current_ops = obj.active_op
+            props = current_op.props
+            props.draw(context, box)
 
 # =======================================================
 #
@@ -88,13 +70,11 @@ class CynthiaPanel(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(CynthiaPanel)
-    bpy.utils.register_class(PROP_items)
     register_core()
 
 
 def unregister():
     bpy.utils.unregister_class(CynthiaPanel)
-    bpy.utils.unregister_class(PROP_items)
     unregister_core()
 
 if __name__ == "__main__":
