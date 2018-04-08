@@ -13,6 +13,9 @@ class FloorplanOperator(bpy.types.Operator):
 
     def execute(self, context):
         Floorplan.build(context, self.props)
-        context.object.active_op = self
         return {'FINISHED'}
+
+    def draw(self, context):
+        layout = self.layout
+        self.props.draw(context, layout)
 
