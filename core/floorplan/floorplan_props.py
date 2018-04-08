@@ -47,8 +47,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tw3     = FloatProperty(
         name="Tail Width 2", min=0.0, max=100.0, default=1,
-        description="Width of floorplan segment",
-        update=update_building)
+        description="Width of floorplan segment")
 
     tl3     = FloatProperty(
         name="Tail Length 2", min=0.0, max=100.0, default=1,

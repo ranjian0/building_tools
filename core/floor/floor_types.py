@@ -5,7 +5,7 @@ from bmesh.types import (
     )
 
 from ...utils import (
-    get_edit_mesh
+    get_edit_mesh,
     filter_geom,
     )
 

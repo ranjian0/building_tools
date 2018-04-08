@@ -14,10 +14,10 @@ from .window    import WindowOperator, WindowProperty
 classes = [
     SplitProperty,
 
-    FloorOperator , FloorProperty,
-    FloorplanOperator, FloorplanProperty,
-    DoorOperator, DoorProperty,
-    WindowOperator, WindowProperty,
+    FloorProperty,FloorOperator ,
+    FloorplanProperty, FloorplanOperator,
+    DoorProperty, DoorOperator,
+    WindowProperty, WindowOperator,
 ]
 
 

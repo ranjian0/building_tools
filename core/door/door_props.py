@@ -15,8 +15,7 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     ift     = FloatProperty(
         name="InnerFrame Thickness", min=0.0, max=100.0, default=0.1,
-        description="Thickness of inner door Frame",
-        update=update_building)
+        description="Thickness of inner door Frame")
 
     ifd     = FloatProperty(
         name="InnerFrame Depth", min=0.0, max=100.0, default=0.1, step=1,

@@ -11,13 +11,11 @@ class SplitProperty(bpy.types.PropertyGroup):
     """
     amount  = FloatVectorProperty(
         name="Split Amount", description="How much to split geometry", min=.01, max=2.99,
-        subtype='XYZ', size=2, default=(2.0, 2.7),
-        update=update_building)
+        subtype='XYZ', size=2, default=(2.0, 2.7))
 
     off     = FloatVectorProperty(
         name="Split Offset", description="How much to offset geometry", min=-1000.0, max=1000.0,
-        subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0),
-        update=update_building)
+        subtype='TRANSLATION', size=3, default=(0.0, 0.0, 0.0))
 
     collapsed = BoolProperty()
 
