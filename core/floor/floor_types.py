@@ -5,8 +5,7 @@ from bmesh.types import (
     )
 
 from ...utils import (
-    bm_to_obj,
-    bm_from_obj,
+    get_edit_mesh
     filter_geom,
     floor_mat_slab,
     floor_mat_wall,
@@ -24,7 +23,6 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
         slab_thickness (float): Thickness of floor slabs
         slab_outset (float): How much the slab extends outwards
     """
-    obj = bpy.context.object
 
     # -- make/get materials
     slab_mat = kwargs.get("mat_slab")
@@ -39,7 +37,7 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
     mslab_faces, mfloor_faces = [], []
 
     # -- get active object bmesh
-    bm = bm_from_obj(obj)
+    bm = bmesh.from_edit_mesh(get_edit_mesh())
 
     # -- find boundary edges
     edges = [e for e in bm.edges if e.is_boundary]
