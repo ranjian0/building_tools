@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 
-from ..generic import SplitProperty
+from ..generic import SizeOffsetProperty
 
 class WindowProperty(bpy.types.PropertyGroup):
     win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
@@ -62,13 +62,11 @@ class WindowProperty(bpy.types.PropertyGroup):
         name="Arc Detail Depth", min=0.01, max=100.0, default=0.02,
         description="Depth of arc details")
 
-    has_split   = BoolProperty(
-        name="Add Split", default=True,
-        description="Whether to split the window face")
-
-    split       = PointerProperty(type=SplitProperty)
+    soff        = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
+        self.soff.draw(context, layout, self)
+
         row = layout.row()
         row.prop(self, "type", text="")
 
@@ -109,6 +107,3 @@ class WindowProperty(bpy.types.PropertyGroup):
         col.prop(self, 'pt', text=txt)
         if self.fill == 'PANE':
             col.prop(self, 'pd')
-
-        # -- draw split property
-        self.split.draw(context, layout, self)

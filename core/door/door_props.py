@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 
-from ..generic import SplitProperty
+from ..generic import SizeOffsetProperty
 
 
 class DoorProperty(bpy.types.PropertyGroup):
@@ -81,13 +81,11 @@ class DoorProperty(bpy.types.PropertyGroup):
         name='Window Panes', default=False,
         description='Door has window panes')
 
-    has_split   = BoolProperty(
-        name="Add Split", default=True,
-        description="Whether to split the door face")
-
-    split   = PointerProperty(type=SplitProperty)
+    soff   = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
+        self.soff.draw(context, layout)
+
         box = layout.box()
         box.prop(self, "hdd", toggle=True)
 
@@ -98,9 +96,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         col = box.column(align=True)
         col.prop(self, 'ift')
         col.prop(self, 'ifd')
-
-        # Split
-        self.split.draw(context, layout, self)
 
         # Panned
         box = layout.box()

@@ -19,12 +19,12 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     collapsed = BoolProperty()
 
-    def draw(self, context, layout, parent):
+    def draw(self, context, layout):
         box = layout.box()
         row = box.row(align=True)
+
         row.prop(self, 'collapsed', text="",
             icon='INLINK' if not self.collapsed else 'LINK')
-
         if not self.collapsed:
             col = box.column(align=True)
             col.prop(self, 'size', slider=True)

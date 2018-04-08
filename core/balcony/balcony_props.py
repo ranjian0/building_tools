@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import *
 
-from ..generic import SplitProperty
+from ..generic import SizeOffsetProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
     width   = FloatProperty(
@@ -67,24 +67,13 @@ class BalconyProperty(bpy.types.PropertyGroup):
         items=fill_types, default='POSTS',
         description="Type of railing")
 
-    has_split = BoolProperty(
-        name="Add Split", default=False,
-        description="Whether to split the balcony face")
-
-    split = PointerProperty(type=SplitProperty)
+    soff = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
+        self.soff.draw(context, layout)
+
         row = layout.row()
         row.prop(self, 'width')
-
-        box = layout.box()
-        box.prop(self, 'has_split', toggle=True)
-        if self.has_split:
-            col = box.column(align=True)
-            col.prop(self.split, 'amount', slider=True)
-
-            col = box.column(align=True)
-            col.prop(self.split, 'off')
 
         box = layout.box()
         box.prop(self, 'railing', toggle=True)
