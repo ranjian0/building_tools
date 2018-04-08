@@ -2,7 +2,7 @@ import bpy
 from bpy.props import (PointerProperty,
     CollectionProperty, IntProperty)
 
-from .generic import SplitProperty
+from .generic import SizeOffsetProperty
 
 from .floor     import FloorOperator, FloorProperty
 from .floorplan import FloorplanOperator, FloorplanProperty
@@ -15,7 +15,7 @@ from .stairs    import StairsOperator, StairsProperty
 
 # -- take care here -- ORDER MATTERS !!!
 classes = [
-    SplitProperty,
+    SizeOffsetProperty,
 
     FloorProperty, FloorOperator,
     FloorplanProperty, FloorplanOperator,
