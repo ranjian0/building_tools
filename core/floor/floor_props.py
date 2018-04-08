@@ -1,34 +1,28 @@
 import bpy
 from bpy.props import *
 
-from ..update import update_building
-
 
 class FloorProperty(bpy.types.PropertyGroup):
     floor_count     = IntProperty(
         name="Floor Count", min=1, max=1000, default=1,
-        description="Number of floors",
-        update=update_building)
+        description="Number of floors")
 
     floor_height    = FloatProperty(
         name="Floor Height", min=0.01, max=1000.0, default=1.0,
-        description="Height of each floor",
-        update=update_building)
+        description="Height of each floor")
 
     slab_thickness  = FloatProperty(
         name="Slab Height", min=0.01, max=1000.0, default=0.15,
-        description="Thickness of each slab",
-        update=update_building)
+        description="Thickness of each slab")
 
     slab_outset     = FloatProperty(
         name="Slab Outset", min=0.01, max=1000.0, default=0.1,
-        description="Outset of each slab",
-        update=update_building)
+        description="Outset of each slab")
 
     mat_slab        = PointerProperty(type=bpy.types.Material,
-        name="Slab Material", description="Material for slab faces", update=update_building)
+        name="Slab Material", description="Material for slab faces")
     mat_wall        = PointerProperty(type=bpy.types.Material,
-        name="Wall Material", description="Material for wall faces", update=update_building)
+        name="Wall Material", description="Material for wall faces")
 
     def draw(self, context, layout):
         box = layout.box()
