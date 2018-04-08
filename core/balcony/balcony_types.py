@@ -1,16 +1,17 @@
 import bmesh
 from mathutils import Vector
 
-from bmesh.types import BMVert
+from bmesh.types import BMVert, BMFace
 from ..rails import rails_types as rails
 from ...utils import (
     split,
     filter_geom,
     get_edit_mesh,
+    face_with_verts,
     )
 
 
-def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, amount, off, has_split):
+def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, amount, off, has_split, **kwargs):
     """ Extrudes selected faces outwards and adds railings to outer edges """
 
     # Get current edit mesh
@@ -40,7 +41,7 @@ def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, 
             top_verts2 = list(f.verts)
             top_verts2.sort(key=lambda v: v.co.z)
 
-            top_face = bm.faces.get(top_verts1[2:] + top_verts2[2:])
+            top_face = face_with_verts(bm, top_verts1[2:] + top_verts2[2:]) #bm.faces.get(top_verts1[2:] + top_verts2[2:])
             reject = bm.edges.get(top_verts2[2:])
 
             edges = set(list(top_face.edges)).difference([reject])
