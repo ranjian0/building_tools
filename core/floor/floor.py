@@ -11,15 +11,13 @@ from ...utils import (
 class Floor:
 
     @classmethod
-    def build(cls, context):
+    def build(cls, context, props):
         """ Build floorplan geomerty from properties """
 
         # -- ensure that the mesh is a valid floorplan - (planar)
         if not cls.check_planar():
             return
 
-        # -- create geometry
-        props = context.object.building.floors
         flr_multistorey(**kwargs_from_props(props))
 
     @classmethod
@@ -27,12 +25,10 @@ class Floor:
         """ Check to see in active mesh is planar """
 
         # -- get current object bmesh
-        obj = bpy.context.object
-        bm = bm_from_obj(obj)
+        me = bpy.context.edit_object
+        bm = bmesh.from_edit_mesh(me)
 
         # -- check that all verts are on same z coordinate
         if len(set([v.co.z for v in bm.verts])) == 1:
-            bm_to_obj(bm, obj)
             return True
-        bm_to_obj(bm, obj)
         return False
