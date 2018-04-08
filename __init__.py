@@ -86,16 +86,3 @@ if __name__ == "__main__":
     except RuntimeError as e:
         pass
     register()
-
-
-    # Dev --init workspace
-    # --clear
-    # bpy.ops.object.select_all(action="SELECT")
-    # bpy.ops.object.delete(use_global=False)
-    # for mat in bpy.data.materials:
-    #     bpy.data.materials.remove(mat)
-    # # -- add
-    # bpy.ops.cynthia.add_floorplan()
-    # bpy.ops.cynthia.add_floors()
-    # bpy.context.object.building.floors.floor_count = 3
-    # bpy.context.object.building.floors.floor_height = 3
