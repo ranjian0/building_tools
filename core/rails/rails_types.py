@@ -1,9 +1,15 @@
 import bmesh
+from mathutils import Vector
+
+from bmesh.types import BMVert
 from ...utils import (
+    cube,
+    filter_geom,
+    face_with_verts,
     calc_edge_median
     )
 
-def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, has_corner_posts, delete_faces, fill):
+def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
     """ Creates rails and posts along selected edges """
 
     def top_rail(e, cen, off_x, off_y):
@@ -28,7 +34,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, has_corner
         off_x = -pw / 4 if cen.x > ref.x else pw / 4
         off_y = -pw / 4 if cen.y > ref.y else pw / 4
 
-        if has_corner_posts:
+        if hcp:
             for v in e.verts:
                 off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
                 off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
@@ -88,7 +94,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, has_corner
                 darg = (True,) * 4 + (False,) * 2
 
             wall = create_post(bm, size, pos)
-            if delete_faces:
+            if df:
                 if wh < cph:
                     darg = (False, False) + darg[2:]
                 del_faces(bm, wall, *darg)
