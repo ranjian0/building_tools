@@ -6,8 +6,6 @@ from mathutils import Matrix, Vector
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     split,
-    bm_to_obj,
-    bm_from_obj,
     filter_geom,
     square_face,
     get_edit_mesh,
