@@ -46,7 +46,6 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
         # Offset Slab
         ret = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
 
-
     # -- fill top face
     ret = bmesh.ops.contextual_create(bm, geom=edges)
 

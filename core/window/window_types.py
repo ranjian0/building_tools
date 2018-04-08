@@ -11,13 +11,7 @@ from ...utils import (
     filter_geom,
     square_face,
     get_edit_mesh,
-    window_mat_pane,
-    window_mat_bars,
-    window_mat_glass,
-    window_mat_frame,
     calc_edge_median,
-    material_set_faces,
-    index_from_facedata,
     calc_face_dimensions,
     filter_vertical_edges,
     filter_horizontal_edges,
@@ -129,30 +123,12 @@ def make_window_split(bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_
 def make_window_frame(bm, face, ft=0.05, fd=0.05, **kwargs):
     """ Inset and extrude to create a frame """
 
-    # -- make/get materials
-    obj = bpy.context.object
-    frame_mat = kwargs.get("mat_frame")
-    glass_mat = kwargs.get("mat_glass")
-    if not frame_mat:
-        frame_mat = window_mat_frame(obj)
-        win_index = obj.property_list[obj.property_index].id
-        obj.building.windows[win_index].mat_frame = frame_mat
-    if not glass_mat:
-        glass_mat = window_mat_glass(obj)
-        win_index = obj.property_list[obj.property_index].id
-        obj.building.windows[win_index].mat_glass = glass_mat
-
-    frame_faces, glass_faces = [], []
-    glass_faces.append(face)
-    material_set_faces(obj, glass_mat, glass_faces)
-
     # if there any double vertices we're in trouble
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
 
     # Make frame inset - frame thickness
     if ft > 0:
         res = bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
-        frame_faces.extend(res['faces'])
 
 
     # Make frame extrude - frame depth
@@ -163,25 +139,11 @@ def make_window_frame(bm, face, ft=0.05, fd=0.05, **kwargs):
         f = ret['faces'][0]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
 
-        current_faces.append(f)
-        new_faces = set(list(bm.faces)).difference(current_faces)
-        frame_faces.extend(list(new_faces))
-        material_set_faces(obj, frame_mat, frame_faces)
         return f
     return face
 
 def make_window_panes(bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
     """ Create some window panes """
-
-    # -- make/get pane materials
-    obj = bpy.context.object
-    pane_mat = kwargs.get("mat_pane")
-    if not pane_mat:
-        pane_mat = window_mat_pane(obj)
-        win_index = obj.property_list[obj.property_index].id
-        obj.building.windows[win_index].mat_pane = pane_mat
-    mpane_faces = []
-
 
     n = face.normal
     v_edges = filter_vertical_edges(face.edges, n)
@@ -209,9 +171,6 @@ def make_window_panes(bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         pane_faces = list({f for ed in e for f in ed.link_faces})
         panes = bmesh.ops.inset_individual(bm, faces=pane_faces, thickness=pt)
 
-        mpane_faces.extend((panes['faces']))
-        material_set_faces(obj, pane_mat, mpane_faces)
-
         for f in pane_faces:
             bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pd)
 
@@ -219,16 +178,6 @@ def make_window_panes(bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
 
 def make_window_bars(bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
     """ Create window bars """
-
-    # -- make/get bar materials
-    obj = bpy.context.object
-    bar_mat = kwargs.get("mat_bar")
-    if not bar_mat:
-        bar_mat = window_mat_bars(obj)
-        win_index = obj.property_list[obj.property_index].id
-        obj.building.windows[win_index].mat_bar = bar_mat
-    mbar_faces = []
-
 
     # Calculate center, width and height of face
     width, height = calc_face_dimensions(face)
@@ -242,10 +191,6 @@ def make_window_bars(bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         ret = bmesh.ops.duplicate(bm, geom=[face])
         square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
         verts = filter_geom(ret['geom'], BMVert)
-
-        # Material
-        mbar_faces.extend(filter_geom(ret['geom'], BMFace))
-        material_set_faces(obj, bar_mat, mbar_faces)
 
         # Scale and translate
         bmesh.ops.scale(bm, verts=verts, vec=(1, 1, pt), space=Matrix.Translation(-fc))
@@ -264,10 +209,6 @@ def make_window_bars(bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         # Duplicate
         ret = bmesh.ops.duplicate(bm, geom=[face])
         verts = filter_geom(ret['geom'], BMVert)
-
-        # Material
-        mbar_faces.extend(filter_geom(ret['geom'], BMFace))
-        material_set_faces(obj, bar_mat, mbar_faces)
 
         # Scale and Translate
         bmesh.ops.scale(bm, verts=verts, vec=(pt, pt, 1), space=Matrix.Translation(-fc))
@@ -329,14 +270,6 @@ def make_window_arch(bm, face, ares=3, aoff=.5, aheight=.4, **kwargs):
 def make_window_arch_detail(bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
     """ Create detail in the arched face """
 
-    obj = bpy.context.object
-    pane_mat = kwargs.get("mat_pane")
-    if not pane_mat:
-        pane_mat = window_mat_pane(obj)
-        win_index = obj.property_list[obj.property_index].id
-        obj.building.windows[win_index].mat_pane = pane_mat
-    mpane_faces = []
-
     if not adetail:
         return
 
@@ -348,9 +281,6 @@ def make_window_arch_detail(bm, face, adetail=True, dthick=.03, ddepth=.01, **kw
     if dthick > 0:
         ret = bmesh.ops.inset_individual(bm, faces=res['faces'], thickness=dthick)
         bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-
-        mpane_faces.extend((ret['faces']))
-        material_set_faces(obj, pane_mat, mpane_faces)
 
         ret = bmesh.ops.extrude_discrete_faces(bm, faces=res['faces'])
         verts = [v for f in ret['faces'] for v in f.verts]
