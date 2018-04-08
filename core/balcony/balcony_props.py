@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import *
 
+from ..generic import SplitProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
     # Balcony Options
