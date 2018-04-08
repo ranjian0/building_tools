@@ -47,18 +47,6 @@ class CynthiaPanel(bpy.types.Panel):
         row.operator("cynthia.add_window")
         row.operator("cynthia.add_door")
 
-        # Draw Properties
-        # ```````````````
-        col = layout.column(align=True)
-        col.box().label("Properties")
-
-        if active:
-            box = col.box()
-            props = context.object.active_op.props
-
-            # -- draw  properties of active operator
-            props.draw(context, box)
-
 # =======================================================
 #
 #           REGISTER
