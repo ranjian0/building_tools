@@ -38,10 +38,8 @@ class CynthiaPanel(bpy.types.Panel):
         # Draw Operators
         # ``````````````
         col = layout.column(align=True)
-
-        row = col.row(align=True)
-        row.operator("cynthia.add_floorplan")
-        row.operator("cynthia.add_floors")
+        col.operator("cynthia.add_floorplan")
+        col.operator("cynthia.add_floors")
 
         row = col.row(align=True)
         row.operator("cynthia.add_window")
