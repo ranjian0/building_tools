@@ -10,7 +10,7 @@ from ...utils import (
     )
 
 
-def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, amount, off, has_split, **kwargs):
+def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, size, off, has_split, **kwargs):
     """ Extrudes selected faces outwards and adds railings to outer edges """
 
     # Get current edit mesh
@@ -25,7 +25,7 @@ def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, 
     for f in faces:
         # Split the faces
         if has_split:
-            f = split(bm, f, amount.y, amount.x, off.x, off.y, off.z)
+            f = split(bm, f, size.y, size.x, off.x, off.y, off.z)
 
         # Extrude
         f.select = False
