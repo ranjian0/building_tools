@@ -7,7 +7,7 @@ from ...utils import (
     kwargs_from_props
     )
 
-class Rails:
+class Balcony:
 
     @classmethod
     def build(cls, context, props):
