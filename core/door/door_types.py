@@ -4,14 +4,8 @@ from bmesh.types import BMEdge, BMVert
 from mathutils import Vector
 from ...utils import (
         split,
-        bm_to_obj,
-        bm_from_obj,
         filter_geom,
-        door_mat_pane,
-        door_mat_glass,
-        door_mat_frame,
-        door_mat_groove,
-        material_set_faces,
+        get_edit_mesh,
         filter_vertical_edges,
         filter_horizontal_edges
     )
@@ -24,8 +18,8 @@ def door_basic(cls, **kwargs):
         **kwargs: DoorProperty items
     """
     # Get active mesh
-    obj = bpy.context.object
-    bm = bm_from_obj(obj)
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
 
     faces = [f for f in bm.faces if f.select]
 
@@ -52,7 +46,7 @@ def door_basic(cls, **kwargs):
 
             make_door_grooves(bm, face, **kwargs)
 
-    bm_to_obj(bm, obj)
+    bmesh.update_edit_mesh(me, True)
 
 # HELPERS
 # ```````
