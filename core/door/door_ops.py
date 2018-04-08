@@ -11,6 +11,10 @@ class DoorOperator(bpy.types.Operator):
 
     props = bpy.props.PointerProperty(type=DoorProperty)
 
+    @classmethod
+    def poll(cls, context):
+        return context.object is not None and context.mode == "EDIT_MESH"
+
     def execute(self, context):
         Door.build(context, self.props)
         return {'FINISHED'}
