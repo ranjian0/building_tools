@@ -12,7 +12,6 @@ from ...utils import (
         door_mat_frame,
         door_mat_groove,
         material_set_faces,
-        index_from_facedata,
         filter_vertical_edges,
         filter_horizontal_edges
     )
@@ -28,15 +27,7 @@ def door_basic(cls, **kwargs):
     obj = bpy.context.object
     bm = bm_from_obj(obj)
 
-    if cls.update:
-        # Find face with corresponding facedata
-        indices = [index_from_facedata(obj, bm, fd) for fd in cls.facedata_list]
-
-        # Find faces with given indices
-        faces = [f for f in bm.faces if f.index in indices]
-    else:
-        faces = [f for f in bm.faces if f.index in cls.facedata_list]
-
+    faces = [f for f in bm.faces if f.select]
 
     for face in faces:
 
