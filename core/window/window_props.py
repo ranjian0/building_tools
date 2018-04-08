@@ -1,100 +1,84 @@
 import bpy
 from bpy.props import *
 
-from ..update import update_building
 from ..generic import SplitProperty
 
 class WindowProperty(bpy.types.PropertyGroup):
     win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
     type        = EnumProperty(
         items=win_types, default='BASIC',
-        description="Type of window",
-        update=update_building)
+        description="Type of window")
 
     fill_type   = [("BAR", "Bar", "", 0), ("PANE", "Pane", "", 1)]
     fill        = EnumProperty(
         items=fill_type, default='BAR',
-        description="Type of fill for window",
-        update=update_building)
+        description="Type of fill for window")
 
     ft          = FloatProperty(
         name="Frame Thickness", min=0.01, max=100.0, default=0.1,
-        description="Thickness of window Frame",
-        update=update_building)
+        description="Thickness of window Frame")
 
     fd          = FloatProperty(
         name="Frame Depth", min=0.0, max=100.0, default=0.1,
-        description="Depth of window Frame",
-        update=update_building)
+        description="Depth of window Frame")
 
     px          = IntProperty(
         name="Horizontal Panes", min=0, max=100, default=1,
-        description="Number of horizontal frames",
-        update=update_building)
+        description="Number of horizontal frames")
 
     py          = IntProperty(
         name="Vertical Panes", min=0, max=100, default=1,
-        description="Number of vertical frames",
-        update=update_building)
+        description="Number of vertical frames")
 
     pt          = FloatProperty(
         name="Pane Frame Thickness", min=0.01, max=100.0, default=0.1,
-        description="Thickness of window pane frame",
-        update=update_building)
+        description="Thickness of window pane frame")
 
     pd          = FloatProperty(
         name="Pane Frame Depth", min=0.01, max=100.0, default=0.01,
-        description="Depth of window pane frame",
-        update=update_building)
+        description="Depth of window pane frame")
 
     ares        = IntProperty(
         name="Arc Resolution", min=0, max=1000, default=5,
-        description="Number of segements for the arc",
-        update=update_building)
+        description="Number of segements for the arc")
 
     aoff        = FloatProperty(
         name="Arc Offset", min=0.01, max=1.0, default=0.5,
-        description="How far arc is from top",
-        update=update_building)
+        description="How far arc is from top")
 
     aheight     = FloatProperty(
         name="Arc Height", min=0.01, max=100.0, default=0.5,
-        description="Radius of the arc",
-        update=update_building)
+        description="Radius of the arc")
 
     adetail     = BoolProperty(
         name="Arc Detail", default=False,
-        description="Whether to add detail to arc",
-        update=update_building)
+        description="Whether to add detail to arc")
 
     dthick      = FloatProperty(
         name="Arc Detail Size", min=0.01, max=100.0, default=0.02,
-        description="Size of arc details",
-        update=update_building)
+        description="Size of arc details")
 
     ddepth      = FloatProperty(
         name="Arc Detail Depth", min=0.01, max=100.0, default=0.02,
-        description="Depth of arc details",
-        update=update_building)
+        description="Depth of arc details")
 
     has_split   = BoolProperty(
         name="Add Split", default=True,
-        description="Whether to split the window face",
-        update=update_building)
+        description="Whether to split the window face")
 
     split       = PointerProperty(type=SplitProperty)
 
     mat_bar     = PointerProperty(type=bpy.types.Material,
-        name="Bar Material", description="Material for window bars", update=update_building)
+        name="Bar Material", description="Material for window bars")
 
     mat_frame   = PointerProperty(type=bpy.types.Material,
-        name="Frame Material", description="Material for window frame", update=update_building)
+        name="Frame Material", description="Material for window frame")
 
     mat_pane    = PointerProperty(type=bpy.types.Material,
-        name="Pane Material", description="Material for window panes", update=update_building)
+        name="Pane Material", description="Material for window panes")
 
     mat_glass   = PointerProperty(type=bpy.types.Material,
-        name="Glass Material", description="Material for window glass", update=update_building)
+        name="Glass Material", description="Material for window glass")
 
     def draw(self, context, layout):
         row = layout.row()
