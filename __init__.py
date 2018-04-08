@@ -54,13 +54,9 @@ class CynthiaPanel(bpy.types.Panel):
 
         if active:
             box = col.box()
-            obj = context.object
+            props = context.object.active_op.props
 
-
-            # -- draw  properties operator
-            current_ops = obj.active_op
-            props = current_op.props
-
+            # -- draw  properties of active operator
             props.draw(context, box)
 
 # =======================================================
