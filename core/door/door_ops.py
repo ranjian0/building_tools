@@ -1,5 +1,6 @@
 import bpy
 from .door import Door
+from .door_props import DoorProperty
 
 
 class DoorOperator(bpy.types.Operator):
@@ -8,5 +9,7 @@ class DoorOperator(bpy.types.Operator):
     bl_label = "Add Door"
     bl_options = {'REGISTER', 'UNDO'}
 
+    props = bpy.props.PointerProperty(type=DoorProperty)
+
     def execute(self, context):
-        Door.build(context)
+        Door.build(context, props)
