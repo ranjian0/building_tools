@@ -21,7 +21,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         name="InnerFrame Depth", min=0.0, max=100.0, default=0.1, step=1,
         description="Depth of inner door Frame")
 
-    # Window Panes
     px      = IntProperty(
         name="Horizontal Panes", min=0, max=100, default=1,
         description="Number of horizontal window panes")
@@ -46,7 +45,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         name="Pane Width", min=0.0, max=100.0, default=0.5,
         description="Width of window panes")
 
-    # Grooves
     gx      = IntProperty(
         name="Horizontal Grooves", min=0, max=100, default=1,
         description="Number of horizontal grooves")
@@ -71,7 +69,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         name="Groove Offset", min=-1.0, max=1.0, default=0.0,
         description="Offset of grooves")
 
-    # Options
     hdd     = BoolProperty(
         name='Double Door', default=False,
         description="If the door is split")
@@ -84,7 +81,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         name='Window Panes', default=False,
         description='Door has window panes')
 
-    # Door Split Options
     has_split   = BoolProperty(
         name="Add Split", default=True,
         description="Whether to split the door face")

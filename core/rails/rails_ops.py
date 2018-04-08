@@ -4,7 +4,7 @@ from .rails_props import RailProperty
 
 
 class RailOperator(bpy.types.Operator):
-    """ Creates doors on selected mesh faces """
+    """ Creates rails on selected mesh edges """
     bl_idname = "cynthia.add_railing"
     bl_label = "Add Railing"
     bl_options = {'REGISTER', 'UNDO'}

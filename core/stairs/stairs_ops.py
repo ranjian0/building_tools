@@ -3,7 +3,7 @@ from .stairs import Stairs
 from .stairs_props import StairsProperty
 
 class StairsOperator(bpy.types.Operator):
-    """ Creates doors on selected mesh faces """
+    """ Creates stairs on selected mesh faces """
     bl_idname = "cynthia.add_stairs"
     bl_label = "Add Stairs"
     bl_options = {'REGISTER', 'UNDO'}

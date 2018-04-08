@@ -4,7 +4,6 @@ from bpy.props import *
 from ..generic import SplitProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
-    # Balcony Options
     width   = FloatProperty(
         name="Balcony Width", min=0.01, max=100.0, default=2,
         description="Width of balcony")
@@ -13,7 +12,6 @@ class BalconyProperty(bpy.types.PropertyGroup):
         name="Add Railing", default=True,
         description="Whether the balcony has railing")
 
-    # Rail Options
     pw = FloatProperty(
         name="Post Width", min=0.01, max=100.0, default=0.15,
         description="Width of each post")
@@ -69,8 +67,6 @@ class BalconyProperty(bpy.types.PropertyGroup):
         items=fill_types, default='POSTS',
         description="Type of railing")
 
-
-    # Balcony Split Options
     has_split = BoolProperty(
         name="Add Split", default=False,
         description="Whether to split the balcony face")

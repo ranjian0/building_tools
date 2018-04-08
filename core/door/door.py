@@ -11,5 +11,4 @@ class Door:
 
     @classmethod
     def build(cls, context, props):
-        """ Build door geomerty from selected faces """
         door_basic(cls, **kwargs_from_props(props))

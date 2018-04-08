@@ -40,7 +40,7 @@ def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, 
             top_verts2 = list(f.verts)
             top_verts2.sort(key=lambda v: v.co.z)
 
-            top_face = face_with_verts(bm, top_verts1[2:] + top_verts2[2:]) #bm.faces.get(top_verts1[2:] + top_verts2[2:])
+            top_face = face_with_verts(bm, top_verts1[2:] + top_verts2[2:])
             reject = bm.edges.get(top_verts2[2:])
 
             edges = set(list(top_face.edges)).difference([reject])
