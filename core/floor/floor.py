@@ -2,8 +2,6 @@ import bpy
 from .floor_types import flr_multistorey
 
 from ...utils import (
-    bm_to_obj,
-    bm_from_obj,
     kwargs_from_props
     )
 
