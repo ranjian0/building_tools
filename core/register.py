@@ -8,6 +8,7 @@ from .floor     import FloorOperator, FloorProperty
 from .floorplan import FloorplanOperator, FloorplanProperty
 from .door      import DoorOperator, DoorProperty
 from .window    import WindowOperator, WindowProperty
+from .rails     import RailOperator, RailProperty
 
 
 # -- take care here -- ORDER MATTERS !!!
@@ -18,6 +19,7 @@ classes = [
     FloorplanProperty, FloorplanOperator,
     DoorProperty, DoorOperator,
     WindowProperty, WindowOperator,
+    RailProperty, RailOperator,
 ]
 
 
