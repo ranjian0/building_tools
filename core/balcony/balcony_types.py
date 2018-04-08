@@ -1,7 +1,6 @@
 import bmesh
-from mathutils import Vector
-
 from bmesh.types import BMVert, BMFace
+
 from ..rails import rails_types as rails
 from ...utils import (
     split,

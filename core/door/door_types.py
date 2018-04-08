@@ -48,15 +48,12 @@ def door_basic(cls, **kwargs):
 
     bmesh.update_edit_mesh(me, True)
 
-# HELPERS
-# ```````
-
-def make_door_split(bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
+def make_door_split(bm, face, amount, off, has_split, **kwargs):
     if has_split:
         return split(bm, face, amount.y, amount.x, off.x, off.y, off.z)
     return face
 
-def make_door_frame(bm, face, oft=0.05, ofd=0.05, **kwargs):
+def make_door_frame(bm, face, oft, ofd, **kwargs):
 
     # if there any double vertices we're in trouble
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
@@ -76,7 +73,7 @@ def make_door_frame(bm, face, oft=0.05, ofd=0.05, **kwargs):
         return f
     return face
 
-def make_door_double(bm, face, hdd=False, **kwargs):
+def make_door_double(bm, face, hdd, **kwargs):
     if hdd:
         edgs = filter_horizontal_edges(face.edges, face.normal)
         ret = bmesh.ops.subdivide_edges(bm, edges=edgs, cuts=1)
@@ -85,7 +82,7 @@ def make_door_double(bm, face, hdd=False, **kwargs):
         return new_faces
     return [face]
 
-def make_door_outline(bm, face, ift=0.0, ifd=0.0, **kwargs):
+def make_door_outline(bm, face, ift, ifd, **kwargs):
     if ift > 0:
         res = bmesh.ops.inset_individual(bm, faces=[face], thickness=ift)
 
@@ -97,7 +94,7 @@ def make_door_outline(bm, face, ift=0.0, ifd=0.0, **kwargs):
             return f
     return face
 
-def make_door_panes(bm, face, panned=False, px=2, py=2, pt=.01, pd=.01, offset=0.5, width=.7, **kwargs):
+def make_door_panes(bm, face, panned, px, py, pt, pd, offset, width, **kwargs):
     if not panned:
         return face
 
@@ -133,7 +130,7 @@ def make_door_panes(bm, face, panned=False, px=2, py=2, pt=.01, pd=.01, offset=0
 
     return ret_face
 
-def make_door_grooves(bm, face, grov=False, gx=3, gy=1, gt=.1, gd=.01, gw=1, goff=0, **kwargs):
+def make_door_grooves(bm, face, grov, gx, gy, gt, gd, gw, goff, **kwargs):
     if not grov:
         return
 

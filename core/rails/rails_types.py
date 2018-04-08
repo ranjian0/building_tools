@@ -101,13 +101,11 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
 
-
 def create_post(bm, size, position):
     """ Create cube to represent railing posts """
     post = cube(bm, *size)
     bmesh.ops.translate(bm, verts=post['verts'], vec=position)
     return post
-
 
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
@@ -135,7 +133,6 @@ def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=Fa
         faces.append(face_with_verts(bm, vts[:-4]))
 
     bmesh.ops.delete(bm, geom=faces, context=3)
-
 
 def array_elements(bm, elem, count, start, stop):
     """ Duplicate elements count-1 times between start and stop """

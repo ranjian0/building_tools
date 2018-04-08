@@ -108,17 +108,13 @@ def win_arched(cls, **kwargs):
 
     bmesh.update_edit_mesh(me, True)
 
-
-# HELPERS
-# ```````
-
-def make_window_split(bm, face, amount=Vector((2, 2)), off=Vector((0,0,0)), has_split=True, **kwargs):
+def make_window_split(bm, face, amount, off, has_split, **kwargs):
     """ Basically scales down the face given based on parameters """
     if has_split:
         return split(bm, face, amount.y, amount.x, off.x, off.y, off.z)
     return face
 
-def make_window_frame(bm, face, ft=0.05, fd=0.05, **kwargs):
+def make_window_frame(bm, face, ft, fd, **kwargs):
     """ Inset and extrude to create a frame """
 
     # if there any double vertices we're in trouble
@@ -140,7 +136,7 @@ def make_window_frame(bm, face, ft=0.05, fd=0.05, **kwargs):
         return f
     return face
 
-def make_window_panes(bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
+def make_window_panes(bm, face, px, py, pt, pd, **kwargs):
     """ Create some window panes """
 
     n = face.normal
@@ -174,7 +170,7 @@ def make_window_panes(bm, face, px=1, py=1, pt=.05, pd=0.05, **kwargs):
 
     pass
 
-def make_window_bars(bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
+def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
     """ Create window bars """
 
     # Calculate center, width and height of face
@@ -241,7 +237,7 @@ def make_window_bars(bm, face, fd=.1, px=1, py=1, pt=.05, pd=0.05, **kwargs):
         ext = bmesh.ops.extrude_edge_only(bm, edges=ext_edges)
         bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * ((fd / 2) - eps))
 
-def make_window_arch(bm, face, ares=3, aoff=.5, aheight=.4, **kwargs):
+def make_window_arch(bm, face, ares, aoff, aheight, **kwargs):
     """ Arc the top edge of a face """
 
     #bmesh.ops.inset_individual(bm, faces=[face], thickness= aheight / ares)
@@ -265,7 +261,7 @@ def make_window_arch(bm, face, ares=3, aoff=.5, aheight=.4, **kwargs):
         v.co.z -= aoff
         v.co.z += off
 
-def make_window_arch_detail(bm, face, adetail=True, dthick=.03, ddepth=.01, **kwargs):
+def make_window_arch_detail(bm, face, adetail, dthick, ddepth, **kwargs):
     """ Create detail in the arched face """
 
     if not adetail:
