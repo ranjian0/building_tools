@@ -10,6 +10,7 @@ from ...utils import (
     bm_from_obj,
     filter_geom,
     square_face,
+    get_edit_mesh,
     window_mat_pane,
     window_mat_bars,
     window_mat_glass,
@@ -32,17 +33,10 @@ def win_basic(cls, **kwargs):
     """
 
     # Get active mesh
-    obj = bpy.context.object
-    bm = bm_from_obj(obj)
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
 
-    if cls.update:
-        # Find face with corresponding facedata
-        indices = [index_from_facedata(obj, bm, fd) for fd in cls.facedata_list]
-
-        # Find faces with given indices
-        faces = [f for f in bm.faces if f.index in indices]
-    else:
-        faces = [f for f in bm.faces if f.index in cls.facedata_list]
+    faces = [f for f in bm.faces if f.select]
 
     for face in faces:
 
@@ -63,7 +57,7 @@ def win_basic(cls, **kwargs):
         else:
             make_window_panes(bm, face, **kwargs)
 
-    bm_to_obj(bm, obj)
+    bmesh.update_edit_mesh(me, True)
 
 def win_arched(cls, **kwargs):
     """Generate arched window
@@ -74,8 +68,8 @@ def win_arched(cls, **kwargs):
     """
 
     # Get active mesh
-    obj = bpy.context.object
-    bm = bm_from_obj(obj)
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
 
     if cls.update:
         # Find face with corresponding facedata
@@ -120,7 +114,7 @@ def win_arched(cls, **kwargs):
         else:
             make_window_panes(bm, lower_face, **kwargs)
 
-    bm_to_obj(bm, obj)
+    bmesh.update_edit_mesh(me, True)
 
 
 # HELPERS
