@@ -148,7 +148,7 @@ def split_quad(vertical=False, cuts=4):
     bm = bmesh.from_edit_mesh(me)
 
     # Find selected faces
-    faces = [f for f in bm.faces if face.select]
+    faces = [f for f in bm.faces if f.select]
 
     for face in faces:
         if vertical:
