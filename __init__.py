@@ -49,6 +49,7 @@ class CynthiaPanel(bpy.types.Panel):
         row.operator("cynthia.add_railing")
         row.operator("cynthia.add_balcony")
 
+        col.operator("cynthia.add_stairs")
 
 
 # =======================================================
