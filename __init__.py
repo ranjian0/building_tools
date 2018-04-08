@@ -45,6 +45,11 @@ class CynthiaPanel(bpy.types.Panel):
         row.operator("cynthia.add_window")
         row.operator("cynthia.add_door")
 
+        row = col.row(align=True)
+        row.operator("cynthia.add_railing")
+
+
+
 # =======================================================
 #
 #           REGISTER
