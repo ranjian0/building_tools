@@ -13,7 +13,7 @@ from ...utils import (
     )
 
 
-def make_stairs_type1(step_count=6, step_width=.5, scale=0, bottom_faces=False):
+def make_stairs_type1(step_count, step_width, scale, bottom_faces, **kwargs):
     """ Extrude edges to make a sequence of steps """
 
     # Get current edit mesh
@@ -92,7 +92,7 @@ def make_stairs_type1(step_count=6, step_width=.5, scale=0, bottom_faces=False):
     bmesh.update_edit_mesh(me, True)
 
 
-def make_stairs_type2(step_count=4, step_width=.5, scale=0, bottom_faces=False):
+def make_stairs_type2(step_count, step_width, scale, bottom_faces, **kwargs):
     """ Extrude faces to create a sequence of stair steps"""
 
     # Get current edit mesh
