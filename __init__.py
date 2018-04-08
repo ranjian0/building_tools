@@ -57,9 +57,10 @@ class CynthiaPanel(bpy.types.Panel):
             obj = context.object
 
 
-            # -- draw  properties for active prop-group
+            # -- draw  properties operator
             current_ops = obj.active_op
             props = current_op.props
+
             props.draw(context, box)
 
 # =======================================================

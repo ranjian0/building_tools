@@ -15,5 +15,6 @@ class FloorOperator(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
+        context.object.active_op = self
         Floor.build(context, self.props)
         return {'FINISHED'}

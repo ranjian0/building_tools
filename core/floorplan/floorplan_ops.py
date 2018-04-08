@@ -12,6 +12,7 @@ class FloorplanOperator(bpy.types.Operator):
     props = bpy.props.PointerProperty(type=FloorplanProperty)
 
     def execute(self, context):
+        context.object.active_op = self
         Floorplan.build(context, self.props)
         return {'FINISHED'}
 
