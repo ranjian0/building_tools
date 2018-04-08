@@ -3,7 +3,7 @@ from .rails import Rails
 from .rails_props import RailProperty
 
 
-class RailsOperator(bpy.types.Operator):
+class RailOperator(bpy.types.Operator):
     """ Creates doors on selected mesh faces """
     bl_idname = "cynthia.add_railing"
     bl_label = "Add Railing"
