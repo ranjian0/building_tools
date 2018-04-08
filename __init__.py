@@ -20,17 +20,6 @@ from .core import register_core, unregister_core
 #
 # =======================================================
 
-class PROP_items(bpy.types.UIList):
-    """UIList for property groups"""
-
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        sp = layout.split(percentage=.9)
-        sp.prop(item, "name", text="", emboss=False, translate=False, icon='SNAP_PEEL_OBJECT')
-        sp.operator("cynthia.remove_property", text="", emboss=False, icon="X")
-
-    def invoke(self, context, event):
-        pass
-
 
 class CynthiaPanel(bpy.types.Panel):
     """UI panel for building operators and properties"""
@@ -66,11 +55,6 @@ class CynthiaPanel(bpy.types.Panel):
         if active:
             box = col.box()
             obj = context.object
-
-            # -- draw UIlist for property groups
-            rows = 2
-            row = box.row()
-            row.template_list("PROP_items", "", obj, "property_list", obj, "property_index", rows=rows)
 
 
             # -- draw  properties for active prop-group
