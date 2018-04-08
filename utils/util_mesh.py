@@ -162,8 +162,12 @@ def split_quad(vertical=False, cuts=4):
     return res
 
 
-def split(bm, face, svertical=2, shorizontal=2, offx=0, offy=0, offz=0):
+def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
+
+    # scale svertical and shorizontal
+    svertical *= 3
+    shorizontal *= 3
 
     face.select = False
     # MAKE VERTICAL SPLIT
