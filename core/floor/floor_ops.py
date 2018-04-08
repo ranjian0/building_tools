@@ -15,7 +15,5 @@ class FloorOperator(bpy.types.Operator):
         return context.object is not None
 
     def execute(self, context):
-        # Build geometry
         Floor.build(context, self.props)
-
         return {'FINISHED'}

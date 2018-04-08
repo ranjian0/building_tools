@@ -13,3 +13,4 @@ class DoorOperator(bpy.types.Operator):
 
     def execute(self, context):
         Door.build(context, self.props)
+        return {'FINISHED'}
