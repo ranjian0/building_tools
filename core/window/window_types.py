@@ -63,14 +63,7 @@ def win_arched(cls, **kwargs):
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
 
-    if cls.update:
-        # Find face with corresponding facedata
-        indices = [index_from_facedata(obj, bm, fd) for fd in cls.facedata_list]
-
-        # Find faces with given indices
-        faces = [f for f in bm.faces if f.index in indices]
-    else:
-        faces = [f for f in bm.faces if f.index in cls.facedata_list]
+    faces = [f for f in bm.faces if f.select]
 
     for face in faces:
         # -- add a split
