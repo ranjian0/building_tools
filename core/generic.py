@@ -1,31 +1,6 @@
 import bpy
 from bpy.props import *
 
-from .update import update_building
-
-class PropertyProxy(bpy.types.PropertyGroup):
-    """Stores the type and id of a PropertyGroup
-
-    -Is currently registered as a collection to bpy.types.Object.
-    -Allows us to get the corresponding PropertyGroup in bpy.types.Object.building
-     where:
-        * type is the PropertyGroup class
-            AND
-        * id is the index of a Property in a collection.
-    - Name is used in the UI for user convinience
-    """
-
-    property_items = [
-        ("FLOORPLAN",   "Floorplan",    "", 0),
-        ("FLOOR",       "Floor",        "", 1),
-        ("WINDOW",      "Window",       "", 2),
-        ("DOOR",        "Door",         "", 3)
-    ]
-    type    = EnumProperty(items=property_items)
-
-    name    = StringProperty(default="Property")
-    id      = IntProperty()
-
 
 class SplitProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for reqular Quad Inset
@@ -62,32 +37,3 @@ class SplitProperty(bpy.types.PropertyGroup):
                 col.prop(self, 'off')
         else:
             box.prop(parent, 'has_split', toggle=True)
-
-
-class RemovePropertyOperator(bpy.types.Operator):
-    """ Remove the active Property in current object's property_list
-        Called via 'X' button in PROP_items(bpy.types.UIList)
-    """
-
-    bl_idname = "cynthia.remove_property"
-    bl_label = "Remove Property"
-    bl_options = {'REGISTER'}
-
-    def execute(self, context):
-        obj = context.object
-
-        # remove property
-        idx     = obj.property_index
-        ptype   = obj.property_list[idx].type
-
-        obj.property_index -= 1
-        obj.property_list.remove(idx)
-
-        # Update building
-        update_building(self, context)
-
-        # if the property is floorplan, delete object
-        if ptype == "FLOORPLAN":
-            bpy.ops.object.delete(use_global=False)
-
-        return {'FINISHED'}
