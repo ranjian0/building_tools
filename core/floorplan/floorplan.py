@@ -1,7 +1,5 @@
 import bpy
 import bmesh
-from bmesh.types import BMVert
-from mathutils import Vector
 
 from .floorplan_types import (
     fp_rectangular,
@@ -12,7 +10,6 @@ from .floorplan_types import (
 
 from ...utils import (
     link_obj,
-    condition,
     make_mesh,
     bm_to_obj,
     make_object,
