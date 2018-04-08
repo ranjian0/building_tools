@@ -1,20 +1,17 @@
 import bpy
 from bpy.props import *
 
-from ..update import update_building
 from ..generic import SplitProperty
 
 
 class DoorProperty(bpy.types.PropertyGroup):
     oft     = FloatProperty(
         name="OuterFrame Thickness", min=0.0, max=100.0, default=0.0,
-        description="Thickness of outer door Frame",
-        update=update_building)
+        description="Thickness of outer door Frame")
 
     ofd     = FloatProperty(
         name="OuterFrame Depth", min=0.0, max=100.0, default=0.0,
-        description="Depth of outer door Frame",
-        update=update_building)
+        description="Depth of outer door Frame")
 
     ift     = FloatProperty(
         name="InnerFrame Thickness", min=0.0, max=100.0, default=0.1,
@@ -23,106 +20,89 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     ifd     = FloatProperty(
         name="InnerFrame Depth", min=0.0, max=100.0, default=0.1, step=1,
-        description="Depth of inner door Frame",
-        update=update_building)
+        description="Depth of inner door Frame")
 
     # Window Panes
     px      = IntProperty(
         name="Horizontal Panes", min=0, max=100, default=1,
-        description="Number of horizontal window panes",
-        update=update_building)
+        description="Number of horizontal window panes")
 
     py      = IntProperty(
         name="Vertical Panes", min=0, max=100, default=1,
-        description="Number of vertical window panes",
-        update=update_building)
+        description="Number of vertical window panes")
 
     pt      = FloatProperty(
         name="Pane Thickness", min=0.01, max=100.0, default=0.05,
-        description="Thickness of window panes",
-        update=update_building)
+        description="Thickness of window panes")
 
     pd      = FloatProperty(
         name="Pane Depth", min=0.01, max=100.0, default=0.01, step=1,
-        description="Depth of window panes",
-        update=update_building)
+        description="Depth of window panes")
 
     offset  = FloatProperty(
         name="Pane Offset", min=-1.0, max=1.0, default=1.0,
-        description="Offset of window panes",
-        update=update_building)
+        description="Offset of window panes")
 
     width   = FloatProperty(
         name="Pane Width", min=0.0, max=100.0, default=0.5,
-        description="Width of window panes",
-        update=update_building)
+        description="Width of window panes")
 
     # Grooves
     gx      = IntProperty(
         name="Horizontal Grooves", min=0, max=100, default=1,
-        description="Number of horizontal grooves",
-        update=update_building)
+        description="Number of horizontal grooves")
 
     gy      = IntProperty(
         name="Vertical Grooves", min=0, max=100, default=1,
-        description="Number of vertical grooves",
-        update=update_building)
+        description="Number of vertical grooves")
 
     gt      = FloatProperty(
         name="Groove Thickness", min=0.01, max=100.0, default=0.05,
-        description="Thickness of groove",
-        update=update_building)
+        description="Thickness of groove")
 
     gd      = FloatProperty(
         name="Groove Depth", min=0.01, max=100.0, default=0.01, step=1,
-        description="Depth of groove",
-        update=update_building)
+        description="Depth of groove")
 
     gw      = FloatProperty(
         name="Groove Width", min=0.01, max=1.0, default=1.0,
-        description="Width of grooves",
-        update=update_building)
+        description="Width of grooves")
 
     goff    = FloatProperty(
         name="Groove Offset", min=-1.0, max=1.0, default=0.0,
-        description="Offset of grooves",
-        update=update_building)
+        description="Offset of grooves")
 
     # Options
     hdd     = BoolProperty(
         name='Double Door', default=False,
-        description="If the door is split",
-        update=update_building)
+        description="If the door is split")
 
     grov    = BoolProperty(
         name='Grooved', default=False,
-        description='Door has grooves',
-        update=update_building)
+        description='Door has grooves')
 
     panned  = BoolProperty(
         name='Window Panes', default=False,
-        description='Door has window panes',
-        update=update_building)
+        description='Door has window panes')
 
     # Door Split Options
     has_split   = BoolProperty(
         name="Add Split", default=True,
-        description="Whether to split the door face",
-        update=update_building)
+        description="Whether to split the door face")
 
     split   = PointerProperty(type=SplitProperty)
 
     mat_groov   = PointerProperty(type=bpy.types.Material,
-        name="Groove Material", description="Material for door grooves", update=update_building)
+        name="Groove Material", description="Material for door grooves")
 
     mat_frame   = PointerProperty(type=bpy.types.Material,
-        name="Frame Material", description="Material for door frame", update=update_building)
+        name="Frame Material", description="Material for door frame")
 
     mat_pane    = PointerProperty(type=bpy.types.Material,
-        name="Pane Material", description="Material for door panes", update=update_building)
+        name="Pane Material", description="Material for door panes")
 
     mat_glass   = PointerProperty(type=bpy.types.Material,
-        name="Glass Material", description="Material for door glass", update=update_building)
+        name="Glass Material", description="Material for door glass")
 
 
     def draw(self, context, layout):
