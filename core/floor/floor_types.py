@@ -21,8 +21,9 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
         slab_outset (float): How much the slab extends outwards
     """
 
-    # -- get active object bmesh
-    bm = bmesh.from_edit_mesh(get_edit_mesh())
+    # --  get active object bmesh
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
 
     # -- find boundary edges
     edges = [e for e in bm.edges if e.is_boundary]
@@ -51,5 +52,6 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
 
     # -- update normals and mesh
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bm_to_obj(bm, obj)
+
+    bmesh.update_edit_mesh(me, True)
 
