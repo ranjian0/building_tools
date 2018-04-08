@@ -12,4 +12,4 @@ class DoorOperator(bpy.types.Operator):
     props = bpy.props.PointerProperty(type=DoorProperty)
 
     def execute(self, context):
-        Door.build(context, props)
+        Door.build(context, self.props)
