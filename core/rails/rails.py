@@ -14,7 +14,7 @@ class Rails:
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
-        edges = [e for e in edges if e.select]
+        edges = [e for e in bm.edges if e.select]
         make_railing(bm, edges, **kwargs_from_props(props))
 
         bmesh.update_edit_mesh(me, True)
