@@ -3,7 +3,7 @@ from .balcony import Balcony
 from .balcony_props import BalconyProperty
 
 
-class RailOperator(bpy.types.Operator):
+class BalconyOperator(bpy.types.Operator):
     """ Creates doors on selected mesh faces """
     bl_idname = "cynthia.add_balcony"
     bl_label = "Add Balcony"
