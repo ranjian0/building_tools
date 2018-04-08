@@ -14,7 +14,7 @@ from .window    import WindowOperator, WindowProperty
 classes = [
     SplitProperty,
 
-    FloorProperty,FloorOperator ,
+    FloorProperty, FloorOperator,
     FloorplanProperty, FloorplanOperator,
     DoorProperty, DoorOperator,
     WindowProperty, WindowOperator,

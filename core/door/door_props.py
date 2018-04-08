@@ -91,19 +91,6 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     split   = PointerProperty(type=SplitProperty)
 
-    mat_groov   = PointerProperty(type=bpy.types.Material,
-        name="Groove Material", description="Material for door grooves")
-
-    mat_frame   = PointerProperty(type=bpy.types.Material,
-        name="Frame Material", description="Material for door frame")
-
-    mat_pane    = PointerProperty(type=bpy.types.Material,
-        name="Pane Material", description="Material for door panes")
-
-    mat_glass   = PointerProperty(type=bpy.types.Material,
-        name="Glass Material", description="Material for door glass")
-
-
     def draw(self, context, layout):
         box = layout.box()
         box.prop(self, "hdd", toggle=True)
@@ -148,13 +135,3 @@ class DoorProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, 'goff')
             col.prop(self, 'gw')
-
-        box = layout.box()
-        col = box.column(align=True)
-        col.prop(self, "mat_frame")
-        if self.panned:
-            col.prop(self, "mat_pane")
-        if self.grov:
-            col.prop(self, "mat_groov")
-        col.prop(self, "mat_glass")
-

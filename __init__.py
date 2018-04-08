@@ -67,6 +67,6 @@ if __name__ == "__main__":
     import os; os.system("clear")
     try:
         unregister()
-    except RuntimeError as e:
-        pass
+    except Exception as e:
+        print(e)
     register()

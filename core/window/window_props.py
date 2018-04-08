@@ -68,18 +68,6 @@ class WindowProperty(bpy.types.PropertyGroup):
 
     split       = PointerProperty(type=SplitProperty)
 
-    mat_bar     = PointerProperty(type=bpy.types.Material,
-        name="Bar Material", description="Material for window bars")
-
-    mat_frame   = PointerProperty(type=bpy.types.Material,
-        name="Frame Material", description="Material for window frame")
-
-    mat_pane    = PointerProperty(type=bpy.types.Material,
-        name="Pane Material", description="Material for window panes")
-
-    mat_glass   = PointerProperty(type=bpy.types.Material,
-        name="Glass Material", description="Material for window glass")
-
     def draw(self, context, layout):
         row = layout.row()
         row.prop(self, "type", text="")
@@ -124,13 +112,3 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         # -- draw split property
         self.split.draw(context, layout, self)
-
-        box = layout.box()
-        col = box.column(align=True)
-        col.prop(self, "mat_frame")
-        if self.fill == 'BAR':
-            col.prop(self, "mat_bar")
-        else:
-            col.prop(self, "mat_pane")
-        col.prop(self, "mat_glass")
-

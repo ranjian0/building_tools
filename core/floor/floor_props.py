@@ -19,11 +19,6 @@ class FloorProperty(bpy.types.PropertyGroup):
         name="Slab Outset", min=0.01, max=1000.0, default=0.1,
         description="Outset of each slab")
 
-    mat_slab        = PointerProperty(type=bpy.types.Material,
-        name="Slab Material", description="Material for slab faces")
-    mat_wall        = PointerProperty(type=bpy.types.Material,
-        name="Wall Material", description="Material for wall faces")
-
     def draw(self, context, layout):
         box = layout.box()
 
@@ -34,7 +29,3 @@ class FloorProperty(bpy.types.PropertyGroup):
         col = box.column(align=True)
         col.prop(self, "slab_thickness")
         col.prop(self, "slab_outset")
-
-        col = box.column(align=True)
-        col.prop(self, "mat_slab")
-        col.prop(self, "mat_wall")

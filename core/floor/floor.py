@@ -1,7 +1,9 @@
 import bpy
+import bmesh
 from .floor_types import flr_multistorey
 
 from ...utils import (
+    get_edit_mesh,
     kwargs_from_props
     )
 
@@ -16,14 +18,15 @@ class Floor:
         if not cls.check_planar():
             return
 
-        flr_multistorey(**kwargs_from_props(props))
+        kwargs = kwargs_from_props(props)
+        flr_multistorey(**kwargs)
 
     @classmethod
     def check_planar(cls):
         """ Check to see in active mesh is planar """
 
         # -- get current object bmesh
-        me = bpy.context.edit_object
+        me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
         # -- check that all verts are on same z coordinate
