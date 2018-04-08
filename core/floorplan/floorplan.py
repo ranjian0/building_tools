@@ -24,18 +24,16 @@ from ...utils import (
 class Floorplan:
 
     @classmethod
-    def build(cls, _obj=None, update=False):
+    def build(cls, context, props):
         """ Build the floorplan from given properties """
 
         # -- create the floorplan object
-        obj = _obj if update else make_object('floorplan', make_mesh('fp_mesh'))
-        building = obj.building
+        obj = make_object('floorplan', make_mesh('fp_mesh'))
 
         # -- get bmesh representation of object
         bm = bm_from_obj(obj)
 
         # -- use properties to create geometry
-        props   = building.floorplan
         kwargs  = kwargs_from_props(props)
 
         if props.type == 'RECTANGULAR':
@@ -54,5 +52,4 @@ class Floorplan:
         bm_to_obj(bm, obj)
 
         # -- link object to current scene
-        if not update:
-            link_obj(obj)
+        link_obj(obj)
