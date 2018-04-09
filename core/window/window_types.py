@@ -66,12 +66,7 @@ def win_arched(cls, **kwargs):
     faces = [f for f in bm.faces if f.select]
 
     for face in faces:
-        # -- add a split
         face = make_window_split(bm, face, **kwargs)
-
-        # -- check that split was successful
-        if not face:
-            return
 
         # subdivide the face horizontally
         e = filter_vertical_edges(face.edges, face.normal)
@@ -79,18 +74,11 @@ def win_arched(cls, **kwargs):
         nedge = filter_geom(res['geom_inner'], BMEdge)[-1]
 
         upper_face = face
-        lower_face = list(set(nedge.link_faces).difference([upper_face]))[-1]
+        lower_face = list(set(nedge.link_faces) - set([upper_face]))[-1]
 
-        # -- make upperface arch
         make_window_arch(bm, upper_face, **kwargs)
-
-        # create window frame
         upper_face = make_window_frame(bm, upper_face, **kwargs)
-
-        # Arch detail
         make_window_arch_detail(bm, upper_face, **kwargs)
-
-        # -- make lowerface panes/bars
         lower_face = make_window_frame(bm, lower_face, **kwargs)
 
         fill = kwargs.get('fill')
@@ -107,21 +95,14 @@ def make_window_split(bm, face, size, off, **kwargs):
 
 def make_window_frame(bm, face, ft, fd, **kwargs):
     """ Inset and extrude to create a frame """
-
-    # if there any double vertices we're in trouble
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
+    if ft:
+        bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
 
-    # Make frame inset - frame thickness
-    if ft > 0:
-        res = bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
-
-
-    # Make frame extrude - frame depth
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if fd > 0:
-        current_faces = list(bm.faces)
-        ret = bmesh.ops.extrude_discrete_faces(bm, faces=[face])
-        f = ret['faces'][0]
+    if fd:
+        f = bmesh.ops.extrude_discrete_faces(bm,
+            faces=[face]).get('faces')[-1]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
 
         return f
@@ -136,30 +117,31 @@ def make_window_panes(bm, face, px, py, pt, pd, **kwargs):
 
     # -- if panes_x == 0, skip
     if px:
-        res1 = bmesh.ops.subdivide_edges(bm, edges=v_edges, cuts=px)
+        res1 = bmesh.ops.subdivide_edges(bm,
+            edges=v_edges, cuts=px).get('geom_inner')
 
-    edgs = filter_geom(res1['geom_inner'], BMEdge) if px else []
     if py:
-        res2 = bmesh.ops.subdivide_edges(bm, edges=h_edges + edgs, cuts=py)
+        res2 = bmesh.ops.subdivide_edges(bm,
+            edges=h_edges + filter_geom(res1, BMEdge) if px else [],
+            cuts=py).get('geom_inner')
 
     # panes
     # -- if we're here successfully, about 3 things may have happened
     do_panes = True
     if py:
-        e = filter_geom(res2['geom_inner'], BMEdge)
+        e = filter_geom(res2, BMEdge)
     else:
         if px:
-            e = edgs
+            e = filter_geom(res1, BMEdge)
         else:
             do_panes = False
     if do_panes:
         pane_faces = list({f for ed in e for f in ed.link_faces})
-        panes = bmesh.ops.inset_individual(bm, faces=pane_faces, thickness=pt)
+        panes = bmesh.ops.inset_individual(bm,
+            faces=pane_faces, thickness=pt)
 
         for f in pane_faces:
             bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pd)
-
-    pass
 
 def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
     """ Create window bars """
@@ -178,14 +160,16 @@ def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
         verts = filter_geom(ret['geom'], BMVert)
 
         # Scale and translate
-        bmesh.ops.scale(bm, verts=verts, vec=(1, 1, pt), space=Matrix.Translation(-fc))
+        bmesh.ops.scale(bm, verts=verts,
+            vec=(1, 1, pt), space=Matrix.Translation(-fc))
         bmesh.ops.translate(bm, verts=verts,
-                            vec=Vector((face.normal * fd / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
+            vec=Vector((face.normal * fd / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
 
         # Extrude
         ext = bmesh.ops.extrude_edge_only(bm,
-                                          edges=filter_horizontal_edges(filter_geom(ret['geom'], BMEdge), face.normal))
-        bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * fd / 2)
+            edges=filter_horizontal_edges(filter_geom(ret['geom'], BMEdge), face.normal))
+        bmesh.ops.translate(bm,
+            verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * fd / 2)
 
     # -- vertical
     eps = 0.015
@@ -196,10 +180,11 @@ def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
         verts = filter_geom(ret['geom'], BMVert)
 
         # Scale and Translate
-        bmesh.ops.scale(bm, verts=verts, vec=(pt, pt, 1), space=Matrix.Translation(-fc))
+        bmesh.ops.scale(bm, verts=verts,
+            vec=(pt, pt, 1), space=Matrix.Translation(-fc))
         perp = face.normal.cross(Vector((0, 0, 1)))
         bmesh.ops.translate(bm, verts=verts,
-                            vec=Vector((face.normal * ((fd / 2) - eps))) + perp * (-width / 2 + ((i + 1) * offset)))
+            vec=Vector((face.normal * ((fd / 2) - eps))) + perp * (-width / 2 + ((i + 1) * offset)))
 
         # Extrude
         ext_edges = []
@@ -207,7 +192,7 @@ def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
         # filter vertical edges
         # -- This part is redundant for good reasons, JUST DON'T!!
 
-        if face.normal.x and face.normal.y:
+        if (face.normal.x and face.normal.y) or (face.normal.y and not face.normal.x):
             for e in filter_geom(ret['geom'], BMEdge):
                 s = set([round(v.co.x, 4) for v in e.verts])
                 if len(s) == 1:
@@ -215,11 +200,6 @@ def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
         elif face.normal.x and not face.normal.y:
             for e in filter_geom(ret['geom'], BMEdge):
                 s = set([round(v.co.y, 4) for v in e.verts])
-                if len(s) == 1:
-                    ext_edges.append(e)
-        elif face.normal.y and not face.normal.x:
-            for e in filter_geom(ret['geom'], BMEdge):
-                s = set([round(v.co.x, 4) for v in e.verts])
                 if len(s) == 1:
                     ext_edges.append(e)
         else:
@@ -240,10 +220,7 @@ def make_window_arch(bm, face, ares, aoff, aheight, **kwargs):
 
     # Sort Verts
     verts = list({v for e in filter_geom(ret['geom_split'], BMEdge) for v in e.verts})
-    if face.normal.y:
-        verts.sort(key=lambda v: v.co.x)
-    else:
-        verts.sort(key=lambda v: v.co.y)
+    verts.sort(key = lambda v: v.co.x if face.normal.y else lambda v: v.co.y)
 
     # Offset verts along sin curve
     angle = pi / (len(verts)-1)
@@ -254,12 +231,10 @@ def make_window_arch(bm, face, ares, aoff, aheight, **kwargs):
 
 def make_window_arch_detail(bm, face, adetail, dthick, ddepth, **kwargs):
     """ Create detail in the arched face """
-
     if not adetail:
         return
 
     fn = face.normal
-    # Poke face
     res = bmesh.ops.poke(bm, faces=[face])
 
     # inset and extrude
@@ -267,6 +242,8 @@ def make_window_arch_detail(bm, face, adetail, dthick, ddepth, **kwargs):
         ret = bmesh.ops.inset_individual(bm, faces=res['faces'], thickness=dthick)
         bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
-        ret = bmesh.ops.extrude_discrete_faces(bm, faces=res['faces'])
-        verts = [v for f in ret['faces'] for v in f.verts]
-        bmesh.ops.translate(bm, verts=verts, vec=-fn * ddepth)
+        faces = bmesh.ops.extrude_discrete_faces(bm,
+            faces=res['faces']).get('faces')
+        bmesh.ops.translate(bm,
+            verts=[v for f in faces for v in f.verts],
+            vec=-fn * ddepth)

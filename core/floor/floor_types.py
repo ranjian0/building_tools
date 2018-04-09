@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import itertools as it
 from bmesh.types import (
     BMVert, BMFace, BMEdge
     )
@@ -20,38 +21,24 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
         slab_thickness (float): Thickness of floor slabs
         slab_outset (float): How much the slab extends outwards
     """
-
-    # --  get active object bmesh
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
 
     # -- find boundary edges
     edges = [e for e in bm.edges if e.is_boundary]
 
-    # -- extrude floor and slabs
-    for i in range(floor_count):
-        # Extrude slab
-        slab_ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
-        slab_faces = filter_geom(slab_ext['geom'], BMFace)
-        verts = filter_geom(slab_ext['geom'], BMVert)
-        edges = filter_geom(slab_ext['geom'], BMEdge)
-        bmesh.ops.translate(bm, vec=(0, 0, slab_thickness), verts=verts)
+    slab_faces  = []
+    offsets     = it.cycle([slab_thickness, floor_height])
+    for offset in it.islice(offsets, 0, floor_count*2):
+        ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
+        bmesh.ops.translate(bm, vec=(0, 0, offset),
+            verts=filter_geom(ext['geom'], bmesh.types.BMVert))
 
-        # Extrude floor
-        floor_ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
-        floor_faces = filter_geom(floor_ext['geom'], BMFace)
-        verts = filter_geom(floor_ext['geom'], BMVert)
-        edges = filter_geom(floor_ext['geom'], BMEdge)
-        bmesh.ops.translate(bm, vec=(0, 0, floor_height), verts=verts)
+        edges = filter_geom(ext['geom'], bmesh.types.BMEdge)
+        if offset == slab_thickness:
+            slab_faces.extend(filter_geom(ext['geom'], bmesh.types.BMFace))
 
-        # Offset Slab
-        ret = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
-
-    # -- fill top face
-    ret = bmesh.ops.contextual_create(bm, geom=edges)
-
-    # -- update normals and mesh
+    bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
+    bmesh.ops.contextual_create(bm, geom=edges)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-
     bmesh.update_edit_mesh(me, True)
-

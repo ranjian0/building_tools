@@ -3,7 +3,6 @@ import bmesh
 
 from .balcony_types import make_balcony
 from ...utils import (
-    get_edit_mesh,
     kwargs_from_props
     )
 

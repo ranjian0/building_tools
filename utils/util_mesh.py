@@ -1,5 +1,7 @@
 import bpy
 import bmesh
+import operator
+import functools as ft
 from mathutils import Matrix, Vector
 from bmesh.types import BMVert
 
@@ -21,7 +23,7 @@ def select(elements, val=True):
 
 
 def filter_geom(geom, _type):
-    """ Find all elements ot type _type in geom iterable """
+    """ Find all elements of type _type in geom iterable """
     return list(filter(lambda x: isinstance(x, _type), geom))
 
 
@@ -61,19 +63,11 @@ def filter_horizontal_edges(edges, normal):
 
 def calc_edge_median(edge):
     """ Calculate the center position of edge """
-    mx = sum([v.co.x for v in edge.verts])
-    my = sum([v.co.y for v in edge.verts])
-    mz = sum([v.co.z for v in edge.verts])
-    return Vector((mx / 2, my / 2, mz / 2))
-
+    return ft.reduce(operator.add, [v.co for v in edge.verts])/len(edge.verts)
 
 def calc_verts_median(verts):
     """ Determine the median position of verts """
-    mx = sum([v.co.x for v in verts])
-    my = sum([v.co.y for v in verts])
-    mz = sum([v.co.z for v in verts])
-    return Vector((mx / 2, my / 2, mz / 2))
-
+    return ft.reduce(operator.add, [v.co for v in verts])/len(verts)
 
 def calc_face_dimensions(face):
     """ Determine the width and height of face """
@@ -134,12 +128,12 @@ def square_face(bm, face):
                     space=Matrix.Translation(-fc))
 
 
-def face_with_verts(bm, verts):
+def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts"""
     for face in bm.faces:
         if len(set(list(face.verts) + verts)) == len(verts):
             return face
-    return None
+    return default
 
 
 def split_quad(vertical=False, cuts=4):
@@ -166,74 +160,66 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
 
     # scale svertical and shorizontal
-    svertical *= 3
-    shorizontal *= 3
+    scale       = 3
+    svertical   *= scale
+    shorizontal *= scale
+
+    do_vertical     = svertical < scale
+    do_horizontal   = shorizontal < scale
 
     face.select = False
-    # MAKE VERTICAL SPLIT
-    # ---------------------
-
-    # Determine horizontal edges
-    # --  edges whose verts have similar z coord
-    horizontal = list(filter(lambda e: len(
-        set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
-
     median = face.calc_center_median()
-    # Subdivide edges
-    sp_res = bmesh.ops.subdivide_edges(bm, edges=horizontal, cuts=2)
-    hverts = filter_geom(sp_res['geom_inner'], BMVert)
 
-    # Scale subdivide face
-    T = Matrix.Translation(-median)
-    sv = face.normal.cross(Vector((0, 0, 1)))
-    scale_vector = (abs(sv.x) * shorizontal if sv.x else 1, abs(sv.y) * shorizontal if sv.y else 1,
-                    abs(sv.z) * shorizontal if sv.z else 1)
-    bmesh.ops.scale(bm, vec=scale_vector, verts=hverts, space=T)
+    # SKIP BOTH
+    # `````````
+    if not do_horizontal and not do_vertical:
+        return face
 
-    # MAKE HORIZONTAL SPLIT
-    # ---------------------
+    if do_horizontal:
+        # Determine horizontal edges
+        # --  edges whose verts have similar z coord
+        horizontal = list(filter(lambda e: len(
+            set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
+        # Subdivide edges
+        sp_res = bmesh.ops.subdivide_edges(bm, edges=horizontal, cuts=2)
+        verts = filter_geom(sp_res['geom_inner'], BMVert)
 
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-    face = face_with_verts(bm, hverts)
+        # Scale subdivide face
+        T = Matrix.Translation(-median)
+        sv = face.normal.cross(Vector((0, 0, 1)))
+        scale_vector = (abs(sv.x) * shorizontal if sv.x else 1, abs(sv.y) * shorizontal if sv.y else 1,
+                        abs(sv.z) * shorizontal if sv.z else 1)
+        bmesh.ops.scale(bm, vec=scale_vector, verts=verts, space=T)
 
-    # Determine vertical edges
-    # -- edges whose verts have similar x/y coord
-    other = list(filter(lambda e: len(
-        set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
-    vertical = list(set(face.edges).difference(other))
 
-    # Subdivide
-    sp_res = bmesh.ops.subdivide_edges(bm, edges=vertical, cuts=2)
-    verts = filter_geom(sp_res['geom_inner'], BMVert)
+    if do_vertical:
+        bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
+        face = face_with_verts(bm, verts) if do_horizontal else face
 
-    # Scale subdivide face
-    T = Matrix.Translation(-median)
-    bmesh.ops.scale(bm, vec=(1, 1, svertical), verts=verts, space=T)
+        # Determine vertical edges
+        # -- edges whose verts have similar x/y coord
+        other = list(filter(lambda e: len(
+            set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
+        vertical = list(set(face.edges) - set(other))
+
+        # Subdivide
+        sp_res = bmesh.ops.subdivide_edges(bm, edges=vertical, cuts=2)
+        verts = filter_geom(sp_res['geom_inner'], BMVert)
+
+        # Scale subdivide face
+        T = Matrix.Translation(-median)
+        bmesh.ops.scale(bm, vec=(1, 1, svertical), verts=verts, space=T)
 
     # OFFSET VERTS
     # ---------------------
-    link_edges = [e for v in verts for e in v.link_edges]
-    all_verts = list(set([v for e in link_edges for v in e.verts]))
-    bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
-    bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
+    if do_vertical:
+        link_edges = [e for v in verts for e in v.link_edges]
+        all_verts = list(set([v for e in link_edges for v in e.verts]))
+        bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
 
-    # CLEANUP
-    # --------
+    if do_horizontal:
+        bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
 
-    # -- delete faces with area less than min_area
-    min_area = 0.01
-    del_faces = []
-    for f in bm.faces:
-        if face.calc_area() < min_area:
-            del_faces.append(f)
-
-    if del_faces:
-        bmesh.ops.delete(bm, geom=del_faces, context=3)
-    select(bm.faces, False)
 
     face = face_with_verts(bm, verts)
-
-    # -- remove doubles
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-
     return face
