@@ -53,7 +53,7 @@ class RailProperty(bpy.types.PropertyGroup):
     fill_types = [("POSTS", "Posts", "", 0),
                   ("RAILS", "Rails", "", 1), ("WALL", "Wall", "", 2)]
     fill = EnumProperty(
-        items=fill_types, default='POSTS',
+        name="Fill Type", items=fill_types, default='POSTS',
         description="Type of railing")
 
     def draw(self, context, layout):
