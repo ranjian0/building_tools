@@ -10,6 +10,10 @@ class FloorplanOperator(bpy.types.Operator):
 
     props = bpy.props.PointerProperty(type=FloorplanProperty)
 
+    @classmethod
+    def poll(cls, context):
+        return not context.object
+
     def execute(self, context):
         Floorplan.build(context, self.props)
         return {'FINISHED'}
