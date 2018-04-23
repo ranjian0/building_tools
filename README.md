@@ -22,23 +22,11 @@
 
 ## Development Status
 
-    Inspite of my sincerest efforts to bring intuitive building generation
-    tools to blender, I have consistently failed as a result of blender's
-    rigid operator design and user interaction philosophy.
+  * under heavy developent
+  * use at own risk
 
-    In particular:-
-     - Blender Operators are data oriented, this means you have to define all data
-       that an operator will consume beforehand. Moreover, the data consumed by an operator
-       must exist as one of the property types defined by blender's api.
+## Contributing
 
-       While this in itself is not particulary BAD, if your addon supports lots of
-       options, it means you have to manually define lots of properties.
-
-       Moreover, where this properties should be stored can occassionally be non-obvious.
-
-       On the one hand, you can store the properties in the operator that needs them. This unfortunately
-       means that the properties cannot be accessed when the operator is not running.
-
-       Or, you can store the properties globally eg register them in the scene
-
-
+  * feel free to fork and submit pull requests
+  * incase of bugs, create an issue that describes the problem
+    and attach any relevant info/logs
