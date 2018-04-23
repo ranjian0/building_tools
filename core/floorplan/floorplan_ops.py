@@ -12,7 +12,7 @@ class FloorplanOperator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return not context.object
+        return context.mode == 'OBJECT'
 
     def execute(self, context):
         Floorplan.build(context, self.props)
