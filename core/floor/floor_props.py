@@ -8,11 +8,11 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Number of floors")
 
     floor_height    = FloatProperty(
-        name="Floor Height", min=0.01, max=1000.0, default=1.0,
+        name="Floor Height", min=0.01, max=1000.0, default=2.0,
         description="Height of each floor")
 
     slab_thickness  = FloatProperty(
-        name="Slab Height", min=0.01, max=1000.0, default=0.15,
+        name="Slab Height", min=0.01, max=1000.0, default=0.2,
         description="Thickness of each slab")
 
     slab_outset     = FloatProperty(
