@@ -213,9 +213,7 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     # OFFSET VERTS
     # ---------------------
     # -- horizontal offset
-    link_edges = [e for v in verts for e in v.link_edges]
-    all_verts = list(set([v for e in link_edges for v in e.verts]))
-    bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
+    bmesh.ops.translate(bm, verts=verts, vec=(offx, offy, 0))
 
     # -- vertical offset
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
