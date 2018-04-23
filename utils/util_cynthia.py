@@ -19,7 +19,7 @@ def args_from_props(props, names):
     return tuple(getattr(props, name) for name in names)
 
 def kwargs_from_props(props):
-    """ Converts all properties in a props into dict """
+    """ Converts all properties in a props{bpy.types.PropertyGroup} into dict """
     valid_types = (
         int, float, str, tuple, bool, Vector,
         bpy.types.Material,
