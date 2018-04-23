@@ -6,8 +6,9 @@ from bmesh.types import (
     )
 
 from ...utils import (
-    get_edit_mesh,
+    select,
     filter_geom,
+    get_edit_mesh,
     )
 
 
@@ -24,9 +25,18 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
 
-    # -- find boundary edges
-    edges = [e for e in bm.edges if e.is_boundary]
+    edges, del_faces = [], None
+    if check_planar(bm):
+        # -- find boundary edges
+        edges = [e for e in bm.edges if e.is_boundary]
+    else:
+        # -- find boundary of selected faces
+        del_faces = [f for f in bm.faces if f.select]
+        all_edges = list({e for f in del_faces for e in f.edges})
+        edges = [e for e in all_edges
+                    if len(list({f.normal.to_tuple() for f in e.link_faces})) > 1]
 
+    # --extrude floors
     slab_faces  = []
     offsets     = it.cycle([slab_thickness, floor_height])
     for offset in it.islice(offsets, 0, floor_count*2):
@@ -41,4 +51,18 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
     bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
     bmesh.ops.contextual_create(bm, geom=edges)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+
+    if del_faces:
+        bmesh.ops.delete(bm,
+            geom=del_faces,
+            context=3)
+        select(list(bm.edges), False)
+
     bmesh.update_edit_mesh(me, True)
+
+
+def check_planar(bm):
+    """ Determine whether the bmesh contains only flat geometry """
+    if len(list({v.co.z for v in bm.verts})) == 1:
+        return True
+    return False
