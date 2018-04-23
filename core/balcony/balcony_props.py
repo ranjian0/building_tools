@@ -5,7 +5,7 @@ from ..generic import SizeOffsetProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
     width   = FloatProperty(
-        name="Balcony Width", min=0.01, max=100.0, default=2,
+        name="Balcony Width", min=0.01, max=100.0, default=1.2,
         description="Width of balcony")
 
     railing = BoolProperty(
