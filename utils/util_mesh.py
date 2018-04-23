@@ -213,11 +213,15 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     # OFFSET VERTS
     # ---------------------
     # -- horizontal offset
-    bmesh.ops.translate(bm, verts=verts, vec=(offx, offy, 0))
+    if do_horizontal and do_vertical:
+        link_edges = [e for v in verts for e in v.link_edges]
+        all_verts = list({v for e in link_edges for v in e.verts})
+        bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
+    elif do_horizontal and not do_vertical:
+        bmesh.ops.translate(bm, verts=verts, vec=(offx, offy, 0))
 
     # -- vertical offset
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
-
 
     face = face_with_verts(bm, verts)
     return face
