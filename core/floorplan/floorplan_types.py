@@ -162,6 +162,9 @@ def fp_random(bm, seed, width, length, **kwargs):
         x_segments=1, y_segments=1, size=1, matrix=mat)
 
     sample = random.sample(list(bm.edges), random.randrange(0, len(bm.edges)))
+    while not sample:
+        sample = random.sample(list(bm.edges), random.randrange(0, len(bm.edges)))
+
     ref = list(bm.faces)[-1].calc_center_median()
     for edge in sample:
         # -- get edge center and length
