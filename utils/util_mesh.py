@@ -10,22 +10,18 @@ def get_edit_mesh():
     """ Get editmode mesh """
     return bpy.context.edit_object.data
 
-
 def make_mesh(name):
     """ Make new mesh data """
     return bpy.data.meshes.new(name)
-
 
 def select(elements, val=True):
     """ For each item in elements set select to val """
     for el in elements:
         el.select = val
 
-
 def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable """
     return list(filter(lambda x: isinstance(x, _type), geom))
-
 
 def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value """
@@ -43,7 +39,6 @@ def filter_vertical_edges(edges, normal):
             res.append(e)
     return res
 
-
 def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value """
     res = []
@@ -59,7 +54,6 @@ def filter_horizontal_edges(edges, normal):
         if len(s) == 1:
             res.append(e)
     return res
-
 
 def calc_edge_median(edge):
     """ Calculate the center position of edge """
@@ -88,7 +82,6 @@ def calc_face_dimensions(face):
         min([v.co.z for v in face.verts])
     return width, height
 
-
 def calc_edge_orient(edge):
     """ Determine the orientation of edge """
     x_coords = list(set([round(v.co.x, 1) for v in edge.verts]))
@@ -103,7 +96,6 @@ def calc_edge_orient(edge):
         return Vector((0, 1, 0))
     else:
         return Vector((0, 0, 0))
-
 
 def square_face(bm, face):
     """ Make face square if it is rectangular """
@@ -127,14 +119,12 @@ def square_face(bm, face):
     bmesh.ops.scale(bm, verts=list(face.verts), vec=scale_vec,
                     space=Matrix.Translation(-fc))
 
-
 def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts"""
     for face in bm.faces:
         if len(set(list(face.verts) + verts)) == len(verts):
             return face
     return default
-
 
 def split_quad(vertical=False, cuts=4):
     """ Subdivide a quad's edges into even horizontal/vertical cuts """
@@ -154,7 +144,6 @@ def split_quad(vertical=False, cuts=4):
 
     bmesh.update_edit_mesh(me, True)
     return res
-
 
 def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
