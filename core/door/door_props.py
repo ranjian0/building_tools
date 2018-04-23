@@ -5,20 +5,12 @@ from ..generic import SizeOffsetProperty
 
 
 class DoorProperty(bpy.types.PropertyGroup):
-    oft     = FloatProperty(
-        name="OuterFrame Thickness", min=0.0, max=100.0, default=0.0,
-        description="Thickness of outer door Frame")
-
-    ofd     = FloatProperty(
-        name="OuterFrame Depth", min=0.0, max=100.0, default=0.0,
-        description="Depth of outer door Frame")
-
-    ift     = FloatProperty(
-        name="InnerFrame Thickness", min=0.0, max=100.0, default=0.1,
+    ft     = FloatProperty(
+        name="Frame Thickness", min=0.0, max=100.0, default=0.1,
         description="Thickness of inner door Frame")
 
-    ifd     = FloatProperty(
-        name="InnerFrame Depth", min=0.0, max=100.0, default=0.1, step=1,
+    fd     = FloatProperty(
+        name="Frame Depth", min=0.0, max=100.0, default=0.1, step=1,
         description="Depth of inner door Frame")
 
     px      = IntProperty(
@@ -90,12 +82,8 @@ class DoorProperty(bpy.types.PropertyGroup):
         box.prop(self, "hdd", toggle=True)
 
         col = box.column(align=True)
-        col.prop(self, 'oft')
-        col.prop(self, 'ofd')
-
-        col = box.column(align=True)
-        col.prop(self, 'ift')
-        col.prop(self, 'ifd')
+        col.prop(self, 'ft')
+        col.prop(self, 'fd')
 
         # Panned
         box = layout.box()

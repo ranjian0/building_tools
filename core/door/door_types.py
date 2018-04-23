@@ -24,11 +24,10 @@ def door_basic(cls, **kwargs):
     faces = (f for f in bm.faces if f.select)
     for face in faces:
         face = make_door_split(bm, face, **kwargs)
-        face = make_door_frame(bm, face, **kwargs)
 
         nfaces = make_door_double(bm, face, **kwargs)
         for face in nfaces:
-            face = make_door_outline(bm, face, **kwargs)
+            face = make_door_frame(bm, face, **kwargs)
             face = make_door_panes(bm, face, **kwargs)
             make_door_grooves(bm, face, **kwargs)
 
@@ -37,19 +36,19 @@ def door_basic(cls, **kwargs):
 def make_door_split(bm, face, size, off, **kwargs):
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
-def make_door_frame(bm, face, oft, ofd, **kwargs):
+def make_door_frame(bm, face, ft, fd, **kwargs):
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
 
     # Make frame inset - frame thickness
-    if oft:
-        bmesh.ops.inset_individual(bm, faces=[face], thickness=oft)
+    if ft:
+        bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
 
     # Make frame extrude - frame depth
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if ofd:
+    if fd:
         f = bmesh.ops.extrude_discrete_faces(bm,
             faces=[face]).get('faces')[-1]
-        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * ofd)
+        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
 
         return f
     return face
@@ -62,17 +61,6 @@ def make_door_double(bm, face, hdd, **kwargs):
 
         return list(filter_geom(ret, BMEdge)[-1].link_faces)
     return [face]
-
-def make_door_outline(bm, face, ift, ifd, **kwargs):
-    if ift:
-        res = bmesh.ops.inset_individual(bm, faces=[face], thickness=ift)
-
-        if ifd:
-            f = bmesh.ops.extrude_discrete_faces(bm,
-                faces=[face]).get('faces')[-1]
-            bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * ifd)
-            return f
-    return face
 
 def make_door_panes(bm, face, panned, px, py, pt, pd, offset, width, **kwargs):
     if not panned:
