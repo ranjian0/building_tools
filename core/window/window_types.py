@@ -96,6 +96,10 @@ def make_window_split(bm, face, size, off, **kwargs):
 def make_window_frame(bm, face, ft, fd, **kwargs):
     """ Inset and extrude to create a frame """
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
+    face = bmesh.ops.extrude_discrete_faces(bm,
+        faces=[face]).get('faces')[-1]
+    bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * fd/2)
+
     if ft:
         bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
 
