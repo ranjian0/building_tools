@@ -4,15 +4,17 @@ from mathutils import Vector
 from bpy_extras import view3d_utils
 
 
+def clamp(val, _min, _max):
+    """ Reset val between _min and __max """
+    return max(min(val, _max), _min)
+
 def condition(con, val1, val2):
     """ Return val1 if con is true else val2 """
     return val1 if con else val2
 
-
 def ifeven(num, val1, val2):
     """ Return val1 if num is an even number else val2 """
     return condition(num % 2 == 0, val1, val2)
-
 
 def args_from_props(props, names):
     """ returns a tuple with the properties in props for the given names """
@@ -39,7 +41,6 @@ def kwargs_from_props(props):
             result.update(kwargs_from_props(prop))
     return result
 
-
 def assert_test(func):
     """ Catch any Exceptions that may occur in test func """
 
@@ -51,7 +52,6 @@ def assert_test(func):
             print(func.__name__.upper() + " FAILED .. :", e)
 
     return wrapper
-
 
 def clean_scene():
     """ Delete all objects in the scene if any """

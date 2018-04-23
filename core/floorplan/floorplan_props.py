@@ -6,12 +6,17 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         ("RECTANGULAR", "Rectangular", "", 0),
         ("CIRCULAR", "Circular", "", 1),
         ("COMPOSITE", "Composite", "", 2),
-        ("H-SHAPED", "H-Shaped", "", 3)
+        ("H-SHAPED", "H-Shaped", "", 3),
+        ("RANDOM", "Random", "", 4)
     ]
 
     type    = EnumProperty(
         items=fp_types, default='RECTANGULAR',
         description="Type of floorplan")
+
+    seed    = IntProperty(
+        name="Seed", min=0, max=10000, default=1,
+        description="Seed for random generation")
 
     width   = FloatProperty(
         name="Width", min=0.01, max=100.0, default=2,
@@ -72,6 +77,12 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.type == 'RECTANGULAR':
             col = box.column(align=True)
+            col.prop(self, 'width')
+            col.prop(self, 'length')
+
+        elif self.type == 'RANDOM':
+            col = box.column(align=True)
+            col.prop(self, 'seed')
             col.prop(self, 'width')
             col.prop(self, 'length')
 

@@ -1,8 +1,10 @@
 import bmesh
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from bmesh.types import BMVert
 
+import random
 from ...utils import (
+    clamp,
     plane,
     circle,
     filter_geom,
@@ -142,3 +144,55 @@ def fp_hshaped(bm, width, length, tl1, tl2, tl3, tl4, tw1, tw2, tw3, tw4, **kwar
             bmesh.ops.translate(bm, verts=verts, vec=Vector((0, v.y, 0)) * lext[idx])
             bmesh.ops.translate(bm, verts=[mv1, mv2], vec=Vector((-v.x, 0, 0)) * wext[idx])
 
+def fp_random(bm, seed, width, length, **kwargs):
+    """ Create randomly generated building footprint/floorplan
+
+    Args:
+        bm      (bmesh.types.BMesh): bmesh to create plane in
+        seed    (int): random seed
+        width   (float): width of base plane
+        length  (float): length of base plane
+
+    """
+    random.seed(seed)
+    sc_x = Matrix.Scale(width, 4, (1, 0, 0))
+    sc_y = Matrix.Scale(length, 4, (0, 1, 0))
+    mat = sc_x * sc_y
+    bmesh.ops.create_grid(bm,
+        x_segments=1, y_segments=1, size=1, matrix=mat)
+
+    sample = random.sample(list(bm.edges), random.randrange(0, len(bm.edges)))
+    ref = list(bm.faces)[-1].calc_center_median()
+    for edge in sample:
+        # -- get edge center and length
+        cen = calc_edge_median(edge)
+        elen = edge.calc_length()
+
+        # -- subdivide
+        res = bmesh.ops.subdivide_edges(bm,
+                edges= [edge],
+                cuts = 2)
+        new_verts = filter_geom(res['geom_inner'], BMVert)
+        new_edge  = list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
+
+        # -- resize new edge
+        axis = Vector((1, 0, 0)) if new_verts[0].co.y == new_verts[1].co.y else Vector((0, 1, 0))
+        scale_factor = clamp(random.random() * elen/new_edge.calc_length(), 1, 2.95)
+        bmesh.ops.scale(bm,
+            verts = new_verts,
+            vec   = axis*scale_factor,
+            space = Matrix.Translation(-cen))
+
+        # -- offset
+        if random.choice([0, 1]):
+            max_offset = (elen - new_edge.calc_length()) / 2
+            rand_offset = random.random() * max_offset
+            bmesh.ops.translate(bm,
+                verts = new_verts,
+                vec   = axis*rand_offset)
+
+        # --extrude
+        res    = bmesh.ops.extrude_edge_only(bm, edges=[new_edge])
+        bmesh.ops.translate(bm,
+            verts = filter_geom(res['geom'], BMVert),
+            vec   = (cen - ref).normalized() * random.randrange(1, int(elen/2)))

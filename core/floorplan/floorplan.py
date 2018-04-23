@@ -5,7 +5,8 @@ from .floorplan_types import (
     fp_rectangular,
     fp_circular,
     fp_composite,
-    fp_hshaped
+    fp_hshaped,
+    fp_random
     )
 
 from ...utils import (
@@ -44,6 +45,9 @@ class Floorplan:
 
         elif props.type == 'H-SHAPED':
             fp_hshaped(bm, **kwargs)
+
+        elif props.type == 'RANDOM':
+            fp_random(bm, **kwargs)
 
         # -- write bmesh back into object
         bm_to_obj(bm, obj)
