@@ -9,16 +9,16 @@
 ## Features:
 
 1. Create Floorplan
-	* Provide a set of basic footprint shapes to build geometry from
+  * Provide a set of basic footprint shapes to build geometry from
 
 2. Create Floors
-	* Extrude floorplan shapes to create walls
+  * Extrude floorplan shapes to create walls
 
 3. Add Windows
-	* Add window geometry to walls
+  * Add window geometry to walls
 
 4. Add Doors
-	* Add door geometry to walls
+  * Add door geometry to walls
 
 5. Add balcony
   * Create balcony on slab faces
@@ -36,8 +36,7 @@
 
 ## Development Status
 
-  * under heavy developent
-  * use at own risk
+  * under heavy developent, use at own risk
 
 ## Contributing
 
