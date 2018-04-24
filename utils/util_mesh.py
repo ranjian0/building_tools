@@ -106,11 +106,11 @@ def square_face(bm, face):
     min_edge = list(filter(lambda e: e.calc_length() == min_length,
                            face.edges))[-1]
 
-    if calc_edge_orient(min_edge).x:
+    if calc_edge_orient(min_edge) == Vector((1, 0, 0)):
         scale_vec = (scale_factor, 1, 1)
-    elif calc_edge_orient(min_edge).y:
+    elif calc_edge_orient(min_edge) == Vector((0, 1, 0)):
         scale_vec = (1, scale_factor, 1)
-    elif calc_edge_orient(min_edge).z:
+    elif calc_edge_orient(min_edge) == Vector((0, 0, 1)):
         scale_vec = (1, 1, scale_factor)
     else:
         scale_vec = (1, 1, 1)
@@ -118,6 +118,7 @@ def square_face(bm, face):
     fc = face.calc_center_median()
     bmesh.ops.scale(bm, verts=list(face.verts), vec=scale_vec,
                     space=Matrix.Translation(-fc))
+    return scale_factor
 
 def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts"""

@@ -1,11 +1,13 @@
 import bpy
 import bmesh
-from mathutils import Vector
-from bmesh.types import BMEdge, BMVert
+from mathutils import Vector, Matrix
+from bmesh.types import BMEdge, BMVert, BMFace
 from ...utils import (
         split,
         filter_geom,
+        square_face,
         get_edit_mesh,
+        calc_face_dimensions,
         filter_vertical_edges,
         filter_horizontal_edges
     )
@@ -17,13 +19,6 @@ def fill_panel(bm, face, panel_x, panel_y, panel_t, panel_d, **kwargs):
     # Create main panel to hold child panels
     bmesh.ops.inset_individual(bm,
         faces=[face], thickness=panel_t)
-
-    # bmesh.ops.scale(bm,
-    #     verts=list({v for e in face.edges for v in e.verts}),
-    #     vec=(1, 1, gw))
-    # bmesh.ops.translate(bm,
-    #     verts=list({v for e in face.edges for v in e.verts}),
-    #     vec=(0, 0, goff))
 
     # Calculate edges to be subdivided
     n = face.normal
@@ -98,56 +93,53 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
 def fill_louver(bm, face, **kwargs):
     pass
 
-def fill_bar(bm, face, **kwargs):
-    pass
+def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
 
-"""
     # Calculate center, width and height of face
     width, height = calc_face_dimensions(face)
     fc = face.calc_center_median()
 
     # Create Inner Frames
     # -- horizontal
-    offset = height / (px + 1)
-    for i in range(px):
+    offset = height / (bar_x + 1)
+    for i in range(bar_x):
         # Duplicate
         ret = bmesh.ops.duplicate(bm, geom=[face])
-        square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
+        fs = square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
         verts = filter_geom(ret['geom'], BMVert)
-
         # Scale and translate
         bmesh.ops.scale(bm, verts=verts,
-            vec=(1, 1, pt), space=Matrix.Translation(-fc))
+            vec=(1, 1, bar_t/fs), space=Matrix.Translation(-fc))
         bmesh.ops.translate(bm, verts=verts,
-            vec=Vector((face.normal * fd / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
+            vec=Vector((face.normal * bar_d / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
 
         # Extrude
         ext = bmesh.ops.extrude_edge_only(bm,
             edges=filter_horizontal_edges(filter_geom(ret['geom'], BMEdge), face.normal))
         bmesh.ops.translate(bm,
-            verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * fd / 2)
+            verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * bar_d / 2)
 
     # -- vertical
     eps = 0.015
-    offset = width / (py + 1)
-    for i in range(py):
+    offset = width / (bar_y + 1)
+    for i in range(bar_y):
         # Duplicate
         ret = bmesh.ops.duplicate(bm, geom=[face])
+        fs = square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
         verts = filter_geom(ret['geom'], BMVert)
 
         # Scale and Translate
         bmesh.ops.scale(bm, verts=verts,
-            vec=(pt, pt, 1), space=Matrix.Translation(-fc))
+            vec=(bar_t/fs, bar_t/fs, 1/fs), space=Matrix.Translation(-fc))
         perp = face.normal.cross(Vector((0, 0, 1)))
         bmesh.ops.translate(bm, verts=verts,
-            vec=Vector((face.normal * ((fd / 2) - eps))) + perp * (-width / 2 + ((i + 1) * offset)))
+            vec=Vector((face.normal * ((bar_d / 2) - eps))) + perp * (-width / 2 + ((i + 1) * offset)))
 
         # Extrude
         ext_edges = []
 
         # filter vertical edges
         # -- This part is redundant for good reasons, JUST DON'T!!
-
         if (face.normal.x and face.normal.y) or (face.normal.y and not face.normal.x):
             for e in filter_geom(ret['geom'], BMEdge):
                 s = set([round(v.co.x, 4) for v in e.verts])
@@ -162,6 +154,6 @@ def fill_bar(bm, face, **kwargs):
             raise NotImplementedError
 
         ext = bmesh.ops.extrude_edge_only(bm, edges=ext_edges)
-        bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * ((fd / 2) - eps))
-
-"""
+        bmesh.ops.translate(bm,
+            verts=filter_geom(ext['geom'], BMVert),
+            vec=-face.normal * ((bar_d / 2) - eps))
