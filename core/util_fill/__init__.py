@@ -1,6 +1,7 @@
 import bpy
 
 from .fill_props import (
+    FillBars,
     FillPanel,
     FillLouver,
     FillGlassPanes
@@ -14,6 +15,7 @@ from .fill_types import (
 )
 
 classes = (
+    FillBars,
     FillPanel,
     FillLouver,
     FillGlassPanes,
