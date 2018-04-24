@@ -1,13 +1,14 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
 
-from ..rails import rails_types as rails
 from ...utils import (
     split,
     filter_geom,
     get_edit_mesh,
     face_with_verts,
-    )
+)
+from ..util_rail import rails_types as rails
+
 
 
 def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, size, off, **kwargs):
