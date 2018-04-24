@@ -58,9 +58,8 @@ def fill_panel(bm, face, panel_x, panel_y, panel_t, panel_d, **kwargs):
 def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
     """ Create glass panes on face """
 
-    n = face.normal
-    v_edges = filter_vertical_edges(face.edges, n)
-    h_edges = filter_horizontal_edges(face.edges, n)
+    v_edges = filter_vertical_edges(face.edges, face.normal)
+    h_edges = filter_horizontal_edges(face.edges, face.normal)
 
     # -- if panes_x == 0, skip
     if pane_x:
