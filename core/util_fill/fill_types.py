@@ -14,46 +14,42 @@ from ...utils import (
     )
 
 
-def fill_panel(bm, face, panel_x, panel_y, panel_t, panel_d, **kwargs):
+def fill_panel(bm, face, panel_x, panel_y, panel_b, panel_t, panel_d, **kwargs):
     """ Create panels on faace """
 
     # Create main panel to hold child panels
     bmesh.ops.inset_individual(bm,
-        faces=[face], thickness=panel_t)
+        faces=[face], thickness=panel_b)
 
     # Calculate edges to be subdivided
     n = face.normal
     vedgs = filter_vertical_edges(face.edges, n)
     hedgs = list(set(face.edges) - set(vedgs))
 
+    vts = []
     # Subdivide the edges
-    res1 = bmesh.ops.subdivide_edges(bm,
-        edges=vedgs,
-        cuts=panel_x)
+    if panel_x:
+        res1 = bmesh.ops.subdivide_edges(bm,
+            edges=vedgs,
+            cuts=panel_x)
+        vts = filter_geom(res1['geom_inner'], BMVert)
 
-    res2 = bmesh.ops.subdivide_edges(bm,
-        edges=hedgs + filter_geom(res1['geom_inner'], BMEdge),
-        cuts=panel_y)
-
-    # Get all panel faces
-    vts = filter_geom(res2['geom_inner'], BMVert)
-    faces = list(filter(lambda f: len(f.verts) == 4,
-        {f for v in vts for f in v.link_faces if f.normal == n}))
+    if panel_y:
+        res2 = bmesh.ops.subdivide_edges(bm,
+            edges=hedgs + filter_geom(res1['geom_inner'], BMEdge) if panel_x else hedgs,
+            cuts=panel_y)
+        vts = filter_geom(res2['geom_inner'], BMVert)
 
     # Make panels
-    bmesh.ops.inset_individual(bm, faces=faces, thickness=panel_t / 2)
-    bmesh.ops.inset_individual(bm, faces=faces, thickness=panel_t / 2)
-    bmesh.ops.translate(bm,
-        verts=list({v for f in faces for v in f.verts}),
-        vec=n * panel_d)
+    if vts:
+        faces = list(filter(lambda f: len(f.verts) == 4,
+            {f for v in vts for f in v.link_faces if f.normal == n}))
 
-    # Clean geometry
-    vts2 = [v for e in filter_geom(res1['geom_split'], BMEdge) for v in e.verts]
-    vts2.sort(key=lambda v: v.co.z)
-    vts2 = vts2[2:len(vts2) - 2]
+        bmesh.ops.inset_individual(bm, faces=faces, thickness=panel_t / 2)
+        bmesh.ops.translate(bm,
+            verts=list({v for f in faces for v in f.verts}),
+            vec=n * panel_d)
 
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
-    bmesh.ops.dissolve_verts(bm, verts=list(set(vts + vts2)))
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
 def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):

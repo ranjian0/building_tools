@@ -11,9 +11,13 @@ class FillPanel(bpy.types.PropertyGroup):
         name="Vertical Panels", min=0, max=100, default=1,
         description="Number of vertical panels")
 
+    panel_b      = FloatProperty(
+        name="Panel Border", min=0.01, max=1.0, default=0.1,
+        description="Border for panels")
+
     panel_t      = FloatProperty(
-        name="Panel Thickness", min=0.01, max=100.0, default=0.05,
-        description="Thickness of panels")
+        name="Panel Inset", min=0.01, max=1.0, default=0.1,
+        description="Inset of each panel")
 
     panel_d      = FloatProperty(
         name="Panel Depth", min=0.01, max=100.0, default=0.01, step=1,
@@ -27,6 +31,7 @@ class FillPanel(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, 'panel_x')
         row.prop(self, 'panel_y')
+        col.prop(self, 'panel_b')
         col.prop(self, 'panel_t')
         col.prop(self, 'panel_d')
 
