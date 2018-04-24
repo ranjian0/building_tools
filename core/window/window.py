@@ -14,7 +14,4 @@ class Window:
         """ Create window geometry from selected faces """
 
         kwargs = kwargs_from_props(props)
-        if props.type == 'BASIC':
-            win_basic(cls, **kwargs)
-        elif props.type == 'ARCHED':
-            win_arched(cls, **kwargs)
+        win_basic(cls, **kwargs)
