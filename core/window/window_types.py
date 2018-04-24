@@ -51,44 +51,6 @@ def win_basic(cls, **kwargs):
 
     bmesh.update_edit_mesh(me, True)
 
-def win_arched(cls, **kwargs):
-    """Generate arched window
-
-    Args:
-        cls: parent window class
-        **kwargs: WindowProperty items
-    """
-
-    # Get active mesh
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    faces = [f for f in bm.faces if f.select]
-
-    for face in faces:
-        face = make_window_split(bm, face, **kwargs)
-
-        # subdivide the face horizontally
-        e = filter_vertical_edges(face.edges, face.normal)
-        res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=1)
-        nedge = filter_geom(res['geom_inner'], BMEdge)[-1]
-
-        upper_face = face
-        lower_face = list(set(nedge.link_faces) - set([upper_face]))[-1]
-
-        make_window_arch(bm, upper_face, **kwargs)
-        upper_face = make_window_frame(bm, upper_face, **kwargs)
-        make_window_arch_detail(bm, upper_face, **kwargs)
-        lower_face = make_window_frame(bm, lower_face, **kwargs)
-
-        fill = kwargs.get('fill')
-        if fill == 'BAR':
-            make_window_bars(bm, lower_face, **kwargs)
-        else:
-            make_window_panes(bm, lower_face, **kwargs)
-
-    bmesh.update_edit_mesh(me, True)
-
 def make_window_split(bm, face, size, off, **kwargs):
     """ Basically scales down the face given based on parameters """
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
@@ -211,43 +173,3 @@ def make_window_bars(bm, face, fd, px, py, pt, pd, **kwargs):
 
         ext = bmesh.ops.extrude_edge_only(bm, edges=ext_edges)
         bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * ((fd / 2) - eps))
-
-def make_window_arch(bm, face, ares, aoff, aheight, **kwargs):
-    """ Arc the top edge of a face """
-
-    #bmesh.ops.inset_individual(bm, faces=[face], thickness= aheight / ares)
-    # Get top edge
-    top = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
-
-    # Subdivide
-    ret = bmesh.ops.subdivide_edges(bm, edges=[top], cuts=ares)
-
-    # Sort Verts
-    verts = list({v for e in filter_geom(ret['geom_split'], BMEdge) for v in e.verts})
-    verts.sort(key = lambda v: v.co.x if face.normal.y else lambda v: v.co.y)
-
-    # Offset verts along sin curve
-    angle = pi / (len(verts)-1)
-    for idx, v in enumerate(verts):
-        off = sin(angle*idx) * aheight
-        v.co.z -= aoff
-        v.co.z += off
-
-def make_window_arch_detail(bm, face, adetail, dthick, ddepth, **kwargs):
-    """ Create detail in the arched face """
-    if not adetail:
-        return
-
-    fn = face.normal
-    res = bmesh.ops.poke(bm, faces=[face])
-
-    # inset and extrude
-    if dthick > 0:
-        ret = bmesh.ops.inset_individual(bm, faces=res['faces'], thickness=dthick)
-        bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-
-        faces = bmesh.ops.extrude_discrete_faces(bm,
-            faces=res['faces']).get('faces')
-        bmesh.ops.translate(bm,
-            verts=[v for f in faces for v in f.verts],
-            vec=-fn * ddepth)

@@ -4,13 +4,6 @@ from bpy.props import *
 from ..generic import SizeOffsetProperty
 
 class WindowProperty(bpy.types.PropertyGroup):
-    win_types  = [
-        ("BASIC", "Basic", "", 0),
-        ("ARCHED", "Arched", "", 1)
-    ]
-    type       = EnumProperty(
-        items=win_types, default='BASIC',
-        description="Type of window")
 
     fill_types = [
         ("BAR", "Bar", "", 0),
@@ -44,30 +37,6 @@ class WindowProperty(bpy.types.PropertyGroup):
         name="Pane Frame Depth", min=0.01, max=100.0, default=0.01,
         description="Depth of window pane frame")
 
-    ares       = IntProperty(
-        name="Arc Resolution", min=0, max=1000, default=5,
-        description="Number of segements for the arc")
-
-    aoff       = FloatProperty(
-        name="Arc Offset", min=0.01, max=1.0, default=0.5,
-        description="How far arc is from top")
-
-    aheight    = FloatProperty(
-        name="Arc Height", min=0.01, max=100.0, default=0.5,
-        description="Radius of the arc")
-
-    adetail    = BoolProperty(
-        name="Arc Detail", default=False,
-        description="Whether to add detail to arc")
-
-    dthick     = FloatProperty(
-        name="Arc Detail Size", min=0.01, max=100.0, default=0.02,
-        description="Size of arc details")
-
-    ddepth     = FloatProperty(
-        name="Arc Detail Depth", min=0.01, max=100.0, default=0.02,
-        description="Depth of arc details")
-
     soff       = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
@@ -77,27 +46,9 @@ class WindowProperty(bpy.types.PropertyGroup):
         row.prop(self, "type", text="")
 
         box = layout.box()
-        if self.type == 'BASIC':
-            pass
-
-        elif self.type == 'ARCHED':
-            # -- arch
-            col = box.column(align=True)
-            col.prop(self, 'ares')
-            col.prop(self, 'aoff')
-            col.prop(self, 'aheight')
-
-            col = box.column(align=True)
-            col.prop(self, 'adetail', toggle=True)
-            if self.adetail:
-                col.prop(self, 'dthick')
-                col.prop(self, 'ddepth')
-
-            # -- lower panes/bars
-            box.separator()
-
         row = box.row(align=True)
         row.prop(self, 'fill', expand=True)
+
         col = box.column(align=True)
         col.prop(self, 'ft')
         col.prop(self, 'fd')
