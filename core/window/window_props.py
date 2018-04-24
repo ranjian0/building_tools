@@ -20,7 +20,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     fill_itemss = [
         ("NONE", "None", "", 0),
         ("BAR", "Bar", "", 1),
-        ("LOUVER", "LOUVER", "", 2),
+        ("LOUVER", "Louver", "", 2),
         ("GLASS PANES", "Glass Panes", "", 3)
     ]
     fill_type  = EnumProperty(

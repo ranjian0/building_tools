@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from ...utils import (
     split,
+    get_edit_mesh,
     )
 
 from ..util_fill import (
