@@ -62,3 +62,8 @@ class FillLouver(bpy.types.PropertyGroup):
 
     def draw(self, layout):
         pass
+
+class FillBars(bpy.types.PropertyGroup):
+
+    def draw(self, layout):
+        pass

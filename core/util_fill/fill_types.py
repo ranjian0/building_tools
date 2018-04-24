@@ -97,3 +97,6 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
 
 def fill_louver(bm, face, **kwargs):
     pass
+
+def fill_bars(bm, face, **kwargs):
+    pass
