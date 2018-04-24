@@ -78,9 +78,6 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
         for f in pane_faces:
             bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pane_d)
 
-def fill_louver(bm, face, **kwargs):
-    pass
-
 def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
 
     # Calculate center, width and height of face
@@ -145,3 +142,6 @@ def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
         bmesh.ops.translate(bm,
             verts=filter_geom(ext['geom'], BMVert),
             vec=-face.normal * ((bar_d / 2) - eps))
+
+def fill_louver(bm, face, **kwargs):
+    pass
