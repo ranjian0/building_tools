@@ -4,6 +4,7 @@ from mathutils import Vector, Matrix
 from bmesh.types import BMEdge, BMVert, BMFace
 from ...utils import (
         split,
+        select,
         filter_geom,
         square_face,
         get_edit_mesh,
@@ -61,28 +62,21 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
     v_edges = filter_vertical_edges(face.edges, face.normal)
     h_edges = filter_horizontal_edges(face.edges, face.normal)
 
-    # -- if panes_x == 0, skip
+    edges = []
     if pane_x:
         res1 = bmesh.ops.subdivide_edges(bm,
             edges=v_edges, cuts=pane_x).get('geom_inner')
+        edges.extend(filter_geom(res1, BMEdge))
 
     if pane_y:
         res2 = bmesh.ops.subdivide_edges(bm,
-            edges=h_edges + filter_geom(res1, BMEdge) if pane_x else [],
+            edges=h_edges + filter_geom(res1, BMEdge) if pane_x else h_edges,
             cuts=pane_y).get('geom_inner')
+        edges.extend(filter_geom(res2, BMEdge))
 
-    # panes
-    # -- if we're here successfully, about 3 things may have happened
-    do_panes = True
-    if pane_y:
-        e = filter_geom(res2, BMEdge)
-    else:
-        if pane_x:
-            e = filter_geom(res1, BMEdge)
-        else:
-            do_panes = False
-    if do_panes:
-        pane_faces = list({f for ed in e for f in ed.link_faces})
+
+    if edges:
+        pane_faces = list({f for ed in edges for f in ed.link_faces})
         panes = bmesh.ops.inset_individual(bm,
             faces=pane_faces, thickness=pane_t)
 
