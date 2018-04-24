@@ -49,7 +49,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         box.prop(self, "hdd", toggle=True)
 
         row = layout.row()
-        row.prop_menu_enum(self, "fill_type") #prop(self, 'fill_type', text="")
+        row.prop_menu_enum(self, "fill_type")
 
         # -- draw fill types
         fill_map = {

@@ -7,6 +7,7 @@ from .fill_props import (
 )
 
 from .fill_types import (
+    fill_bar,
     fill_panel,
     fill_louver,
     fill_glass_panes

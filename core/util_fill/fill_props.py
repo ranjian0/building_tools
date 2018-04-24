@@ -12,7 +12,7 @@ class FillPanel(bpy.types.PropertyGroup):
         description="Number of vertical panels")
 
     panel_t      = FloatProperty(
-        name="Pane Thickness", min=0.01, max=100.0, default=0.05,
+        name="Panel Thickness", min=0.01, max=100.0, default=0.05,
         description="Thickness of panels")
 
     panel_d      = FloatProperty(
@@ -64,6 +64,29 @@ class FillLouver(bpy.types.PropertyGroup):
         pass
 
 class FillBars(bpy.types.PropertyGroup):
+    bar_x      = IntProperty(
+        name="Horizontal Bars", min=0, max=100, default=1,
+        description="Number of horizontal bars")
+
+    bar_y      = IntProperty(
+        name="Vertical Bars", min=0, max=100, default=1,
+        description="Number of vertical bars")
+
+    bar_t      = FloatProperty(
+        name="Bar Thickness", min=0.01, max=100.0, default=0.05,
+        description="Thickness of bars")
+
+    bar_d      = FloatProperty(
+        name="Bar Depth", min=0.01, max=100.0, default=0.01, step=1,
+        description="Depth of bars")
+
 
     def draw(self, layout):
-        pass
+        box = layout.box()
+
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, 'bar_x')
+        row.prop(self, 'bar_y')
+        col.prop(self, 'bar_t')
+        col.prop(self, 'bar_d')

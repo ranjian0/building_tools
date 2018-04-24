@@ -98,5 +98,70 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
 def fill_louver(bm, face, **kwargs):
     pass
 
-def fill_bars(bm, face, **kwargs):
+def fill_bar(bm, face, **kwargs):
     pass
+
+"""
+    # Calculate center, width and height of face
+    width, height = calc_face_dimensions(face)
+    fc = face.calc_center_median()
+
+    # Create Inner Frames
+    # -- horizontal
+    offset = height / (px + 1)
+    for i in range(px):
+        # Duplicate
+        ret = bmesh.ops.duplicate(bm, geom=[face])
+        square_face(bm, filter_geom(ret['geom'], BMFace)[-1])
+        verts = filter_geom(ret['geom'], BMVert)
+
+        # Scale and translate
+        bmesh.ops.scale(bm, verts=verts,
+            vec=(1, 1, pt), space=Matrix.Translation(-fc))
+        bmesh.ops.translate(bm, verts=verts,
+            vec=Vector((face.normal * fd / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
+
+        # Extrude
+        ext = bmesh.ops.extrude_edge_only(bm,
+            edges=filter_horizontal_edges(filter_geom(ret['geom'], BMEdge), face.normal))
+        bmesh.ops.translate(bm,
+            verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * fd / 2)
+
+    # -- vertical
+    eps = 0.015
+    offset = width / (py + 1)
+    for i in range(py):
+        # Duplicate
+        ret = bmesh.ops.duplicate(bm, geom=[face])
+        verts = filter_geom(ret['geom'], BMVert)
+
+        # Scale and Translate
+        bmesh.ops.scale(bm, verts=verts,
+            vec=(pt, pt, 1), space=Matrix.Translation(-fc))
+        perp = face.normal.cross(Vector((0, 0, 1)))
+        bmesh.ops.translate(bm, verts=verts,
+            vec=Vector((face.normal * ((fd / 2) - eps))) + perp * (-width / 2 + ((i + 1) * offset)))
+
+        # Extrude
+        ext_edges = []
+
+        # filter vertical edges
+        # -- This part is redundant for good reasons, JUST DON'T!!
+
+        if (face.normal.x and face.normal.y) or (face.normal.y and not face.normal.x):
+            for e in filter_geom(ret['geom'], BMEdge):
+                s = set([round(v.co.x, 4) for v in e.verts])
+                if len(s) == 1:
+                    ext_edges.append(e)
+        elif face.normal.x and not face.normal.y:
+            for e in filter_geom(ret['geom'], BMEdge):
+                s = set([round(v.co.y, 4) for v in e.verts])
+                if len(s) == 1:
+                    ext_edges.append(e)
+        else:
+            raise NotImplementedError
+
+        ext = bmesh.ops.extrude_edge_only(bm, edges=ext_edges)
+        bmesh.ops.translate(bm, verts=filter_geom(ext['geom'], BMVert), vec=-face.normal * ((fd / 2) - eps))
+
+"""
