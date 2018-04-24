@@ -4,65 +4,71 @@ from bpy.props import *
 from ..generic import SizeOffsetProperty
 
 class WindowProperty(bpy.types.PropertyGroup):
-    win_types   = [("BASIC", "Basic", "", 0), ("ARCHED", "Arched", "", 1)]
-    type        = EnumProperty(
+    win_types  = [
+        ("BASIC", "Basic", "", 0),
+        ("ARCHED", "Arched", "", 1)
+    ]
+    type       = EnumProperty(
         items=win_types, default='BASIC',
         description="Type of window")
 
-    fill_type   = [("BAR", "Bar", "", 0), ("PANE", "Pane", "", 1)]
-    fill        = EnumProperty(
-        items=fill_type, default='BAR',
+    fill_types = [
+        ("BAR", "Bar", "", 0),
+        ("PANE", "Pane", "", 1)
+    ]
+    fill       = EnumProperty(
+        items=fill_types, default='BAR',
         description="Type of fill for window")
 
-    ft          = FloatProperty(
+    ft         = FloatProperty(
         name="Frame Thickness", min=0.01, max=100.0, default=0.1,
         description="Thickness of window Frame")
 
-    fd          = FloatProperty(
+    fd         = FloatProperty(
         name="Frame Depth", min=0.0, max=100.0, default=0.1,
         description="Depth of window Frame")
 
-    px          = IntProperty(
+    px         = IntProperty(
         name="Horizontal Panes", min=0, max=100, default=1,
         description="Number of horizontal frames")
 
-    py          = IntProperty(
+    py         = IntProperty(
         name="Vertical Panes", min=0, max=100, default=1,
         description="Number of vertical frames")
 
-    pt          = FloatProperty(
+    pt         = FloatProperty(
         name="Pane Frame Thickness", min=0.01, max=100.0, default=0.1,
         description="Thickness of window pane frame")
 
-    pd          = FloatProperty(
+    pd         = FloatProperty(
         name="Pane Frame Depth", min=0.01, max=100.0, default=0.01,
         description="Depth of window pane frame")
 
-    ares        = IntProperty(
+    ares       = IntProperty(
         name="Arc Resolution", min=0, max=1000, default=5,
         description="Number of segements for the arc")
 
-    aoff        = FloatProperty(
+    aoff       = FloatProperty(
         name="Arc Offset", min=0.01, max=1.0, default=0.5,
         description="How far arc is from top")
 
-    aheight     = FloatProperty(
+    aheight    = FloatProperty(
         name="Arc Height", min=0.01, max=100.0, default=0.5,
         description="Radius of the arc")
 
-    adetail     = BoolProperty(
+    adetail    = BoolProperty(
         name="Arc Detail", default=False,
         description="Whether to add detail to arc")
 
-    dthick      = FloatProperty(
+    dthick     = FloatProperty(
         name="Arc Detail Size", min=0.01, max=100.0, default=0.02,
         description="Size of arc details")
 
-    ddepth      = FloatProperty(
+    ddepth     = FloatProperty(
         name="Arc Detail Depth", min=0.01, max=100.0, default=0.02,
         description="Depth of arc details")
 
-    soff        = PointerProperty(type=SizeOffsetProperty)
+    soff       = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
         self.soff.draw(context, layout)

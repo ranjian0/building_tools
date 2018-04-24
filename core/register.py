@@ -1,6 +1,7 @@
 import bpy
 from .generic import SizeOffsetProperty
 
+from .util_fill import register_fill, unregister_fill
 from .door      import register_door, unregister_door
 from .rails     import register_rail, unregister_rail
 from .floor     import register_floor, unregister_floor
@@ -16,6 +17,7 @@ classes = [
 ]
 
 register_funcs = [
+    register_fill,
     register_door,
     register_rail,
     register_floor,
@@ -26,6 +28,7 @@ register_funcs = [
 ]
 
 unregister_funcs = [
+    unregister_fill,
     unregister_door,
     unregister_rail,
     unregister_floor,
