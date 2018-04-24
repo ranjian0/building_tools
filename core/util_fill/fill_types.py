@@ -4,7 +4,6 @@ from mathutils import Vector, Matrix
 from bmesh.types import BMEdge, BMVert, BMFace
 from ...utils import (
         split,
-        select,
         filter_geom,
         square_face,
         get_edit_mesh,
