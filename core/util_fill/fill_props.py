@@ -77,7 +77,7 @@ class FillBars(bpy.types.PropertyGroup):
         description="Thickness of bars")
 
     bar_d      = FloatProperty(
-        name="Bar Depth", min=0.01, max=100.0, default=0.01, step=1,
+        name="Bar Depth", min=0.01, max=100.0, default=0.05, step=1,
         description="Depth of bars")
 
 
