@@ -5,7 +5,7 @@ from ...utils import (
     )
 
 from ..util_fill import (
-    fill_bars,
+    fill_bar,
     fill_louver,
     fill_glass_panes
     )
