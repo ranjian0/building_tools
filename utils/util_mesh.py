@@ -127,23 +127,18 @@ def face_with_verts(bm, verts, default=None):
             return face
     return default
 
-def split_quad(vertical=False, cuts=4):
+def split_quad(bm, face, vertical=False, cuts=4):
     """ Subdivide a quad's edges into even horizontal/vertical cuts """
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
 
-    # Find selected faces
-    faces = [f for f in bm.faces if f.select]
+    res = None
+    if vertical:
+        e = filter_horizontal_edges(face.edges, face.normal)
+        res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
+    else:
+        e = filter_vertical_edges(face.edges, face.normal)
+        res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
 
-    for face in faces:
-        if vertical:
-            e = filter_horizontal_edges(face.edges, face.normal)
-            res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-        else:
-            e = filter_vertical_edges(face.edges, face.normal)
-            res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-
-    bmesh.update_edit_mesh(me, True)
+    import pprint; pprint.pprint(res)
     return res
 
 def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):

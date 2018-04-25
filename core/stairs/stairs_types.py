@@ -103,7 +103,7 @@ def make_stairs_type2(step_count, step_width, scale, bottom_faces, **kwargs):
     faces = [f for f in bm.faces if f.select]
 
     for f in faces:
-        res = split_quad(False, step_count - 1)
+        res = split_quad(bm, f, False, step_count - 1)
         f.select = False
         step_edges = filter_geom(res['geom_inner'], BMEdge)
         step_faces = list({f for e in step_edges for f in e.link_faces})

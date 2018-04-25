@@ -1,5 +1,5 @@
 from .door_types import (
-    door_basic
+    make_door
     )
 
 from ...utils import (
@@ -10,5 +10,5 @@ from ...utils import (
 class Door:
 
     @classmethod
-    def build(cls, context, props):
-        door_basic(cls, **kwargs_from_props(props))
+    def build(cls, props):
+        make_door(**kwargs_from_props(props))

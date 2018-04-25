@@ -16,7 +16,7 @@ class DoorOperator(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        Door.build(context, self.props)
+        Door.build(self.props)
         return {'FINISHED'}
 
     def draw(self, context):

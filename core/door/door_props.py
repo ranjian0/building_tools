@@ -9,11 +9,11 @@ from ..util_fill import (
 
 class DoorProperty(bpy.types.PropertyGroup):
     ft     = FloatProperty(
-        name="Frame Thickness", min=0.0, max=100.0, default=0.1,
+        name="Frame Thickness", min=0.0, max=2.99, default=0.1,
         description="Thickness of inner door Frame")
 
     fd     = FloatProperty(
-        name="Frame Depth", min=0.0, max=100.0, default=0.1, step=1,
+        name="Frame Depth", min=0.0, max=100.0, default=0.05, step=1,
         description="Depth of inner door Frame")
 
     soff   = PointerProperty(type=SizeOffsetProperty)

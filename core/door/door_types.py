@@ -1,11 +1,16 @@
 import bpy
 import bmesh
 from bmesh.types import BMEdge, BMVert
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from ...utils import (
         split,
+        select,
+        split_quad,
         filter_geom,
         get_edit_mesh,
+        face_with_verts,
+        calc_edge_median,
+        calc_verts_median,
         filter_vertical_edges,
         filter_horizontal_edges
     )
@@ -16,11 +21,10 @@ from ..util_fill import (
     fill_louver,
 )
 
-def door_basic(cls, **kwargs):
+def make_door(**kwargs):
     """Create basic flush door
 
     Args:
-        cls: parent door class
         **kwargs: DoorProperty items
     """
 
@@ -42,11 +46,44 @@ def make_door_split(bm, face, size, off, **kwargs):
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 def make_door_frame(bm, face, ft, fd, **kwargs):
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
+
+    def delete_hidden_face(_face):
+        """ remove hidden bottom faces after frame extrusion """
+        bottom_edge = min(filter_horizontal_edges(_face.edges, _face.normal),
+                        key=lambda e : calc_edge_median(e).z)
+        hidden = min([f for f in bottom_edge.link_faces],
+                        key=lambda f : f.calc_center_median().z)
+        bmesh.ops.delete(bm, geom=[hidden], context=5)
+
+    # Frame outset
+    face = bmesh.ops.extrude_discrete_faces(bm,
+            faces=[face]).get('faces')[-1]
+    bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * fd)
+    delete_hidden_face(face)
 
     # Make frame inset - frame thickness
     if ft:
-        bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
+        # Vertical Split
+        res = split_quad(bm, face, True, 2)
+        edges = filter_geom(res['geom_inner'], BMEdge)
+        verts = list({v for e in edges for v in e.verts})
+        bmesh.ops.scale(bm,
+            verts=verts,
+            vec=(3-(2*ft), 1, 1) if face.normal.y else (1, 3-(2*ft), 1), # Magic Numbers == Trial and Error
+            space=Matrix.Translation(-calc_verts_median(verts)))
+
+        # Top horizontal split
+        face = face_with_verts(bm, verts)
+        v_edges = filter_vertical_edges(face.edges, face.normal)
+        new_verts = []
+        for e in v_edges:
+            vert = max(list(e.verts), key=lambda v: v.co.z)
+            _, v = bmesh.utils.edge_split(e, vert, ft / e.calc_length())
+            new_verts.append(v)
+
+        res = bmesh.ops.connect_verts(bm, verts=new_verts).get('edges')
+        face = min(list({f for e in res for f in e.link_faces}),
+                key=lambda f: f.calc_center_median().z)
 
     # Make frame extrude - frame depth
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
@@ -54,7 +91,7 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
         f = bmesh.ops.extrude_discrete_faces(bm,
             faces=[face]).get('faces')[-1]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
-
+        delete_hidden_face(f)
         return f
     return face
 
