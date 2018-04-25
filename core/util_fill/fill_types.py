@@ -3,6 +3,7 @@ from mathutils import Vector, Matrix
 from bmesh.types import BMEdge, BMVert
 from ...utils import (
         filter_geom,
+        calc_edge_median,
         calc_face_dimensions,
         filter_vertical_edges,
         filter_horizontal_edges
@@ -124,5 +125,52 @@ def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
             verts=filter_geom(ext['geom'], BMVert),
             vec=-face.normal * ((bar_d / 2) - eps))
 
-def fill_louver(bm, face, **kwargs):
-    pass
+def fill_louver(bm, face, louver_m, louver_count, louver_d, louver_b, **kwargs):
+    normal = face.normal
+
+    # -- inset margin
+    if louver_m:
+        bmesh.ops.inset_individual(bm,
+            faces=[face],
+            thickness=louver_m)
+
+    # -- cut vertical edges
+    count = (2 * louver_count) - 1
+    count = count if count % 2 == 0 else count + 1
+
+    res = bmesh.ops.subdivide_edges(bm,
+        edges=filter_vertical_edges(face.edges, face.normal),
+        cuts=count)
+
+    # -- find louver faces
+    faces = list({f for e in filter_geom(res['geom_inner'], BMEdge)
+                    for f in e.link_faces})
+    faces.sort(key=lambda f: f.calc_center_median().z)
+    louver_faces = faces[1::2]
+
+    # -- scale to border
+    for face in louver_faces:
+        bmesh.ops.scale(bm,
+            vec=(1, 1, 1 + louver_b),
+            verts=face.verts,
+            space=Matrix.Translation(-face.calc_center_median()))
+
+    # -- extrude louver faces
+    res = bmesh.ops.extrude_discrete_faces(bm,
+            faces=louver_faces)
+    bmesh.ops.translate(bm,
+        vec=normal * louver_d,
+        verts=list({v for face in res['faces'] for v in face.verts }))
+
+    # -- slope louver faces
+    for face in res['faces']:
+        top_edge = max(
+            filter_horizontal_edges(face.edges, face.normal),
+            key= lambda e: calc_edge_median(e).z)
+
+        bmesh.ops.translate(bm,
+            vec=-face.normal * louver_d,
+            verts=top_edge.verts)
+
+    # -- cleanup
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)

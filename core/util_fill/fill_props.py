@@ -64,9 +64,32 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         col.prop(self, 'pane_d')
 
 class FillLouver(bpy.types.PropertyGroup):
+    louver_count = IntProperty(
+        name="Louver Count", min=0, max=1000, default=10,
+        description="Number of louvers on to create face")
+
+    louver_m     = FloatProperty(
+        name="Louver Margin", min=0.0, max=100.0, default=0.1, step=1,
+        description="Offset of louvers from face border")
+
+    louver_d     = FloatProperty(
+        name="Louver Depth", min=0.01, max=100.0, default=0.05, step=1,
+        description="Depth of each louver")
+
+    louver_b     = FloatProperty(
+        name="Louver Border", min=0.0, max=1.0, default=0.01, step=1,
+        description="Distance between louvers")
 
     def draw(self, layout):
-        pass
+        box = layout.box()
+        box.prop(self, 'louver_m')
+
+        col = box.column(align=True)
+        col.prop(self, 'louver_count')
+        col.prop(self, 'louver_d')
+        col.prop(self, 'louver_b')
+
+
 
 class FillBars(bpy.types.PropertyGroup):
     bar_x      = IntProperty(
