@@ -1,17 +1,13 @@
 import bpy
 import bmesh
-from bmesh.types import BMEdge, BMVert
-from mathutils import Vector, Matrix
+from bmesh.types import BMEdge
 from ...utils import (
         split,
-        select,
         split_quad,
         filter_geom,
         get_edit_mesh,
         face_with_verts,
         calc_edge_median,
-        edge_split_offset,
-        calc_verts_median,
         calc_face_dimensions,
         filter_vertical_edges,
         filter_horizontal_edges
@@ -21,7 +17,7 @@ from ..util_fill import (
     fill_panel,
     fill_glass_panes,
     fill_louver,
-)
+    )
 
 def make_door(**kwargs):
     """Create basic flush door

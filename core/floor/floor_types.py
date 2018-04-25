@@ -6,7 +6,6 @@ from bmesh.types import (
     )
 
 from ...utils import (
-    select,
     filter_geom,
     get_edit_mesh,
     )

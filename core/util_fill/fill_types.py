@@ -1,11 +1,8 @@
-import bpy
 import bmesh
 from mathutils import Vector, Matrix
-from bmesh.types import BMEdge, BMVert, BMFace
+from bmesh.types import BMEdge, BMVert
 from ...utils import (
-        split,
         filter_geom,
-        get_edit_mesh,
         calc_face_dimensions,
         filter_vertical_edges,
         filter_horizontal_edges

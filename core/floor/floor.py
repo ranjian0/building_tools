@@ -3,7 +3,6 @@ import bmesh
 from .floor_types import flr_multistorey
 
 from ...utils import (
-    get_edit_mesh,
     kwargs_from_props
     )
 

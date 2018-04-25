@@ -1,6 +1,6 @@
 import bmesh
-from mathutils import Vector, Matrix
 from bmesh.types import BMVert
+from mathutils import Vector, Matrix
 
 import random
 from ...utils import (
