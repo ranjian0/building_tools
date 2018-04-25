@@ -37,6 +37,10 @@ class DoorProperty(bpy.types.PropertyGroup):
     glass_fill  = PointerProperty(type=FillGlassPanes)
     louver_fill = PointerProperty(type=FillLouver)
 
+    def set_defaults(self):
+        """ Helper function to make convinient property adjustments """
+        self.soff.size = (0.5, 1.0)
+
 
     def draw(self, context, layout):
         self.soff.draw(context, layout)
