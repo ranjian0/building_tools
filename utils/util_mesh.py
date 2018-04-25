@@ -210,3 +210,18 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
 
     face = face_with_verts(bm, verts)
     return face
+
+def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
+    """ Split the edges, offset amount from verts """
+
+    new_verts = []
+    for idx, e in enumerate(edges):
+        vert = verts[idx]
+        _, v = bmesh.utils.edge_split(e, vert, offset / e.calc_length())
+        new_verts.append(v)
+
+    if connect_verts:
+        res = bmesh.ops.connect_verts(bm, verts=new_verts).get('edges')
+        return res
+    return new_verts
+

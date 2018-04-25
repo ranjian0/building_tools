@@ -10,7 +10,9 @@ from ...utils import (
         get_edit_mesh,
         face_with_verts,
         calc_edge_median,
+        edge_split_offset,
         calc_verts_median,
+        calc_face_dimensions,
         filter_vertical_edges,
         filter_horizontal_edges
     )
@@ -63,17 +65,21 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
 
     # Make frame inset - frame thickness
     if ft:
-        # Vertical Split
-        res = split_quad(bm, face, True, 2)
+        # Vertical Splits
+        w, _ = calc_face_dimensions(face)
+        res  = split_quad(bm, face, True, 2)
         edges = filter_geom(res['geom_inner'], BMEdge)
-        verts = list({v for e in edges for v in e.verts})
-        bmesh.ops.scale(bm,
-            verts=verts,
-            vec=(3-(2*ft), 1, 1) if face.normal.y else (1, 3-(2*ft), 1), # Magic Numbers == Trial and Error
-            space=Matrix.Translation(-calc_verts_median(verts)))
+        edges.sort(key=lambda e: getattr(calc_edge_median(e),
+                    'x' if face.normal.y else 'y'))
+
+        offsets = [(-w/3) + ft, (w/3) - ft]
+        for off, e in zip(offsets, edges):
+            bmesh.ops.translate(bm,
+                verts=e.verts,
+                vec=(off, 0, 0) if face.normal.y else (0, off, 0))
 
         # Top horizontal split
-        face = face_with_verts(bm, verts)
+        face = face_with_verts(bm, list({v for e in edges for v in e.verts}))
         v_edges = filter_vertical_edges(face.edges, face.normal)
         new_verts = []
         for e in v_edges:
