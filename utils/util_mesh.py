@@ -97,12 +97,15 @@ def calc_edge_orient(edge):
     else:
         return Vector((0, 0, 0))
 
-def square_face(bm, face):
+def square_face(bm, face, invert=False):
     """ Make face square if it is rectangular """
     max_length = max([e.calc_length() for e in face.edges])
     min_length = min([e.calc_length() for e in face.edges])
 
-    scale_factor = max_length / min_length
+    if invert:
+        scale_factor = min_length / max_length
+    else:
+        scale_factor = max_length / min_length
     min_edge = list(filter(lambda e: e.calc_length() == min_length,
                            face.edges))[-1]
 
