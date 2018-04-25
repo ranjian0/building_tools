@@ -82,47 +82,6 @@ def calc_face_dimensions(face):
         min([v.co.z for v in face.verts])
     return width, height
 
-def calc_edge_orient(edge):
-    """ Determine the orientation of edge """
-    x_coords = list(set([round(v.co.x, 1) for v in edge.verts]))
-    y_coords = list(set([round(v.co.y, 1) for v in edge.verts]))
-    z_coords = list(set([round(v.co.z, 1) for v in edge.verts]))
-
-    if len(x_coords) == 1 or len(y_coords) == 1:
-        return Vector((0, 0, 1))
-    elif len(z_coords) == 1 and len(y_coords) == 1:
-        return Vector((1, 0, 0))
-    elif len(z_coords) == 1 and len(x_coords) == 1:
-        return Vector((0, 1, 0))
-    else:
-        return Vector((0, 0, 0))
-
-def square_face(bm, face, invert=False):
-    """ Make face square if it is rectangular """
-    max_length = max([e.calc_length() for e in face.edges])
-    min_length = min([e.calc_length() for e in face.edges])
-
-    if invert:
-        scale_factor = min_length / max_length
-    else:
-        scale_factor = max_length / min_length
-    min_edge = list(filter(lambda e: e.calc_length() == min_length,
-                           face.edges))[-1]
-
-    if calc_edge_orient(min_edge) == Vector((1, 0, 0)):
-        scale_vec = (scale_factor, 1, 1)
-    elif calc_edge_orient(min_edge) == Vector((0, 1, 0)):
-        scale_vec = (1, scale_factor, 1)
-    elif calc_edge_orient(min_edge) == Vector((0, 0, 1)):
-        scale_vec = (1, 1, scale_factor)
-    else:
-        scale_vec = (1, 1, 1)
-
-    fc = face.calc_center_median()
-    bmesh.ops.scale(bm, verts=list(face.verts), vec=scale_vec,
-                    space=Matrix.Translation(-fc))
-    return scale_factor
-
 def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts"""
     for face in bm.faces:

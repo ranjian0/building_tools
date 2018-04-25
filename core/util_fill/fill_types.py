@@ -5,7 +5,6 @@ from bmesh.types import BMEdge, BMVert, BMFace
 from ...utils import (
         split,
         filter_geom,
-        square_face,
         get_edit_mesh,
         calc_face_dimensions,
         filter_vertical_edges,
