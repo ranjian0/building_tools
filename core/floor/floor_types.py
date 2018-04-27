@@ -13,14 +13,15 @@ from ...utils import (
 
 
 
-def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kwargs):
-    """Create muti extrusions to resemble building floors
+def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs):
+    """Create extrusions to resemble building floors
 
     Args:
-        floor_count (int): Number of floors
+        floor_count  (int): Number of floors
         floor_height (float): Height of each floor
         slab_thickness (float): Thickness of floor slabs
         slab_outset (float): How much the slab extends outwards
+        **kwargs: Extra kwargs from FloorProperty
     """
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
@@ -37,8 +38,8 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
                     if len(list({f.normal.to_tuple() for f in e.link_faces})) > 1]
 
     # --extrude floors
-    slab_faces  = []
-    offsets     = it.cycle([slab_thickness, floor_height])
+    slab_faces = []
+    offsets    = it.cycle([slab_thickness, floor_height])
     for offset in it.islice(offsets, 0, floor_count*2):
         ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
         bmesh.ops.translate(bm, vec=(0, 0, offset),
@@ -62,7 +63,14 @@ def flr_multistorey(floor_count, floor_height, slab_thickness, slab_outset, **kw
 
 
 def check_planar(bm):
-    """ Determine whether the bmesh contains only flat geometry """
+    """Determine whether bm contains only flat geometry
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh for current edit mesh
+
+    Returns:
+        bool: result of condition
+    """
     if len(list({v.co.z for v in bm.verts})) == 1:
         return True
     return False

@@ -73,5 +73,6 @@ if __name__ == "__main__":
     try:
         unregister()
     except Exception as e:
-        print(e)
-    register()
+        print("Unregister Failed")
+    finally:
+        register()

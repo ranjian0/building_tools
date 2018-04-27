@@ -12,36 +12,36 @@ class BalconyProperty(bpy.types.PropertyGroup):
         name="Add Railing", default=True,
         description="Whether the balcony has railing")
 
-    pw = FloatProperty(
+    pw  = FloatProperty(
         name="Post Width", min=0.01, max=100.0, default=0.15,
         description="Width of each post")
 
-    ph = FloatProperty(
+    ph  = FloatProperty(
         name="Post Height", min=0.01, max=100.0, default=0.7,
         description="Height of each post")
 
-    pd = FloatProperty(
+    pd  = FloatProperty(
         name="Post Desnsity", min=0.0, max=1.0,default=0.9,
         description="Number of posts along each edge")
 
-    rw = FloatProperty(
+    rw  = FloatProperty(
         name="Rail Width", min=0.01, max=100.0, default=0.15,
         description="Width of each rail")
 
-    rh = FloatProperty(
+    rh  = FloatProperty(
         name="Rail Height",
         description="Height of each rail",
                        min=0.01, max=100.0, default=0.025)
 
-    rd = FloatProperty(
+    rd  = FloatProperty(
         name="Rail Desnsity", min=0.0, max=1.0,default=0.2,
         description="Number of rails over each edge")
 
-    ww = FloatProperty(
+    ww  = FloatProperty(
         name="Wall Width", min=0.01, max=100.0, default=0.075,
         description="Width of each wall")
 
-    wh = FloatProperty(
+    wh  = FloatProperty(
         name="Wall Height", min=0.01, max=100.0, default=0.7,
         description="Height of each wall")
 
@@ -57,7 +57,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         name="Corner Posts", default=True,
         description="Whether the railing has corner posts")
 
-    df = BoolProperty(
+    df  = BoolProperty(
         name="Delete Faces", default=True,
         description="Whether to delete unseen faces")
 

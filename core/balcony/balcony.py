@@ -10,4 +10,10 @@ class Balcony:
 
     @classmethod
     def build(cls, context, props):
+        """Use balcony types and properties to generate geomerty
+
+        Args:
+            context (bpy.context): blender context
+            props   (bpy.types.PropertyGroup): BalconyProperty
+        """
         make_balcony(**kwargs_from_props(props))

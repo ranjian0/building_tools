@@ -8,17 +8,17 @@ from ..util_fill import (
 
 
 class DoorProperty(bpy.types.PropertyGroup):
-    ft     = FloatProperty(
+    ft   = FloatProperty(
         name="Frame Thickness", min=0.0, max=2.99, default=0.1,
         description="Thickness of inner door Frame")
 
-    fd     = FloatProperty(
+    fd   = FloatProperty(
         name="Frame Depth", min=0.0, max=100.0, default=0.05, step=1,
         description="Depth of inner door Frame")
 
-    soff   = PointerProperty(type=SizeOffsetProperty)
+    soff = PointerProperty(type=SizeOffsetProperty)
 
-    hdd    = BoolProperty(
+    hdd  = BoolProperty(
         name='Double Door', default=False,
         description="If the door is split")
 

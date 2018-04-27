@@ -11,11 +11,21 @@ from ...utils import (
 
 
 def fill_panel(bm, face, panel_x, panel_y, panel_b, panel_t, panel_d, **kwargs):
-    """ Create panels on faace """
+    """Create panels on face
+
+    Args:
+        bm   (bmesh.types.BMesh):  bmesh of current edit mesh
+        face (bmesh.types.BMFace): face to create panels on
+        panel_x (int):   number of horizontal panels
+        panel_y (int):   number of vertical panels
+        panel_b (float): border of panels from face edges
+        panel_t (float): thickness of panel inset
+        panel_d (float): depth of panel
+        **kwargs: Extra kwargs from FillPanel
+    """
 
     # Create main panel to hold child panels
-    bmesh.ops.inset_individual(bm,
-        faces=[face], thickness=panel_b)
+    bmesh.ops.inset_individual(bm, faces=[face], thickness=panel_b)
 
     # Calculate edges to be subdivided
     n = face.normal
@@ -25,9 +35,7 @@ def fill_panel(bm, face, panel_x, panel_y, panel_b, panel_t, panel_d, **kwargs):
     vts = []
     # Subdivide the edges
     if panel_x:
-        res1 = bmesh.ops.subdivide_edges(bm,
-            edges=vedgs,
-            cuts=panel_x)
+        res1 = bmesh.ops.subdivide_edges(bm, edges=vedgs, cuts=panel_x)
         vts = filter_geom(res1['geom_inner'], BMVert)
 
     if panel_y:
@@ -49,7 +57,17 @@ def fill_panel(bm, face, panel_x, panel_y, panel_b, panel_t, panel_d, **kwargs):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
 def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
-    """ Create glass panes on face """
+    """Create glass panes on face
+
+    Args:
+        bm   (bmesh.types.BMesh):  bmesh of current edit mesh
+        face (bmesh.types.BMFace): face to create glass panes on
+        pane_x (int): number of horizontal glass panes
+        pane_y (int): number of vertical glass panes
+        pane_t (float): thickness of glass pane borders
+        pane_d (float): depth of glass panes
+        **kwargs: Extra kwargs from FillGlassPanes
+    """
 
     v_edges = filter_vertical_edges(face.edges, face.normal)
     h_edges = filter_horizontal_edges(face.edges, face.normal)
@@ -76,6 +94,17 @@ def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
             bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pane_d)
 
 def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
+    """Create bars on face
+
+    Args:
+        bm   (bmesh.types.BMesh): bmesh of current edit mesh
+        face (bmesh.types.BMFace): face to create panels on
+        bar_x (int): number of horizontal bars
+        bar_y (int): number of vertical bars
+        bar_t (float): thickness of each bar
+        bar_d (float): depth of each bar
+        **kwargs: Extra kwargs from FillBar
+    """
 
     # Calculate center, width and height of face
     width, height = calc_face_dimensions(face)
@@ -91,8 +120,8 @@ def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
 
         # Scale and translate
         fs =  bar_t / height
-        bmesh.ops.scale(bm, verts=verts,
-            vec=(1, 1, fs), space=Matrix.Translation(-fc))
+        bmesh.ops.scale(bm,
+            verts=verts, vec=(1, 1, fs), space=Matrix.Translation(-fc))
         bmesh.ops.translate(bm, verts=verts,
             vec=Vector((face.normal * bar_d / 2)) + Vector((0, 0, -height / 2 + (i + 1) * offset)))
 
@@ -126,8 +155,18 @@ def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d,**kwargs):
             vec=-face.normal * ((bar_d / 2) - eps))
 
 def fill_louver(bm, face, louver_m, louver_count, louver_d, louver_b, **kwargs):
-    normal = face.normal
+    """Create louvers from face
 
+    Args:
+        bm   (bmesh.types.BMesh): bmesh from current edit mesh
+        face (bmesh.types.BMFace): face to operate on
+        louver_m (float): margin of louvers from face edges
+        louver_count (int): number of louvers
+        louver_d (float): depth of each louver
+        louver_b (float): border between consecutive louvers
+        **kwargs: Extra kwargs from FIllLouver
+    """
+    normal = face.normal
     # -- inset margin
     if louver_m:
         bmesh.ops.inset_individual(bm,

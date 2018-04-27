@@ -31,3 +31,16 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
             col = row.column(align=True)
             col.prop(self, 'off')
+
+
+classes = (
+    SizeOffsetProperty
+)
+
+def register_generic():
+    for cls in classes:
+        bpy.utils.register_class(cls)
+
+def unregister_generic():
+    for cls in classes:
+        bpy.utils.unregister_class(cls)

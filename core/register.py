@@ -1,5 +1,4 @@
 import bpy
-from .generic import SizeOffsetProperty
 
 from .util_fill import register_fill, unregister_fill
 from .util_rail import register_rail, unregister_rail
@@ -10,14 +9,13 @@ from .window    import register_window, unregister_window
 from .stairs    import register_stairs, unregister_stairs
 from .balcony   import register_balcony, unregister_balcony
 from .floorplan import register_floorplan, unregister_floorplan
+from .generic   import register_generic, unregister_generic
 
-
-# -- take care here -- ORDER MATTERS !!!
-classes = [
-    SizeOffsetProperty,
-]
+# -- take care here --
+# -- ORDER MATTERS --
 
 register_funcs = [
+    register_generic,
     register_fill,
     register_rail,
 
@@ -30,6 +28,7 @@ register_funcs = [
 ]
 
 unregister_funcs = [
+    unregister_generic,
     unregister_fill,
     unregister_rail,
 
@@ -43,16 +42,10 @@ unregister_funcs = [
 
 
 def register_core():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
     for func in register_funcs:
         func()
 
 
 def unregister_core():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
-
     for func in unregister_funcs:
         func()

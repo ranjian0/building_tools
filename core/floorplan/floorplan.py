@@ -23,17 +23,16 @@ class Floorplan:
 
     @classmethod
     def build(cls, context, props):
-        """ Build the floorplan from given properties """
+        """Use floorplan types and properties to generate geometry
 
-        # -- create the floorplan object
+        Args:
+            context (bpy.context): blender context
+            props (bpy.types.PropertyGroup): FloorplanProperty
+        """
         obj = make_object('floorplan', make_mesh('fp_mesh'))
-
-        # -- get bmesh representation of object
         bm = bm_from_obj(obj)
 
-        # -- use properties to create geometry
         kwargs  = kwargs_from_props(props)
-
         if props.type == 'RECTANGULAR':
             fp_rectangular(bm, **kwargs)
 
@@ -49,8 +48,5 @@ class Floorplan:
         elif props.type == 'RANDOM':
             fp_random(bm, **kwargs)
 
-        # -- write bmesh back into object
         bm_to_obj(bm, obj)
-
-        # -- link object to current scene
         link_obj(obj)

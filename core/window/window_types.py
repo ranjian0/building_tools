@@ -12,11 +12,10 @@ from ..util_fill import (
     )
 
 
-def make_window(cls, **kwargs):
+def make_window(**kwargs):
     """Generate a basic window
 
     Args:
-        cls: parent window class
         **kwargs: WindowProperty items
     """
 
@@ -36,11 +35,34 @@ def make_window(cls, **kwargs):
     bmesh.update_edit_mesh(me, True)
 
 def make_window_split(bm, face, size, off, **kwargs):
-    """ Basically scales down the face given based on parameters """
+    """Use properties from SplitOffset to subdivide face into regular quads
+
+    Args:
+        bm   (bmesh.types.BMesh):  bmesh for current edit mesh
+        face (bmesh.types.BMFace): face to make split (must be quad)
+        size (vector2): proportion of the new face to old face
+        off  (vector3): how much to offset new face from center
+        **kwargs: Extra kwargs from WindowProperty
+
+    Returns:
+        bmesh.types.BMFace: New face created after split
+    """
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 def make_window_frame(bm, face, ft, fd, **kwargs):
-    """ Inset and extrude to create a frame """
+    """Create extrude and inset around a face to make window frame
+
+    Args:
+        bm   (bmesh.types.BMesh): bmesh of current edit mesh
+        face (bmesh.types.BMFace): face to make frame for
+        ft (float): Thickness of the window frame
+        fd (float): Depth of the window frame
+        **kwargs: Extra kwargs from WindowProperty
+
+    Returns:
+        bmesh.types.BMFace: face after frame is created
+    """
+
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
     face = bmesh.ops.extrude_discrete_faces(bm,
         faces=[face]).get('faces')[-1]
@@ -59,6 +81,14 @@ def make_window_frame(bm, face, ft, fd, **kwargs):
     return face
 
 def make_window_fill(bm, face, fill_type, **kwargs):
+    """Create extra elements on face
+
+    Args:
+        bm   (bmesh.types.BMesh): bmesh for current edit mesh
+        face (bmesh.types.BMFace): face to operate on
+        fill_type (str): Type of elements to add
+        **kwargs: Extra kwargs from WindowProperty
+    """
 
     if fill_type == 'NONE':
         pass

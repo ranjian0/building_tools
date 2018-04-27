@@ -18,9 +18,9 @@ def fp_rectangular(bm, width, length, **kwargs):
     """Create plane in provided bmesh
 
     Args:
-        bm      (bmesh.types.BMesh): bmesh to create plane in
-        width   (float): width of plane
-        length  (float): length of plane
+        bm     (bmesh.types.BMesh): bmesh to create plane in
+        width  (float): width of plane
+        length (float): length of plane
     """
     plane(bm, width, length)
 
@@ -49,9 +49,9 @@ def fp_composite(bm, width, length, tl1, tl2, tl3, tl4, **kwargs):
         .____.
 
     Args:
-        bm      (bmesh.types.BMesh): bmesh to create shape in
-        width   (float): width of inner rectangle
-        length  (float): length of inner rectangle
+        bm     (bmesh.types.BMesh): bmesh to create shape in
+        width  (float): width of inner rectangle
+        length (float): length of inner rectangle
         tl1 (float): length of fan (bottom)
         tl2 (float): length of fan (left)
         tl3 (float): length of fan (right)
@@ -69,7 +69,7 @@ def fp_composite(bm, width, length, tl1, tl2, tl3, tl4, **kwargs):
     exts = [tl1, tl2, tl3, tl4]
     for idx, e in enumerate(edges):
         if exts[idx] > 0:
-            res = bmesh.ops.extrude_edge_only(bm, edges=[e])
+            res   = bmesh.ops.extrude_edge_only(bm, edges=[e])
             verts = filter_geom(res['geom'], BMVert)
 
             v = (calc_edge_median(e) - ref)
@@ -90,9 +90,9 @@ def fp_hshaped(bm, width, length, tl1, tl2, tl3, tl4, tw1, tw2, tw3, tw4, **kwar
     .___.      .___.
 
     Args:
-        bm      (bmesh.types.BMesh): bmesh to create shape in
-        width   (float): width of inner rectangle
-        length  (float): length of inner rectangle
+        bm     (bmesh.types.BMesh): bmesh to create shape in
+        width  (float): width of inner rectangle
+        length (float): length of inner rectangle
         tl1 (float): length of fan (bottom-left)
         tl2 (float): length of fan (bottom-right)
         tl3 (float): length of fan (top-left)
@@ -148,10 +148,10 @@ def fp_random(bm, seed, width, length, **kwargs):
     """ Create randomly generated building footprint/floorplan
 
     Args:
-        bm      (bmesh.types.BMesh): bmesh to create plane in
-        seed    (int): random seed
-        width   (float): width of base plane
-        length  (float): length of base plane
+        bm     (bmesh.types.BMesh): bmesh to create plane in
+        seed   (int): random seed
+        width  (float): width of base plane
+        length (float): length of base plane
 
     """
     random.seed(seed)
@@ -161,10 +161,7 @@ def fp_random(bm, seed, width, length, **kwargs):
     bmesh.ops.create_grid(bm,
         x_segments=1, y_segments=1, size=1, matrix=mat)
 
-    sample = random.sample(list(bm.edges), random.randrange(0, len(bm.edges)))
-    while not sample:
-        sample = random.sample(list(bm.edges), random.randrange(0, len(bm.edges)))
-
+    sample = random.sample(list(bm.edges), random.randrange(1, len(bm.edges)))
     ref = list(bm.faces)[-1].calc_center_median()
     for edge in sample:
         # -- get edge center and length
@@ -172,9 +169,7 @@ def fp_random(bm, seed, width, length, **kwargs):
         elen = edge.calc_length()
 
         # -- subdivide
-        res = bmesh.ops.subdivide_edges(bm,
-                edges= [edge],
-                cuts = 2)
+        res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
         new_verts = filter_geom(res['geom_inner'], BMVert)
         new_edge  = list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
 
@@ -182,20 +177,17 @@ def fp_random(bm, seed, width, length, **kwargs):
         axis = Vector((1, 0, 0)) if new_verts[0].co.y == new_verts[1].co.y else Vector((0, 1, 0))
         scale_factor = clamp(random.random() * elen/new_edge.calc_length(), 1, 2.95)
         bmesh.ops.scale(bm,
-            verts = new_verts,
-            vec   = axis*scale_factor,
-            space = Matrix.Translation(-cen))
+            verts=new_verts, vec=axis*scale_factor, space=Matrix.Translation(-cen))
 
         # -- offset
         if random.choice([0, 1]):
             max_offset = (elen - new_edge.calc_length()) / 2
             rand_offset = random.random() * max_offset
             bmesh.ops.translate(bm,
-                verts = new_verts,
-                vec   = axis*rand_offset)
+                verts=new_verts, vec=axis*rand_offset)
 
         # --extrude
-        res    = bmesh.ops.extrude_edge_only(bm, edges=[new_edge])
+        res = bmesh.ops.extrude_edge_only(bm, edges=[new_edge])
         bmesh.ops.translate(bm,
-            verts = filter_geom(res['geom'], BMVert),
-            vec   = (cen - ref).normalized() * random.randrange(1, int(elen/2)))
+            verts=filter_geom(res['geom'], BMVert),
+            vec=(cen - ref).normalized() * random.randrange(1, int(elen/2)))

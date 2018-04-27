@@ -12,7 +12,67 @@ from ...utils import (
     filter_horizontal_edges
     )
 
+def make_stairs(step_count, step_width, scale, bottom_faces, **kwargs):
+    """Extrude steps from selected faces
 
+    Args:
+        step_count (int): Number of stair steps
+        step_width (float): width of each stair step
+        scale (float): scale of end faces of stair steps
+        bottom_faces (bool): whether to delete bottom faces
+        **kwargs: Extra kwargs from StairsProperty
+    """
+    # Get current edit mesh
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
+
+    # Find selected face
+    faces = [f for f in bm.faces if f.select]
+
+    for f in faces:
+        res = split_quad(bm, f, False, step_count - 1)
+        f.select = False
+        step_edges = filter_geom(res['geom_inner'], BMEdge)
+        step_faces = list({f for e in step_edges for f in e.link_faces})
+
+        if f.normal.x or f.normal.y:
+            step_faces.sort(key=lambda f: f.calc_center_median().z, reverse=True)
+        else:
+            step_faces.sort(key=lambda f: f.calc_center_median().x, reverse=True)
+
+        for idx, fa in enumerate(step_faces):
+            # Ref bottom verts - to delete bottom faces
+            if fa.normal.z:
+                bot_verts = sorted(list(fa.verts), key=lambda v: v.co.y)[:-2]
+            else:
+                bot_verts = sorted(list(fa.verts), key=lambda v: v.co.z)[:-2]
+
+            # Extrude this step
+            ret = bmesh.ops.extrude_discrete_faces(bm, faces=[fa])['faces'][0]
+            verts = ret.verts
+            bmesh.ops.translate(bm, verts=verts, vec=ret.normal * (step_width * (idx + 1)))
+
+            # Scale the step
+            sc = 1 + scale + (idx * scale)
+            if ret.normal.x:
+                bmesh.ops.scale(bm, verts=verts, vec=(1, sc, 1))
+            elif ret.normal.y or fa.normal.z:
+                bmesh.ops.scale(bm, verts=verts, vec=(sc, 1, 1))
+
+            # Delete bottom Face
+            if ret.normal.z:
+                verts1 = sorted(list(ret.verts), key=lambda v: v.co.y)[:-2]
+            else:
+                verts1 = sorted(list(ret.verts), key=lambda v: v.co.z)[:-2]
+
+            if not bottom_faces:
+                face = face_with_verts(bm, verts1 + bot_verts)
+                bmesh.ops.delete(bm, geom=[face], context=3)
+            bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
+    bmesh.update_edit_mesh(me, True)
+
+
+# DEPRECATED
 def make_stairs_type1(step_count, step_width, scale, bottom_faces, **kwargs):
     """ Extrude edges to make a sequence of steps """
 
@@ -69,7 +129,8 @@ def make_stairs_type1(step_count, step_width, scale, bottom_faces, **kwargs):
             for idx, dverts in [(-1, right_verts), (0, left_verts)]:
                 # Create new vertex at the bottom of each step
                 v = vverts[idx]
-                rvert = bmesh.ops.create_vert(bm, co=Vector((v.co.x, v.co.y, v.co.z - (step_count - (i + 1)) * split_length)))['vert']
+                rvert = bmesh.ops.create_vert(bm,
+                    co=Vector((v.co.x, v.co.y, v.co.z - (step_count - (i + 1)) * split_length)))['vert']
                 cverts = list(set(rvert + dverts))
 
                 # Fill a face
@@ -90,57 +151,3 @@ def make_stairs_type1(step_count, step_width, scale, bottom_faces, **kwargs):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
     bmesh.update_edit_mesh(me, True)
-
-
-def make_stairs_type2(step_count, step_width, scale, bottom_faces, **kwargs):
-    """ Extrude faces to create a sequence of stair steps"""
-
-    # Get current edit mesh
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    # Find selected face
-    faces = [f for f in bm.faces if f.select]
-
-    for f in faces:
-        res = split_quad(bm, f, False, step_count - 1)
-        f.select = False
-        step_edges = filter_geom(res['geom_inner'], BMEdge)
-        step_faces = list({f for e in step_edges for f in e.link_faces})
-
-        if f.normal.x or f.normal.y:
-            step_faces.sort(key=lambda f: f.calc_center_median().z, reverse=True)
-        else:
-            step_faces.sort(key=lambda f: f.calc_center_median().x, reverse=True)
-
-        for idx, fa in enumerate(step_faces):
-            # Ref bottom verts - to delete bottom faces
-            if fa.normal.z:
-                bot_verts = sorted(list(fa.verts), key=lambda v: v.co.y)[:-2]
-            else:
-                bot_verts = sorted(list(fa.verts), key=lambda v: v.co.z)[:-2]
-
-            # Extrude this step
-            ret = bmesh.ops.extrude_discrete_faces(bm, faces=[fa])['faces'][0]
-            verts = ret.verts
-            bmesh.ops.translate(bm, verts=verts, vec=ret.normal * (step_width * (idx + 1)))
-
-            # Scale the step
-            sc = 1 + scale + (idx * scale)
-            if ret.normal.x:
-                bmesh.ops.scale(bm, verts=verts, vec=(1, sc, 1))
-            elif ret.normal.y or fa.normal.z:
-                bmesh.ops.scale(bm, verts=verts, vec=(sc, 1, 1))
-
-            # Delete bottom Face
-            if ret.normal.z:
-                verts1 = sorted(list(ret.verts), key=lambda v: v.co.y)[:-2]
-            else:
-                verts1 = sorted(list(ret.verts), key=lambda v: v.co.z)[:-2]
-
-            if not bottom_faces:
-                face = face_with_verts(bm, verts1 + bot_verts)
-                bmesh.ops.delete(bm, geom=[face], context=3)
-            bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-    bmesh.update_edit_mesh(me, True)
-

@@ -1,4 +1,5 @@
 import bmesh
+import itertools as it
 from mathutils import Vector
 
 from bmesh.types import BMVert
@@ -10,16 +11,23 @@ from ...utils import (
     )
 
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
-    """ Creates rails and posts along selected edges """
+    """Creates rails and posts along selected edges
+
+    Args:
+        bm    (bmesh.types.BMesh): bmesh of current edit mesh
+        edges (list): list of edges to create rails along
+        *args: items from RailsProperty, see rail_props.py
+        **kwargs: Extra kwargs
+    """
 
     def top_rail(e, cen, off_x, off_y):
         if len(set([v.co.x for v in e.verts])) == 1:
             size = (rw, e.calc_length() - (cpw * 3), rh)
-            pos = cen.x + off_x, cen.y, cen.z + cph + rh / 2
+            pos  = cen.x + off_x, cen.y, cen.z + cph + rh / 2
             darg = (False,) * 4 + (True,) * 2
         else:
             size = (e.calc_length() - (cpw * 3), rw, rh)
-            pos = cen.x, cen.y + off_y, cen.z + cph + rh / 2
+            pos  = cen.x, cen.y + off_y, cen.z + cph + rh / 2
             darg = (False,) * 2 + (True,) * 2 + (False,) * 2
 
         rail = create_post(bm, size, pos)
@@ -110,27 +118,15 @@ def create_post(bm, size, position):
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
     vts = post['verts']
+    keys = ['z', 'z', 'x', 'x', 'y', 'y']
+    dirs = [top, bottom, left, right, front, back]
+    slcs = it.chain.from_iterable(it.repeat([slice(4,8), slice(4)], 3))
+
     faces = []
-    if top:
-        vts.sort(key=lambda v: v.co.z)
-        faces.append(face_with_verts(bm, vts[4:]))
-    if bottom:
-        vts.sort(key=lambda v: v.co.z)
-        faces.append(face_with_verts(bm, vts[:-4]))
-
-    if left:
-        vts.sort(key=lambda v: v.co.x)
-        faces.append(face_with_verts(bm, vts[4:]))
-    if right:
-        vts.sort(key=lambda v: v.co.x)
-        faces.append(face_with_verts(bm, vts[:-4]))
-
-    if front:
-        vts.sort(key=lambda v: v.co.y)
-        faces.append(face_with_verts(bm, vts[4:]))
-    if back:
-        vts.sort(key=lambda v: v.co.y)
-        faces.append(face_with_verts(bm, vts[:-4]))
+    for direction, key, _slice in zip(dirs, keys, slcs):
+        if direction:
+            vts.sort(key=lambda v: getattr(v.co, key))
+            faces.append(face_with_verts(bm, vts[_slice]))
 
     bmesh.ops.delete(bm, geom=faces, context=3)
 
