@@ -99,8 +99,6 @@ def split_quad(bm, face, vertical=False, cuts=4):
     else:
         e = filter_vertical_edges(face.edges, face.normal)
         res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-
-    import pprint; pprint.pprint(res)
     return res
 
 def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
