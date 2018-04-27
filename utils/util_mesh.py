@@ -184,4 +184,3 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
         res = bmesh.ops.connect_verts(bm, verts=new_verts).get('edges')
         return res
     return new_verts
-
