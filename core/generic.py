@@ -34,7 +34,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
 
 classes = (
-    SizeOffsetProperty
+    SizeOffsetProperty,
 )
 
 def register_generic():
