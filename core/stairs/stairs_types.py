@@ -12,13 +12,12 @@ from ...utils import (
     filter_horizontal_edges
     )
 
-def make_stairs(step_count, step_width, scale, bottom_faces, **kwargs):
+def make_stairs(step_count, step_width, bottom_faces, **kwargs):
     """Extrude steps from selected faces
 
     Args:
         step_count (int): Number of stair steps
         step_width (float): width of each stair step
-        scale (float): scale of end faces of stair steps
         bottom_faces (bool): whether to delete bottom faces
         **kwargs: Extra kwargs from StairsProperty
     """
@@ -51,13 +50,6 @@ def make_stairs(step_count, step_width, scale, bottom_faces, **kwargs):
             ret = bmesh.ops.extrude_discrete_faces(bm, faces=[fa])['faces'][0]
             verts = ret.verts
             bmesh.ops.translate(bm, verts=verts, vec=ret.normal * (step_width * (idx + 1)))
-
-            # Scale the step
-            sc = 1 + scale + (idx * scale)
-            if ret.normal.x:
-                bmesh.ops.scale(bm, verts=verts, vec=(1, sc, 1))
-            elif ret.normal.y or fa.normal.z:
-                bmesh.ops.scale(bm, verts=verts, vec=(sc, 1, 1))
 
             # Delete bottom Face
             if ret.normal.z:
