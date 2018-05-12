@@ -20,19 +20,6 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
         **kwargs: Extra kwargs
     """
 
-    def top_rail(e, cen, off_x, off_y):
-        if len(set([v.co.x for v in e.verts])) == 1:
-            size = (rw, e.calc_length() - (cpw * 3), rh)
-            pos  = cen.x + off_x, cen.y, cen.z + cph + rh / 2
-            darg = (False,) * 4 + (True,) * 2
-        else:
-            size = (e.calc_length() - (cpw * 3), rw, rh)
-            pos  = cen.x, cen.y + off_y, cen.z + cph + rh / 2
-            darg = (False,) * 2 + (True,) * 2 + (False,) * 2
-
-        rail = create_post(bm, size, pos)
-        del_faces(bm, rail, *darg)
-
     for e in edges:
         lfaces = list({f for f in e.link_faces})
         if len(lfaces) > 1:
@@ -71,7 +58,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
         elif fill == 'POSTS':  # has_mid_posts:
             # create top rail
-            top_rail(e, cen, off_x, off_y)
+            create_rail(e, cen, off_x, off_y)
 
             # create posts
             num_posts = int((e.calc_length() / (pw * 2)) * pd)
@@ -89,7 +76,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
         elif fill == 'WALL':  # has_wall:
             # create top rail
-            top_rail(e, cen, off_x, off_y)
+            create_rail(e, cen, off_x, off_y)
 
             # create wall
             if len(set([v.co.x for v in e.verts])) == 1:
@@ -108,6 +95,20 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
                 del_faces(bm, wall, *darg)
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
+
+def create_rail(e, cen, off_x, off_y):
+    """ Create rail on top of posts """
+    if len(set([v.co.x for v in e.verts])) == 1:
+        size = (rw, e.calc_length() - (cpw * 3), rh)
+        pos  = cen.x + off_x, cen.y, cen.z + cph + rh / 2
+        darg = (False,) * 4 + (True,) * 2
+    else:
+        size = (e.calc_length() - (cpw * 3), rw, rh)
+        pos  = cen.x, cen.y + off_y, cen.z + cph + rh / 2
+        darg = (False,) * 2 + (True,) * 2 + (False,) * 2
+
+    rail = create_post(bm, size, pos)
+    del_faces(bm, rail, *darg)
 
 def create_post(bm, size, position):
     """ Create cube to represent railing posts """
