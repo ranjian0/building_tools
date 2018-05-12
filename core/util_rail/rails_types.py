@@ -7,7 +7,8 @@ from ...utils import (
     cube,
     filter_geom,
     face_with_verts,
-    calc_edge_median
+    calc_edge_median,
+    calc_verts_median,
     )
 
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
@@ -20,11 +21,13 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
         **kwargs: Extra kwargs
     """
 
+
+    # calculate reference from face(s)
+    lfaces = list({f for e in edges for f in e.link_faces})
+    lfaces = list(filter(lambda f: f.normal.z, lfaces))
+    ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
+
     for e in edges:
-        lfaces = list({f for f in e.link_faces})
-        if len(lfaces) > 1:
-            lfaces = list(filter(lambda f: f.normal.z, lfaces))
-        ref = lfaces[0].calc_center_median()
         cen = calc_edge_median(e)
         off_x = -pw / 4 if cen.x > ref.x else pw / 4
         off_y = -pw / 4 if cen.y > ref.y else pw / 4
