@@ -58,7 +58,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
         elif fill == 'POSTS':  # has_mid_posts:
             # create top rail
-            create_rail(e, cen, off_x, off_y)
+            create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw)
 
             # create posts
             num_posts = int((e.calc_length() / (pw * 2)) * pd)
@@ -76,7 +76,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
         elif fill == 'WALL':  # has_wall:
             # create top rail
-            create_rail(e, cen, off_x, off_y)
+            create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw)
 
             # create wall
             if len(set([v.co.x for v in e.verts])) == 1:
@@ -96,7 +96,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
 
-def create_rail(e, cen, off_x, off_y):
+def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw):
     """ Create rail on top of posts """
     if len(set([v.co.x for v in e.verts])) == 1:
         size = (rw, e.calc_length() - (cpw * 3), rh)
