@@ -23,8 +23,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
 
     # calculate reference from face(s)
-    lfaces = list({f for e in edges for f in e.link_faces})
-    lfaces = list(filter(lambda f: f.normal.z, lfaces))
+    lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
     ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
 
     for e in edges:
