@@ -1,6 +1,6 @@
 import bmesh
-from bmesh.types import BMVert, BMEdge
 from mathutils import Vector
+from bmesh.types import BMVert, BMEdge
 
 from ...utils import (
     split_quad,
