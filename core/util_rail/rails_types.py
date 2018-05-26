@@ -1,5 +1,7 @@
 import bmesh
 import itertools as it
+
+from copy import copy
 from mathutils import Vector
 
 from bmesh.types import BMVert
@@ -11,7 +13,7 @@ from ...utils import (
     calc_verts_median,
     )
 
-def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
+def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, merge_colinear, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -21,10 +23,14 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
         **kwargs: Extra kwargs
     """
 
-
     # calculate reference from face(s)
     lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
     ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
+
+
+    if merge_colinear:
+        new_bm = merge_colinear_edges(edges)
+        edges = list(new_bm.edges)
 
     for e in edges:
         cen = calc_edge_median(e)
@@ -147,4 +153,73 @@ def array_elements(bm, elem, count, start, stop):
             faces = list({f for v in elem['verts'] for f in v.link_faces})
             ret = bmesh.ops.duplicate(bm, geom=faces)
             bmesh.ops.translate(bm, verts=filter_geom(ret['geom'], BMVert), vec=(dx * i, dy * i, dz * i))
+
+def edge_axis(e):
+    """ Determine on which axis an edge is oriented """
+    verts = list(e.verts)
+    if len(set([v.co.x for v in verts])) == 1:
+        return 'y'
+    elif len(set([v.co.y for v in verts])) == 1:
+        return 'x'
+    else:
+        return 'z'
+
+def colinear(e1, e2, axis):
+    """ Determine whether e1 and e2 are colinear """
+    cen1, cen2 = calc_edge_median(e1), calc_edge_median(e2)
+    if cen1.z == cen2.z:
+        if axis == 'x':
+            if cen1.y == cen2.y:
+                return True
+        if axis == 'y':
+            if cen1.x == cen2.x:
+                return True
+    return False
+
+def get_bounding_verts(edges):
+    """ Determine furmost verts for given edges """
+    verts = list({v for e in edges for v in e.verts})
+
+    if len(set([v.co.x for v in verts])) == 1:
+        return [
+            min(verts, key=lambda v:v.co.y),
+            max(verts, key=lambda v:v.co.y)
+        ]
+
+    elif len(set([v.co.y for v in verts])) == 1:
+        return [
+            min(verts, key=lambda v:v.co.x),
+            max(verts, key=lambda v:v.co.x)
+        ]
+
+
+def merge_colinear_edges(edges):
+    """ Covert all colinear edge groups into single edge """
+
+    tmp_bm = bmesh.new()
+    col_edge_groups = []
+    nedges = []
+
+    while len(edges):
+        group = []
+
+        current  = edges[0]
+        col_axis = edge_axis(current)
+        group.append(current)
+
+        for e in edges:
+            if e != current and colinear(e, current, col_axis):
+                group.append(e)
+
+        for e in group:
+            edges.remove(e)
+
+        col_edge_groups.append(group)
+
+    for group in col_edge_groups:
+        bound_verts = get_bounding_verts(group)
+        verts = [tmp_bm.verts.new(v.co) for v in bound_verts]
+        new_edge = tmp_bm.edges.new(verts)
+
+    return tmp_bm
 
