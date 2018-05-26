@@ -9,7 +9,7 @@ from ...utils import (
     )
 
 
-def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, size, off, **kwargs):
+def make_balcony(width, railing, size, off, **kwargs):
     """Generate balcony geometry
 
     Args:
@@ -34,7 +34,7 @@ def make_balcony(width, railing, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, 
                             if e not in list(face.edges)})
             edges.append(bm.edges.get(top_verts))
 
-            rails.make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill)
+            rails.make_railing(bm, edges, **kwargs)
 
         bmesh.ops.delete(bm, geom=[f], context=3)
     bmesh.update_edit_mesh(me, True)
