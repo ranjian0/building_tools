@@ -88,11 +88,13 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
             # create wall
             if len(set([v.co.x for v in e.verts])) == 1:
                 pos = cen.x + off_x, cen.y, cen.z + cph / 2
+                rot = 90 if ref.x < cen.x else -90
                 length = e.calc_length() - (cpw * 2)
                 width = cph
                 axis = 'Y'
             else:
                 pos = cen.x, cen.y + off_y, cen.z + cph / 2
+                rot = -90 if ref.y < cen.y else 90
                 width = e.calc_length() - (cpw * 2)
                 length = cph
                 axis = 'X'
@@ -100,7 +102,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
             wall = plane(bm, width/2, length/2)
             bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
             bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
-                matrix=Matrix.Rotation(math.radians(90), 4, axis))
+                matrix=Matrix.Rotation(math.radians(rot), 4, axis))
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
 
