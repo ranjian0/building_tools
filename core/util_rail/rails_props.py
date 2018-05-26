@@ -50,9 +50,9 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Delete Faces", default=True,
         description="Whether to delete unseen faces")
 
-    merge_colinear = BoolProperty(
-        name="Merge Colinear", default=True,
-        description="Whether to treat colinear edges as single edge")
+    # merge_colinear = BoolProperty(
+    #     name="Merge Colinear", default=False,
+    #     description="Whether to treat colinear edges as single edge")
 
 
     fill_types = [("POSTS", "Posts", "", 0),
@@ -92,4 +92,4 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'cph')
 
         row = layout.row()
-        row.prop(self, 'merge_colinear', toggle=True)
+        # row.prop(self, 'merge_colinear', toggle=True)

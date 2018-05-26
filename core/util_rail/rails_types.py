@@ -13,7 +13,7 @@ from ...utils import (
     calc_verts_median,
     )
 
-def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, merge_colinear, **kwargs):
+def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -27,10 +27,9 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
     lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
     ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
 
-
-    if merge_colinear:
-        new_bm = merge_colinear_edges(edges)
-        edges = list(new_bm.edges)
+    # merge colinear edges into single edge
+    new_bm = merge_colinear_edges(edges)
+    edges = list(new_bm.edges)
 
     for e in edges:
         cen = calc_edge_median(e)
@@ -198,7 +197,6 @@ def merge_colinear_edges(edges):
 
     tmp_bm = bmesh.new()
     col_edge_groups = []
-    nedges = []
 
     while len(edges):
         group = []
