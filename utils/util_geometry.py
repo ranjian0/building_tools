@@ -32,3 +32,21 @@ def cone(bm, r1=.5, r2=.01, height=2, segs=32):
     ret = bmesh.ops.create_cone(bm, diameter1=r1*2, diameter2=r2*2, depth=height,
                                 cap_ends=True, cap_tris=True, segments=segs)
     return ret
+
+def cylinder(bm, radius=1, height=2, segs=10):
+    """ Create cylinder in bmesh """
+
+    # -- circle
+    ret = bmesh.ops.create_circle(
+        bm, cap_ends=True, cap_tris=False, segments=segs, diameter=radius * 2)
+
+    verts = ret['verts']
+    face = list(verts[0].link_faces)
+
+    res = bmesh.ops.extrude_discrete_faces(bm, faces=face)
+    bmesh.ops.translate(bm, verts=res['faces'][-1].verts, vec=(0, 0, height))
+
+    result = {'verts' : verts + list(res['faces'][-1].verts)}
+    bmesh.ops.translate(bm, verts=result['verts'], vec=(0, 0, -height/2))
+    return result
+

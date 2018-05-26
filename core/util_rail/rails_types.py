@@ -1,19 +1,21 @@
+import math
 import bmesh
 import itertools as it
 
 from copy import copy
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 from bmesh.types import BMVert
 from ...utils import (
     cube,
+    plane,
     filter_geom,
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
     )
 
-def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, fill, **kwargs):
+def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -36,18 +38,16 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
         off_x = -pw / 4 if cen.x > ref.x else pw / 4
         off_y = -pw / 4 if cen.y > ref.y else pw / 4
 
-        if hcp:
-            for v in e.verts:
-                off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
-                off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
-                pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (cph / 2))
+        # Create Corner posts
+        # -- required by all types
+        for v in e.verts:
+            off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
+            off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
 
-                corner_post = create_post(bm, (cpw, cpw, cph), pos)
-                del_faces(bm, corner_post)
+            _cph = cph if has_decor else cph + rh
+            pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (_cph / 2))
 
-                # Top decor
-                px, py, pz = pos
-                post_decor = create_post(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, v.co.z + cph + cpw / 4))
+            corner_post(bm, (cpw, cpw, _cph), pos, has_decor)
 
         if fill == 'RAILS':  # has_rails:
             num_rails = int((cph / rh) * rd)
@@ -65,7 +65,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
         elif fill == 'POSTS':  # has_mid_posts:
             # create top rail
-            create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw)
+            create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor)
 
             # create posts
             num_posts = int((e.calc_length() / (pw * 2)) * pd)
@@ -87,41 +87,56 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, wh, cpw, cph, hcp, df, f
 
             # create wall
             if len(set([v.co.x for v in e.verts])) == 1:
-                size = (ww, e.calc_length() - (cpw * 2), wh)
                 pos = cen.x + off_x, cen.y, cen.z + cph / 2
-                darg = (True,) * 2 + (False,) * 2 + (True,) * 2
+                length = e.calc_length() - (cpw * 2)
+                width = cph
+                axis = 'Y'
             else:
-                size = (e.calc_length() - (cpw * 2), ww, wh)
                 pos = cen.x, cen.y + off_y, cen.z + cph / 2
-                darg = (True,) * 4 + (False,) * 2
+                width = e.calc_length() - (cpw * 2)
+                length = cph
+                axis = 'X'
 
-            wall = create_post(bm, size, pos)
-            if df:
-                if wh < cph:
-                    darg = (False, False) + darg[2:]
-                del_faces(bm, wall, *darg)
+            wall = plane(bm, width/2, length/2)
+            bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
+            bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
+                matrix=Matrix.Rotation(math.radians(90), 4, axis))
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
 
-def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw):
+def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor=False):
     """ Create rail on top of posts """
+    factor = 3 if has_decor else 2
     if len(set([v.co.x for v in e.verts])) == 1:
-        size = (rw, e.calc_length() - (cpw * 3), rh)
+        size = (rw, e.calc_length() - (cpw * factor), rh)
         pos  = cen.x + off_x, cen.y, cen.z + cph + rh / 2
         darg = (False,) * 4 + (True,) * 2
     else:
-        size = (e.calc_length() - (cpw * 3), rw, rh)
+        size = (e.calc_length() - (cpw * factor), rw, rh)
         pos  = cen.x, cen.y + off_y, cen.z + cph + rh / 2
         darg = (False,) * 2 + (True,) * 2 + (False,) * 2
 
-    rail = create_post(bm, size, pos)
+    rail = create_cube(bm, size, pos)
     del_faces(bm, rail, *darg)
 
-def create_post(bm, size, position):
-    """ Create cube to represent railing posts """
+def create_cube(bm, size, position):
+    """ Create cube with size and at position"""
     post = cube(bm, *size)
     bmesh.ops.translate(bm, verts=post['verts'], vec=position)
     return post
+
+def corner_post(bm, size, pos, has_decor):
+    """ Create corner post """
+    post = cube(bm, *size)
+    bmesh.ops.translate(bm, verts=post['verts'], vec=pos)
+    del_faces(bm, post, top=has_decor)
+
+    # Top decor
+    if has_decor:
+        px, py, pz = pos
+        cpw, _, cph = size
+        post_decor = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+
 
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
