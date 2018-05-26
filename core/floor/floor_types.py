@@ -9,6 +9,8 @@ from ...utils import (
     select,
     filter_geom,
     get_edit_mesh,
+    bm_from_obj,
+    bm_to_obj,
     )
 
 
@@ -23,8 +25,12 @@ def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs
         slab_outset (float): How much the slab extends outwards
         **kwargs: Extra kwargs from FloorProperty
     """
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
+    mode = bpy.context.mode
+    if mode == 'OBJECT':
+        bm = bm_from_obj(bpy.context.object)
+    elif mode == 'EDIT_MESH':
+        me = get_edit_mesh()
+        bm = bmesh.from_edit_mesh(me)
 
     edges, del_faces = [], None
     if check_planar(bm):
@@ -59,7 +65,11 @@ def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs
             context=3)
         select(list(bm.edges), False)
 
-    bmesh.update_edit_mesh(me, True)
+    if mode == 'OBJECT':
+        bm_to_obj(bm, bpy.context.object)
+        bpy.context.region.tag_redraw()
+    elif mode == 'EDIT_MESH':
+        bmesh.update_edit_mesh(me, True)
 
 
 def check_planar(bm):
