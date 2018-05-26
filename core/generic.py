@@ -4,10 +4,6 @@ from bpy.props import *
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for reqular Quad Inset
-
-    TODO: rename this, Split implies dividing in half
-    TODO: rename properties to size and position
-    TODO: Clamp amount factor to between 0.0 and 1.0. (0.0 - 3.0 is confusing)
     """
     size  = FloatVectorProperty(
         name="Size", min=.01, max=1.0, subtype='XYZ', size=2, default=(0.7, 0.7),
