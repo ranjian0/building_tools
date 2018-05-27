@@ -41,26 +41,18 @@ def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
         if not f:
             return
 
-        # create landing for stairs
-        if landing:
-            f = bmesh.ops.extrude_discrete_faces(bm,
-                faces=[f]).get('faces')[-1]
-
-            bmesh.ops.translate(bm, vec=n * landing_width,
-                verts=f.verts)
-
         _key = lambda v : v.co.z
         fheight =  max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
 
         ext_face = f
         for i in range(step_count):
             # extrude face
+            ext_width = landing_width if (landing and i==0) else step_width
             ret_face = bmesh.ops.extrude_discrete_faces(bm,
                 faces=[ext_face]).get('faces')[-1]
 
-            bmesh.ops.translate(bm, vec=n * step_width,
+            bmesh.ops.translate(bm, vec=n * ext_width,
                 verts=ret_face.verts)
-
 
             if i < (step_count-1):
                 # cut step height
