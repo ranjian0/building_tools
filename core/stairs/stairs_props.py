@@ -31,7 +31,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         col.prop(self, 'step_width')
 
         box = layout.box()
-        box.prop(self, 'landing')
+        box.prop(self, 'landing', toggle=True)
         if self.landing:
             col = box.column()
             col.prop(self, 'landing_width')

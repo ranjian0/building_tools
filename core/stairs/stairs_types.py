@@ -19,7 +19,10 @@ def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
     Args:
         step_count (int): Number of stair steps
         step_width (float): width of each stair step
+        landing (bool): Whether the stairs have a landing
+        landing_width (float): Width of the landing if any
         **kwargs: Extra kwargs from StairsProperty
+
     """
 
     # Get current edit mesh
@@ -37,6 +40,14 @@ def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
         f = make_stair_split(bm, f, **kwargs)
         if not f:
             return
+
+        # create landing for stairs
+        if landing:
+            f = bmesh.ops.extrude_discrete_faces(bm,
+                faces=[f]).get('faces')[-1]
+
+            bmesh.ops.translate(bm, vec=n * landing_width,
+                verts=f.verts)
 
         _key = lambda v : v.co.z
         fheight =  max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
