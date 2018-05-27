@@ -13,7 +13,7 @@ from ...utils import (
     filter_horizontal_edges
     )
 
-def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
+def make_stairs(step_count, step_width, landing, landing_width, stair_direction, **kwargs):
     """Extrude steps from selected faces
 
     Args:
@@ -33,7 +33,7 @@ def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
     faces = [f for f in bm.faces if f.select]
 
     for f in faces:
-        n = f.normal
+
         f.select = False
 
         # Perform split
@@ -47,12 +47,42 @@ def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
         ext_face = f
         for i in range(step_count):
             # extrude face
+            n = ext_face.normal
             ext_width = landing_width if (landing and i==0) else step_width
             ret_face = bmesh.ops.extrude_discrete_faces(bm,
                 faces=[ext_face]).get('faces')[-1]
 
             bmesh.ops.translate(bm, vec=n * ext_width,
                 verts=ret_face.verts)
+
+
+            if landing and i == 0:
+                # adjust ret_face based on stair direction
+
+                # determine left/right faces
+                fnormal_filter = {
+                    # normal        left      right
+                    ( 0, 1, 0) : [(-1, 0, 0), ( 1, 0, 0)],
+                    ( 0,-1, 0) : [( 1, 0, 0), (-1, 0, 0)],
+                    ( 1, 0, 0) : [( 0, 1, 0), ( 0,-1, 0)],
+                    (-1, 0, 0) : [( 0,-1, 0), ( 0, 1, 0)]
+                }
+
+                print(ret_face.normal.to_tuple())
+                print(list({f.normal.to_tuple() for e in ret_face.edges for f in e.link_faces}))
+                valid_faces = list(filter(
+                    lambda f : f.normal.to_tuple(1) in fnormal_filter[ret_face.normal.to_tuple(1)],
+                    list({f for e in ret_face.edges for f in e.link_faces}))
+                )
+
+                left, right = valid_faces
+                # set appropriate face for next extrusion
+                if stair_direction == 'FRONT':
+                    pass
+                elif stair_direction == 'LEFT':
+                    ret_face = left
+                elif stair_direction == 'RIGHT':
+                    ret_face = right
 
             if i < (step_count-1):
                 # cut step height

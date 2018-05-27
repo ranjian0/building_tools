@@ -14,7 +14,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         description="Width of each step")
 
     landing_width  = FloatProperty(
-        name="Landing Width", min=0.01, max=100.0, default=.5,
+        name="Landing Width", min=0.01, max=100.0, default=1.0,
         description="Width of each stairs landing")
 
     landing = BoolProperty(
@@ -22,6 +22,16 @@ class StairsProperty(bpy.types.PropertyGroup):
         description="Wether to stairs have a landing")
 
     soff = PointerProperty(type=SizeOffsetProperty)
+
+    direction_items = [
+        ("FRONT", "Front", "", 0),
+        ("LEFT", "Left", "", 1),
+        ("RIGHT", "Right", "", 2)
+    ]
+
+    stair_direction = EnumProperty(
+        name="Stair Direction", items=direction_items, default='FRONT',
+        description="The direction to put the stairs")
 
     def draw(self, context, layout):
         self.soff.draw(context, layout)
@@ -35,4 +45,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         if self.landing:
             col = box.column()
             col.prop(self, 'landing_width')
+
+            row = box.row()
+            row.prop(self, 'stair_direction')
 
