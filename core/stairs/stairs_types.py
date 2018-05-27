@@ -13,7 +13,7 @@ from ...utils import (
     filter_horizontal_edges
     )
 
-def make_stairs(step_count, step_width, **kwargs):
+def make_stairs(step_count, step_width, landing, landing_width, **kwargs):
     """Extrude steps from selected faces
 
     Args:
@@ -32,6 +32,11 @@ def make_stairs(step_count, step_width, **kwargs):
     for f in faces:
         n = f.normal
         f.select = False
+
+        # Perform split
+        f = make_stair_split(bm, f, **kwargs)
+        if not f:
+            return
 
         _key = lambda v : v.co.z
         fheight =  max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
@@ -58,3 +63,19 @@ def make_stairs(step_count, step_width, **kwargs):
                     key=lambda f: f.calc_center_median().z)
 
     bmesh.update_edit_mesh(me, True)
+
+def make_stair_split(bm, face, size, off, **kwargs):
+    """Use properties from SplitOffset to subdivide face into regular quads
+
+    Args:
+        bm   (bmesh.types.BMesh):  bmesh for current edit mesh
+        face (bmesh.types.BMFace): face to make split (must be quad)
+        size (vector2): proportion of the new face to old face
+        off  (vector3): how much to offset new face from center
+        **kwargs: Extra kwargs from WindowProperty
+
+    Returns:
+        bmesh.types.BMFace: New face created after split
+    """
+    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+

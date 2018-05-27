@@ -1,6 +1,8 @@
 import bpy
 from bpy.props import *
 
+from ..generic import SizeOffsetProperty
+
 
 class StairsProperty(bpy.types.PropertyGroup):
     step_count = IntProperty(
@@ -11,14 +13,26 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Step Width", min=0.01, max=100.0, default=.5,
         description="Width of each step")
 
-    bottom_faces = BoolProperty(
-        name="Bottom Faces", default=True,
-        description="Wether to delete bottom faces")
+    landing_width  = FloatProperty(
+        name="Landing Width", min=0.01, max=100.0, default=.5,
+        description="Width of each stairs landing")
+
+    landing = BoolProperty(
+        name="Has Landing", default=True,
+        description="Wether to stairs have a landing")
+
+    soff = PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
+        self.soff.draw(context, layout)
+
         col = layout.column(align=True)
         col.prop(self, 'step_count')
         col.prop(self, 'step_width')
 
-        layout.prop(self, 'bottom_faces', toggle=True)
+        box = layout.box()
+        box.prop(self, 'landing')
+        if self.landing:
+            col = box.column()
+            col.prop(self, 'landing_width')
 
