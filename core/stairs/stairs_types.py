@@ -68,8 +68,6 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
                     (-1, 0, 0) : [( 0,-1, 0), ( 0, 1, 0)]
                 }
 
-                print(ret_face.normal.to_tuple())
-                print(list({f.normal.to_tuple() for e in ret_face.edges for f in e.link_faces}))
                 valid_faces = list(filter(
                     lambda f : f.normal.to_tuple(1) in fnormal_filter[ret_face.normal.to_tuple(1)],
                     list({f for e in ret_face.edges for f in e.link_faces}))
