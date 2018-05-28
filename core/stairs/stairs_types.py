@@ -33,7 +33,6 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
     faces = [f for f in bm.faces if f.select]
 
     for f in faces:
-
         f.select = False
 
         # Perform split
@@ -45,6 +44,7 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
         fheight =  max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
 
         ext_face = f
+        top_faces = []
         for i in range(step_count):
             # extrude face
             n = ext_face.normal
@@ -55,6 +55,9 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
             bmesh.ops.translate(bm, vec=n * ext_width,
                 verts=ret_face.verts)
 
+            # -- keep reference to top faces for railing
+            top_faces.append(filter(lambda f:f.normal.z,
+                list({f for e in ret_face.edges for f in e.link_faces})))
 
             if landing and i == 0:
                 # adjust ret_face based on stair direction
