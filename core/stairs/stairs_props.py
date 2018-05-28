@@ -2,6 +2,7 @@ import bpy
 from bpy.props import *
 
 from ..generic import SizeOffsetProperty
+from ..util_rail.rails_props import RailProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):
@@ -21,7 +22,12 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Has Landing", default=True,
         description="Wether to stairs have a landing")
 
+    railing = BoolProperty(
+        name="Has Railing", default=True,
+        description="Wether to stairs have a rails")
+
     soff = PointerProperty(type=SizeOffsetProperty)
+    rail = PointerProperty(type=RailProperty)
 
     direction_items = [
         ("FRONT", "Front", "", 0),
@@ -48,4 +54,10 @@ class StairsProperty(bpy.types.PropertyGroup):
 
             row = box.row()
             row.prop(self, 'stair_direction')
+
+        box = layout.box()
+        box.prop(self, 'railing', toggle=True)
+        if self.railing:
+            pass
+
 
