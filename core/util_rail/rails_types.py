@@ -43,11 +43,8 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
         link_verts = [e.other_vert(v) for e in link_edges]
 
         vec = (calc_verts_median(link_verts) - v.co).normalized()
-        print([v.co for v in link_verts], " --> ", vec)
-        off_x = 0#-copysign(1, v.co.x) * (cpw/2)
-        off_y = 0#-copysign(1, v.co.y) * (cpw/2)
-        # off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
-        # off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
+        off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
+        off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
 
         _cph = cph if has_decor else cph + rh
         pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (_cph / 2))
