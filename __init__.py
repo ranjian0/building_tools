@@ -4,7 +4,7 @@ bl_info = {
     "version": (0, 0, 1),
     "blender": (2, 79, 0),
     "location": "View3D > Toolshelf > Building Tools",
-    "description": "Building Generation Tools",
+    "description": "Building Creation Tools",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
