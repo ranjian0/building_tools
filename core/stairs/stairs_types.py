@@ -93,8 +93,8 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
                 ext_face = min([f for f in filter_geom(res['geom_inner'], BMVert)[-1].link_faces],
                     key=lambda f: f.calc_center_median().z)
 
-    if railing:
-        make_stairs_railing(bm, init_normal, top_faces, landing, stair_direction, **kwargs)
+    # if railing:
+    #     make_stairs_railing(bm, init_normal, top_faces, landing, stair_direction, **kwargs)
     bmesh.update_edit_mesh(me, True)
 
 def make_stair_split(bm, face, size, off, **kwargs):
