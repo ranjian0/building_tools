@@ -32,7 +32,30 @@
 ## TODO:
 
 1. Roof
+    - flat
+    - gable
+    - hip
+
 2. Material and textures
+    - quick unwrap
+    - apply material - vert groups e.g window frame
+    - baking
+
+3. Arch Window and Door
+
+4. Staircase
+    - l-shapes, double-l-shaped
+    - u-shaped
+    - spiral
+    - curved
+    - 90 and 180 winder
+
+5. Extras
+    - circular window
+    - more fill types - e.g grilles
+    - stair railing
+    - corner balcony
+
 
 ## Development Status
 
