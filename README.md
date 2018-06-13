@@ -3,7 +3,7 @@
 
 ## Purpose:
 
-> Provide a quick way to model buildings in blender
+> Provide tools to model building exteriors quickly in blender
 
 
 ## Features:
