@@ -8,7 +8,7 @@ bl_info = {
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
-    "category": "Add Mesh"
+    "category": "Cynthia"
 }
 
 import bpy
