@@ -31,7 +31,14 @@ def make_door(**kwargs):
 
     faces = (f for f in bm.faces if f.select)
     for face in faces:
+        # SKIP INVALID
+        if face.normal.z:
+            continue
+
         face = make_door_split(bm, face, **kwargs)
+        # -- check that split was successful
+        if not face:
+            continue
 
         nfaces = make_door_double(bm, face, **kwargs)
         for face in nfaces:
