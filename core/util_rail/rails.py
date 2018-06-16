@@ -15,7 +15,7 @@ class Rails:
         bm = bmesh.from_edit_mesh(me)
 
         # if a face is selected that is not upward facing, return
-        if False
+        if False:
             faces = [f for f in bm.faces if f.select]
             if faces:
                 if not all([f.normal.z == 1 for f in faces]):
