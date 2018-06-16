@@ -5,6 +5,12 @@
 
 > Provide tools to model building exteriors quickly in blender
 
+## Installing:
+
+  * Click on the 'Clone or download' button.
+  * Download zip
+  * In blender, go to : User Preferences -> Add-ons -> install addon from file.
+  * Select the downloaded zip file and you're good to go.
 
 ## RoadMap
   * You can find the list of features and todos here: https://trello.com/b/CK0O4MjA
