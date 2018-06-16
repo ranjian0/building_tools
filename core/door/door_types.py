@@ -1,6 +1,7 @@
 import bpy
 import bmesh
 from bmesh.types import BMEdge
+from mathutils import Matrix, Vector
 from ...utils import (
         split,
         split_quad,
@@ -90,6 +91,7 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
     delete_hidden_face(face)
 
     # Make frame inset - frame thickness
+    median = face.calc_center_median()
     if ft:
         # Vertical Splits
         w, _  = calc_face_dimensions(face)
@@ -98,11 +100,12 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
         edges.sort(key=lambda e: getattr(calc_edge_median(e),
                     'x' if face.normal.y else 'y'))
 
-        offsets = [(-w/3) + ft, (w/3) - ft]
+        offsets = [(w/3), (w/3)]
         for off, e in zip(offsets, edges):
+            tvec = calc_edge_median(e) - median
             bmesh.ops.translate(bm,
                 verts=e.verts,
-                vec=(off, 0, 0) if face.normal.y else (0, off, 0))
+                vec=tvec.normalized() * (off-ft))
 
         # Top horizontal split
         face = face_with_verts(bm, list({v for e in edges for v in e.verts}))
@@ -117,7 +120,7 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
         face = min(list({f for e in res for f in e.link_faces}),
                 key=lambda f: f.calc_center_median().z)
 
-    # Make frame extrude - frame depth
+    # # Make frame extrude - frame depth
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if fd:
         f = bmesh.ops.extrude_discrete_faces(bm,
