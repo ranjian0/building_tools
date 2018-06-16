@@ -47,6 +47,9 @@ def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs
     slab_faces = []
     offsets    = it.cycle([slab_thickness, floor_height])
     for offset in it.islice(offsets, 0, floor_count*2):
+        if offset == 0 and offset == slab_thickness:
+            continue
+
         ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
         bmesh.ops.translate(bm, vec=(0, 0, offset),
             verts=filter_geom(ext['geom'], bmesh.types.BMVert))
