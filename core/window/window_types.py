@@ -25,12 +25,16 @@ def make_window(**kwargs):
 
     faces = [f for f in bm.faces if f.select]
     for face in faces:
+        # SKIP INVALID
+        if face.normal.z:
+            continue
+
         face = make_window_split(bm, face, **kwargs)
         # -- check that split was successful
-        # if not face:
-        #     return
-        # face = make_window_frame(bm, face, **kwargs)
-        # make_window_fill(bm, face, **kwargs)
+        if not face:
+            continue
+        face = make_window_frame(bm, face, **kwargs)
+        make_window_fill(bm, face, **kwargs)
 
     bmesh.update_edit_mesh(me, True)
 
