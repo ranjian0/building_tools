@@ -4,7 +4,7 @@ from bpy.props import *
 class FloorplanProperty(bpy.types.PropertyGroup):
     fp_types = [
         ("RECTANGULAR", "Rectangular", "", 0),
-        # ("CIRCULAR", "Circular", "", 1),
+        ("CIRCULAR", "Circular", "", 1),
         ("COMPOSITE", "Composite", "", 2),
         ("H-SHAPED", "H-Shaped", "", 3),
         ("RANDOM", "Random", "", 4)

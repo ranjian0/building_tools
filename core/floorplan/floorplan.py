@@ -36,8 +36,8 @@ class Floorplan:
         if props.type == 'RECTANGULAR':
             fp_rectangular(bm, **kwargs)
 
-        # elif props.type == 'CIRCULAR':
-        #     fp_circular(bm, **kwargs)
+        elif props.type == 'CIRCULAR':
+            fp_circular(bm, **kwargs)
 
         elif props.type == 'COMPOSITE':
             fp_composite(bm, **kwargs)
