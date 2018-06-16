@@ -1,4 +1,5 @@
 import math
+import time
 import bmesh
 import itertools as it
 
@@ -10,12 +11,70 @@ from bmesh.types import BMVert
 from ...utils import (
     cube,
     plane,
+    select,
     filter_geom,
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
     )
 
+
+def make_railing(bm, edges, **kwargs):
+    """Creates rails and posts along selected edges
+
+    Args:
+        bm    (bmesh.types.BMesh): bmesh of current edit mesh
+        edges (list): list of edges to create rails along
+        *args: items from RailsProperty, see rail_props.py
+        **kwargs: Extra kwargs
+    """
+
+    # calculate reference from face(s)
+    lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
+    ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
+
+    # merge colinear edges into single edge
+    # new_bm = merge_colinear_edges(edges)
+    # edges = list(new_bm.edges)
+    select(edges, False)
+    make_corner_post(bm, edges, **kwargs)
+
+
+
+def make_corner_post(bm, edges, cpw, cph, has_decor, **kwargs):
+    """ Create Corner posts """
+
+    # -- required by all types
+    print("Select mode", bm.select_mode)
+    for v in {vert for e in edges for vert in e.verts}:
+        link_edges = list({e for e in v.link_edges if e in edges})
+        print([e in edges for e in link_edges])
+        select(link_edges)
+        # select(link_edges, False)
+        # v.select = True
+        return
+                             # for vert in e.verts
+                             # if vert != v and e in edges})
+        link_verts = [e.other_vert(v) for e in link_edges]
+        vec = link_verts[0].co - link_verts[1].co
+        ang = math.degrees(math.atan2(vec.y, vec.x))
+        print(ang, " ->", vec)
+        if ang == 180.0:
+            # v.select = True
+            select(link_verts)
+            return
+
+        cen = calc_verts_median(link_verts)
+        off_x = -cpw / 2 if v.co.x > cen.x else cpw / 2
+        off_y = -cpw / 2 if v.co.y > cen.y else cpw / 2
+
+        #_cph = cph if has_decor else cph + rh
+        pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (cph / 2))
+
+        corner_post(bm, (cpw, cpw, cph), pos, has_decor)
+
+
+'''
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
     """Creates rails and posts along selected edges
 
@@ -37,14 +96,18 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
 
     # Create Corner posts
     # -- required by all types
+    verts = list({vert for e in edges for vert in e.verts})
+    angles = list([ref.angle(v.co) for v in verts])
+    vsorted = sorted(verts, key=lambda v:angles[verts.index(v)])
+
     for v in {vert for e in edges for vert in e.verts}:
         link_edges = list({e for e in v.link_edges
                     for vert in e.verts if vert != v and vert.co.z == v.co.z})
         link_verts = [e.other_vert(v) for e in link_edges]
 
-        vec = (calc_verts_median(link_verts) - v.co).normalized()
-        off_x = -cpw / 2 if v.co.x > ref.x else cpw / 2
-        off_y = -cpw / 2 if v.co.y > ref.y else cpw / 2
+        vec = calc_verts_median(link_verts)
+        off_x = -cpw / 2 if v.co.x > vec.x else cpw / 2
+        off_y = -cpw / 2 if v.co.y > vec.y else cpw / 2
 
         _cph = cph if has_decor else cph + rh
         pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (_cph / 2))
@@ -112,6 +175,7 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
                 matrix=Matrix.Rotation(math.radians(rot), 4, axis))
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.0)
+'''
 
 def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor=False):
     """ Create rail on top of posts """
@@ -245,4 +309,3 @@ def merge_colinear_edges(edges):
             tmp_bm.edges.new(verts)
 
     return tmp_bm
-

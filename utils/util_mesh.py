@@ -138,6 +138,7 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     if do_vertical:
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
         face = face_with_verts(bm, verts) if do_horizontal else face
+        #TODO - ensure face is not None
 
         # Determine vertical edges
         # -- edges whose verts have similar x/y coord

@@ -203,6 +203,7 @@ def fill_louver(bm, face, louver_m, louver_count, louver_d, louver_b, **kwargs):
 
     # -- slope louver faces
     for face in res['faces']:
+        # TODO - prevent empty sequence
         top_edge = max(
             filter_horizontal_edges(face.edges, face.normal),
             key= lambda e: calc_edge_median(e).z)

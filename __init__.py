@@ -46,7 +46,7 @@ class MeshGenerationPanel(bpy.types.Panel):
         row.operator("cynthia.add_door")
 
         row = col.row(align=True)
-        # row.operator("cynthia.add_railing")
+        row.operator("cynthia.add_railing")
         row.operator("cynthia.add_balcony")
 
         col.operator("cynthia.add_stairs")
