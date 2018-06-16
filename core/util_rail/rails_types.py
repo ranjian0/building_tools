@@ -146,7 +146,6 @@ def corner_post(bm, size, pos, has_decor):
         cpw, _, cph = size
         post_decor = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
 
-
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
     vts = post['verts']
@@ -214,8 +213,6 @@ def get_bounding_verts(edges):
     verts.sort(key=lambda v:v.co.x)
     verts.sort(key=lambda v:v.co.y)
     return [verts[0], verts[-1]]
-
-
 
 def merge_colinear_edges(edges):
     """ Convert all colinear edge groups into single edge """
