@@ -27,10 +27,10 @@ def make_window(**kwargs):
     for face in faces:
         face = make_window_split(bm, face, **kwargs)
         # -- check that split was successful
-        if not face:
-            return
-        face = make_window_frame(bm, face, **kwargs)
-        make_window_fill(bm, face, **kwargs)
+        # if not face:
+        #     return
+        # face = make_window_frame(bm, face, **kwargs)
+        # make_window_fill(bm, face, **kwargs)
 
     bmesh.update_edit_mesh(me, True)
 

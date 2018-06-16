@@ -105,7 +105,7 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
 
     # scale svertical and shorizontal
-    scale       = 3
+    scale       = 3      # number of cuts + 1
     svertical   *= scale
     shorizontal *= scale
 
@@ -125,16 +125,14 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
         # --  edges whose verts have similar z coord
         horizontal = list(filter(lambda e: len(
             set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
+
         # Subdivide edges
         sp_res = bmesh.ops.subdivide_edges(bm, edges=horizontal, cuts=2)
         verts = filter_geom(sp_res['geom_inner'], BMVert)
 
         # Scale subdivide face
         T = Matrix.Translation(-median)
-        sv = face.normal.cross(Vector((0, 0, 1)))
-        scale_vector = (abs(sv.x) * shorizontal if sv.x else 1, abs(sv.y) * shorizontal if sv.y else 1,
-                        abs(sv.z) * shorizontal if sv.z else 1)
-        bmesh.ops.scale(bm, vec=scale_vector, verts=verts, space=T)
+        bmesh.ops.scale(bm, vec=(shorizontal, shorizontal, 1), verts=verts, space=T)
 
 
     if do_vertical:
