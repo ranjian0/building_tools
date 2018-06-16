@@ -7,8 +7,8 @@
 
 ## Installing:
 
-  * Click on the 'Clone or download' button.
-  * Download zip
+  * Click on the  *Clone or download*  button.
+  * *Download zip*
   * In blender, go to : User Preferences -> Add-ons -> install addon from file.
   * Select the downloaded zip file and you're good to go.
 
