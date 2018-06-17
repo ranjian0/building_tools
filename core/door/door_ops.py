@@ -17,8 +17,7 @@ class DoorOperator(bpy.types.Operator):
 
     def execute(self, context):
         self.props.set_defaults()
-        Door.build(self.props)
-        return {'FINISHED'}
+        return Door.build(self.props)
 
     def draw(self, context):
         self.props.draw(context, self.layout)

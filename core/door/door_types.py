@@ -46,8 +46,6 @@ def make_door(**kwargs):
             face = make_door_frame(bm, face, **kwargs)
             make_door_fill(bm, face, **kwargs)
 
-    bmesh.update_edit_mesh(me, True)
-
 def make_door_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
 

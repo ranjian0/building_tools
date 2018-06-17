@@ -1,4 +1,3 @@
-import bpy
 import bmesh
 
 from .balcony_types import make_balcony
