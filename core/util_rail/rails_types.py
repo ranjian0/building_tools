@@ -19,7 +19,7 @@ from ...utils import (
     )
 
 
-def make_railing(bm, edges, **kwargs):
+def make_railing(bm, remove_colinear, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -29,49 +29,37 @@ def make_railing(bm, edges, **kwargs):
         **kwargs: Extra kwargs
     """
 
-    # calculate reference from face(s)
+    bmcopy = bm.copy()
+    edges = [e for e in bmcopy.edges if e.select]
     lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
-    ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
+    bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
-    # merge colinear edges into single edge
-    # new_bm = merge_colinear_edges(edges)
-    # edges = list(new_bm.edges)
-    select(edges, False)
-    make_corner_post(bm, edges, **kwargs)
+    loops = list({loop for e in edges for loop in e.link_loops})
+    if remove_colinear:
+        # - remove loops where edges are parallel
+        loops = [l for l in loops if round(l.calc_angle(),3) != 3.142]
+
+    make_corner_post(bm, loops, **kwargs)
+    bmcopy.free()
 
 
 
-def make_corner_post(bm, edges, cpw, cph, has_decor, **kwargs):
+def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
     """ Create Corner posts """
+    for loop in loops:
+        v = loop.vert
 
-    # -- required by all types
-    print("Select mode", bm.select_mode)
-    for v in {vert for e in edges for vert in e.verts}:
-        link_edges = list({e for e in v.link_edges if e in edges})
-        print([e in edges for e in link_edges])
-        select(link_edges)
-        # select(link_edges, False)
-        # v.select = True
-        return
-                             # for vert in e.verts
-                             # if vert != v and e in edges})
-        link_verts = [e.other_vert(v) for e in link_edges]
-        vec = link_verts[0].co - link_verts[1].co
-        ang = math.degrees(math.atan2(vec.y, vec.x))
-        print(ang, " ->", vec)
-        if ang == 180.0:
-            # v.select = True
-            select(link_verts)
-            return
-
-        cen = calc_verts_median(link_verts)
-        off_x = -cpw / 2 if v.co.x > cen.x else cpw / 2
-        off_y = -cpw / 2 if v.co.y > cen.y else cpw / 2
-
-        #_cph = cph if has_decor else cph + rh
+        vec = loop.calc_tangent()
+        off_x = math.copysign(cpw/2, vec.x)
+        off_y = math.copysign(cpw/2, vec.y)
         pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (cph / 2))
 
-        corner_post(bm, (cpw, cpw, cph), pos, has_decor)
+        post = create_cube(bm, (cpw, cpw, cph), pos)
+        del_faces(bm, post, top=has_decor)
+        if has_decor:
+            px, py, pz = pos
+            _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+
 
 
 '''
@@ -198,17 +186,6 @@ def create_cube(bm, size, position):
     bmesh.ops.translate(bm, verts=post['verts'], vec=position)
     return post
 
-def corner_post(bm, size, pos, has_decor):
-    """ Create corner post """
-    post = cube(bm, *size)
-    bmesh.ops.translate(bm, verts=post['verts'], vec=pos)
-    del_faces(bm, post, top=has_decor)
-
-    # Top decor
-    if has_decor:
-        px, py, pz = pos
-        cpw, _, cph = size
-        post_decor = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
 
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
@@ -240,6 +217,7 @@ def array_elements(bm, elem, count, start, stop):
             ret = bmesh.ops.duplicate(bm, geom=faces)
             bmesh.ops.translate(bm, verts=filter_geom(ret['geom'], BMVert), vec=(dx * i, dy * i, dz * i))
 
+'''
 def edge_slope(e):
     """ Calculate the slope of an edge """
     p1, p2 = [v.co for v in e.verts]
@@ -309,3 +287,4 @@ def merge_colinear_edges(edges):
             tmp_bm.edges.new(verts)
 
     return tmp_bm
+'''

@@ -16,7 +16,7 @@ class Rails:
 
         edges = [e for e in bm.edges if e.select]
         if edges:
-            make_railing(bm, edges, **kwargs_from_props(props))
+            make_railing(bm, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {'FINISHED'}
         return {'CANCELLED'}

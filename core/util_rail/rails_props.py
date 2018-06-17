@@ -48,7 +48,11 @@ class RailProperty(bpy.types.PropertyGroup):
 
     has_decor = BoolProperty(
         name="Has Decor", default=True,
-        description="Whether to corner posts have decor")
+        description="Whether corner posts have decor")
+
+    remove_colinear = BoolProperty(
+        name="Remove Colinear", default=False,
+        description="Whether to remove extra colinear posts")
 
     fill_types = [
         ("POSTS", "Posts", "", 0),
@@ -78,7 +82,9 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'cpw')
             col.prop(self, 'cph')
 
-            box1.prop(self, 'has_decor')
+            row = box1.row(align=True)
+            row.prop(self, 'remove_colinear', toggle=True)
+            row.prop(self, 'has_decor', toggle=True)
 
             box2 = box.box()
             box2.label("Inner Posts")
