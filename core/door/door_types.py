@@ -20,22 +20,14 @@ from ..util_fill import (
     fill_louver,
     )
 
-def make_door(**kwargs):
+def make_door(bm, faces, **kwargs):
     """Create basic flush door
 
     Args:
         **kwargs: DoorProperty items
     """
 
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    faces = (f for f in bm.faces if f.select)
     for face in faces:
-        # SKIP INVALID
-        if face.normal.z:
-            continue
-
         face = make_door_split(bm, face, **kwargs)
         # -- check that split was successful
         if not face:
