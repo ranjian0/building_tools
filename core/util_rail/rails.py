@@ -14,9 +14,20 @@ class Rails:
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
-        edges = [e for e in bm.edges if e.select]
-        if edges:
+        if cls.validate(bm):
             make_railing(bm, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {'FINISHED'}
         return {'CANCELLED'}
+
+    @classmethod
+    def validate(cls, bm):
+        """ Ensure valid user selection if any """
+        edges = [e for e in bm.edges if e.select]
+        if edges:
+            return True
+
+        faces = [f for f in bm.edges if f.select]
+        if faces:
+            return True
+        return False

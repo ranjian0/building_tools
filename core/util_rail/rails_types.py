@@ -29,9 +29,20 @@ def make_railing(bm, remove_colinear, **kwargs):
         **kwargs: Extra kwargs
     """
 
+    lfaces = []
     bmcopy = bm.copy()
     edges = [e for e in bmcopy.edges if e.select]
-    lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
+    if edges:
+        # -- if user selection is edges
+        lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
+    else:
+        sel_faces = [f for f in bmcopy.faces if f.select]
+        lfaces = sel_faces
+        if sel_faces:
+            # -- if user selection if faces
+            all_edges = list({e for f in sel_faces for e in f.edges})
+            edges = [e for e in all_edges
+                if len(list({f for f in e.link_faces if f in sel_faces})) == 1]
     bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
     loops = list({loop for e in edges for loop in e.link_loops})
