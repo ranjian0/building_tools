@@ -15,8 +15,7 @@ class StairsOperator(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        Stairs.build(context, self.props)
-        return {'FINISHED'}
+        return Stairs.build(context, self.props)
 
     def draw(self, context):
         self.props.draw(context, self.layout)

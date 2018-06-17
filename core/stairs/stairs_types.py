@@ -1,8 +1,7 @@
 import bmesh
+import itertools as it
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge
-
-import itertools as it
 
 from ..util_rail import rails_types as rails
 from ...utils import (
@@ -17,7 +16,7 @@ from ...utils import (
     filter_horizontal_edges
     )
 
-def make_stairs(step_count, step_width, landing, landing_width, stair_direction, railing, **kwargs):
+def make_stairs(bm, faces, step_count, step_width, landing, landing_width, stair_direction, railing, **kwargs):
     """Extrude steps from selected faces
 
     Args:
@@ -28,12 +27,6 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
         **kwargs: Extra kwargs from StairsProperty
 
     """
-
-    # Get current edit mesh
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    faces = [f for f in bm.faces if f.select]
 
     for f in faces:
         f.select = False
@@ -95,7 +88,6 @@ def make_stairs(step_count, step_width, landing, landing_width, stair_direction,
 
     # if railing:
     #     make_stairs_railing(bm, init_normal, top_faces, landing, stair_direction, **kwargs)
-    bmesh.update_edit_mesh(me, True)
 
 def make_stair_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
