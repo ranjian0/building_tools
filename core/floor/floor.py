@@ -3,6 +3,7 @@ import bmesh
 from .floor_types import make_floors
 
 from ...utils import (
+    get_edit_mesh,
     kwargs_from_props
     )
 
@@ -17,4 +18,22 @@ class Floor:
             context (bpy.context): blender context
             props   (bpy.types.PropertyGroup): FloorProperty
         """
-        make_floors(**kwargs_from_props(props))
+
+        me = get_edit_mesh()
+        bm = bmesh.from_edit_mesh(me)
+
+        if cls.validate(bm):
+            edges = [e for e in bm.edges if e.is_boundary]
+            make_floors(bm, edges, **kwargs_from_props(props))
+            bmesh.update_edit_mesh(me, True)
+            return {'FINISHED'}
+        return {'CANCELLED'}
+
+    @classmethod
+    def validate(cls, bm):
+        """ Validate input if any """
+        if len(list({v.co.z for v in bm.verts})) == 1:
+            return True
+        elif any([f for f in bm.faces if f.select]):
+            return True
+        return False

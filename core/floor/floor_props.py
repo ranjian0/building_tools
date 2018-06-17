@@ -16,7 +16,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Thickness of each slab")
 
     slab_outset     = FloatProperty(
-        name="Slab Outset", min=0.0, max=1000.0, default=0.1,
+        name="Slab Outset", min=-10.0, max=10.0, default=0.1,
         description="Outset of each slab")
 
     def draw(self, context, layout):

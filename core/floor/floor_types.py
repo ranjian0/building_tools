@@ -1,4 +1,3 @@
-import bpy
 import bmesh
 import itertools as it
 from bmesh.types import (
@@ -8,14 +7,9 @@ from bmesh.types import (
 from ...utils import (
     select,
     filter_geom,
-    get_edit_mesh,
-    bm_from_obj,
-    bm_to_obj,
     )
 
-
-
-def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs):
+def make_floors(bm, edges, floor_count, floor_height, slab_thickness, slab_outset, **kwargs):
     """Create extrusions to resemble building floors
 
     Args:
@@ -26,19 +20,13 @@ def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs
         **kwargs: Extra kwargs from FloorProperty
     """
 
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    edges, del_faces = [], None
-    if check_planar(bm):
-        # -- find boundary edges
-        edges = [e for e in bm.edges if e.is_boundary]
-    else:
+    del_faces = []
+    if not edges:
         # -- find boundary of selected faces
         del_faces = [f for f in bm.faces if f.select]
         all_edges = list({e for f in del_faces for e in f.edges})
         edges = [e for e in all_edges
-                    if len(list({f.normal.to_tuple() for f in e.link_faces})) > 1]
+            if len(list({f for f in e.link_faces if f in del_faces})) == 1]
 
     # --extrude floors
     slab_faces = []
@@ -62,21 +50,5 @@ def make_floors(floor_count, floor_height, slab_thickness, slab_outset, **kwargs
     if del_faces:
         bmesh.ops.delete(bm,
             geom=del_faces,
-            context=3)
+            context=5)
         select(list(bm.edges), False)
-
-    bmesh.update_edit_mesh(me, True)
-
-
-def check_planar(bm):
-    """Determine whether bm contains only flat geometry
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-
-    Returns:
-        bool: result of condition
-    """
-    if len(list({v.co.z for v in bm.verts})) == 1:
-        return True
-    return False
