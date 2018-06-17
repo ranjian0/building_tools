@@ -12,18 +12,13 @@ from ..util_fill import (
     )
 
 
-def make_window(**kwargs):
+def make_window(bm, faces, **kwargs):
     """Generate a basic window
 
     Args:
         **kwargs: WindowProperty items
     """
 
-    # Get active mesh
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
-
-    faces = [f for f in bm.faces if f.select]
     for face in faces:
         # SKIP INVALID
         if face.normal.z:
@@ -35,8 +30,6 @@ def make_window(**kwargs):
             continue
         face = make_window_frame(bm, face, **kwargs)
         make_window_fill(bm, face, **kwargs)
-
-    bmesh.update_edit_mesh(me, True)
 
 def make_window_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
