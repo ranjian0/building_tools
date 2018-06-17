@@ -12,7 +12,7 @@ class FloorOperator(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.object is not None
+        return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
         Floor.build(context, self.props)
