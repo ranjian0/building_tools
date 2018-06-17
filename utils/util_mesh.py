@@ -26,15 +26,14 @@ def filter_geom(geom, _type):
 def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value """
     res = []
-    rnd = lambda val: round(val, 4)
+    rnd = lambda val: round(val, 3)
 
     for e in edges:
-        if normal.z:
-            s = set([rnd(v.co.x) for v in e.verts])
-        elif normal.y:
-            s = set([rnd(v.co.x) for v in e.verts])
-        else:
+        if normal.x:
             s = set([rnd(v.co.y) for v in e.verts])
+        else:
+            s = set([rnd(v.co.x) for v in e.verts])
+
         if len(s) == 1:
             res.append(e)
     return res
@@ -42,15 +41,14 @@ def filter_vertical_edges(edges, normal):
 def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value """
     res = []
-    rnd = lambda val: round(val, 4)
+    rnd = lambda val: round(val, 3)
 
     for e in edges:
         if normal.z:
             s = set([rnd(v.co.y) for v in e.verts])
-        elif normal.y:
-            s = set([rnd(v.co.z) for v in e.verts])
         else:
             s = set([rnd(v.co.z) for v in e.verts])
+
         if len(s) == 1:
             res.append(e)
     return res
