@@ -19,6 +19,5 @@ class RailOperator(bpy.types.Operator):
         return Rails.build(context, self.props)
 
     def draw(self, context):
-        layout = self.layout
-        self.props.draw(context, layout)
+        self.props.draw(context, self.layout)
 
