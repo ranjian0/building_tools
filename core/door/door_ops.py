@@ -21,6 +21,5 @@ class DoorOperator(bpy.types.Operator):
         return {'FINISHED'}
 
     def draw(self, context):
-        layout = self.layout
-        self.props.draw(context, layout)
+        self.props.draw(context, self.layout)
 
