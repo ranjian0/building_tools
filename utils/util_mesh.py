@@ -63,22 +63,10 @@ def calc_verts_median(verts):
 
 def calc_face_dimensions(face):
     """ Determine the width and height of face """
-    if face.normal.x and not face.normal.y:
-        width = max([v.co.y for v in face.verts]) - \
-            min([v.co.y for v in face.verts])
-    elif face.normal.y and not face.normal.x:
-        width = max([v.co.x for v in face.verts]) - \
-            min([v.co.x for v in face.verts])
-    elif face.normal.x and face.normal.y:
-        v1 = max([v.co for v in face.verts], key=lambda v: v.x)
-        v2 = min([v.co for v in face.verts], key=lambda v: v.x)
-        width = (v1 - v2).length
-    else:
-        width = 0
+    vertical = filter_vertical_edges(face.edges, face.normal)[-1]
+    horizontal = filter_horizontal_edges(face.edges, face.normal)[-1]
+    return horizontal.calc_length(), vertical.calc_length()
 
-    height = max([v.co.z for v in face.verts]) - \
-        min([v.co.z for v in face.verts])
-    return width, height
 
 def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts"""
