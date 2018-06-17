@@ -10,17 +10,14 @@ from ...utils import (
     )
 
 
-def make_balcony(width, railing, size, off, open_side, **kwargs):
+def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
     """Generate balcony geometry
 
     Args:
         *args: see balcony_props.py for types and description
         **kwargs: extra kwargs from BalconyProperty not used in this function
     """
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
 
-    faces = (face for face in bm.faces if face.select)
     for f in faces:
         f   = split(bm, f, size.y, size.x, off.x, off.y, off.z)
         ret = bmesh.ops.extrude_face_region(bm, geom=[f])
@@ -55,5 +52,3 @@ def make_balcony(width, railing, size, off, open_side, **kwargs):
             rails.make_railing(bm, r_edges, **kwargs)
 
         bmesh.ops.delete(bm, geom=[f], context=3)
-    bmesh.update_edit_mesh(me, True)
-

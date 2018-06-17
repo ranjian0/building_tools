@@ -16,8 +16,7 @@ class BalconyOperator(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        Balcony.build(context, self.props)
-        return {'FINISHED'}
+        return Balcony.build(context, self.props)
 
     def draw(self, context):
         self.props.draw(context, self.layout)
