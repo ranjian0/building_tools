@@ -43,7 +43,9 @@ def make_railing(bm, remove_colinear, **kwargs):
             all_edges = list({e for f in sel_faces for e in f.edges})
             edges = [e for e in all_edges
                 if len(list({f for f in e.link_faces if f in sel_faces})) == 1]
-    bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
+
+    if len(lfaces) > 1:
+        bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
     loops = list({loop for e in edges for loop in e.link_loops})
     if remove_colinear:
