@@ -49,6 +49,6 @@ def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
             elif open_side == 'RIGHT':
                 r_edges = [front, left]
 
-            rails.make_railing(bm, r_edges, **kwargs)
+            # rails.make_railing(bm, r_edges, **kwargs)
 
         bmesh.ops.delete(bm, geom=[f], context=3)
