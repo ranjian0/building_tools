@@ -50,8 +50,8 @@ def make_railing(bm, remove_colinear, **kwargs):
     for e in edges:
         for v in e.verts:
             if len(v.link_loops) > 1:
-                # - make sure we add loop whose edge is in edges
-                loops.extend([l for l in v.link_loops if l.edge in edges])
+                # - make sure we add loop whose face is in lfaces
+                loops.extend([l for l in v.link_loops if l.face in lfaces])
             else:
                 loops.extend([l for l in v.link_loops])
 
