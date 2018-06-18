@@ -19,7 +19,7 @@ from ...utils import (
     )
 
 
-def make_railing(bm, fill, remove_colinear, **kwargs):
+def make_railing(bm, remove_colinear, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -91,8 +91,20 @@ def make_fill_rails(bm, loops, **kwargs):
 def make_fill_posts(bm, loops, **kwargs):
     pass
 
-def make_fill_walls(bm, loops, **kwargs):
-    pass
+def make_fill_walls(bm, loops, cph, **kwargs):
+    for loop in loops:
+        vert = loop.vert
+        nvert = loop.link_loop_next.vert
+
+        width = (vert.co - nvert.co).length
+        pos   = (vert.co + nvert.co) / 2
+        rot   = vert.co.angle(nvert.co)
+
+        wall = plane(bm, width/2, cph/2)
+        bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
+        bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
+            matrix=Matrix.Rotation(math.radians(rot), 4, 'Z'))
+
 
 
 '''
