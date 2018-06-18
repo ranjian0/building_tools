@@ -19,7 +19,7 @@ from ...utils import (
     )
 
 
-def make_railing(bm, remove_colinear, **kwargs):
+def make_railing(bm, fill, remove_colinear, **kwargs):
     """Creates rails and posts along selected edges
 
     Args:
@@ -56,8 +56,8 @@ def make_railing(bm, remove_colinear, **kwargs):
 
 
     make_corner_post(bm, loops, **kwargs)
+    make_fill(bm, loops, **kwargs)
     bmcopy.free()
-
 
 
 def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
@@ -76,6 +76,23 @@ def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
             px, py, pz = pos
             _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
 
+def make_fill(bm, loops, fill, **kwargs):
+    """ Create fill types for railing """
+    if fill == 'RAILS':
+        make_fill_rails(bm, loops, **kwargs)
+    elif fill == 'POSTS':
+        make_fill_posts(bm, loops, **kwargs)
+    elif fill == 'WALL':
+        make_fill_walls(bm, loops, **kwargs)
+
+def make_fill_rails(bm, loops, **kwargs):
+    pass
+
+def make_fill_posts(bm, loops, **kwargs):
+    pass
+
+def make_fill_walls(bm, loops, **kwargs):
+    pass
 
 
 '''
