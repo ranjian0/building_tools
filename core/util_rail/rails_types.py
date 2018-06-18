@@ -99,18 +99,22 @@ def make_fill_rails(bm, edges, **kwargs):
 def make_fill_posts(bm, edges, **kwargs):
     pass
 
-def make_fill_walls(bm, edges, cph, **kwargs):
+def make_fill_walls(bm, edges, cph, cpw, **kwargs):
     for edge in edges:
         v1, v2 = edge.verts
 
-        width = (v1.co - v2.co).length
+        size  = [edge.calc_length()/2 - cpw, cph/2]
         pos   = (v1.co + v2.co) / 2 + Vector((0, 0, cph/2))
-        rot   = v1.co.angle(v2.co)
+        axis  = 'X' if v1.co.y == v2.co.y else 'Y'
+        if axis == 'X':
+            width, height = size
+        else:
+            height, width = size
 
-        wall = plane(bm, width/2, cph/2)
+        wall = plane(bm, width, height)
         bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
-        # bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
-        #     matrix=Matrix.Rotation(math.radians(rot), 4, 'Z'))
+        bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
+            matrix=Matrix.Rotation(math.radians(90), 4, axis))
 
 
 
