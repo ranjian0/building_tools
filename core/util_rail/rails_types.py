@@ -64,7 +64,7 @@ def make_railing(bm, remove_colinear, **kwargs):
 
 
     make_corner_post(bm, loops, **kwargs)
-    make_fill(bm, loops, **kwargs)
+    make_fill(bm, edges, **kwargs)
     bmcopy.free()
 
 
@@ -84,34 +84,33 @@ def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
             px, py, pz = pos
             _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
 
-def make_fill(bm, loops, fill, **kwargs):
+def make_fill(bm, edges, fill, **kwargs):
     """ Create fill types for railing """
     if fill == 'RAILS':
-        make_fill_rails(bm, loops, **kwargs)
+        make_fill_rails(bm, edges, **kwargs)
     elif fill == 'POSTS':
-        make_fill_posts(bm, loops, **kwargs)
+        make_fill_posts(bm, edges, **kwargs)
     elif fill == 'WALL':
-        make_fill_walls(bm, loops, **kwargs)
+        make_fill_walls(bm, edges, **kwargs)
 
-def make_fill_rails(bm, loops, **kwargs):
+def make_fill_rails(bm, edges, **kwargs):
     pass
 
-def make_fill_posts(bm, loops, **kwargs):
+def make_fill_posts(bm, edges, **kwargs):
     pass
 
-def make_fill_walls(bm, loops, cph, **kwargs):
-    for loop in loops:
-        vert = loop.vert
-        nvert = loop.link_loop_next.vert
+def make_fill_walls(bm, edges, cph, **kwargs):
+    for edge in edges:
+        v1, v2 = edge.verts
 
-        width = (vert.co - nvert.co).length
-        pos   = (vert.co + nvert.co) / 2
-        rot   = vert.co.angle(nvert.co)
+        width = (v1.co - v2.co).length
+        pos   = (v1.co + v2.co) / 2 + Vector((0, 0, cph/2))
+        rot   = v1.co.angle(v2.co)
 
         wall = plane(bm, width/2, cph/2)
         bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
-        bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
-            matrix=Matrix.Rotation(math.radians(rot), 4, 'Z'))
+        # bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
+        #     matrix=Matrix.Rotation(math.radians(rot), 4, 'Z'))
 
 
 
