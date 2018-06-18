@@ -48,8 +48,12 @@ def make_railing(bm, remove_colinear, **kwargs):
 
     loops = list({loop for e in edges for v in e.verts for loop in v.link_loops})
     if remove_colinear:
-        # - remove loops where edges are parallel
-        loops = [l for l in loops if round(l.calc_angle(),3) != 3.142]
+        # - remove loops where edges are parallel, and both link_edges in selection
+        flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
+        flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
+
+        loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
+
 
     make_corner_post(bm, loops, **kwargs)
     bmcopy.free()
