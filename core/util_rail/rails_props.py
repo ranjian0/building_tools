@@ -47,7 +47,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Whether the railing has corner posts")
 
     has_decor = BoolProperty(
-        name="Has Decor", default=True,
+        name="Has Decor", default=False,
         description="Whether corner posts have decor")
 
     remove_colinear = BoolProperty(
