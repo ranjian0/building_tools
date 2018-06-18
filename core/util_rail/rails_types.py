@@ -54,6 +54,7 @@ def make_railing(bm, remove_colinear, **kwargs):
                 loops.extend([l for l in v.link_loops if l.face in lfaces])
             else:
                 loops.extend([l for l in v.link_loops])
+    loops = list(set(loops))
 
     if remove_colinear:
         # - remove loops where edges are parallel, and both link_edges in selection
