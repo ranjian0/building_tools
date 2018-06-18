@@ -39,13 +39,14 @@ def make_railing(bm, remove_colinear, **kwargs):
     else:
         # -- user selection is edges
         edges = [e for e in bmcopy.edges if e.select]
-        lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
+        verts = list({v for e in edges for v in e.verts})
+        lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
 
 
     if len(lfaces) > 1:
         bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
-    loops = list({loop for e in edges for loop in e.link_loops})
+    loops = list({loop for e in edges for v in e.verts for loop in v.link_loops})
     if remove_colinear:
         # - remove loops where edges are parallel
         loops = [l for l in loops if round(l.calc_angle(),3) != 3.142]
