@@ -1,9 +1,7 @@
 import math
-import time
 import bmesh
 import itertools as it
 
-from copy import copy
 from math import copysign
 from mathutils import Vector, Matrix
 
