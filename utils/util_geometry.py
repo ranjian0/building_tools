@@ -37,8 +37,8 @@ def cylinder(bm, radius=1, height=2, segs=10):
     """ Create cylinder in bmesh """
 
     # -- circle
-    ret = bmesh.ops.create_circle(
-        bm, cap_ends=True, cap_tris=False, segments=segs, diameter=radius * 2)
+    ret = bmesh.ops.create_circle(bm,
+        cap_ends=True, cap_tris=False, segments=segs, diameter=radius * 2)
 
     verts = ret['verts']
     face = list(verts[0].link_faces)

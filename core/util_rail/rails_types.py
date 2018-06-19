@@ -12,6 +12,7 @@ from ...utils import (
     cube,
     plane,
     select,
+    cylinder,
     filter_geom,
     face_with_verts,
     calc_edge_median,
@@ -72,19 +73,27 @@ def make_railing(bm, remove_colinear, **kwargs):
 
 def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
     """ Create Corner posts """
+    num_poly = lambda ang: round((2*math.pi) / (math.pi - ang))
     for loop in loops:
         v = loop.vert
 
         vec = loop.calc_tangent()
         off_x = math.copysign(cpw/2, vec.x)
         off_y = math.copysign(cpw/2, vec.y)
-        pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (cph / 2))
+        pos = v.co + Vector((off_x, off_y, cph/2))
 
-        post = create_cube(bm, (cpw, cpw, cph), pos)
-        del_faces(bm, post, top=has_decor)
-        if has_decor:
-            px, py, pz = pos
-            _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+        segments = num_poly(loop.calc_angle())
+        if segments == 4 or segments < 0: # - (90 or 180)
+            post = create_cube(bm, (cpw, cpw, cph), pos)
+
+            del_faces(bm, post, top=has_decor)
+            if has_decor:
+                px, py, pz = pos
+                _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+
+        else:
+            pos = v.co + (vec * cpw) + Vector((0, 0, cph/2))
+            post = create_cylinder(bm, cpw/2, cph, segments, pos)
 
 def make_fill(bm, edges, fill, **kwargs):
     """ Create fill types for railing """
@@ -244,6 +253,11 @@ def create_cube(bm, size, position):
     bmesh.ops.translate(bm, verts=post['verts'], vec=position)
     return post
 
+def create_cylinder(bm, r, h, segs, position):
+    """ Create cylinder at pos"""
+    cy = cylinder(bm, r, h, segs)
+    bmesh.ops.translate(bm, verts=cy['verts'], vec=position)
+    return cy
 
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
