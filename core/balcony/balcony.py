@@ -31,8 +31,8 @@ class Balcony:
     def validate(cls, faces):
         """ Ensure user has appropriate selection if any """
         if faces:
-            # -- ensure all are upward facing
-            if all([f.normal.z == 1.0 for f in faces]):
+            # -- ensure none are upward facing
+            if not any([f.normal.z for f in faces]):
                 return True
         return False
 
