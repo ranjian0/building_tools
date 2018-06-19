@@ -20,104 +20,135 @@ from ...utils import (
     )
 
 
-def make_railing(bm, remove_colinear, **kwargs):
-    """Creates rails and posts along selected edges
+class MakeRailing:
 
-    Args:
-        bm    (bmesh.types.BMesh): bmesh of current edit mesh
-        edges (list): list of edges to create rails along
-        *args: items from RailsProperty, see rail_props.py
-        **kwargs: Extra kwargs
-    """
+    def __init__(self, *args, **kwargs):
+        # -- global state {Wall FILL}
+        self.wall_switch = False
+        self.corner_angle = 0
+        self.num_corners = 1
 
-    bmcopy = bm.copy()
-    lfaces = [f for f in bmcopy.faces if f.select]
-    if lfaces:
-        # -- user selection if faces
-        all_edges = list({e for f in lfaces for e in f.edges})
-        edges = [e for e in all_edges
-            if len(list({f for f in e.link_faces if f in lfaces})) == 1]
-    else:
-        # -- user selection is edges
-        edges = [e for e in bmcopy.edges if e.select]
-        verts = list({v for e in edges for v in e.verts})
-        lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
+        # -- execute from user selection
+        self.make_railing(*args, **kwargs)
 
+    @classmethod
+    def from_edges(cls, bm, edges, **kwargs):
+        pass
 
-    if len(lfaces) > 1:
-        bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
+    @classmethod
+    def from_faces(cls, bm, faces, **kwargs):
+        pass
 
-    loops = []
-    for e in edges:
-        for v in e.verts:
-            if len(v.link_loops) > 1:
-                # - make sure we add loop whose face is in lfaces
-                loops.extend([l for l in v.link_loops if l.face in lfaces])
-            else:
-                loops.extend([l for l in v.link_loops])
-    loops = list(set(loops))
+    def make_railing(self, bm, remove_colinear, **kwargs):
+        """Creates rails and posts along selected edges
 
-    if remove_colinear:
-        # TODO - make this work on loop with more than two links
-        # - remove loops where edges are parallel, and both link_edges in selection
-        flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
-        flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
+        Args:
+            bm    (bmesh.types.BMesh): bmesh of current edit mesh
+            edges (list): list of edges to create rails along
+            *args: items from RailsProperty, see rail_props.py
+            **kwargs: Extra kwargs
+        """
 
-        loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
-
-
-    make_corner_post(bm, loops, **kwargs)
-    make_fill(bm, edges, **kwargs)
-    bmcopy.free()
-
-
-def make_corner_post(bm, loops, cpw, cph, has_decor, **kwargs):
-    """ Create Corner posts """
-    num_poly = lambda ang: round((2*math.pi) / (math.pi - ang))
-    for loop in loops:
-        v = loop.vert
-
-        vec = loop.calc_tangent()
-        off_x = math.copysign(cpw/2, vec.x)
-        off_y = math.copysign(cpw/2, vec.y)
-        pos = v.co + Vector((off_x, off_y, cph/2))
-
-        segments = num_poly(loop.calc_angle())
-        if segments == 4 or segments < 0: # - (90 or 180)
-            post = create_cube(bm, (cpw, cpw, cph), pos)
-
-            del_faces(bm, post, top=has_decor)
-            if has_decor:
-                px, py, pz = pos
-                _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
-
+        bmcopy = bm.copy()
+        lfaces = [f for f in bmcopy.faces if f.select]
+        if lfaces:
+            # -- user selection if faces
+            all_edges = list({e for f in lfaces for e in f.edges})
+            edges = [e for e in all_edges
+                if len(list({f for f in e.link_faces if f in lfaces})) == 1]
         else:
-            pos = v.co + (vec * cpw) + Vector((0, 0, cph/2))
-            post = create_cylinder(bm, cpw/2, cph, segments, pos)
+            # -- user selection is edges
+            edges = [e for e in bmcopy.edges if e.select]
+            verts = list({v for e in edges for v in e.verts})
+            lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
 
-def make_fill(bm, edges, fill, **kwargs):
-    """ Create fill types for railing """
-    if fill == 'RAILS':
-        make_fill_rails(bm, edges, **kwargs)
-    elif fill == 'POSTS':
-        make_fill_posts(bm, edges, **kwargs)
-    elif fill == 'WALL':
-        make_fill_walls(bm, edges, **kwargs)
 
-def make_fill_rails(bm, edges, **kwargs):
-    pass
+        if len(lfaces) > 1:
+            bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
-def make_fill_posts(bm, edges, **kwargs):
-    pass
+        loops = []
+        for e in edges:
+            for v in e.verts:
+                if len(v.link_loops) > 1:
+                    # - make sure we add loop whose face is in lfaces
+                    loops.extend([l for l in v.link_loops if l.face in lfaces])
+                else:
+                    loops.extend([l for l in v.link_loops])
+        loops = list(set(loops))
 
-def make_fill_walls(bm, edges, cph, cpw, ww, **kwargs):
-    for edge in edges:
-        v1, v2 = edge.verts
-        _dir = (v1.co - v2.co).normalized()
+        if remove_colinear:
+            # TODO - make this work on loop with more than two links
+            # - remove loops where edges are parallel, and both link_edges in selection
+            flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
+            flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
 
-        start = v1.co - (_dir * cpw)
-        end = v2.co + (_dir * cpw)
-        create_wall(bm, start, end, cph, ww)
+            loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
+
+
+        self.make_corner_post(bm, loops, **kwargs)
+        self.make_fill(bm, edges, **kwargs)
+        bmcopy.free()
+
+    def make_corner_post(self, bm, loops, cpw, cph, has_decor, **kwargs):
+        """ Create Corner posts """
+        num_poly = lambda ang: round((2*math.pi) / (math.pi - ang))
+        for loop in loops:
+            v = loop.vert
+
+            vec = loop.calc_tangent()
+            off_x = math.copysign(cpw/2, vec.x)
+            off_y = math.copysign(cpw/2, vec.y)
+            pos = v.co + Vector((off_x, off_y, cph/2))
+
+            angle = loop.calc_angle()
+            segments = num_poly(angle)
+            if segments == 4 or segments < 0: # - (90 or 180)
+                post = create_cube(bm, (cpw, cpw, cph), pos)
+
+                del_faces(bm, post, top=has_decor)
+                if has_decor:
+                    px, py, pz = pos
+                    _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+
+            else:
+                pos = v.co + (vec * cpw) + Vector((0, 0, cph/2))
+                post = create_cylinder(bm, cpw/2, cph, segments, pos)
+
+                # -- store global state
+                self.wall_switch = True
+                self.num_corners = segments
+                self.corner_angle = math.pi - angle
+
+    def make_fill(self, bm, edges, fill, **kwargs):
+        """ Create fill types for railing """
+        if fill == 'RAILS':
+            self.make_fill_rails(bm, edges, **kwargs)
+        elif fill == 'POSTS':
+            self.make_fill_posts(bm, edges, **kwargs)
+        elif fill == 'WALL':
+            self.make_fill_walls(bm, edges, **kwargs)
+
+    def make_fill_rails(self, bm, edges, **kwargs):
+        pass
+
+    def make_fill_posts(self, bm, edges, **kwargs):
+        pass
+
+    def make_fill_walls(self, bm, edges, cph, cpw, ww, **kwargs):
+        off = cpw
+        if self.wall_switch:
+            # - a cylinder corner post was created, determine length of side with cosine rule
+            val_a = 2 * (cpw**2)
+            val_b = val_a * math.cos(self.corner_angle)
+            off = math.sqrt(val_a - val_b)
+
+        for edge in edges:
+            v1, v2 = edge.verts
+            _dir = (v1.co - v2.co).normalized()
+
+            start = v1.co - (_dir * off)
+            end = v2.co + (_dir * off)
+            create_wall(bm, start, end, cph, ww)
 
 '''
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
