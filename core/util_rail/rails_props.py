@@ -31,7 +31,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Number of rails over each edge")
 
     ww = FloatProperty(
-        name="Wall Width", min=0.01, max=100.0, default=0.075,
+        name="Wall Width", min=0.0, max=100.0, default=0.075,
         description="Width of each wall")
 
     cpw = FloatProperty(

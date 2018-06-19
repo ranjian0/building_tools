@@ -7,7 +7,7 @@ from copy import copy
 from math import copysign
 from mathutils import Vector, Matrix
 
-from bmesh.types import BMVert
+from bmesh.types import BMVert, BMFace
 from ...utils import (
     cube,
     plane,
@@ -110,24 +110,14 @@ def make_fill_rails(bm, edges, **kwargs):
 def make_fill_posts(bm, edges, **kwargs):
     pass
 
-def make_fill_walls(bm, edges, cph, cpw, **kwargs):
+def make_fill_walls(bm, edges, cph, cpw, ww, **kwargs):
     for edge in edges:
         v1, v2 = edge.verts
+        _dir = (v1.co - v2.co).normalized()
 
-        size  = [edge.calc_length()/2 - cpw, cph/2]
-        pos   = (v1.co + v2.co) / 2 + Vector((0, 0, cph/2))
-        axis  = 'X' if v1.co.y == v2.co.y else 'Y'
-        if axis == 'X':
-            width, height = size
-        else:
-            height, width = size
-
-        wall = plane(bm, width, height)
-        bmesh.ops.translate(bm, verts=wall['verts'], vec=pos)
-        bmesh.ops.rotate(bm, cent=pos, verts=wall['verts'],
-            matrix=Matrix.Rotation(math.radians(90), 4, axis))
-
-
+        start = v1.co - (_dir * cpw)
+        end = v2.co + (_dir * cpw)
+        create_wall(bm, start, end, cph, ww)
 
 '''
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
@@ -258,6 +248,27 @@ def create_cylinder(bm, r, h, segs, position):
     cy = cylinder(bm, r, h, segs)
     bmesh.ops.translate(bm, verts=cy['verts'], vec=position)
     return cy
+
+def create_wall(bm, start, end, height, width):
+    """ Extrude a wall of height from start to end """
+    start_v1 = bm.verts.new(start)
+    start_v2 = bm.verts.new(start + Vector((0, 0, height)))
+    start_edge = bm.edges.new((start_v1, start_v2))
+
+    res = bmesh.ops.extrude_edge_only(bm, edges=[start_edge])
+    bmesh.ops.translate(bm,
+        vec=end-start,
+        verts=filter_geom(res['geom'], BMVert))
+
+    if width:
+        face = filter_geom(res['geom'], BMFace)[-1]
+        face.normal_flip()
+        n = face.normal
+
+        res = bmesh.ops.extrude_face_region(bm, geom=[face])
+        bmesh.ops.translate(bm,
+            vec=-n*width,
+            verts=filter_geom(res['geom'], BMVert))
 
 def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
