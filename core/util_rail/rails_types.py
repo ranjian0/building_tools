@@ -57,6 +57,7 @@ def make_railing(bm, remove_colinear, **kwargs):
     loops = list(set(loops))
 
     if remove_colinear:
+        # TODO - make this work on loop with more than two links
         # - remove loops where edges are parallel, and both link_edges in selection
         flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
         flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
