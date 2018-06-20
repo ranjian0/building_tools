@@ -128,19 +128,22 @@ class MakeRailing:
             elif fill == 'WALL':
                 self.make_fill_walls(bm, edge, **kwargs)
 
-    def make_fill_rails(self, bm, edge, rc, rs, **kwargs):
-        num_rails = int((cph / rh) * rd)
-        if len(set([v.co.x for v in e.verts])) == 1:
-            size = (cpw / 2, e.calc_length() - (cpw * 2), rh)
-            st = Vector((cen.x + off_x, cen.y, cen.z))
-            sp = Vector((cen.x + off_x, cen.y, cen.z + cph))
+    def make_fill_rails(self, bm, edge, cpw, cph, rc, rs, **kwargs):
+        v1, v2 = edge.verts
+        _dir = (v1.co - v2.co).normalized()
+        tan = edge_tangent(edge)
+
+        off = tan.normalized() * (cpw/2)
+        start = calc_edge_median(edge) + off
+        stop = calc_edge_median(edge) + off + Vector((0, 0, cph))
+
+        if len(set([v.co.x for v in edge.verts])) == 1:
+            size = (rs, edge.calc_length() - (cpw * 2), rs)
         else:
-            size = (e.calc_length() - (cpw * 2), cpw / 2, rh)
-            st = Vector((cen.x, cen.y + off_y, cen.z))
-            sp = Vector((cen.x, cen.y + off_y, cen.z + cph))
+            size = (edge.calc_length() - (cpw * 2), rs, rs)
 
         rail = cube(bm, *size)
-        array_elements(bm, rail, num_rails, st, sp)
+        array_elements(bm, rail, rc, start, stop)
 
     def make_fill_posts(self, bm, edge, **kwargs):
         pass
@@ -155,11 +158,7 @@ class MakeRailing:
 
         v1, v2 = edge.verts
         _dir = (v1.co - v2.co).normalized()
-        tan = None
-        for l in edge.link_loops:
-            t = edge.calc_tangent(l)
-            if not round(t.z):
-                tan = t
+        tan = edge_tangent(edge)
 
         start = v1.co - (_dir * off)
         end = v2.co + (_dir * off)
@@ -243,6 +242,14 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
             array_elements(bm, post, num_posts, start, stop)
 
 '''
+
+def edge_tangent(edge):
+    tan = None
+    for l in edge.link_loops:
+        t = edge.calc_tangent(l)
+        if not round(t.z):
+            tan = t
+    return tan
 
 def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor=False):
     """ Create rail on top of posts """
