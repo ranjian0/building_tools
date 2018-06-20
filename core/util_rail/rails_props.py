@@ -2,20 +2,12 @@ import bpy
 from bpy.props import *
 
 class RailProperty(bpy.types.PropertyGroup):
-    pw = FloatProperty(
-        name="Post Width", min=0.01, max=100.0, default=0.15,
-        description="Width of each post")
+    ps = FloatProperty(
+        name="Post Size", min=0.01, max=100.0, default=0.15,
+        description="Size of each post")
 
-    ps = IntProperty(
-        name="Post Segments", min=3, max=256, default=6,
-        description="Number of segments for circular posts")
-
-    ph = FloatProperty(
-        name="Post Height", min=0.01, max=100.0, default=0.7,
-        description="Height of each post")
-
-    pd = FloatProperty(
-        name="Post Density", min=0.0, max=1.0, default=0.9,
+    pc = IntProperty(
+        name="Post Count", min=0, max=100, default=3,
         description="Number of posts along each edge")
 
     rs = FloatProperty(
@@ -68,6 +60,10 @@ class RailProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.fill == 'POSTS':
             col = box.column(align=True)
+            col.prop(self, 'pc')
+            col.prop(self, 'ps')
+
+            col = box.column(align=True)
             # col.prop(self, 'rh')
             # col.prop(self, 'rw')
 
@@ -82,13 +78,13 @@ class RailProperty(bpy.types.PropertyGroup):
             row.prop(self, 'remove_colinear', toggle=True)
             row.prop(self, 'has_decor', toggle=True)
 
-            box2 = box.box()
-            box2.label("Inner Posts")
+            # box2 = box.box()
+            # box2.label("Inner Posts")
 
-            col = box2.column(align=True)
-            col.prop(self, 'pw')
-            col.prop(self, 'ph')
-            col.prop(self, 'pd')
+            # col = box2.column(align=True)
+            # col.prop(self, 'pw')
+            # col.prop(self, 'ph')
+            # col.prop(self, 'pd')
 
         elif self.fill == 'RAILS':
             col = box.column(align=True)
