@@ -3,7 +3,7 @@ from bpy.props import *
 
 class RailProperty(bpy.types.PropertyGroup):
     ps = FloatProperty(
-        name="Post Size", min=0.01, max=100.0, default=0.15,
+        name="Post Size", min=0.01, max=100.0, default=0.05,
         description="Size of each post")
 
     pc = IntProperty(
