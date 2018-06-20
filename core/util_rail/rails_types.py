@@ -146,8 +146,14 @@ class MakeRailing:
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
         array_elements(bm, rail, rc, start, stop)
 
-    def make_fill_posts(self, bm, edge, **kwargs):
-        pass
+    def make_fill_posts(self, bm, edge, cpw, cph, **kwargs):
+        v1, v2 = edge.verts
+        _dir = (v1.co - v2.co).normalized()
+        tan = edge_tangent(edge)
+
+        off = tan.normalized() * (cpw/2)
+        start = v1.co + off + Vector((0, 0, cph/2))
+        end = v2.co + off + Vector((0, 0, cph/2))
 
     def make_fill_walls(self, bm, edge, cph, cpw, ww, **kwargs):
         off = cpw
@@ -185,44 +191,10 @@ def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has
     # edges = list(new_bm.edges)
 
 
-    # Create Corner posts
-    # -- required by all types
-    verts = list({vert for e in edges for vert in e.verts})
-    angles = list([ref.angle(v.co) for v in verts])
-    vsorted = sorted(verts, key=lambda v:angles[verts.index(v)])
-
-    for v in {vert for e in edges for vert in e.verts}:
-        link_edges = list({e for e in v.link_edges
-                    for vert in e.verts if vert != v and vert.co.z == v.co.z})
-        link_verts = [e.other_vert(v) for e in link_edges]
-
-        vec = calc_verts_median(link_verts)
-        off_x = -cpw / 2 if v.co.x > vec.x else cpw / 2
-        off_y = -cpw / 2 if v.co.y > vec.y else cpw / 2
-
-        _cph = cph if has_decor else cph + rh
-        pos = (v.co.x + off_x, v.co.y + off_y, v.co.z + (_cph / 2))
-
-        corner_post(bm, (cpw, cpw, _cph), pos, has_decor)
-
     for e in edges:
         cen = calc_edge_median(e)
         off_x = -pw / 4 if cen.x > ref.x else pw / 4
         off_y = -pw / 4 if cen.y > ref.y else pw / 4
-
-        if fill == 'RAILS':  # has_rails:
-            num_rails = int((cph / rh) * rd)
-            if len(set([v.co.x for v in e.verts])) == 1:
-                size = (cpw / 2, e.calc_length() - (cpw * 2), rh)
-                st = Vector((cen.x + off_x, cen.y, cen.z))
-                sp = Vector((cen.x + off_x, cen.y, cen.z + cph))
-            else:
-                size = (e.calc_length() - (cpw * 2), cpw / 2, rh)
-                st = Vector((cen.x, cen.y + off_y, cen.z))
-                sp = Vector((cen.x, cen.y + off_y, cen.z + cph))
-
-            rail = cube(bm, *size)
-            array_elements(bm, rail, num_rails, st, sp)
 
         elif fill == 'POSTS':  # has_mid_posts:
             # create top rail
