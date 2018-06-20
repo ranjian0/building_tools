@@ -130,19 +130,18 @@ class MakeRailing:
 
     def make_fill_rails(self, bm, edge, cpw, cph, rc, rs, **kwargs):
         v1, v2 = edge.verts
-        _dir = (v1.co - v2.co).normalized()
+        dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
 
         off = tan.normalized() * (cpw/2)
         start = calc_edge_median(edge) + off
         stop = calc_edge_median(edge) + off + Vector((0, 0, cph))
-
-        if len(set([v.co.x for v in edge.verts])) == 1:
-            size = (rs, edge.calc_length() - (cpw * 2), rs)
-        else:
-            size = (edge.calc_length() - (cpw * 2), rs, rs)
+        size = (edge.calc_length() - (cpw * 2), rs, rs)
 
         rail = cube(bm, *size)
+        bmesh.ops.rotate(bm, verts=rail['verts'],
+            cent=calc_verts_median(rail['verts']),
+            matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
         array_elements(bm, rail, rc, start, stop)
 
     def make_fill_posts(self, bm, edge, **kwargs):
