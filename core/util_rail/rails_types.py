@@ -104,7 +104,7 @@ class MakeRailing:
             if segments == 4 or segments < 0: # - (90 or 180)
                 post = create_cube(bm, (cpw, cpw, cph), pos)
 
-                del_faces(bm, post, top=has_decor)
+                del_faces(bm, post, bottom=True, top=has_decor)
                 if has_decor:
                     px, py, pz = pos
                     _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
@@ -146,23 +146,36 @@ class MakeRailing:
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
         array_elements(bm, rail, rc, start, stop)
 
-    def make_fill_posts(self, bm, edge, cpw, cph, pc, ps, **kwargs):
+    def make_fill_posts(self, bm, edge, cpw, cph, pc, ps, rs, **kwargs):
         v1, v2 = edge.verts
         dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
 
+        # -- add posts
         off = tan.normalized() * (cpw/2)
-        start = v1.co + off + Vector((0, 0, cph/2))
-        stop = v2.co + off + Vector((0, 0, cph/2))
-        size = (ps, ps, cph)
+        start = v1.co + off + Vector((0, 0, cph/2 - rs/2))
+        stop = v2.co + off + Vector((0, 0, cph/2 - rs/2))
+        size = (ps, ps, cph-rs)
 
         post = cube(bm, *size)
-        del_faces(bm, post, top=False)
+        del_faces(bm, post, top=True, bottom=True)
 
         bmesh.ops.rotate(bm, verts=post['verts'],
             cent=calc_verts_median(post['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
         array_elements(bm, post, pc, start, stop)
+
+        # -- add top rail
+        rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs))
+        size = (edge.calc_length() - (cpw * 2), 2*rs, rs)
+
+        rail = create_cube(bm, size, rail_pos)
+        del_faces(bm, rail, left=True, right=True)
+
+        bmesh.ops.rotate(bm, verts=rail['verts'],
+            cent=calc_verts_median(rail['verts']),
+            matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
+
 
     def make_fill_walls(self, bm, edge, cph, cpw, ww, **kwargs):
         off = cpw
@@ -282,7 +295,7 @@ def create_wall(bm, start, end, height, width, tangent):
             vec=-n*width,
             verts=filter_geom(res['geom'], BMVert))
 
-def del_faces(bm, post, top=True, bottom=True, left=False, right=False, front=False, back=False):
+def del_faces(bm, post, top=False, bottom=False, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
     vts = post['verts']
     keys = ['z', 'z', 'x', 'x', 'y', 'y']
