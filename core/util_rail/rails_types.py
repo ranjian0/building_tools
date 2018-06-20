@@ -145,7 +145,7 @@ class MakeRailing:
         off = tan.normalized() * (cpw/2)
         start = calc_edge_median(edge) + off
         stop = calc_edge_median(edge) + off + Vector((0, 0, cph))
-        size = (edge.calc_length() - (cpw * 2), rs, rs)
+        size = (edge.calc_length(), rs, rs)
 
         rail = cube(bm, *size)
         del_faces(bm, rail, left=True, right=True)
@@ -175,8 +175,8 @@ class MakeRailing:
         array_elements(bm, post, pc, start, stop)
 
         # -- add top rail
-        rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs))
-        size = (edge.calc_length() - (cpw * 2), 2*rs, rs)
+        rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs/2))
+        size = (edge.calc_length(), 2*rs, rs)
 
         rail = create_cube(bm, size, rail_pos)
         del_faces(bm, rail, left=True, right=True)
