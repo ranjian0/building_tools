@@ -176,7 +176,6 @@ class MakeRailing:
             cent=calc_verts_median(rail['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
 
-
     def make_fill_walls(self, bm, edge, cph, cpw, ww, **kwargs):
         off = cpw
         if self.wall_switch:
@@ -193,50 +192,6 @@ class MakeRailing:
         end = v2.co + (_dir * off)
         create_wall(bm, start, end, cph, ww, tan)
 
-'''
-def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
-    """Creates rails and posts along selected edges
-
-    Args:
-        bm    (bmesh.types.BMesh): bmesh of current edit mesh
-        edges (list): list of edges to create rails along
-        *args: items from RailsProperty, see rail_props.py
-        **kwargs: Extra kwargs
-    """
-
-    # calculate reference from face(s)
-    lfaces = list({f for e in edges for f in e.link_faces if f.normal.z})
-    ref = calc_verts_median(list({v for f in lfaces for v in f.verts}))
-
-    # merge colinear edges into single edge
-    # new_bm = merge_colinear_edges(edges)
-    # edges = list(new_bm.edges)
-
-
-    for e in edges:
-        cen = calc_edge_median(e)
-        off_x = -pw / 4 if cen.x > ref.x else pw / 4
-        off_y = -pw / 4 if cen.y > ref.y else pw / 4
-
-        elif fill == 'POSTS':  # has_mid_posts:
-            # create top rail
-            create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor)
-
-            # create posts
-            num_posts = int((e.calc_length() / (pw * 2)) * pd)
-            st, sp = [v.co for v in e.verts]
-            if st.x == sp.x:
-                start = Vector((st.x + off_x, st.y, st.z + ph / 2))
-                stop = Vector((sp.x + off_x, sp.y, sp.z + ph / 2))
-            else:
-                start = Vector((st.x, st.y + off_y, st.z + ph / 2))
-                stop = Vector((sp.x, sp.y + off_y, sp.z + ph / 2))
-
-            post = cube(bm, pw / 2, pw / 2, ph)
-            del_faces(bm, post)
-            array_elements(bm, post, num_posts, start, stop)
-
-'''
 
 def edge_tangent(edge):
     tan = None
@@ -245,21 +200,6 @@ def edge_tangent(edge):
         if not round(t.z):
             tan = t
     return tan
-
-def create_rail(bm, e, cen, off_x, off_y, rw, rh, cph, cpw, has_decor=False):
-    """ Create rail on top of posts """
-    factor = 3 if has_decor else 2
-    if len(set([v.co.x for v in e.verts])) == 1:
-        size = (rw, e.calc_length() - (cpw * factor), rh)
-        pos  = cen.x + off_x, cen.y, cen.z + cph + rh / 2
-        darg = (False,) * 4 + (True,) * 2
-    else:
-        size = (e.calc_length() - (cpw * factor), rw, rh)
-        pos  = cen.x, cen.y + off_y, cen.z + cph + rh / 2
-        darg = (False,) * 2 + (True,) * 2 + (False,) * 2
-
-    rail = create_cube(bm, size, pos)
-    del_faces(bm, rail, *darg)
 
 def create_cube(bm, size, position):
     """ Create cube with size and at position"""
