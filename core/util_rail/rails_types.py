@@ -175,7 +175,8 @@ class MakeRailing:
         array_elements(bm, post, pc, start, stop)
 
         # -- add top rail
-        rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs/2))
+        pinch = 0.01 # offset to prevent z-buffer fighting
+        rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs/2 - pinch))
         size = (edge.calc_length(), 2*rs, rs)
 
         rail = create_cube(bm, size, rail_pos)
