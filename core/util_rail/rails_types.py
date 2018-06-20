@@ -143,10 +143,15 @@ class MakeRailing:
         for edge in edges:
             v1, v2 = edge.verts
             _dir = (v1.co - v2.co).normalized()
+            tan = None
+            for l in edge.link_loops:
+                t = edge.calc_tangent(l)
+                if not round(t.z):
+                    tan = t
 
             start = v1.co - (_dir * off)
             end = v2.co + (_dir * off)
-            create_wall(bm, start, end, cph, ww, self.wall_switch)
+            create_wall(bm, start, end, cph, ww, tan)
 
 '''
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
@@ -278,7 +283,7 @@ def create_cylinder(bm, r, h, segs, position):
     bmesh.ops.translate(bm, verts=cy['verts'], vec=position)
     return cy
 
-def create_wall(bm, start, end, height, width, switch):
+def create_wall(bm, start, end, height, width, tangent):
     """ Extrude a wall of height from start to end """
     start_v1 = bm.verts.new(start)
     start_v2 = bm.verts.new(start + Vector((0, 0, height)))
@@ -291,8 +296,7 @@ def create_wall(bm, start, end, height, width, switch):
 
     if width:
         face = filter_geom(res['geom'], BMFace)[-1]
-        if not switch:
-            # -- only flip for cube corner posts
+        if face.normal.to_tuple(3) != tangent.to_tuple(3):
             face.normal_flip()
         n = face.normal
 
