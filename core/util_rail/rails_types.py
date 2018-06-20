@@ -120,14 +120,15 @@ class MakeRailing:
 
     def make_fill(self, bm, edges, fill, **kwargs):
         """ Create fill types for railing """
-        if fill == 'RAILS':
-            self.make_fill_rails(bm, edges, **kwargs)
-        elif fill == 'POSTS':
-            self.make_fill_posts(bm, edges, **kwargs)
-        elif fill == 'WALL':
-            self.make_fill_walls(bm, edges, **kwargs)
+        for edge in edges:
+            if fill == 'RAILS':
+                self.make_fill_rails(bm, edge, **kwargs)
+            elif fill == 'POSTS':
+                self.make_fill_posts(bm, edge, **kwargs)
+            elif fill == 'WALL':
+                self.make_fill_walls(bm, edge, **kwargs)
 
-    def make_fill_rails(self, bm, edges, rc, rs, **kwargs):
+    def make_fill_rails(self, bm, edge, rc, rs, **kwargs):
         num_rails = int((cph / rh) * rd)
         if len(set([v.co.x for v in e.verts])) == 1:
             size = (cpw / 2, e.calc_length() - (cpw * 2), rh)
@@ -141,10 +142,10 @@ class MakeRailing:
         rail = cube(bm, *size)
         array_elements(bm, rail, num_rails, st, sp)
 
-    def make_fill_posts(self, bm, edges, **kwargs):
+    def make_fill_posts(self, bm, edge, **kwargs):
         pass
 
-    def make_fill_walls(self, bm, edges, cph, cpw, ww, **kwargs):
+    def make_fill_walls(self, bm, edge, cph, cpw, ww, **kwargs):
         off = cpw
         if self.wall_switch:
             # - a cylinder corner post was created, determine length of side with cosine rule
@@ -152,18 +153,17 @@ class MakeRailing:
             val_b = val_a * math.cos(self.corner_angle)
             off = math.sqrt(val_a - val_b)
 
-        for edge in edges:
-            v1, v2 = edge.verts
-            _dir = (v1.co - v2.co).normalized()
-            tan = None
-            for l in edge.link_loops:
-                t = edge.calc_tangent(l)
-                if not round(t.z):
-                    tan = t
+        v1, v2 = edge.verts
+        _dir = (v1.co - v2.co).normalized()
+        tan = None
+        for l in edge.link_loops:
+            t = edge.calc_tangent(l)
+            if not round(t.z):
+                tan = t
 
-            start = v1.co - (_dir * off)
-            end = v2.co + (_dir * off)
-            create_wall(bm, start, end, cph, ww, tan)
+        start = v1.co - (_dir * off)
+        end = v2.co + (_dir * off)
+        create_wall(bm, start, end, cph, ww, tan)
 
 '''
 def make_railing(bm, edges, pw, ph, pd, rw, rh, rd, ww, cpw, cph, hcp, fill, has_decor, **kwargs):
