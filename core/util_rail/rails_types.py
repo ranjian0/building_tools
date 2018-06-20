@@ -126,7 +126,6 @@ class MakeRailing:
                 cent=calc_verts_median(post['verts']),
                 matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
 
-
     def make_fill(self, bm, edges, fill, **kwargs):
         """ Create fill types for railing """
         for edge in edges:
