@@ -139,6 +139,8 @@ class MakeRailing:
         size = (edge.calc_length() - (cpw * 2), rs, rs)
 
         rail = cube(bm, *size)
+        del_faces(bm, rail, left=True, right=True)
+
         bmesh.ops.rotate(bm, verts=rail['verts'],
             cent=calc_verts_median(rail['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
