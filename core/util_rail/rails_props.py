@@ -19,7 +19,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Number of posts along each edge")
 
     rs = FloatProperty(
-        name="Rail Size", min=0.01, max=100.0, default=0.15,
+        name="Rail Size", min=0.01, max=100.0, default=0.05,
         description="Size of each rail")
 
     rc = IntProperty(
@@ -68,8 +68,8 @@ class RailProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.fill == 'POSTS':
             col = box.column(align=True)
-            col.prop(self, 'rh')
-            col.prop(self, 'rw')
+            # col.prop(self, 'rh')
+            # col.prop(self, 'rw')
 
             box1 = box.box()
             box1.label("Corner Posts")
@@ -92,8 +92,8 @@ class RailProperty(bpy.types.PropertyGroup):
 
         elif self.fill == 'RAILS':
             col = box.column(align=True)
-            col.prop(self, 'rh')
-            col.prop(self, 'rd')
+            col.prop(self, 'rc')
+            col.prop(self, 'rs')
 
             box1 = box.box()
             box1.label("Corner Posts")
