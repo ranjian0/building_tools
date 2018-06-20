@@ -127,8 +127,19 @@ class MakeRailing:
         elif fill == 'WALL':
             self.make_fill_walls(bm, edges, **kwargs)
 
-    def make_fill_rails(self, bm, edges, **kwargs):
-        pass
+    def make_fill_rails(self, bm, edges, rc, rs, **kwargs):
+        num_rails = int((cph / rh) * rd)
+        if len(set([v.co.x for v in e.verts])) == 1:
+            size = (cpw / 2, e.calc_length() - (cpw * 2), rh)
+            st = Vector((cen.x + off_x, cen.y, cen.z))
+            sp = Vector((cen.x + off_x, cen.y, cen.z + cph))
+        else:
+            size = (e.calc_length() - (cpw * 2), cpw / 2, rh)
+            st = Vector((cen.x, cen.y + off_y, cen.z))
+            sp = Vector((cen.x, cen.y + off_y, cen.z + cph))
+
+        rail = cube(bm, *size)
+        array_elements(bm, rail, num_rails, st, sp)
 
     def make_fill_posts(self, bm, edges, **kwargs):
         pass

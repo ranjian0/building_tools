@@ -18,16 +18,12 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Post Density", min=0.0, max=1.0, default=0.9,
         description="Number of posts along each edge")
 
-    rw = FloatProperty(
-        name="Rail Width", min=0.01, max=100.0, default=0.15,
-        description="Width of each rail")
+    rs = FloatProperty(
+        name="Rail Size", min=0.01, max=100.0, default=0.15,
+        description="Size of each rail")
 
-    rh = FloatProperty(
-        name="Rail Height", min=0.01, max=100.0, default=0.025,
-        description="Height of each rail")
-
-    rd = FloatProperty(
-        name="Rail Density", min=0.0, max=1.0, default=0.2,
+    rc = IntProperty(
+        name="Rail Count", min=0, max=100, default=3,
         description="Number of rails over each edge")
 
     ww = FloatProperty(
