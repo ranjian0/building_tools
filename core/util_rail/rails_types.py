@@ -93,6 +93,7 @@ class MakeRailing:
         num_poly = lambda ang: round((2*math.pi) / (math.pi - ang))
         for loop in loops:
             v = loop.vert
+            e = loop.edge
 
             vec = loop.calc_tangent()
             off_x = math.copysign(cpw/2, vec.x)
@@ -117,6 +118,14 @@ class MakeRailing:
                 self.wall_switch = True
                 self.num_corners = segments
                 self.corner_angle = math.pi - angle
+
+            # -- align
+            v1, v2 = e.verts
+            dx, dy = (v1.co - v2.co).normalized().xy
+            bmesh.ops.rotate(bm, verts=post['verts'],
+                cent=calc_verts_median(post['verts']),
+                matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
+
 
     def make_fill(self, bm, edges, fill, **kwargs):
         """ Create fill types for railing """
