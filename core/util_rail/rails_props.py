@@ -15,7 +15,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Size of each rail")
 
     rd = FloatProperty(
-        name="Rail Desnsity", min=0.0, max=1.0, default=.3,
+        name="Rail Density", min=0.0, max=1.0, default=.3,
         description="Number of rails over each edge")
 
     ww = FloatProperty(
@@ -63,9 +63,8 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'pd')
             col.prop(self, 'ps')
 
-            col = box.column(align=True)
-            # col.prop(self, 'rh')
-            # col.prop(self, 'rw')
+            # col = box.column(align=True)
+            # col.prop(self, 'rs')
 
             box1 = box.box()
             box1.label("Corner Posts")
@@ -77,14 +76,6 @@ class RailProperty(bpy.types.PropertyGroup):
             row = box1.row(align=True)
             row.prop(self, 'remove_colinear', toggle=True)
             row.prop(self, 'has_decor', toggle=True)
-
-            # box2 = box.box()
-            # box2.label("Inner Posts")
-
-            # col = box2.column(align=True)
-            # col.prop(self, 'pw')
-            # col.prop(self, 'ph')
-            # col.prop(self, 'pd')
 
         elif self.fill == 'RAILS':
             col = box.column(align=True)
@@ -98,7 +89,9 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'cpw')
             col.prop(self, 'cph')
 
-            box1.prop(self, 'has_decor')
+            row = box1.row(align=True)
+            row.prop(self, 'remove_colinear', toggle=True)
+            row.prop(self, 'has_decor', toggle=True)
 
         elif self.fill == 'WALL':
             col = box.column(align=True)
@@ -111,4 +104,6 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'cpw')
             col.prop(self, 'cph')
 
-            box1.prop(self, 'has_decor')
+            row = box1.row(align=True)
+            row.prop(self, 'remove_colinear', toggle=True)
+            row.prop(self, 'has_decor', toggle=True)
