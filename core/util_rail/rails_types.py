@@ -136,7 +136,7 @@ class MakeRailing:
             elif fill == 'WALL':
                 self.make_fill_walls(bm, edge, **kwargs)
 
-    def make_fill_rails(self, bm, edge, cpw, cph, rc, rs, **kwargs):
+    def make_fill_rails(self, bm, edge, cpw, cph, rd, rs, **kwargs):
         v1, v2 = edge.verts
         dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
@@ -152,9 +152,11 @@ class MakeRailing:
         bmesh.ops.rotate(bm, verts=rail['verts'],
             cent=calc_verts_median(rail['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
-        array_elements(bm, rail, rc, start, stop)
 
-    def make_fill_posts(self, bm, edge, cpw, cph, pc, ps, rs, **kwargs):
+        rail_count = int((cph / rs) * rd)
+        array_elements(bm, rail, rail_count, start, stop)
+
+    def make_fill_posts(self, bm, edge, cpw, cph, pd, ps, rs, **kwargs):
         v1, v2 = edge.verts
         dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
@@ -171,7 +173,9 @@ class MakeRailing:
         bmesh.ops.rotate(bm, verts=post['verts'],
             cent=calc_verts_median(post['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
-        array_elements(bm, post, pc, start, stop)
+
+        post_count = int((edge.calc_length() / ps) * pd)
+        array_elements(bm, post, post_count, start, stop)
 
         # -- add top rail
         pinch = 0.01 # offset to prevent z-buffer fighting
@@ -197,8 +201,8 @@ class MakeRailing:
         _dir = (v1.co - v2.co).normalized()
         tan = edge_tangent(edge)
 
-        start = v1.co - (_dir * off)
-        end = v2.co + (_dir * off)
+        start = v1.co - (_dir * off) if self.wall_switch else v1.co
+        end   = v2.co + (_dir * off) if self.wall_switch else v2.co
         create_wall(bm, start, end, cph, ww, tan)
 
 

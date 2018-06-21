@@ -6,16 +6,16 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Post Size", min=0.01, max=100.0, default=0.05,
         description="Size of each post")
 
-    pc = IntProperty(
-        name="Post Count", min=0, max=100, default=3,
+    pd = FloatProperty(
+        name="Post Density", min=0.0, max=1.0, default=.3,
         description="Number of posts along each edge")
 
     rs = FloatProperty(
         name="Rail Size", min=0.01, max=100.0, default=0.05,
         description="Size of each rail")
 
-    rc = IntProperty(
-        name="Rail Count", min=0, max=100, default=3,
+    rd = FloatProperty(
+        name="Rail Desnsity", min=0.0, max=1.0, default=.3,
         description="Number of rails over each edge")
 
     ww = FloatProperty(
@@ -60,7 +60,7 @@ class RailProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.fill == 'POSTS':
             col = box.column(align=True)
-            col.prop(self, 'pc')
+            col.prop(self, 'pd')
             col.prop(self, 'ps')
 
             col = box.column(align=True)
@@ -88,7 +88,7 @@ class RailProperty(bpy.types.PropertyGroup):
 
         elif self.fill == 'RAILS':
             col = box.column(align=True)
-            col.prop(self, 'rc')
+            col.prop(self, 'rd')
             col.prop(self, 'rs')
 
             box1 = box.box()
