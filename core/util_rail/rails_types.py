@@ -50,16 +50,12 @@ class MakeRailing:
         self.make_railing(bm, edges, lfaces, **kwargs)
         bmcopy.free()
 
-
     def from_edges(self, bm, edges, **kwargs):
         """ Create railing from edges """
         verts = list({v for e in edges for v in e.verts})
         lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
 
         self.make_railing(bm, edges, lfaces, **kwargs)
-
-    def from_faces(cls, bm, faces, **kwargs):
-        pass
 
     def make_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
         """Creates rails and posts along selected edges
