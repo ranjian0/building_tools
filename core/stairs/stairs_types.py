@@ -164,11 +164,45 @@ def make_railing_left(bm, face, normal, **kwargs):
         **kwargs: Description
     """
 
-    # -- determine front and right edges, based on normal
-    pass
+    # -- determine front and left edges
+    valid_edges = []
+    valid_loops = [l for l in face.loops]
+    for e in face.edges:
+        for loop in e.link_loops:
+            if loop in valid_loops:
+                tan = e.calc_tangent(loop)
+                if tan == -normal:
+                    valid_edges.append(e)
+
+                if round(normal.cross(tan).z) < 0:
+                    valid_edges.append(e)
+
+    MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 def make_railing_right(bm, face, normal, **kwargs):
-    pass
+    """Create rails for landing when stair direction is right
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of current edit object
+        face (bmesh.types.BMFace): Top face of the landing
+        normal (Vector3): Normal direction for the initial face of stairs
+        **kwargs: Description
+    """
+
+    # -- determine front and right edges
+    valid_edges = []
+    valid_loops = [l for l in face.loops]
+    for e in face.edges:
+        for loop in e.link_loops:
+            if loop in valid_loops:
+                tan = e.calc_tangent(loop)
+                if tan == -normal:
+                    valid_edges.append(e)
+
+                if round(normal.cross(tan).z) > 0:
+                    valid_edges.append(e)
+
+    MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 def make_step_railing(faces, landing, direction):
     pass
