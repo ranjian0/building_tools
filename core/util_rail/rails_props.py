@@ -63,9 +63,6 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'pd')
             col.prop(self, 'ps')
 
-            # col = box.column(align=True)
-            # col.prop(self, 'rs')
-
             box1 = box.box()
             box1.label("Corner Posts")
 
