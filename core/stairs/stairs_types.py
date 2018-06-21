@@ -3,7 +3,7 @@ import itertools as it
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge
 
-from ..util_rail import rails_types as rails
+from ..util_rail.rails_types import MakeRailing
 from ...utils import (
     split,
     select,
@@ -86,8 +86,8 @@ def make_stairs(bm, faces, step_count, step_width, landing, landing_width, stair
                 ext_face = min([f for f in filter_geom(res['geom_inner'], BMVert)[-1].link_faces],
                     key=lambda f: f.calc_center_median().z)
 
-    # if railing:
-    #     make_stairs_railing(bm, init_normal, top_faces, landing, stair_direction, **kwargs)
+    if railing:
+        make_stairs_railing(bm, init_normal, top_faces, landing, stair_direction, **kwargs)
 
 def make_stair_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
@@ -103,7 +103,6 @@ def make_stair_split(bm, face, size, off, **kwargs):
         bmesh.types.BMFace: New face created after split
     """
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
-
 
 def make_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwargs):
     """Create railing for stairs
@@ -143,16 +142,17 @@ def make_railing_front(bm, face, normal, **kwargs):
         **kwargs: Description
     """
 
-    # -- determine left and right edges, based on normal
+    # -- determine left and right edges
     valid_edges = []
-    ref = face.calc_center_median()
+    valid_loops = [l for l in face.loops]
     for e in face.edges:
-        diff = ref - calc_edge_median(e)
-        if diff * Vector(map(abs, normal.to_tuple(1))) == 0: # MAGIC!!
-            valid_edges.append(e)
+        for loop in e.link_loops:
+            if loop in valid_loops:
+                tan = e.calc_tangent(loop)
+                if round(normal.cross(tan).z):
+                    valid_edges.append(e)
 
-    # -- add railing on edges
-    rails.make_railing(bm, valid_edges, **kwargs)
+    MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 def make_railing_left(bm, face, normal, **kwargs):
     """Create rails for landing when stair direction is left
@@ -167,7 +167,7 @@ def make_railing_left(bm, face, normal, **kwargs):
     # -- determine front and right edges, based on normal
     pass
 
-def make_railing_right(face, normal):
+def make_railing_right(bm, face, normal, **kwargs):
     pass
 
 def make_step_railing(faces, landing, direction):
