@@ -5,7 +5,7 @@ import itertools as it
 from math import copysign
 from mathutils import Vector, Matrix
 
-from bmesh.types import BMVert, BMFace
+from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     cube,
     plane,
@@ -247,6 +247,12 @@ def create_wall(bm, start, end, height, width, tangent):
         bmesh.ops.translate(bm,
             vec=-n*width,
             verts=filter_geom(res['geom'], BMVert))
+
+        # delete hidden geom
+        edges = filter_geom(res['geom'], BMEdge)
+        faces = [f for e in edges for f in e.link_faces
+                    if not f.normal.z and f not in filter_geom(res['geom'], BMFace)]
+        bmesh.ops.delete(bm, geom=faces, context=3)
 
 def del_faces(bm, post, top=False, bottom=False, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
