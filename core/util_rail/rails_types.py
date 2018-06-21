@@ -44,7 +44,6 @@ class MakeRailing:
             verts = list({v for e in edges for v in e.verts})
             lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
 
-
         if len(lfaces) > 1:
             bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
@@ -52,36 +51,12 @@ class MakeRailing:
         bmcopy.free()
 
 
-    def from_edges(cls, bm, edges, remove_colinear, **kwargs):
-        # find valid link faces
+    def from_edges(self, bm, edges, **kwargs):
+        """ Create railing from edges """
         verts = list({v for e in edges for v in e.verts})
         lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
 
-        bmcopy = bm.copy()
-        loops = []
-        for e in edges:
-            for v in e.verts:
-                # loops.extend([l for l in v.link_loops])
-                if len(v.link_loops) > 1:
-                    # - make sure we add loop whose face is in lfaces
-                    loops.extend([l for l in v.link_loops if l.face in lfaces])
-                else:
-                    loops.extend([l for l in v.link_loops])
-        loops = list(set(loops))
-
-        if remove_colinear:
-            # TODO - make this work on loop with more than two links
-            # - remove loops where edges are parallel, and both link_edges are in selection
-            flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
-            flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
-
-            cls.colinear_loops.extend([l for l in loops if (flt_parallel(l) and flt_mid(l))])
-            loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
-
-        cls.make_corner_post(cls, bm, loops, **kwargs)
-        cls.make_fill(bm, edges, **kwargs)
-        bmesh.ops.remove_doubles(bm, verts=bm.verts)
-        bmcopy.free()
+        self.make_railing(bm, edges, lfaces, **kwargs)
 
     def from_faces(cls, bm, faces, **kwargs):
         pass
