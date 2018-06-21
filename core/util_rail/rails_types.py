@@ -26,6 +26,9 @@ class MakeRailing:
         self.corner_angle = 0
         self.num_corners = 1
 
+        # -- global state {remove colinear}
+        self.colinear_loops = []
+
         # -- execute from user selection
         self.make_railing(*args, **kwargs)
 
@@ -76,12 +79,12 @@ class MakeRailing:
 
         if remove_colinear:
             # TODO - make this work on loop with more than two links
-            # - remove loops where edges are parallel, and both link_edges in selection
+            # - remove loops where edges are parallel, and both link_edges are in selection
             flt_parallel = lambda loop: round(loop.calc_angle(),3) == 3.142
             flt_mid = lambda loop: loop.link_loop_next in loops and loop.link_loop_prev in loops
 
+            self.colinear_loops.extend([l for l in loops if (flt_parallel(l) and flt_mid(l))])
             loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
-
 
         self.make_corner_post(bm, loops, **kwargs)
         self.make_fill(bm, edges, **kwargs)
