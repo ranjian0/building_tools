@@ -137,7 +137,7 @@ class MakeRailing:
             elif fill == 'WALL':
                 self.make_fill_walls(bm, edge, **kwargs)
 
-    def make_fill_rails(self, bm, edge, cpw, cph, rd, rs, **kwargs):
+    def make_fill_rails(self, bm, edge, cpw, cph, rd, rs, expand, **kwargs):
         v1, v2 = edge.verts
         dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
@@ -145,7 +145,10 @@ class MakeRailing:
         off = tan.normalized() * (cpw/2)
         start = calc_edge_median(edge) + off
         stop = calc_edge_median(edge) + off + Vector((0, 0, cph))
-        size = (edge.calc_length(), rs, rs)
+        if expand:
+            size = (edge.calc_length(), rs, rs)
+        else:
+            size = (edge.calc_length() - (cpw * 2), rs, rs)
 
         rail = cube(bm, *size)
         del_faces(bm, rail, left=True, right=True)
@@ -202,7 +205,7 @@ class MakeRailing:
             cent=calc_verts_median(rail['verts']),
             matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
 
-    def make_fill_walls(self, bm, edge, cph, cpw, ww, **kwargs):
+    def make_fill_walls(self, bm, edge, cph, cpw, ww, expand, **kwargs):
         off = cpw
         if self.wall_switch:
             # - a cylinder corner post was created, determine length of side with cosine rule
@@ -214,8 +217,17 @@ class MakeRailing:
         _dir = (v1.co - v2.co).normalized()
         tan = edge_tangent(edge)
 
-        start = v1.co - (_dir * off) if self.wall_switch else v1.co
-        end   = v2.co + (_dir * off) if self.wall_switch else v2.co
+        if self.wall_switch: # -- only for cyliner corner posts
+            start = v1.co - (_dir * off)
+            end   = v2.co + (_dir * off)
+        else:
+            if expand:
+                start = v1.co
+                end   = v2.co
+            else:
+                start = v1.co - (_dir * off)
+                end   = v2.co + (_dir * off)
+
         create_wall(bm, start, end, cph, ww, tan)
 
 

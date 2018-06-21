@@ -34,6 +34,10 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Corner Posts", default=True,
         description="Whether the railing has corner posts")
 
+    expand = BoolProperty(
+        name="Expand", default=False,
+        description="Whether to expand fill type to extremes")
+
     has_decor = BoolProperty(
         name="Has Decor", default=False,
         description="Whether corner posts have decor")
@@ -78,6 +82,7 @@ class RailProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, 'rd')
             col.prop(self, 'rs')
+            col.prop(self, 'expand', text="Expand Rails", toggle=True)
 
             box1 = box.box()
             box1.label("Corner Posts")
@@ -93,6 +98,7 @@ class RailProperty(bpy.types.PropertyGroup):
         elif self.fill == 'WALL':
             col = box.column(align=True)
             col.prop(self, 'ww')
+            col.prop(self, 'expand', text="Expand Walls", toggle=True)
 
             box1 = box.box()
             box1.label("Corner Posts")
