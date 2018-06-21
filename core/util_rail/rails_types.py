@@ -96,9 +96,8 @@ class MakeRailing:
             e = loop.edge
 
             vec = loop.calc_tangent()
-            off_x = math.copysign(cpw/2, vec.x)
-            off_y = math.copysign(cpw/2, vec.y)
-            pos = v.co + Vector((off_x, off_y, cph/2))
+            off = vec * math.sqrt(2 * ((cpw/2)**2))
+            pos = v.co + off + Vector((0, 0, cph/2))
 
             angle = loop.calc_angle()
             segments = num_poly(angle)
