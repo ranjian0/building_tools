@@ -179,6 +179,18 @@ class MakeRailing:
         post_count = int((edge.calc_length() / ps) * pd)
         array_elements(bm, post, post_count, start, stop)
 
+        # fill gaps created by remove colinear
+        if self.colinear_loops:
+            # -- fill spaces created by no corner posts
+            for loop in self.colinear_loops:
+                if loop.edge != edge:
+                    continue
+
+                v = loop.vert
+                p = v.co + off + Vector((0, 0, cph/2 - rs/2))
+                fill_post = create_cube(bm, size, p)
+                del_faces(bm, fill_post, top=True, bottom=True)
+
         # -- add top rail
         pinch = 0.01 # offset to prevent z-buffer fighting
         rail_pos = calc_edge_median(edge) + off + Vector((0, 0, cph - rs/2 - pinch))
