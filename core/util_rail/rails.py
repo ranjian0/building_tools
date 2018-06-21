@@ -15,7 +15,7 @@ class Rails:
         bm = bmesh.from_edit_mesh(me)
 
         if cls.validate(bm):
-            MakeRailing(bm, **kwargs_from_props(props))
+            MakeRailing().from_selection(bm, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {'FINISHED'}
         return {'CANCELLED'}
