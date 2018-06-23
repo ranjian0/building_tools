@@ -57,6 +57,10 @@ class MakeRailing:
 
         self.make_railing(bm, edges, lfaces, **kwargs)
 
+    def from_step_edges(self, bm, edges, **kwargs):
+        """ Create railing from stair step edges """
+        pass
+
     def make_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
         """Creates rails and posts along selected edges
 
