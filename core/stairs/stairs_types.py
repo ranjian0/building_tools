@@ -130,7 +130,7 @@ def make_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwarg
         step_faces = faces
 
     # --create railing for steps
-    make_step_railing(step_faces, has_landing, stair_direction)
+    make_step_railing(bm, normal, step_faces, has_landing, stair_direction)
 
 def make_railing_front(bm, face, normal, **kwargs):
     """Create rails for landing when stair direction is front
@@ -204,5 +204,5 @@ def make_railing_right(bm, face, normal, **kwargs):
 
     MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
-def make_step_railing(faces, landing, direction):
+def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
     pass
