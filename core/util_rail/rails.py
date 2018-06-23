@@ -23,12 +23,13 @@ class Rails:
     @classmethod
     def validate(cls, bm):
         """ Ensure valid user selection if any """
-        faces = [f for f in bm.edges if f.select]
+        faces = [f for f in bm.faces if f.select]
         if faces:
-            return True
+            if all([f.normal.z for f in faces]):
+                return True
 
         edges = [e for e in bm.edges if e.select]
-        if edges:
+        if edges and not faces:
             return True
 
         return False
