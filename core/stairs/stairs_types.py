@@ -186,7 +186,7 @@ def make_railing_right(bm, face, normal, **kwargs):
         bm (bmesh.types.BMesh): bmesh of current edit object
         face (bmesh.types.BMFace): Top face of the landing
         normal (Vector3): Normal direction for the initial face of stairs
-        **kwargs: Description
+        **kwargs: extra kwargs from StairProperty
     """
 
     # -- determine front and right edges
@@ -205,4 +205,14 @@ def make_railing_right(bm, face, normal, **kwargs):
     MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
+    """Create railing for stair steps
+
+    Args:
+        bm (bmesh.types.BMesh): current editmode bmesh
+        normal (Vector): Normal direction for the initial face of stairs
+        faces (bmesh.types.BMFace): Top faces for stairs
+        landing (bool): Whether the stairs have a landing
+        direction (str): The type of stair direction
+        **kwargs: extra kwargs from StairProperty
+    """
     pass
