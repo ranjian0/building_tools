@@ -216,6 +216,12 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
         **kwargs: extra kwargs from StairProperty
     """
 
+    # -- update normal based on stair direction
+    if direction == 'LEFT':
+        normal = normal.cross(Vector((0, 0, 1)))
+    elif direction == 'RIGHT':
+        normal = normal.cross(Vector((0, 0, -1)))
+
     # -- get all left and right edges
     left_edges = []
     right_edges = []
@@ -231,3 +237,12 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
 
                     if round(normal.cross(tan).z) > 0:
                         left_edges.append(edge)
+
+    # -- fiter edges based on direction
+    valid_edges = []
+    if direction == 'FRONT':
+        valid_edges.extend(left_edges + right_edges)
+    elif direction == 'LEFT':
+        valid_edges.extend(right_edges)
+    elif direction == 'RIGHT':
+        valid_edges.extend(left_edges)
