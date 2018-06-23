@@ -15,7 +15,7 @@ def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
 
     Args:
         *args: see balcony_props.py for types and description
-        **kwargs: extra kwargs from BalconyProperty not used in this function
+        **kwargs: extra kwargs from BalconyProperty
     """
 
     for f in faces:
