@@ -23,8 +23,11 @@ class Floor:
         bm = bmesh.from_edit_mesh(me)
 
         if cls.validate(bm):
-            edges = [e for e in bm.edges if e.is_boundary]
-            make_floors(bm, edges, **kwargs_from_props(props))
+            if any([f for f in bm.faces if f.select]):
+                make_floors(bm, None, **kwargs_from_props(props))
+            else:
+                edges = [e for e in bm.edges if e.is_boundary]
+                make_floors(bm, edges, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {'FINISHED'}
         return {'CANCELLED'}
