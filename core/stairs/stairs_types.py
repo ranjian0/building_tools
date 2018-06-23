@@ -215,4 +215,19 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
         direction (str): The type of stair direction
         **kwargs: extra kwargs from StairProperty
     """
-    pass
+
+    # -- get all left and right edges
+    left_edges = []
+    right_edges = []
+
+    for face in faces:
+        for edge in face.edges:
+            for loop in edge.link_loops:
+                if loop in [l for l in face.loops]:
+                    tan = edge.calc_tangent(loop)
+
+                    if round(normal.cross(tan).z) < 0:
+                        right_edges.append(edge)
+
+                    if round(normal.cross(tan).z) > 0:
+                        left_edges.append(edge)
