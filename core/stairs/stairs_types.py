@@ -97,7 +97,7 @@ def make_stair_split(bm, face, size, off, **kwargs):
         face (bmesh.types.BMFace): face to make split (must be quad)
         size (vector2): proportion of the new face to old face
         off  (vector3): how much to offset new face from center
-        **kwargs: Extra kwargs from WindowProperty
+        **kwargs: Extra kwargs from StairsProperty
 
     Returns:
         bmesh.types.BMFace: New face created after split
@@ -112,7 +112,7 @@ def make_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwarg
         faces (list): top faces of the stairs
         has_landing (bool): whether the stairs have landing
         stair_direction (Enum): Direction of stairs, if has_landing is true
-        **kwargs: Extra properties from StairsPropertyGroup
+        **kwargs: Extra kwargs from StairProperty
     """
 
     # -- create railing for landing
@@ -139,7 +139,7 @@ def make_railing_front(bm, face, normal, **kwargs):
         bm (bmesh.types.BMesh): bmesh of current edit object
         face (bmesh.types.BMFace): Top face of the landing
         normal (Vector3): Normal direction for the initial face of stairs
-        **kwargs: Description
+        **kwargs: extra kwargs from StairProperty
     """
 
     # -- determine left and right edges
@@ -161,7 +161,7 @@ def make_railing_left(bm, face, normal, **kwargs):
         bm (bmesh.types.BMesh): bmesh of current edit object
         face (bmesh.types.BMFace): Top face of the landing
         normal (Vector3): Normal direction for the initial face of stairs
-        **kwargs: Description
+        **kwargs: extra kwargs from StairProperty
     """
 
     # -- determine front and left edges
