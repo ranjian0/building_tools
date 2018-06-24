@@ -59,7 +59,9 @@ class MakeRailing:
 
     def from_step_edges(self, bm, edges, **kwargs):
         """ Create railing from stair step edges """
-        pass
+        verts = list({v for e in edges for v in e.verts})
+        lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
+
 
     def make_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
         """Creates rails and posts along selected edges
