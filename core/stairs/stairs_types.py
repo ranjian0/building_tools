@@ -247,4 +247,4 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
     elif direction == 'RIGHT':
         valid_edges.extend(left_edges)
 
-    MakeRailing().from_step_edges(bm, valid_edges, **kwargs)
+    MakeRailing().from_step_edges(bm, valid_edges, normal, **kwargs)

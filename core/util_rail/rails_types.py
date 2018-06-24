@@ -57,10 +57,41 @@ class MakeRailing:
 
         self.make_railing(bm, edges, lfaces, **kwargs)
 
-    def from_step_edges(self, bm, edges, **kwargs):
+    def from_step_edges(self, bm, edges, normal,
+        cpw, cph, has_decor, fill,
+        pd, ps, rs, **kwargs):
         """ Create railing from stair step edges """
         verts = list({v for e in edges for v in e.verts})
         lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
+
+        # - find lowest edges
+        min_edge = min(edges, key=lambda e: calc_edge_median(e).z)
+        low_edges = [e for e in edges
+            if round(calc_edge_median(e).z,3) == round(calc_edge_median(min_edge).z,3)]
+
+        # -- add corner post
+        for e in low_edges:
+            loop = [l for l in e.link_loops if l.face in lfaces][-1]
+            cen = calc_edge_median(e)
+            tan = e.calc_tangent(loop)
+            off = tan * cpw/2
+            pos = cen + off + Vector((0, 0, cph/2))
+
+
+            post = create_cube(bm, (cpw, cpw, cph), pos)
+
+            del_faces(bm, post, bottom=True, top=has_decor)
+            if has_decor:
+                px, py, pz = pos
+                _ = create_cube(bm, (cpw * 2, cpw * 2, cpw / 2), (px, py, pz + cph/2 + cpw / 4))
+
+        # -- add fill types
+        if fill == 'POSTS':
+            pass
+        elif fill == 'RAILS':
+            pass
+        elif fill == 'WALL':
+            pass
 
 
     def make_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
