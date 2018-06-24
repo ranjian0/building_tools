@@ -87,7 +87,18 @@ class MakeRailing:
 
         # -- add fill types
         if fill == 'POSTS':
-            pass
+            other_edges = list(set(edges) - set(low_edges))
+            # -- add mid posts
+            for e in other_edges:
+                loop = [l for l in e.link_loops if l.face in lfaces][-1]
+                cen = calc_edge_median(e)
+                tan = e.calc_tangent(loop)
+                off = tan * cpw/2
+                pos = cen + off + Vector((0, 0, cph/2 - rs/2))
+
+
+                post = create_cube(bm, (ps, ps, cph-rs), pos)
+
         elif fill == 'RAILS':
             pass
         elif fill == 'WALL':
