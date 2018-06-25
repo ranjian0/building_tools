@@ -3,7 +3,7 @@ import itertools as it
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge
 
-from ..util_rail.rails_types import MakeRailing
+from ..rails import MakeRailing
 from ...utils import (
     split,
     select,

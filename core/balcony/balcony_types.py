@@ -1,7 +1,7 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
 
-from ..util_rail.rails_types import MakeRailing
+from ..rails import MakeRailing
 from ...utils import (
     split,
     filter_geom,

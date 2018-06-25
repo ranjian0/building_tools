@@ -3,6 +3,7 @@ import bpy
 from .rails import Rails
 from .rails_ops import RailOperator
 from .rails_props import RailProperty
+from .rails_types import MakeRailing
 
 classes = (
     RailProperty, RailOperator
