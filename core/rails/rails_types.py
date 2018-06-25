@@ -57,7 +57,7 @@ class MakeRailing:
 
         self.make_railing(bm, edges, lfaces, **kwargs)
 
-    def from_step_edges(self, bm, edges, normal,
+    def from_step_edges(self, bm, edges, normal, direction,
         cpw, cph, has_decor, fill,
         pd, ps, rs, **kwargs):
         """ Create railing from stair step edges """
@@ -96,8 +96,34 @@ class MakeRailing:
                 off = tan * cpw/2
                 pos = cen + off + Vector((0, 0, cph/2 - rs/2))
 
-
                 post = create_cube(bm, (ps, ps, cph-rs), pos)
+
+            # -- add rail
+            rail_groups = []
+            if direction == 'FRONT':
+                ledges = edges[:int(len(edges)/2)]
+                redges = edges[int(len(edges)/2):]
+                rail_groups.append(ledges)
+                rail_groups.append(redges)
+            else:
+                rail_groups.append(edges)
+
+            for group in rail_groups:
+                cen = calc_verts_median([v for e in group for v in e.verts])
+                off = Vector((0, 0, cph))
+                pos = cen + off
+
+                length = sum([e.calc_length() for e in group])
+                size = (length, 2*rs, rs)
+
+                rail = cube(bm, *size)
+                bmesh.ops.translate(bm, vec=pos, verts=rail['verts'])
+
+                # --rotate
+            bmesh.ops.rotate(bm, verts=rail['verts'],
+                cent=calc_verts_median(rail['verts']),
+                matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, 'Z'))
+
 
         elif fill == 'RAILS':
             pass

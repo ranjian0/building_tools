@@ -238,7 +238,7 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
                     if round(normal.cross(tan).z) > 0:
                         left_edges.append(edge)
 
-    # -- fiter edges based on direction
+    # -- filter edges based on direction
     valid_edges = []
     if direction == 'FRONT':
         valid_edges.extend(left_edges + right_edges)
@@ -247,4 +247,4 @@ def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
     elif direction == 'RIGHT':
         valid_edges.extend(left_edges)
 
-    MakeRailing().from_step_edges(bm, valid_edges, normal, **kwargs)
+    MakeRailing().from_step_edges(bm, valid_edges, normal, direction, **kwargs)
