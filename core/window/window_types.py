@@ -5,7 +5,7 @@ from ...utils import (
     get_edit_mesh,
     )
 
-from ..util_fill import (
+from ..fill import (
     fill_bar,
     fill_louver,
     fill_glass_panes

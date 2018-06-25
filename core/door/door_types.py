@@ -14,7 +14,7 @@ from ...utils import (
     filter_horizontal_edges
     )
 
-from ..util_fill import (
+from ..fill import (
     fill_panel,
     fill_glass_panes,
     fill_louver,
