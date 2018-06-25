@@ -1,7 +1,7 @@
 import bpy
 
-from .util_fill import register_fill, unregister_fill
-from .util_rail import register_rail, unregister_rail
+from .fill import register_fill, unregister_fill
+from .rails import register_rail, unregister_rail
 
 from .door      import register_door, unregister_door
 from .floor     import register_floor, unregister_floor

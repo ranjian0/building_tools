@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 
 from ..generic import SizeOffsetProperty
-from ..util_fill import (
+from ..fill import (
     FillPanel, FillLouver, FillGlassPanes
 )
 

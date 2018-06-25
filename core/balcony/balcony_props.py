@@ -6,7 +6,7 @@ from bpy.props import (
     PointerProperty)
 
 from ..generic import SizeOffsetProperty
-from ..util_rail.rails_props import RailProperty
+from ..rails import RailProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
     width   = FloatProperty(

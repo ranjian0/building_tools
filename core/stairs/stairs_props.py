@@ -2,7 +2,7 @@ import bpy
 from bpy.props import *
 
 from ..generic import SizeOffsetProperty
-from ..util_rail.rails_props import RailProperty
+from ..rails import RailProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):
