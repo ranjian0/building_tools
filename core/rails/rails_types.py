@@ -238,12 +238,12 @@ class MakeRailing:
 
     def make_fill_posts(self, bm, edge, cpw, cph, pd, ps, rs, **kwargs):
         v1, v2 = edge.verts
-        dx, dy = (v1.co - v2.co).normalized().xy
-        tan = edge_tangent(edge)
+        vec = (v1.co - v2.co).normalized()
+        tan = edge_tangent(edge).normalized()
 
         # -- add posts
-        off = tan.normalized() * (cpw/2)
-        gap = (v1.co - v2.co).normalized() * cpw
+        off = tan * (cpw/2)
+        gap = vec * cpw
         start = v1.co + off + Vector((0, 0, cph/2 - rs/2)) + gap
         stop = v2.co + off + Vector((0, 0, cph/2 - rs/2)) - gap
         size = (ps, ps, cph-rs)
@@ -253,7 +253,7 @@ class MakeRailing:
 
         bmesh.ops.rotate(bm, verts=post['verts'],
             cent=calc_verts_median(post['verts']),
-            matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
+            matrix=Matrix.Rotation(math.atan2(*vec.yx), 4, 'Z'))
 
         post_count = int((edge.calc_length() / ps) * pd)
         array_elements(bm, post, post_count, start, stop)
@@ -280,7 +280,7 @@ class MakeRailing:
 
         bmesh.ops.rotate(bm, verts=rail['verts'],
             cent=calc_verts_median(rail['verts']),
-            matrix=Matrix.Rotation(math.atan2(dy, dx), 4, 'Z'))
+            matrix=Matrix.Rotation(math.atan2(*vec.yx), 4, 'Z'))
 
     def make_fill_walls(self, bm, edge, cph, cpw, ww, expand, **kwargs):
         off = cpw
