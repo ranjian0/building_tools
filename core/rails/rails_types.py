@@ -118,6 +118,7 @@ class MakeRailing:
 
                 rail = cube(bm, *size)
                 bmesh.ops.translate(bm, vec=pos, verts=rail['verts'])
+                del_faces(bm, rail, right=True)
 
                 # --rotate
                 bmesh.ops.rotate(bm, verts=rail['verts'],
