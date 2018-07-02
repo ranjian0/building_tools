@@ -6,6 +6,8 @@ from ..rails import RailProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):
+    redo = BoolProperty()
+
     step_count = IntProperty(
         name="Step Count", min=1, max=100, default=3,
         description="Number of steps")
@@ -38,6 +40,14 @@ class StairsProperty(bpy.types.PropertyGroup):
     stair_direction = EnumProperty(
         name="Stair Direction", items=direction_items, default='FRONT',
         description="The direction to put the stairs")
+
+    def set_defaults(self):
+        """ Helper function to make convinient property adjustments """
+        if self.redo:
+            return
+
+        self.soff.size = (0.5, 1.0)
+        self.redo = True
 
     def draw(self, context, layout):
         self.soff.draw(context, layout)
