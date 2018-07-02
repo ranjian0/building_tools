@@ -54,6 +54,7 @@ class MakeRailing:
         """ Create railing from edges """
         verts = list({v for e in edges for v in e.verts})
         lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
+        lfaces = [f for f in lfaces if all([e in f.edges for e in edges])]
 
         self.make_railing(bm, edges, lfaces, **kwargs)
 
