@@ -120,9 +120,9 @@ class MakeRailing:
                 bmesh.ops.translate(bm, vec=pos, verts=rail['verts'])
 
                 # --rotate
-            bmesh.ops.rotate(bm, verts=rail['verts'],
-                cent=calc_verts_median(rail['verts']),
-                matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, 'Z'))
+                bmesh.ops.rotate(bm, verts=rail['verts'],
+                    cent=calc_verts_median(rail['verts']),
+                    matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, 'Z'))
 
 
         elif fill == 'RAILS':
