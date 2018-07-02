@@ -304,7 +304,6 @@ class MakeRailing:
 
         create_wall(bm, start, end, cph, ww, tan)
 
-
 def edge_tangent(edge):
     tan = None
     for l in edge.link_loops:
