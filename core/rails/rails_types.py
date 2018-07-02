@@ -243,8 +243,9 @@ class MakeRailing:
 
         # -- add posts
         off = tan.normalized() * (cpw/2)
-        start = v1.co + off + Vector((0, 0, cph/2 - rs/2))
-        stop = v2.co + off + Vector((0, 0, cph/2 - rs/2))
+        gap = (v1.co - v2.co).normalized() * cpw
+        start = v1.co + off + Vector((0, 0, cph/2 - rs/2)) + gap
+        stop = v2.co + off + Vector((0, 0, cph/2 - rs/2)) - gap
         size = (ps, ps, cph-rs)
 
         post = cube(bm, *size)
