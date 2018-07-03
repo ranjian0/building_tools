@@ -1,7 +1,6 @@
 import bpy
 import bmesh
 
-
 class Roof:
 
     @classmethod

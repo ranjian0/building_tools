@@ -9,6 +9,7 @@ from .window    import register_window, unregister_window
 from .floorplan import register_floorplan, unregister_floorplan
 from .balcony   import register_balcony, unregister_balcony
 from .stairs    import register_stairs, unregister_stairs
+from .roof      import register_roof, unregister_roof
 from .generic   import register_generic, unregister_generic
 
 # -- take care here --
@@ -24,7 +25,8 @@ register_funcs = [
     register_window,
     register_floorplan,
     register_balcony,
-    register_stairs
+    register_stairs,
+    register_roof,
 ]
 
 unregister_funcs = [
@@ -37,7 +39,8 @@ unregister_funcs = [
     unregister_window,
     unregister_floorplan,
     unregister_balcony,
-    unregister_stairs
+    unregister_stairs,
+    unregister_roof,
 ]
 
 
