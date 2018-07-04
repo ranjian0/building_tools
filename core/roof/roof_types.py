@@ -4,8 +4,17 @@ import bmesh
 def make_roof(bm, faces, type, **kwargs):
 
     if type == 'FLAT':
-        pass
+        make_flat_roof(bm, faces, **kwargs)
     elif type == 'GABLE':
-        pass
+        make_gable_roof(bm, faces, **kwargs)
     elif type == 'HIP':
-        pass
+        make_hip_roof(bm, faces, **kwargs)
+
+def make_flat_roof(bm, faces, **kwargs):
+    pass
+
+def make_gable_roof(bm, faces, **kwargs):
+    pass
+
+def make_hip_roof(bm, faces, **kwargs):
+    pass
