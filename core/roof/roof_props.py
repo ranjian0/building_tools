@@ -8,7 +8,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("HIP", "Hip", "", 2),
     ]
     type = EnumProperty(
-        name="Roof Type", items=roof_items, default='FLAT'
+        name="Roof Type", items=roof_items, default='FLAT',
         description="Type of roof to create")
 
     thick = FloatProperty(
