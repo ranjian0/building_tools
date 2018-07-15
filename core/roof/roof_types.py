@@ -36,7 +36,24 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
 
 
 def make_gable_roof(bm, faces, **kwargs):
+    if not rectangular_area(faces):
+        return
     pass
 
 def make_hip_roof(bm, faces, **kwargs):
     pass
+
+def rectangular_area(faces):
+    face_area = sum([f.calc_area() for f in faces])
+
+    verts = [v for f in faces for v in f.verts]
+    verts = sorted(verts, key=lambda v: (v.co.x, v.co.y))
+
+    _min, _max = verts[0], verts[-1]
+    width = abs(_min.co.x - _max.co.x)
+    length = abs(_min.co.y - _max.co.y)
+    area = width * length
+
+    if round(face_area, 4) == round(area, 4):
+        return True
+    return False
