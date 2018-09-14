@@ -38,7 +38,12 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
 def make_gable_roof(bm, faces, **kwargs):
     if not rectangular_area(faces):
         return
-    pass
+
+    if len(faces) == 1:
+        pass
+    else:
+        pass
+
 
 def make_hip_roof(bm, faces, **kwargs):
     pass
