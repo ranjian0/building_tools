@@ -27,7 +27,7 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
     link_faces = [f for e in top_face.edges for f in e.link_faces
                     if f is not top_face]
 
-    bmesh.ops.inset_region(bm, faces=link_faces, depth=outset)
+    bmesh.ops.inset_region(bm, faces=link_faces, depth=outset, use_even_offset=True)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     bmesh.ops.delete(bm,
