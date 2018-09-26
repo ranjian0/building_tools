@@ -23,8 +23,8 @@ class RoofProperty(bpy.types.PropertyGroup):
         name="Height",  min=0.01, max=1000.0, default=1,
         description="Height of entire roof")
 
-    # o_types = [("LEFT", "Left", "", 0), ("RIGHT", "Right", "", 1), ]
-    # orient = EnumProperty(description="Orientation of gable", items=o_types, default='LEFT')
+    o_types = [("LEFT", "Left", "", 0), ("RIGHT", "Right", "", 1), ]
+    orient = EnumProperty(description="Orientation of gable", items=o_types, default='LEFT')
 
 
     def draw(self, context, layout):
@@ -42,8 +42,8 @@ class RoofProperty(bpy.types.PropertyGroup):
             col.prop(self, 'outset')
             col.prop(self, 'height')
 
-            # row = box.row(align=True)
-            # row.prop(self, 'orient', expand=True)
+            row = box.row(align=True)
+            row.prop(self, 'orient', expand=True)
 
         else:
             col = box.column()

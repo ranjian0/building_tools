@@ -36,19 +36,15 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
 
 
 def make_gable_roof(bm, faces, **kwargs):
-    if not rectangular_area(faces):
+    if not is_rectangular(faces):
         return
-
-    if len(faces) == 1:
-        pass
-    else:
-        pass
 
 
 def make_hip_roof(bm, faces, **kwargs):
     pass
 
-def rectangular_area(faces):
+def is_rectangular(faces):
+    # -- determine if faces form a rectangular area
     face_area = sum([f.calc_area() for f in faces])
 
     verts = [v for f in faces for v in f.verts]
