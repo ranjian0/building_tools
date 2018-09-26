@@ -4,7 +4,7 @@ from .roof_props import RoofProperty
 
 class RoofOperator(bpy.types.Operator):
     """ Creates roof on selected faces """
-    bl_idname = "cynthia.add_roof"
+    bl_idname = "btools.add_roof"
     bl_label = "Add Roof"
     bl_options = {'REGISTER', 'UNDO'}
 

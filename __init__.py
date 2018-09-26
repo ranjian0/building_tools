@@ -24,7 +24,7 @@ from .core import register_core, unregister_core
 class MeshGenerationPanel(bpy.types.Panel):
     """UI panel for building operators and properties"""
 
-    bl_idname = "VIEW3D_PT_cynthia"
+    bl_idname = "VIEW3D_PT_btools"
     bl_label = "Mesh Generation"
 
     bl_space_type = 'VIEW_3D'
@@ -38,19 +38,19 @@ class MeshGenerationPanel(bpy.types.Panel):
         # Draw Operators
         # ``````````````
         col = layout.column(align=True)
-        col.operator("cynthia.add_floorplan")
-        col.operator("cynthia.add_floors")
+        col.operator("btools.add_floorplan")
+        col.operator("btools.add_floors")
 
         row = col.row(align=True)
-        row.operator("cynthia.add_window")
-        row.operator("cynthia.add_door")
+        row.operator("btools.add_window")
+        row.operator("btools.add_door")
 
         row = col.row(align=True)
-        row.operator("cynthia.add_railing")
-        row.operator("cynthia.add_balcony")
+        row.operator("btools.add_railing")
+        row.operator("btools.add_balcony")
 
-        col.operator("cynthia.add_stairs")
-        col.operator("cynthia.add_roof")
+        col.operator("btools.add_stairs")
+        col.operator("btools.add_roof")
 
 
 # =======================================================

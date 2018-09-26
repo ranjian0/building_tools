@@ -4,7 +4,7 @@ from .floor_props import FloorProperty
 
 class FloorOperator(bpy.types.Operator):
     """ Creates floors from active floorplan object """
-    bl_idname = "cynthia.add_floors"
+    bl_idname = "btools.add_floors"
     bl_label = "Add Floors"
     bl_options = {'REGISTER', 'UNDO'}
 

@@ -4,7 +4,7 @@ from .window_props import WindowProperty
 
 class WindowOperator(bpy.types.Operator):
     """ Creates windows on selected mesh faces """
-    bl_idname = "cynthia.add_window"
+    bl_idname = "btools.add_window"
     bl_label = "Add Window"
     bl_options = {'REGISTER', 'UNDO'}
 
