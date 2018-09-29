@@ -32,12 +32,12 @@ class RoofProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         if self.type == 'FLAT':
-            col = box.column()
+            col = box.column(align=True)
             col.prop(self, 'thick')
             col.prop(self, 'outset')
 
         elif self.type == 'GABLE':
-            col = box.column()
+            col = box.column(align=True)
             col.prop(self, 'thick')
             col.prop(self, 'outset')
             col.prop(self, 'height')
@@ -46,8 +46,7 @@ class RoofProperty(bpy.types.PropertyGroup):
             row.prop(self, 'orient', expand=True)
 
         else:
-            col = box.column()
+            col = box.column(align=True)
             col.prop(self, 'thick')
             col.prop(self, 'outset')
-
             col.prop(self, 'height')
