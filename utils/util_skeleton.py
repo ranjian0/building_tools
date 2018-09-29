@@ -326,7 +326,6 @@ def _connect_line2_line2(A, B):
     return LineSegment2(Point2(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y),
                         Point2(B.p.x + ub * B.v.x, B.p.y + ub * B.v.y))
 
-
 class Point2(Vector2, Geometry):
     def __repr__(self):
         return 'Point2(%.2f, %.2f)' % (self.x, self.y)
@@ -355,7 +354,6 @@ class Point2(Vector2, Geometry):
         c = _connect_point2_line2(self, other)
         if c:
             return c._swap()
-
 
 class Line2(Geometry):
     __slots__ = ['p', 'v']
