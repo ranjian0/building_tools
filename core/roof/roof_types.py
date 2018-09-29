@@ -1,10 +1,15 @@
 import bpy
 import bmesh
 
+from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     select,
     filter_geom,
+    calc_edge_median,
+    calc_verts_median,
+    filter_vertical_edges,
+    filter_horizontal_edges
     )
 
 def make_roof(bm, faces, type, **kwargs):
@@ -35,9 +40,31 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
         context=5)
 
 
-def make_gable_roof(bm, faces, **kwargs):
+def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     if not is_rectangular(faces):
         return
+
+    # -- if more than one face, dissolve
+    if len(faces) > 1:
+        faces = bmesh.ops.dissolve_faces(bm,
+            faces=faces, use_verts=True).get('region')
+
+    # -- extrude the face to height
+    ret = bmesh.ops.extrude_face_region(bm, geom=faces)
+    verts = filter_geom(ret['geom'], BMVert)
+    edges = filter_geom(ret['geom'], BMEdge)
+    nfaces = filter_geom(ret['geom'], BMFace)
+    bmesh.ops.translate(bm, verts=verts, vec=(0, 0, height))
+    bmesh.ops.delete(bm, geom=faces + nfaces, context=3)
+
+    # -- merge opposite verts
+    axis = 'x' if orient == 'LEFT' else 'y'
+    _max = max([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
+    _min = min([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
+    mid = getattr((_max.co + _min.co)/2, axis)
+    for v in set([v for e in edges for v in e.verts]):
+        setattr(v.co, axis, mid)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
 def make_hip_roof(bm, faces, **kwargs):
