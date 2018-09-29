@@ -18,7 +18,6 @@ _enable_swizzle_set = False
 if _enable_swizzle_set:
     _use_slots = True
 
-
 class Vector2:
     __slots__ = ['x', 'y']
     __hash__ = None
@@ -452,7 +451,6 @@ class LineSegment2(Line2):
     length = property(lambda self: abs(self.v))
 
 
-
 def _window(lst):
     prevs, items, nexts = it.tee(lst, 3)
     prevs = it.islice(it.cycle(prevs), len(lst)-1, None)
@@ -472,7 +470,6 @@ def _approximately_same(point_a, point_b):
 def _normalize_contour(contour):
     contour = [Point2(float(x), float(y)) for (x,y) in contour]
     return [point for prev, point, next in _window(contour) if not (point==next or (point-prev).normalized() == (next-point).normalized())]
-
 
 class _SplitEvent(namedtuple("_SplitEvent", "distance, intersection_point, vertex, opposite_edge")):
     __slots__ = ()
