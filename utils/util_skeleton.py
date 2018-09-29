@@ -238,11 +238,6 @@ class Vector2:
         n = other.normalized()
         return self.dot(n)*n
 
-
-# Geometry
-# Much maths thanks to Paul Bourke, http://astronomy.swin.edu.au/~pbourke
-# ---------------------------------------------------------------------------
-
 class Geometry:
     def _connect_unimplemented(self, other):
         raise AttributeError('Cannot connect %s to %s' %
@@ -460,10 +455,6 @@ class LineSegment2(Line2):
 
 
 
-'''
-###
-'''
-
 def _window(lst):
     prevs, items, nexts = it.tee(lst, 3)
     prevs = it.islice(it.cycle(prevs), len(lst)-1, None)
@@ -622,7 +613,9 @@ class _SLAV:
         self._lavs = [ _LAV.from_polygon(contour, self) for contour in contours ]
 
         #store original polygon edges for calculating split events
-        self._original_edges = [_OriginalEdge(LineSegment2(vertex.prev.point, vertex.point), vertex.prev.bisector, vertex.bisector) for vertex in it.chain.from_iterable(self._lavs)]
+        self._original_edges = [_OriginalEdge(
+            LineSegment2(vertex.prev.point, vertex.point), vertex.prev.bisector, vertex.bisector)
+            for vertex in it.chain.from_iterable(self._lavs)]
 
     def __iter__(self):
         for lav in self._lavs:
@@ -856,8 +849,8 @@ def skeletonize(polygon, holes=None):
         if isinstance(i, _EdgeEvent):
             if not i.vertex_a.is_valid or not i.vertex_b.is_valid:
                 continue
-
             (arc, events) = slav.handle_edge_event(i)
+
         elif isinstance(i, _SplitEvent):
             if not i.vertex.is_valid:
                 continue
