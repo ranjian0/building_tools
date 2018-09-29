@@ -39,7 +39,6 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
         geom=faces,
         context=5)
 
-
 def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     if not is_rectangular(faces):
         return
@@ -101,7 +100,6 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
         edges = [e for e in valid_edges if getattr(calc_edge_median(e), axis) == loc]
         bmesh.ops.contextual_create(bm, geom=edges)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-
 
 def make_hip_roof(bm, faces, **kwargs):
     pass
