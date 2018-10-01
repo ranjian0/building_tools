@@ -103,22 +103,51 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
         bmesh.ops.contextual_create(bm, geom=edges)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
-def make_hip_roof(bm, faces, **kwargs):
+def make_hip_roof(bm, faces, height, **kwargs):
     # -- if more than one face, dissolve
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm,
             faces=faces, use_verts=True).get('region')
     face = faces[-1]
-    convex = all([loop.is_convex for loop in face.loops])
+    median = face.calc_center_median()
 
     # get verts in anti-clockwise order
-    center = face.calc_center_median().to_tuple()[:2]
-    verts = [v.co.to_tuple()[:2] for v in face.verts]
-    verts.sort(key=lambda v:clockwise(v, center), reverse=True)
+    verts = [v.co.to_tuple()[:2] for v in sort_verts_by_loops(face)]
 
     # compute skeleton
     skeleton = skeletonize(verts, [])
-    print(skeleton)
+
+    # create hip roof from skeleton
+    # 1. -- remove face
+    bmesh.ops.delete(bm, geom=[face], context=3)
+
+    # 2. -- create new vertices and edges
+    sources = [arc.source for arc in skeleton]
+    height_scale = height/max([arc.height for arc in skeleton])
+    for arc in skeleton:
+        face = []
+        ht = arc.height * height_scale
+
+        vert = bmesh.ops.create_vert(bm,
+                    co=Vector((arc.source.x, arc.source.y, median.z + ht))).get('vert')
+        face.extend(vert)
+
+        for sink in arc.sinks:
+            if sink in sources:
+                sink_ht = [arc for arc in skeleton if arc.source == sink][-1].height
+                sink_ht *= height_scale
+                svert = bmesh.ops.create_vert(bm,
+                            co=Vector((sink.x, sink.y, median.z + sink_ht))).get('vert')
+                bmesh.ops.contextual_create(bm, geom=svert+vert)
+
+            else:
+                svert = bmesh.ops.create_vert(bm,
+                            co=Vector((sink.x, sink.y, median.z))).get('vert')
+                face.extend(svert)
+
+        bmesh.ops.contextual_create(bm, geom=face)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 def is_rectangular(faces):
     # -- determine if faces form a rectangular area
@@ -136,7 +165,7 @@ def is_rectangular(faces):
         return True
     return False
 
-def clockwise(point, origin=(0, 0)):
+def sort_clockwise(point, origin=(0, 0)):
     # https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python
     refvec = [0, 1] # y-axis
 
@@ -159,3 +188,17 @@ def clockwise(point, origin=(0, 0)):
     # I return first the angle because that's the primary sorting criterium
     # but if two vectors have the same angle then the shorter distance should come first.
     return angle, lenvector
+
+def sort_verts_by_loops(face):
+    """ sort verts in face clockwise using loops """
+
+    start_loop = max(face.loops,
+        key=lambda loop: loop.vert.co.to_tuple()[:2])
+
+    verts = []
+    current_loop = start_loop
+    while len(verts) < len(face.loops):
+        verts.append(current_loop.vert)
+        current_loop = current_loop.link_loop_prev
+
+    return verts

@@ -1,9 +1,8 @@
 ## Adapted from https://github.com/yonghah/polyskel
 
 import math
-import operator
-
 import heapq
+import operator
 import itertools as it
 from collections import namedtuple
 
@@ -248,19 +247,9 @@ class Geometry:
 
     _intersect_point2 = _intersect_unimplemented
     _intersect_line2 = _intersect_unimplemented
-    _intersect_circle = _intersect_unimplemented
     _connect_point2 = _connect_unimplemented
     _connect_line2 = _connect_unimplemented
-    _connect_circle = _connect_unimplemented
 
-    _intersect_point3 = _intersect_unimplemented
-    _intersect_line3 = _intersect_unimplemented
-    _intersect_sphere = _intersect_unimplemented
-    _intersect_plane = _intersect_unimplemented
-    _connect_point3 = _connect_unimplemented
-    _connect_line3 = _connect_unimplemented
-    _connect_sphere = _connect_unimplemented
-    _connect_plane = _connect_unimplemented
 
     def intersect(self, other):
         raise NotImplementedError
@@ -651,7 +640,7 @@ class _SLAV:
         x = None   # right vertex
         y = None   # left vertex
         norm = event.opposite_edge.v.normalized()
-        for v in chain.from_iterable(self._lavs):
+        for v in it.chain.from_iterable(self._lavs):
             if norm == v.edge_left.v.normalized() and event.opposite_edge.p == v.edge_left.p:
                 x = v
                 y = x.prev
