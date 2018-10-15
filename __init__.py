@@ -1,7 +1,8 @@
+from .version import VER
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
-    "version": (0, 0, 1),
+    "version": VER,
     "blender": (2, 79, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
