@@ -1,6 +1,7 @@
 import bpy
-import bmesh
 import math
+import bmesh
+import itertools as it
 
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
@@ -124,53 +125,84 @@ def make_hip_roof(bm, faces, height, **kwargs):
     # 1. -- remove face
     bmesh.ops.delete(bm, geom=[face], context=3)
 
-    # 2. -- create new vertices and edges
-    sources = [arc.source for arc in skeleton]
-    sinks = [sink for arc in skeleton for sink in arc.sinks]
-    height_scale = height/max([arc.height for arc in skeleton])
-    for arc in skeleton:
-        face = []
-        ht = arc.height * height_scale
+    # 2. -- determine unique sources and all their sinks
+    sources = set([arc.source for arc in skeleton])
+    source_sink_dict = {}
+    for source in sources:
+        _source_sinks = list()
+        for arc in skeleton:
+            if arc.source == source:
+                _source_sinks.extend(arc.sinks)
 
-        # create vert for source
-        vert = bmesh.ops.create_vert(bm,
-                co=Vector((arc.source.x, arc.source.y, median.z + ht))).get('vert')
+
+        source_sink_dict[source] = [snk for snk in set(_source_sinks) if snk != source]
+
+    # 3. -- determine height scale for skeleton
+    height_scale = height/max([arc.height for arc in skeleton])
+
+    # 4. -- make triangle faces between sources and sinks
+    print(source_sink_dict)
+    for source, sinks in source_sink_dict.items():
+        for idx, snk in enumerate(sinks):
+            next_snk = sinks[(idx+1) % len(sinks)]
+            vert_loc = [source, snk, next_snk]
+
+            # - make verts if they dont exist
+            tri_verts = []
+            for vloc in vert_loc:
+                v = vert_at_loc(vloc, bm.verts)
+                if not v:
+                    ht = height_scale * [arc.height for arc in skeleton if arc.source == source][-1]
+                    v = bmesh.ops.create_vert(bm,
+                            co=Vector((vloc.x, vloc.y, median.z + ht))).get('vert')[-1]
+
+                tri_verts.append(v)
+
+            print(tri_verts)
+
+            # -- make face from tri_verts
+            bmesh.ops.contextual_create(bm, geom=tri_verts)
+
+
+
+    # for arc in skeleton:
+    #     face = []
+    #     ht = arc.height * height_scale
+
+    #     # create vert for source
+    #     vert = bmesh.ops.create_vert(bm,
+    #             co=Vector((arc.source.x, arc.source.y, median.z + ht))).get('vert')
 
 
         # create level 1 faces i.e between sources and sinks that are original verts
-        vts = [vert_at_loc(snk, verts) for snk in arc.sinks if snk not in sources]
-        if all(vts) and len(vts) > 1:
-            edgs = list({e for v in vts for e in v.link_edges if e in edges})
-            for ed in edgs:
-                cont_verts = vert + list(ed.verts)
-                if not bm.faces.get(cont_verts):
-                    bmesh.ops.contextual_create(bm, geom=cont_verts)
+        # vts = [vert_at_loc(snk, verts) for snk in arc.sinks if snk not in sources]
+        # if all(vts) and len(vts) > 1:
+        #     edgs = list({e for v in vts for e in v.link_edges if e in edges})
+        #     for ed in edgs:
+        #         cont_verts = vert + list(ed.verts)
+        #         if not bm.faces.get(cont_verts):
+        #             bmesh.ops.contextual_create(bm, geom=cont_verts)
 
-        # create other faces i.e between sources and sinks that are also sources
-        if len(arc.sinks) == 2:
-            p1, p2 = arc.sinks
-            vts = vert
-            if (p1 in sources) or (p2 in sources):
-                for snk in arc.sinks:
-                    if snk == arc.source: continue
-                    vt = vert_at_loc(snk, verts)
-                    if not vt:
-                        snk_arc = [arc for arc in skeleton if arc.source == snk][-1]
-                        snk_h = snk_arc.height * height_scale
-                        vt = bmesh.ops.create_vert(bm,
-                                co=Vector((snk.x, snk.y, median.z + snk_h))).get('vert')[-1]
-                    vts.append(vt)
-                res = bmesh.ops.contextual_create(bm, geom=vts)
-                print(res)
-                if res['faces']:
-                    face = res['faces'][-1]
-                    for edge in face.edges:
-                        print(edge.is_boundary)
-
-
-
-
-
+        # # create other faces i.e between sources and sinks that are also sources
+        # if len(arc.sinks) == 2:
+        #     p1, p2 = arc.sinks
+        #     vts = vert
+        #     if (p1 in sources) or (p2 in sources):
+        #         for snk in arc.sinks:
+        #             if snk == arc.source: continue
+        #             vt = vert_at_loc(snk, verts)
+        #             if not vt:
+        #                 snk_arc = [arc for arc in skeleton if arc.source == snk][-1]
+        #                 snk_h = snk_arc.height * height_scale
+        #                 vt = bmesh.ops.create_vert(bm,
+        #                         co=Vector((snk.x, snk.y, median.z + snk_h))).get('vert')[-1]
+        #             vts.append(vt)
+        #         res = bmesh.ops.contextual_create(bm, geom=vts)
+        #         print(res)
+        #         if res['faces']:
+        #             face = res['faces'][-1]
+        #             for edge in face.edges:
+        #                 print(edge.is_boundary)
 
         # -- create faces from source and sinks
         # face.extend(vert)
@@ -198,30 +230,6 @@ def make_hip_roof(bm, faces, height, **kwargs):
         #             bmesh.ops.contextual_create(bm,
         #                 geom=list(edge.verts) + vert)
 
-
-
-
-
-
-
-
-
-
-        # -- add verts and edges
-        # for sink in arc.sinks:
-        #     if sink in sources:
-        #         sink_ht = [arc for arc in skeleton if arc.source == sink][-1].height
-        #         sink_ht *= height_scale
-        #         svert = bmesh.ops.create_vert(bm,
-        #                     co=Vector((sink.x, sink.y, median.z + sink_ht))).get('vert')
-        #         bmesh.ops.contextual_create(bm, geom=svert+vert)
-
-        #     else:
-        #         svert = bmesh.ops.create_vert(bm,
-        #                     co=Vector((sink.x, sink.y, median.z))).get('vert')
-        #         face.extend(svert)
-
-        # bmesh.ops.contextual_create(bm, geom=face)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
