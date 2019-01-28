@@ -1,11 +1,11 @@
 import bpy
 
 from .floorplan import Floorplan
-from .floorplan_ops import FloorplanOperator
+from .floorplan_ops import BTOOLS_OT_add_floorplan
 from .floorplan_props import FloorplanProperty
 
 classes = (
-    FloorplanProperty, FloorplanOperator
+    FloorplanProperty, BTOOLS_OT_add_floorplan
 )
 
 def register_floorplan():

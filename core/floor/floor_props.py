@@ -3,19 +3,19 @@ from bpy.props import *
 
 
 class FloorProperty(bpy.types.PropertyGroup):
-    floor_count     = IntProperty(
+    floor_count    : IntProperty(
         name="Floor Count", min=1, max=1000, default=1,
         description="Number of floors")
 
-    floor_height    = FloatProperty(
+    floor_height   : FloatProperty(
         name="Floor Height", min=0.01, max=1000.0, default=2.0,
         description="Height of each floor")
 
-    slab_thickness  = FloatProperty(
+    slab_thickness : FloatProperty(
         name="Slab Thickness", min=0.0, max=1000.0, default=0.2,
         description="Thickness of each slab")
 
-    slab_outset     = FloatProperty(
+    slab_outset    : FloatProperty(
         name="Slab Outset", min=-10.0, max=10.0, default=0.1,
         description="Outset of each slab")
 

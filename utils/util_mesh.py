@@ -17,7 +17,7 @@ def make_mesh(name):
 def select(elements, val=True):
     """ For each item in elements set select to val """
     for el in elements:
-        el.select = val
+        el.select_set(val)
 
 def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable """

@@ -2,13 +2,13 @@ import bpy
 from .floorplan import Floorplan
 from .floorplan_props import FloorplanProperty
 
-class FloorplanOperator(bpy.types.Operator):
+class BTOOLS_OT_add_floorplan(bpy.types.Operator):
     """ Create a floorplan object """
     bl_idname = "btools.add_floorplan"
     bl_label = "Create Floorplan"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=FloorplanProperty)
+    props : bpy.props.PointerProperty(type=FloorplanProperty)
 
     @classmethod
     def poll(cls, context):

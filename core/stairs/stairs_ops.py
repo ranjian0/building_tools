@@ -2,13 +2,13 @@ import bpy
 from .stairs import Stairs
 from .stairs_props import StairsProperty
 
-class StairsOperator(bpy.types.Operator):
+class BTOOLS_OT_add_stairs(bpy.types.Operator):
     """ Creates stairs on selected mesh faces """
     bl_idname = "btools.add_stairs"
     bl_label = "Add Stairs"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=StairsProperty)
+    props : bpy.props.PointerProperty(type=StairsProperty)
 
     @classmethod
     def poll(cls, context):

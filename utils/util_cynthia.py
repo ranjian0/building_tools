@@ -57,8 +57,8 @@ def clean_scene():
     """ Delete all objects in the scene if any """
     scene = bpy.context.scene
 
-    if scene.objects:
-        active = scene.objects.active
+    if scene.collection.objects:
+        active = scene.collection.objects.active
         if active and active.mode == 'EDIT':
             bpy.ops.object.mode_set(mode='OBJECT')
 

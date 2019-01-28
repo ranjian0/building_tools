@@ -1,11 +1,11 @@
 import bpy
 
 from .window import Window
-from .window_ops import WindowOperator
+from .window_ops import BTOOLS_OT_add_window
 from .window_props import WindowProperty
 
 classes = (
-    WindowProperty, WindowOperator
+    WindowProperty, BTOOLS_OT_add_window
 )
 
 def register_window():

@@ -7,24 +7,24 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("GABLE", "Gable", "", 1),
         # ("HIP", "Hip", "", 2),
     ]
-    type = EnumProperty(
+    type : EnumProperty(
         name="Roof Type", items=roof_items, default='FLAT',
         description="Type of roof to create")
 
-    thick = FloatProperty(
+    thick : FloatProperty(
         name="Thickness",  min=0.01, max=1000.0, default=.1,
         description="Thickness of roof hangs")
 
-    outset = FloatProperty(
+    outset : FloatProperty(
         name="Outset",  min=0.01, max=1000.0, default=.1,
         description="Outset of roof hangs")
 
-    height = FloatProperty(
+    height : FloatProperty(
         name="Height",  min=0.01, max=1000.0, default=1,
         description="Height of entire roof")
 
     o_types = [("LEFT", "Left", "", 0), ("RIGHT", "Right", "", 1), ]
-    orient = EnumProperty(description="Orientation of gable", items=o_types, default='LEFT')
+    orient : EnumProperty(description="Orientation of gable", items=o_types, default='LEFT')
 
 
     def draw(self, context, layout):
