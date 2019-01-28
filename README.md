@@ -5,7 +5,12 @@
 
 > Provide tools to model building exteriors quickly in blender
 
+> Watch a short preview [here](https://www.youtube.com/watch?v=oMwa6priW3k)
+
 ## Installing:
+
+    For Blender 2.8
+      Switch the branch to 2.8-port, proceed to next steps.
 
   * Click on the  *Clone or download*  button.
   * *Download zip*
