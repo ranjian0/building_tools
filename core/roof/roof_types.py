@@ -108,131 +108,116 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
 def make_hip_roof(bm, faces, height, **kwargs):
     # -- if more than one face, dissolve
     if len(faces) > 1:
-        faces = bmesh.ops.dissolve_faces(bm,
-            faces=faces, use_verts=True).get('region')
+        faces = bmesh.ops.dissolve_faces(bm, faces=faces).get('region')
     face = faces[-1]
     median = face.calc_center_median()
 
     # get verts in anti-clockwise order
-    edges = [e for e in face.edges]
+    original_edges = [e for e in face.edges]
     verts = [v for v in sort_verts_by_loops(face)]
     points = [v.co.to_tuple()[:2] for v in verts]
 
     # compute skeleton
     skeleton = skeletonize(points, [])
-    import pprint; pprint.pprint(skeleton)
 
     # create hip roof from skeleton
     # 1. -- remove face
-    bmesh.ops.delete(bm, geom=[face], context=3)
+    bmesh.ops.delete(bm, geom=faces, context=3)
 
-    # 2. -- determine unique sources and all their sinks
-    sources = set([arc.source for arc in skeleton])
-    source_sink_dict = {}
-    for source in sources:
-        _source_sinks = list()
-        for arc in skeleton:
-            if arc.source == source:
-                _source_sinks.extend(arc.sinks)
-
-
-        source_sink_dict[source] = [snk for snk in set(_source_sinks) if snk != source]
-
-    # 3. -- determine height scale for skeleton
+    # 2. -- determine height scale for skeleton
     height_scale = height/max([arc.height for arc in skeleton])
 
-    # 4. -- make triangle faces between sources and sinks
-    print(source_sink_dict)
-    for source, sinks in source_sink_dict.items():
-        for idx, snk in enumerate(sinks):
-            next_snk = sinks[(idx+1) % len(sinks)]
-            vert_loc = [source, snk, next_snk]
+    # 3. -- create edges and vertices
+    skeleton_edges = []
+    for arc in skeleton:
+        source = arc.source
+        vsource = vert_at_loc(source, bm.verts)
+        if not vsource:
+            ht = height_scale * [arc.height for arc in skeleton if arc.source == source][-1]
+            vsource = bmesh.ops.create_vert(bm,
+                        co=Vector((source.x, source.y, median.z + ht))).get('vert')[-1]
 
-            # - make verts if they dont exist
-            tri_verts = []
-            for vloc in vert_loc:
-                v = vert_at_loc(vloc, bm.verts)
-                if not v:
-                    ht = height_scale * [arc.height for arc in skeleton if arc.source == source][-1]
-                    v = bmesh.ops.create_vert(bm,
-                            co=Vector((vloc.x, vloc.y, median.z + ht))).get('vert')[-1]
+        for sink in arc.sinks:
+            # -- create sink vert
+            vs = vert_at_loc(sink, bm.verts)
+            if not vs:
+                ht = height_scale * min([arc.height for arc in skeleton if sink in arc.sinks])
+                vs = bmesh.ops.create_vert(bm,
+                        co=Vector((sink.x, sink.y, median.z + ht))).get('vert')[-1]
 
-                tri_verts.append(v)
+            # create edge
+            if vs != vsource:
+                geom = bmesh.ops.contextual_create(bm, geom=[vsource, vs]).get('edges')
+                skeleton_edges.extend(geom)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-            print(tri_verts)
+    # 4. -- create faces
+    for ed in original_edges:
 
-            # -- make face from tri_verts
-            bmesh.ops.contextual_create(bm, geom=tri_verts)
+        # -- determine skeleton_edges linked to this original edge
+        face_edges = []
+        for v in ed.verts:
+            common = set(v.link_edges).intersection(skeleton_edges)
+            face_edges.extend(list(common))
 
+        if len(face_edges) == 2:
+        # -- cycle through edge links until we form a polygon
+            processed_edges = [ed]
+            start, end = ed.verts
 
+            closest = None
+            current_vert = start
+            while current_vert != end:
+                distance = 1000
+                # -- find new closest vert
+                for e in current_vert.link_edges :
+                    if e not in skeleton_edges or e in processed_edges: continue
 
-    # for arc in skeleton:
-    #     face = []
-    #     ht = arc.height * height_scale
+                    other_vert = e.other_vert(current_vert)
 
-    #     # create vert for source
-    #     vert = bmesh.ops.create_vert(bm,
-    #             co=Vector((arc.source.x, arc.source.y, median.z + ht))).get('vert')
+                    dist = (other_vert.co - end.co).length
+                    if dist < distance:
+                        closest = other_vert
+                        distance = dist
 
+                # -- add edge between closest and current if any
+                new_edge = bm.edges.get([closest, current_vert])
+                if new_edge:
+                    processed_edges.append(new_edge)
 
-        # create level 1 faces i.e between sources and sinks that are original verts
-        # vts = [vert_at_loc(snk, verts) for snk in arc.sinks if snk not in sources]
-        # if all(vts) and len(vts) > 1:
-        #     edgs = list({e for v in vts for e in v.link_edges if e in edges})
-        #     for ed in edgs:
-        #         cont_verts = vert + list(ed.verts)
-        #         if not bm.faces.get(cont_verts):
-        #             bmesh.ops.contextual_create(bm, geom=cont_verts)
+                # -- update current
+                current_vert = closest
+            bmesh.ops.contextual_create(bm, geom=processed_edges)
+        else:
+        # -- special case
+        # -- len(face_edges) == 1
+        # -- means that original edge has a lone vert(not connected to skeleton)
 
-        # # create other faces i.e between sources and sinks that are also sources
-        # if len(arc.sinks) == 2:
-        #     p1, p2 = arc.sinks
-        #     vts = vert
-        #     if (p1 in sources) or (p2 in sources):
-        #         for snk in arc.sinks:
-        #             if snk == arc.source: continue
-        #             vt = vert_at_loc(snk, verts)
-        #             if not vt:
-        #                 snk_arc = [arc for arc in skeleton if arc.source == snk][-1]
-        #                 snk_h = snk_arc.height * height_scale
-        #                 vt = bmesh.ops.create_vert(bm,
-        #                         co=Vector((snk.x, snk.y, median.z + snk_h))).get('vert')[-1]
-        #             vts.append(vt)
-        #         res = bmesh.ops.contextual_create(bm, geom=vts)
-        #         print(res)
-        #         if res['faces']:
-        #             face = res['faces'][-1]
-        #             for edge in face.edges:
-        #                 print(edge.is_boundary)
+        # -- cycle edge links only once
+            fedge = face_edges[-1]
+            common_vert = [v for v in ed.verts if v in fedge.verts][-1]
 
-        # -- create faces from source and sinks
-        # face.extend(vert)
-        # for sink in arc.sinks:
-        #     if sink == arc.source: continue
-        #     vt = vert_at_loc(sink, verts)
-        #     if vt:
-        #         # -- use existing vert
-        #         face.append(vt)
-            # else:
-            #     # -- create new vert
-            #     sink_ht = [arc for arc in skeleton if arc.source == sink][-1].height
-            #     sink_ht *= height_scale
+            other_vert = fedge.other_vert(common_vert)
+            compare_vert = ed.other_vert(common_vert)
 
-            #     vt = bmesh.ops.create_vert(bm,
-            #             co=Vector((sink.x, sink.y, median.z + sink_ht))).get('vert')
-            #     face.extend(vt)
-        # bmesh.ops.contextual_create(bm, geom=face)
+            closest = None
+            distance = 1000
+            for ledge in other_vert.link_edges:
+                if ledge != fedge:
+                    next_vert = ledge.other_vert(other_vert)
+                    new_dist = (next_vert.co - compare_vert.co).length
+                    if new_dist  < distance:
+                        closest = next_vert
+                        distance = new_dist
+            new_edge = bm.edges.get([closest, other_vert])
+            face_edges.append(new_edge)
+            face_edges.append(ed)
 
-        # -- create faces from source and alternate sinks
-        # vts = [vert_at_loc(snk, verts) for snk in arc.sinks]
-        # if all(vts):
-        #     for edge in edges:
-        #         if len(set(list(edge.verts) + vts)) == 3:
-        #             bmesh.ops.contextual_create(bm,
-        #                 geom=list(edge.verts) + vert)
+            bmesh.ops.contextual_create(bm, geom=face_edges)
+
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
 
 def is_rectangular(faces):
     # -- determine if faces form a rectangular area
@@ -250,29 +235,6 @@ def is_rectangular(faces):
         return True
     return False
 
-def sort_clockwise(point, origin=(0, 0)):
-    # https://stackoverflow.com/questions/41855695/sorting-list-of-two-dimensional-coordinates-by-clockwise-angle-using-python
-    refvec = [0, 1] # y-axis
-
-    # Vector between point and the origin: v = p - o
-    vector = [point[0]-origin[0], point[1]-origin[1]]
-    # Length of vector: ||v||
-    lenvector = math.hypot(vector[0], vector[1])
-    # If length is zero there is no angle
-    if lenvector == 0:
-        return -math.pi, 0
-    # Normalize vector: v/||v||
-    normalized = [vector[0]/lenvector, vector[1]/lenvector]
-    dotprod  = normalized[0]*refvec[0] + normalized[1]*refvec[1]     # x1*x2 + y1*y2
-    diffprod = refvec[1]*normalized[0] - refvec[0]*normalized[1]     # x1*y2 - y1*x2
-    angle = math.atan2(diffprod, dotprod)
-    # Negative angles represent counter-clockwise angles so we need to subtract them
-    # from 2*pi (360 degrees)
-    if angle < 0:
-        return 2*math.pi+angle, lenvector
-    # I return first the angle because that's the primary sorting criterium
-    # but if two vectors have the same angle then the shorter distance should come first.
-    return angle, lenvector
 
 def sort_verts_by_loops(face):
     """ sort verts in face clockwise using loops """

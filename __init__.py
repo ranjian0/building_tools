@@ -75,6 +75,8 @@ if __name__ == "__main__":
     try:
         unregister()
     except Exception as e:
-        pass
+        import traceback
+        print(e)
+        print(traceback.print_exc())
     finally:
         register()

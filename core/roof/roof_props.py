@@ -5,7 +5,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     roof_items = [
         ("FLAT", "Flat", "", 0),
         ("GABLE", "Gable", "", 1),
-        # ("HIP", "Hip", "", 2),
+        ("HIP", "Hip", "", 2),
     ]
     type = EnumProperty(
         name="Roof Type", items=roof_items, default='FLAT',
