@@ -7,15 +7,15 @@ from ..fill import (
     )
 
 class WindowProperty(bpy.types.PropertyGroup):
-    ft         = FloatProperty(
+    ft   = FloatProperty(
         name="Frame Thickness", min=0.01, max=100.0, default=0.1,
         description="Thickness of window Frame")
 
-    fd         = FloatProperty(
+    fd   = FloatProperty(
         name="Frame Depth", min=0.0, max=100.0, default=0.1,
         description="Depth of window Frame")
 
-    soff       = PointerProperty(type=SizeOffsetProperty)
+    soff = PointerProperty(type=SizeOffsetProperty)
 
     fill_itemss = [
         ("NONE", "None", "", 0),
@@ -27,7 +27,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         name="Fill Type", items=fill_itemss, default='NONE',
         description="Type of fill for window")
 
-    bar_fill  = PointerProperty(type=FillBars)
+    bar_fill    = PointerProperty(type=FillBars)
     louver_fill = PointerProperty(type=FillLouver)
     glass_fill  = PointerProperty(type=FillGlassPanes)
 

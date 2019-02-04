@@ -7,7 +7,7 @@ def cube(bm, width=2, length=2, height=2):
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
     sc_z = Matrix.Scale(height, 4, (0, 0, 1))
-    mat = sc_x * sc_y * sc_z
+    mat = sc_x @ sc_y @ sc_z
     ret = bmesh.ops.create_cube(bm, size=1, matrix=mat)
     return ret
 
@@ -16,7 +16,7 @@ def plane(bm, width=2, length=2):
 
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
-    mat = sc_x * sc_y
+    mat = sc_x @ sc_y
     ret = bmesh.ops.create_grid(
         bm, x_segments=1, y_segments=1, size=1, matrix=mat)
     return ret

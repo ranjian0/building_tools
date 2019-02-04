@@ -40,7 +40,7 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
 
     bmesh.ops.delete(bm,
         geom=faces,
-        context=5)
+        context='FACES')
 
 def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     if not is_rectangular(faces):
@@ -57,7 +57,7 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     edges = filter_geom(ret['geom'], BMEdge)
     nfaces = filter_geom(ret['geom'], BMFace)
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, height))
-    bmesh.ops.delete(bm, geom=faces + nfaces, context=3)
+    bmesh.ops.delete(bm, geom=faces + nfaces, context='FACES_ONLY')
 
     # -- merge opposite verts
     axis = 'x' if orient == 'LEFT' else 'y'
@@ -74,7 +74,7 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     faces = list(set([f for v in top_verts for f in v.link_faces if f.normal.z]))
     boundary_edges = [e for f in faces for e in f.edges
         if len(set(e.link_faces) - set(faces)) == 1]
-    bmesh.ops.delete(bm, geom=faces, context=5)
+    bmesh.ops.delete(bm, geom=faces, context='FACES')
 
     ret = bmesh.ops.extrude_edge_only(bm, edges=boundary_edges)
     verts = filter_geom(ret['geom'], BMVert)

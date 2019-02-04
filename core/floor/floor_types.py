@@ -50,5 +50,5 @@ def make_floors(bm, edges, floor_count, floor_height, slab_thickness, slab_outse
     if del_faces:
         bmesh.ops.delete(bm,
             geom=del_faces,
-            context=5)
+            context='FACES')
         select(list(bm.edges), False)

@@ -1,11 +1,11 @@
 import bpy
 
 from .door import Door
-from .door_ops import DoorOperator
+from .door_ops import BTOOLS_OT_add_door
 from .door_props import DoorProperty
 
 classes = (
-    DoorProperty, DoorOperator
+    DoorProperty, BTOOLS_OT_add_door
 )
 
 def register_door():

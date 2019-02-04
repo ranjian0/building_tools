@@ -3,7 +3,7 @@ bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
     "version": VER,
-    "blender": (2, 79, 0),
+    "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
     "warning": "",
@@ -22,11 +22,9 @@ from .core import register_core, unregister_core
 # =======================================================
 
 
-class MeshGenerationPanel(bpy.types.Panel):
+class PANEL_PT_mesh_tools(bpy.types.Panel):
     """UI panel for building operators and properties"""
-
-    bl_label = "Mesh Generation"
-    bl_idname = "VIEW3D_PT_btools"
+    bl_label = "Mesh Tools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Building Tools'
@@ -59,14 +57,20 @@ class MeshGenerationPanel(bpy.types.Panel):
 #
 # =======================================================
 
+classes = (
+    PANEL_PT_mesh_tools,
+)
+
 def register():
-    bpy.utils.register_class(MeshGenerationPanel)
     register_core()
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 def unregister():
-    bpy.utils.unregister_class(MeshGenerationPanel)
     unregister_core()
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
 
 if __name__ == "__main__":
     # -- continuos updates with script watcher

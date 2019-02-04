@@ -3,7 +3,7 @@ from .door import Door
 from .door_props import DoorProperty
 
 
-class DoorOperator(bpy.types.Operator):
+class BTOOLS_OT_add_door(bpy.types.Operator):
     """ Creates doors on selected mesh faces """
     bl_idname = "btools.add_door"
     bl_label = "Add Door"

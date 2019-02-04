@@ -7,7 +7,7 @@ from bpy.props import (
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for reqular Quad Inset """
-    size  = FloatVectorProperty(
+    size    = FloatVectorProperty(
         name="Size", min=.01, max=1.0, subtype='XYZ', size=2, default=(0.7, 0.7),
         description="Size of geometry")
 

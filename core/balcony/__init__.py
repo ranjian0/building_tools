@@ -1,11 +1,11 @@
 import bpy
 
 from .balcony import Balcony
-from .balcony_ops import BalconyOperator
+from .balcony_ops import BTOOLS_OT_add_balcony
 from .balcony_props import BalconyProperty
 
 classes = (
-    BalconyProperty, BalconyOperator
+    BalconyProperty, BTOOLS_OT_add_balcony
 )
 
 def register_balcony():

@@ -1,12 +1,12 @@
 import bpy
 
 from .rails import Rails
-from .rails_ops import RailOperator
+from .rails_ops import BTOOLS_OT_add_railing
 from .rails_props import RailProperty
 from .rails_types import MakeRailing
 
 classes = (
-    RailProperty, RailOperator
+    RailProperty, BTOOLS_OT_add_railing
 )
 
 def register_rail():
