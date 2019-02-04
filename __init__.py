@@ -25,9 +25,8 @@ from .core import register_core, unregister_core
 class MeshGenerationPanel(bpy.types.Panel):
     """UI panel for building operators and properties"""
 
-    bl_idname = "VIEW3D_PT_btools"
     bl_label = "Mesh Generation"
-
+    bl_idname = "VIEW3D_PT_btools"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Building Tools'
@@ -75,8 +74,7 @@ if __name__ == "__main__":
     try:
         unregister()
     except Exception as e:
-        import traceback
         print(e)
-        print(traceback.print_exc())
+        #import traceback; print(traceback.print_exc())
     finally:
         register()

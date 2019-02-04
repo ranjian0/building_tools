@@ -187,10 +187,11 @@ def make_hip_roof(bm, faces, height, **kwargs):
 
                 # -- update current
                 current_vert = closest
+                closest = None
+
             bmesh.ops.contextual_create(bm, geom=processed_edges)
-        else:
+        elif len(face_edges) == 1:
         # -- special case
-        # -- len(face_edges) == 1
         # -- means that original edge has a lone vert(not connected to skeleton)
 
         # -- cycle edge links only once
@@ -215,9 +216,12 @@ def make_hip_roof(bm, faces, height, **kwargs):
 
             bmesh.ops.contextual_create(bm, geom=face_edges)
 
+        else:
+            return
+
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
 def is_rectangular(faces):
     # -- determine if faces form a rectangular area

@@ -1,25 +1,28 @@
 import bpy
-from bpy.props import *
+from bpy.props import (
+        IntProperty,
+        FloatProperty,
+    )
 
 class FillPanel(bpy.types.PropertyGroup):
 
-    panel_x      = IntProperty(
+    panel_x = IntProperty(
         name="Horizontal Panels", min=0, max=100, default=1,
         description="Number of horizontal panels")
 
-    panel_y      = IntProperty(
+    panel_y = IntProperty(
         name="Vertical Panels", min=0, max=100, default=1,
         description="Number of vertical panels")
 
-    panel_b      = FloatProperty(
+    panel_b = FloatProperty(
         name="Panel Border", min=0.01, max=1.0, default=0.1,
         description="Border for panels")
 
-    panel_t      = FloatProperty(
+    panel_t = FloatProperty(
         name="Panel Inset", min=0.01, max=1.0, default=0.1,
         description="Inset of each panel")
 
-    panel_d      = FloatProperty(
+    panel_d = FloatProperty(
         name="Panel Depth", min=0.01, max=100.0, default=0.01, step=1,
         description="Depth of panels")
 
@@ -36,19 +39,19 @@ class FillPanel(bpy.types.PropertyGroup):
         col.prop(self, 'panel_d')
 
 class FillGlassPanes(bpy.types.PropertyGroup):
-    pane_x      = IntProperty(
+    pane_x = IntProperty(
         name="Horizontal glass panes", min=0, max=100, default=1,
         description="Number of horizontal glass panes")
 
-    pane_y      = IntProperty(
+    pane_y = IntProperty(
         name="Vertical glass panes", min=0, max=100, default=1,
         description="Number of vertical glass panes")
 
-    pane_t      = FloatProperty(
+    pane_t = FloatProperty(
         name="Glass Pane Thickness", min=0.01, max=100.0, default=0.05,
         description="Thickness of glass pane frames")
 
-    pane_d      = FloatProperty(
+    pane_d = FloatProperty(
         name="Glass Pane Depth", min=0.01, max=100.0, default=0.01, step=1,
         description="Depth of glass panes")
 
@@ -92,19 +95,19 @@ class FillLouver(bpy.types.PropertyGroup):
 
 
 class FillBars(bpy.types.PropertyGroup):
-    bar_x      = IntProperty(
+    bar_x = IntProperty(
         name="Horizontal Bars", min=0, max=100, default=1,
         description="Number of horizontal bars")
 
-    bar_y      = IntProperty(
+    bar_y = IntProperty(
         name="Vertical Bars", min=0, max=100, default=1,
         description="Number of vertical bars")
 
-    bar_t      = FloatProperty(
+    bar_t = FloatProperty(
         name="Bar Thickness", min=0.01, max=100.0, default=0.05,
         description="Thickness of bars")
 
-    bar_d      = FloatProperty(
+    bar_d = FloatProperty(
         name="Bar Depth", min=0.01, max=100.0, default=0.05, step=1,
         description="Depth of bars")
 
