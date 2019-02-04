@@ -60,13 +60,13 @@ class MeshGenerationPanel(bpy.types.Panel):
 # =======================================================
 
 def register():
-    bpy.utils.register_class(MeshGenerationPanel)
     register_core()
+    bpy.utils.register_class(MeshGenerationPanel)
 
 
 def unregister():
-    bpy.utils.unregister_class(MeshGenerationPanel)
     unregister_core()
+    bpy.utils.unregister_class(MeshGenerationPanel)
 
 if __name__ == "__main__":
     # -- continuos updates with script watcher
