@@ -3,7 +3,7 @@ from .rails import Rails
 from .rails_props import RailProperty
 
 
-class RailOperator(bpy.types.Operator):
+class BTOOLS_OT_add_railing(bpy.types.Operator):
     """ Creates rails on selected mesh edges """
     bl_idname = "btools.add_railing"
     bl_label = "Add Railing"

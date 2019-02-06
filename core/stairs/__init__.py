@@ -1,11 +1,11 @@
 import bpy
 
 from .stairs import Stairs
-from .stairs_ops import StairsOperator
+from .stairs_ops import BTOOLS_OT_add_stairs
 from .stairs_props import StairsProperty
 
 classes = (
-    StairsProperty, StairsOperator
+    StairsProperty, BTOOLS_OT_add_stairs
 )
 
 def register_stairs():

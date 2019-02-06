@@ -119,6 +119,7 @@ def make_hip_roof(bm, faces, height, **kwargs):
 
     # compute skeleton
     skeleton = skeletonize(points, [])
+    import pprint; pprint.pprint(skeleton)
 
     # create hip roof from skeleton
     # 1. -- remove face
@@ -181,13 +182,13 @@ def make_hip_roof(bm, faces, height, **kwargs):
                         distance = dist
 
                 # -- add edge between closest and current if any
+                if closest == current_vert: break
                 new_edge = bm.edges.get([closest, current_vert])
                 if new_edge:
                     processed_edges.append(new_edge)
 
                 # -- update current
                 current_vert = closest
-                closest = None
 
             bmesh.ops.contextual_create(bm, geom=processed_edges)
         elif len(face_edges) == 1:

@@ -1,8 +1,8 @@
-from .version import VER
+from .version import VERSION
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
-    "version": VER,
+    "version": VERSION,
     "blender": (2, 79, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
@@ -75,6 +75,5 @@ if __name__ == "__main__":
         unregister()
     except Exception as e:
         print(e)
-        #import traceback; print(traceback.print_exc())
     finally:
         register()

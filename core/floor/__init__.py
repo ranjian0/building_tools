@@ -1,11 +1,11 @@
 import bpy
 
 from .floor import Floor
-from .floor_ops import FloorOperator
+from .floor_ops import BTOOLS_OT_add_floors
 from .floor_props import FloorProperty
 
 classes = (
-    FloorProperty, FloorOperator
+    FloorProperty, BTOOLS_OT_add_floors
 )
 
 def register_floor():
