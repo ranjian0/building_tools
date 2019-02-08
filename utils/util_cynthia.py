@@ -4,6 +4,10 @@ from mathutils import Vector
 from bpy_extras import view3d_utils
 
 
+def equal(a, b, eps=0.001):
+    """ Check if a and b are approximately equal with a margin of eps """
+    return a == b or (abs(a-b) <= max(abs(a), abs(b)) * eps)
+
 def clamp(val, _min, _max):
     """ Reset val between _min and __max """
     return max(min(val, _max), _min)
