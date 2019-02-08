@@ -9,11 +9,10 @@
 
 ## Installing:
 
-    For Blender 2.8
-      Switch the branch to 2.8-port, proceed to next steps.
+  * Go to the releases tab.
+  * Select appropriate release for your blender version (2.79 / 2.80).
+  * Download source.zip
 
-  * Click on the  *Clone or download*  button.
-  * *Download zip*
   * In blender, go to : User Preferences -> Add-ons -> install addon from file.
   * Select the downloaded zip file and you're good to go.
 
@@ -22,7 +21,7 @@
 
 ## Development Status
 
-  * under heavy developent, use at own risk
+  * under heavy developent, use at own risk.
 
 ## Contributing
 
