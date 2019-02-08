@@ -9,11 +9,11 @@ from ..generic import SizeOffsetProperty
 from ..rails import RailProperty
 
 class BalconyProperty(bpy.types.PropertyGroup):
-    width   = FloatProperty(
+    width   : FloatProperty(
         name="Balcony Width", min=0.01, max=100.0, default=1.2,
         description="Width of balcony")
 
-    railing = BoolProperty(
+    railing : BoolProperty(
         name="Add Railing", default=True,
         description="Whether the balcony has railing")
 
@@ -24,12 +24,12 @@ class BalconyProperty(bpy.types.PropertyGroup):
         ("RIGHT", "Right", "", 3)
     ]
 
-    open_side = EnumProperty(
+    open_side : EnumProperty(
         name="Open Side", items=open_items, default='NONE',
         description="Sides of the balcony with no railing")
 
-    rail = PointerProperty(type=RailProperty)
-    soff = PointerProperty(type=SizeOffsetProperty)
+    rail : PointerProperty(type=RailProperty)
+    soff : PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
         self.soff.draw(context, layout)
