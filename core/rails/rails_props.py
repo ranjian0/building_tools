@@ -2,47 +2,47 @@ import bpy
 from bpy.props import *
 
 class RailProperty(bpy.types.PropertyGroup):
-    ps = FloatProperty(
+    ps : FloatProperty(
         name="Post Size", min=0.01, max=100.0, default=0.05,
         description="Size of each post")
 
-    pd = FloatProperty(
+    pd : FloatProperty(
         name="Post Density", min=0.0, max=1.0, default=.3,
         description="Number of posts along each edge")
 
-    rs = FloatProperty(
+    rs : FloatProperty(
         name="Rail Size", min=0.01, max=100.0, default=0.05,
         description="Size of each rail")
 
-    rd = FloatProperty(
+    rd : FloatProperty(
         name="Rail Density", min=0.0, max=1.0, default=.3,
         description="Number of rails over each edge")
 
-    ww = FloatProperty(
+    ww : FloatProperty(
         name="Wall Width", min=0.0, max=100.0, default=0.075,
         description="Width of each wall")
 
-    cpw = FloatProperty(
+    cpw : FloatProperty(
         name="Corner Post Width", min=0.01, max=100.0, default=0.15,
         description="Width of each corner post")
 
-    cph = FloatProperty(
+    cph : FloatProperty(
         name="Corner Post Height", min=0.01, max=100.0, default=0.7,
         description="Height of each corner post")
 
-    hcp = BoolProperty(
+    hcp : BoolProperty(
         name="Corner Posts", default=True,
         description="Whether the railing has corner posts")
 
-    expand = BoolProperty(
+    expand : BoolProperty(
         name="Expand", default=False,
         description="Whether to expand fill type to extremes")
 
-    has_decor = BoolProperty(
+    has_decor : BoolProperty(
         name="Has Decor", default=False,
         description="Whether corner posts have decor")
 
-    remove_colinear = BoolProperty(
+    remove_colinear : BoolProperty(
         name="Remove Colinear", default=False,
         description="Whether to remove extra colinear posts")
 
@@ -52,7 +52,7 @@ class RailProperty(bpy.types.PropertyGroup):
         ("WALL", "Wall", "", 2)
     ]
 
-    fill = EnumProperty(
+    fill : EnumProperty(
         name="Fill Type", items=fill_types, default='POSTS',
         description="Type of railing")
 

@@ -8,17 +8,17 @@ from ..fill import (
 
 
 class DoorProperty(bpy.types.PropertyGroup):
-    redo = BoolProperty()
+    redo : BoolProperty()
 
-    ft   = FloatProperty(
+    ft   : FloatProperty(
         name="Frame Thickness", min=0.0, max=2.99, default=0.1,
         description="Thickness of inner door Frame")
 
-    fd   = FloatProperty(
+    fd   : FloatProperty(
         name="Frame Depth", min=0.0, max=100.0, default=0.05, step=1,
         description="Depth of inner door Frame")
 
-    hdd  = BoolProperty(
+    hdd  : BoolProperty(
         name='Double Door', default=False,
         description="If the door is split")
 
@@ -29,15 +29,15 @@ class DoorProperty(bpy.types.PropertyGroup):
         ("LOUVER", "Louver", "", 3)
 
     ]
-    fill_type = EnumProperty(
+    fill_type : EnumProperty(
         name="Fill Type", items=fill_items, default="NONE",
         description="Type of fill for door")
 
-    soff = PointerProperty(type=SizeOffsetProperty)
+    soff : PointerProperty(type=SizeOffsetProperty)
 
-    panel_fill  = PointerProperty(type=FillPanel)
-    glass_fill  = PointerProperty(type=FillGlassPanes)
-    louver_fill = PointerProperty(type=FillLouver)
+    panel_fill  : PointerProperty(type=FillPanel)
+    glass_fill  : PointerProperty(type=FillGlassPanes)
+    louver_fill : PointerProperty(type=FillLouver)
 
     def set_defaults(self):
         """ Helper function to make convinient property adjustments """
