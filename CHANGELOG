@@ -1,5 +1,3 @@
-VER = (0, 8, 2)
-
 # -- Versioning Scheme
 #    `````````````````
 # Given a version number MAJOR.MINOR.PATCH, increment the:
