@@ -25,7 +25,7 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
     """UI panel for building operators and properties"""
     bl_label = "Mesh Tools"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
+    bl_region_type = 'UI'
     bl_category = 'Building Tools'
 
     def draw(self, context):
