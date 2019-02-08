@@ -83,11 +83,10 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
                         if all([v in verts for v in e.verts])]))
 
     # -- fix roof slope at bottom edges
-    min_edges = [e for e in nedges
-        if calc_edge_median(e).z == min([v.co.z for e in nedges for v in e.verts])]
+    min_loc_z = min([v.co.z for e in nedges for v in e.verts])
+    min_verts = list({v for e in nedges for v in e.verts if v.co.z == min_loc_z})
     bmesh.ops.translate(bm,
-        verts=list(set([v for e in min_edges for v in e.verts])),
-        vec=(0, 0, -outset))
+        verts=min_verts, vec=(0, 0, -outset))
 
     # -- extrude edges upwards and fill face
     ret = bmesh.ops.extrude_edge_only(bm, edges=nedges)
