@@ -68,7 +68,7 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'ps')
 
             box1 = box.box()
-            box1.label("Corner Posts")
+            box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
             col.prop(self, 'cpw')
@@ -85,7 +85,7 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'expand', text="Expand Rails", toggle=True)
 
             box1 = box.box()
-            box1.label("Corner Posts")
+            box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
             col.prop(self, 'cpw')
@@ -101,7 +101,7 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, 'expand', text="Expand Walls", toggle=True)
 
             box1 = box.box()
-            box1.label("Corner Posts")
+            box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
             col.prop(self, 'cpw')
