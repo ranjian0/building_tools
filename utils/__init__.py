@@ -1,4 +1,4 @@
-from .util_cynthia import *
+from .util_general import *
 from .util_geometry import *
 from .util_mesh import *
 from .util_object import *

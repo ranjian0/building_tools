@@ -1,7 +1,5 @@
 import bpy
-import bgl
 from mathutils import Vector
-from bpy_extras import view3d_utils
 
 
 def equal(a, b, eps=0.001):
