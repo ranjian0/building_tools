@@ -450,10 +450,6 @@ _OriginalEdge = namedtuple("_OriginalEdge", "edge bisector_left, bisector_right"
 
 Subtree = namedtuple("Subtree", "source, height, sinks")
 
-def _side(point, line):
-    a = line.p.x
-    b = line.p.y
-
 class _LAVertex:
     def __init__(self, point, edge_left, edge_right, direction_vectors=None):
         self.point = point
