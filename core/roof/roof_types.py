@@ -93,7 +93,7 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     bmesh.ops.delete(bm, geom=faces + nfaces, context='FACES_ONLY')
 
     # -- merge opposite verts
-    axis = 'x' if orient == 'LEFT' else 'y'
+    axis = 'x' if orient == 'HORIZONTAL' else 'y'
     _max = max([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
     _min = min([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
     mid = getattr((_max.co + _min.co)/2, axis)
