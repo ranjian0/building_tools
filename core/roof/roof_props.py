@@ -24,7 +24,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of entire roof")
 
     o_types = [("HORIZONTAL", "Horizontal", "", 0), ("VERTICAL", "Vertical", "", 1), ]
-    orient : EnumProperty(description="Orientation of gable", items=o_types, default='LEFT')
+    orient : EnumProperty(description="Orientation of gable", items=o_types, default='HORIZONTAL')
 
 
     def draw(self, context, layout):
