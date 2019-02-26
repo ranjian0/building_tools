@@ -164,7 +164,7 @@ def make_hip_roof(bm, faces, thick, outset, height, **kwargs):
 
     # create hip roof from skeleton
     # 1. -- remove face
-    bmesh.ops.delete(bm, geom=faces, context=3)
+    bmesh.ops.delete(bm, geom=faces, context='FACES_ONLY')
 
     # 2. -- determine height scale for skeleton
     height_scale = height/max([arc.height for arc in skeleton])
