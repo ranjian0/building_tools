@@ -30,7 +30,6 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        active = context.object
 
         # Draw Operators
         # ``````````````
@@ -49,6 +48,16 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_stairs")
         col.operator("btools.add_roof")
 
+class PANEL_PT_material_tools(bpy.types.Panel):
+    """UI panel for building operators and properties"""
+    bl_label = "Material Tools"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Building Tools'
+
+    def draw(self, context):
+        layout = self.layout
+
 
 # =======================================================
 #
@@ -58,6 +67,7 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
 
 classes = (
     PANEL_PT_mesh_tools,
+    PANEL_PT_material_tools,
 )
 
 def register():

@@ -22,7 +22,7 @@ def link_obj(obj):
     """ Link object to active scene """
     bpy.context.scene.collection.objects.link(obj)
     bpy.context.view_layer.objects.active = obj
-    select(bpy.data.objects, False)
+    select(bpy.context.view_layer.objects, False)
     obj.select_set(True)
     obj.location = bpy.context.scene.cursor_location
 
