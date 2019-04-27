@@ -16,7 +16,7 @@ from ...utils import (
     make_object,
     bm_from_obj,
     kwargs_from_props,
-    create_material_group,
+    create_default_materials,
     )
 
 
@@ -51,3 +51,4 @@ class Floorplan:
 
         bm_to_obj(bm, obj)
         link_obj(obj)
+        create_default_materials(obj)
