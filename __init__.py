@@ -114,8 +114,8 @@ class PANEL_PT_material_tools(bpy.types.Panel):
 
 classes = (
     PANEL_PT_mesh_tools,
-    PANEL_PT_material_tools,
-    MATERIAL_UL_matgroups,
+    # PANEL_PT_material_tools,
+    # MATERIAL_UL_matgroups,
 )
 
 def register():
