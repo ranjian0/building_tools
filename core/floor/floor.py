@@ -28,12 +28,11 @@ class Floor:
 
         if cls.validate(bm):
             if any([f for f in bm.faces if f.select]):
-                faces = make_floors(bm, None, **kwargs_from_props(props))
+                make_floors(bm, None, **kwargs_from_props(props))
             else:
                 edges = [e for e in bm.edges if e.is_boundary]
-                faces = make_floors(bm, edges, **kwargs_from_props(props))
+                make_floors(bm, edges, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
-            cls.create_materials(context, *faces)
             return {'FINISHED'}
         return {'CANCELLED'}
 
@@ -45,12 +44,3 @@ class Floor:
         elif any([f for f in bm.faces if f.select]):
             return True
         return False
-
-    @classmethod
-    def create_materials(cls, context, slab_faces, wall_faces):
-        if not cls.has_mat_groups:
-            smat = create_material_group(context.object, "slab")
-            material_set_faces(context.object, smat, slab_faces)
-            wmat = create_material_group(context.object, "wall")
-            material_set_faces(context.object, wmat, wall_faces)
-            cls.has_mat_groups = True
