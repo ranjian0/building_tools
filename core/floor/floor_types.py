@@ -7,19 +7,22 @@ from bmesh.types import (
 from ...utils import (
     select,
     filter_geom,
+    set_material,
     )
 
 def make_floors(bm, edges, floor_count, floor_height, slab_thickness, slab_outset, **kwargs):
-    """Create extrusions to resemble building floors
+    """Create extrusions of floor geometry from a floorplan
 
     Args:
+        bm (bmesh.types.BMesh): bmesh for the current editmesh
+        edges (bmesh.types.BMEdgeSeq): bounding edges for editmesh (floorplan)
         floor_count  (int): Number of floors
         floor_height (float): Height of each floor
         slab_thickness (float): Thickness of floor slabs
         slab_outset (float): How much the slab extends outwards
         **kwargs: Extra kwargs from FloorProperty
-    """
 
+    """
     del_faces = []
     if not edges:
         # -- find boundary of selected faces
@@ -53,4 +56,8 @@ def make_floors(bm, edges, floor_count, floor_height, slab_thickness, slab_outse
             geom=del_faces,
             context='FACES')
 
-    return slab_faces, [f for f in bm.faces if f not in slab_faces and not f.normal.z]
+    wall_faces = [f for f in bm.faces if f not in slab_faces and not f.normal.z]
+
+    # -- setup materials for slab and wall faces
+    set_material(slab_faces, "mat_slab")
+    set_material(wall_faces, "mat_wall")
