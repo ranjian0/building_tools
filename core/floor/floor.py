@@ -6,8 +6,6 @@ from ...utils import (
     select,
     get_edit_mesh,
     kwargs_from_props,
-    material_set_faces,
-    create_material_group
     )
 
 
