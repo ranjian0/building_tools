@@ -13,7 +13,7 @@ from bpy_extras.image_utils import load_image
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
-    """ Convinience PropertyGroup used for regular Quad Inset """
+    """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
     size : FloatVectorProperty(
         name="Size", min=.01, max=1.0, subtype='XYZ', size=2, default=(0.7, 0.7),
         description="Size of geometry")
