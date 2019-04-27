@@ -114,12 +114,12 @@ def register_generic():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.mat_groups = bpy.props.CollectionProperty(type=MaterialGroup)
-    bpy.types.Object.mat_group_index = bpy.props.IntProperty()
+    # bpy.types.Object.mat_groups = bpy.props.CollectionProperty(type=MaterialGroup)
+    # bpy.types.Object.mat_group_index = bpy.props.IntProperty()
 
 def unregister_generic():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    del bpy.types.Object.mat_groups
-    del bpy.types.Object.mat_group_index
+    # del bpy.types.Object.mat_groups
+    # del bpy.types.Object.mat_group_index
