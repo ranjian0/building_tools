@@ -17,6 +17,16 @@ DEFAULT_MATERIALS = {
 
 def create_default_materials(obj):
 	for name, color in DEFAULT_MATERIALS.items():
+		if has_material(obj, name):
+			continue
+
+		# -- the material exists but not linked to object
+		# -- happens due to undo-redo esp when changing object data
+		if name in bpy.data.materials.keys():
+			mat = bpy.data.materials[name]
+			link_mat(obj, mat)
+			continue
+
 		mat = bpy.data.materials.new(obj.name + '_' + name)
 		mat.diffuse_color = color + (1,)
 		mat.use_nodes = True
