@@ -157,7 +157,7 @@ def fp_random(bm, seed, width, length, **kwargs):
     random.seed(seed)
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
-    mat = sc_x * sc_y
+    mat = sc_x @ sc_y
     bmesh.ops.create_grid(bm,
         x_segments=1, y_segments=1, size=1, matrix=mat)
 

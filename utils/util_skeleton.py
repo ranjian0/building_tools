@@ -746,7 +746,7 @@ class _LAV:
             yield cur
             cur = cur.next
             if cur == self.head:
-                raise StopIteration
+                return
 
     def _show(self):
         cur = self.head

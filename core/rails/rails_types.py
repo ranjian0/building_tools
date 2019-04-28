@@ -353,7 +353,7 @@ def create_wall(bm, start, end, height, width, tangent):
         edges = filter_geom(res['geom'], BMEdge)
         faces = [f for e in edges for f in e.link_faces
                     if not f.normal.z and f not in filter_geom(res['geom'], BMFace)]
-        bmesh.ops.delete(bm, geom=faces, context=3)
+        bmesh.ops.delete(bm, geom=faces, context='FACES_ONLY')
 
 def del_faces(bm, post, top=False, bottom=False, left=False, right=False, front=False, back=False):
     """ Delete flagged faces for the given post (cube geometry) """
@@ -368,7 +368,7 @@ def del_faces(bm, post, top=False, bottom=False, left=False, right=False, front=
             vts.sort(key=lambda v: getattr(v.co, key))
             faces.append(face_with_verts(bm, vts[_slice]))
 
-    bmesh.ops.delete(bm, geom=faces, context=3)
+    bmesh.ops.delete(bm, geom=faces, context='FACES_ONLY')
 
 def array_elements(bm, elem, count, start, stop):
     """ Duplicate elements count-1 times between start and stop """

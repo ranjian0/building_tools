@@ -48,7 +48,6 @@ def register_core():
     for func in register_funcs:
         func()
 
-
 def unregister_core():
     for func in unregister_funcs:
         func()

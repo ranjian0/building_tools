@@ -51,4 +51,4 @@ def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
 
             MakeRailing().from_edges(bm, r_edges, **kwargs)
 
-        bmesh.ops.delete(bm, geom=[f], context=3)
+        bmesh.ops.delete(bm, geom=[f], context='FACES_ONLY')
