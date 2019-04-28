@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from ...utils import (
     split,
+    set_material,
     get_edit_mesh,
     )
 
@@ -60,6 +61,8 @@ def make_window_frame(bm, face, ft, fd, **kwargs):
         bmesh.types.BMFace: face after frame is created
     """
 
+    set_material([face], "mat_window_frame")
+
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
     face = bmesh.ops.extrude_discrete_faces(bm,
         faces=[face]).get('faces')[-1]
@@ -73,7 +76,6 @@ def make_window_frame(bm, face, ft, fd, **kwargs):
         f = bmesh.ops.extrude_discrete_faces(bm,
             faces=[face]).get('faces')[-1]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
-
         return f
     return face
 
@@ -88,13 +90,10 @@ def make_window_fill(bm, face, fill_type, **kwargs):
     """
 
     if fill_type == 'NONE':
-        pass
-
+        set_material([face], 'mat_window_glass')
     elif fill_type == 'GLASS PANES':
         fill_glass_panes(bm, face, **kwargs)
-
     elif fill_type == 'BAR':
         fill_bar(bm, face, **kwargs)
-
     elif fill_type == 'LOUVER':
         fill_louver(bm, face, **kwargs)
