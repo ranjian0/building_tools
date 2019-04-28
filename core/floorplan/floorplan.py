@@ -30,7 +30,9 @@ class Floorplan:
             context (bpy.context): blender context
             props (bpy.types.PropertyGroup): FloorplanProperty
         """
-        obj = make_object('floorplan', make_mesh('fp_mesh'))
+
+        name = "building_" + str("{:0>3}".format(len(bpy.data.objects)+1))
+        obj = make_object(name, make_mesh(name+'_mesh'))
         bm = bm_from_obj(obj)
 
         kwargs  = kwargs_from_props(props)
