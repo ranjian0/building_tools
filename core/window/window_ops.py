@@ -8,7 +8,7 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
     bl_label = "Add Window"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=WindowProperty)
+    props : bpy.props.PointerProperty(type=WindowProperty)
 
     @classmethod
     def poll(cls, context):

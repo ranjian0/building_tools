@@ -9,7 +9,7 @@ class BTOOLS_OT_add_railing(bpy.types.Operator):
     bl_label = "Add Railing"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=RailProperty)
+    props : bpy.props.PointerProperty(type=RailProperty)
 
     @classmethod
     def poll(cls, context):

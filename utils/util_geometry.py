@@ -24,7 +24,7 @@ def plane(bm, width=2, length=2):
 def circle(bm, radius=1, segs=10, cap_tris=False):
     """ Create circle in the bmesh """
     ret = bmesh.ops.create_circle(
-        bm, cap_ends=True, cap_tris=cap_tris, segments=segs, diameter=radius * 2)
+        bm, cap_ends=True, cap_tris=cap_tris, segments=segs, radius=radius)
     return ret
 
 def cone(bm, r1=.5, r2=.01, height=2, segs=32):

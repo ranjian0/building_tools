@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
-    "version": (0, 8, 2),
+    "version": (0, 9, 2),
     "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
@@ -25,12 +25,11 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
     """UI panel for building operators and properties"""
     bl_label = "Mesh Tools"
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
+    bl_region_type = 'UI'
     bl_category = 'Building Tools'
 
     def draw(self, context):
         layout = self.layout
-        active = context.object
 
         # Draw Operators
         # ``````````````
@@ -48,7 +47,6 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
 
         col.operator("btools.add_stairs")
         col.operator("btools.add_roof")
-
 
 # =======================================================
 #

@@ -1,148 +1,46 @@
 import bpy
 
-def create_mat(name="Default Material"):
-	return bpy.data.materials.new(name)
+DEFAULT_MATERIALS = {
+	"mat_slab" : (.208, .183, .157),
+	"mat_wall" : (.190, .117, .04),
+
+	"mat_window_frame" : (.8, .8, .8),
+	"mat_window_pane"  : (0, .6, 0),
+	"mat_window_bars"  : (0, .7, 0),
+	"mat_window_glass" : (0, .1, .6),
+
+	"mat_door_frame" : (.8, .8, .8),
+	"mat_door_pane"  : (.13, .05, 0),
+	"mat_door_groove" : (.13, .05, 0),
+	"mat_door_glass"  : (0, .1, .6)
+}
+
+def create_default_materials(obj):
+	for name, color in DEFAULT_MATERIALS.items():
+		mat = bpy.data.materials.new(obj.name + '_' + name)
+		mat.diffuse_color = color + (1,)
+		mat.use_nodes = True
+		link_mat(obj, mat)
 
 def link_mat(obj, mat):
-	obj.data.materials.append(mat)
-
-def set_defaults(mat, diffuse, diff_int, specular, spec_int):
-	mat.diffuse_color = diffuse
-	mat.diffuse_intensity = diff_int
-	mat.specular_color = specular
-	mat.specular_intensity = spec_int
-
-def material_set_faces(obj, mat, faces):
-	# if the material is not in obj.materials, append it
-	if not mat: return
-	if mat.name not in obj.data.materials:
-		link_mat(obj, mat)
-	mat_index = list(obj.data.materials).index(mat)
-	for face in faces:
-		face.material_index = mat_index
+	if not has_material(obj, mat.name):
+		obj.data.materials.append(mat)
 
 def has_material(obj, name):
 	return name in obj.data.materials.keys()
 
-def template_create_materials(obj, name, defaults):
-	mat_name = name
-	if has_material(obj, mat_name):
-		mat = obj.data.materials[mat_name]
-	else:
-		mat = create_mat(mat_name)
-		link_mat(obj, mat)
+def set_material(faces, name_or_index):
+	obj = bpy.context.object
+	if not obj: return
 
-		# set some material defaults
-		diffuse 	= defaults.get('diffuse')
-		diff_int 	= defaults.get('diffuse_intensity')
-		specular 	= defaults.get('specular')
-		spec_int 	= defaults.get('specular_intensity')
-		set_defaults(mat, diffuse, diff_int, specular, spec_int)
-	return mat
+	mat_idx = 0
+	if isinstance(name_or_index, str):
+		name = name_or_index
+		for i, mat in enumerate(obj.data.materials):
+			if name in mat.name:
+				mat_idx = i
+	elif isinstance(name_or_index, int):
+		mat_idx = name_or_index
 
-
-# FLOOR MATERIALS
-
-def floor_mat_slab(obj):
-	return template_create_materials(obj,
-			"material_slab",
-			{
-				'diffuse' 			: (.4, .35, .3),
-				'diffuse_intensity' : .8,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def floor_mat_wall(obj):
-	return template_create_materials(obj,
-			"material_wall",
-			{
-				'diffuse' 			: (.3, .25, .13),
-				'diffuse_intensity' : .8,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-# WINDOW MATERIALS
-
-def window_mat_frame(obj):
-	return template_create_materials(obj,
-			"material_window_frame",
-			{
-				'diffuse' 			: (.8, .8, .8),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def window_mat_pane(obj):
-	return template_create_materials(obj,
-			"material_window_pane",
-			{
-				'diffuse' 			: (0, .6, 0),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def window_mat_bars(obj):
-	return template_create_materials(obj,
-			"material_window_bar",
-			{
-				'diffuse' 			: (0, .6, .0),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def window_mat_glass(obj):
-	return template_create_materials(obj,
-			"material_window_glass",
-			{
-				'diffuse' 			: (0, .1, .6),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-# DOOR MATERIALS
-
-def door_mat_frame(obj):
-	return template_create_materials(obj,
-			"material_door_frame",
-			{
-				'diffuse' 			: (.8, .8, .8),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def door_mat_pane(obj):
-	return template_create_materials(obj,
-			"material_door_pane",
-			{
-				'diffuse' 			: (.13, .05, 0),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def door_mat_groove(obj):
-	return template_create_materials(obj,
-			"material_door_groove",
-			{
-				'diffuse' 			: (.13, .05, 0),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
-
-def door_mat_glass(obj):
-	return template_create_materials(obj,
-			"material_door_glass",
-			{
-				'diffuse' 			: (0, .1, .6),
-				'diffuse_intensity' : 1,
-				'specular'			: (1, 1, 1),
-				'specular_intensity': 0
-			})
+	for f in faces:
+		f.material_index = mat_idx
