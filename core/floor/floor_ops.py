@@ -8,7 +8,7 @@ class BTOOLS_OT_add_floors(bpy.types.Operator):
     bl_label = "Add Floors"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=FloorProperty)
+    props : bpy.props.PointerProperty(type=FloorProperty)
 
     @classmethod
     def poll(cls, context):

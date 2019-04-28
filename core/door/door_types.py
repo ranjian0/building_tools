@@ -72,7 +72,7 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
                         key=lambda e : calc_edge_median(e).z)
         hidden = min([f for f in bottom_edge.link_faces],
                         key=lambda f : f.calc_center_median().z)
-        bmesh.ops.delete(bm, geom=[hidden], context=5)
+        bmesh.ops.delete(bm, geom=[hidden], context='FACES')
 
     # Frame outset
     face = bmesh.ops.extrude_discrete_faces(bm,

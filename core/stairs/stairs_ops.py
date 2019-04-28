@@ -8,7 +8,7 @@ class BTOOLS_OT_add_stairs(bpy.types.Operator):
     bl_label = "Add Stairs"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=StairsProperty)
+    props : bpy.props.PointerProperty(type=StairsProperty)
 
     @classmethod
     def poll(cls, context):

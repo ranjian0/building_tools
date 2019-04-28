@@ -9,7 +9,7 @@ class BTOOLS_OT_add_balcony(bpy.types.Operator):
     bl_label = "Add Balcony"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=BalconyProperty)
+    props : bpy.props.PointerProperty(type=BalconyProperty)
 
     @classmethod
     def poll(cls, context):

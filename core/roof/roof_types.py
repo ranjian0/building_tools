@@ -58,7 +58,7 @@ def make_flat_roof(bm, faces, thick, outset, **kwargs):
 
     bmesh.ops.inset_region(bm, faces=link_faces, depth=outset, use_even_offset=True)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bmesh.ops.delete(bm, geom=faces, context=5)
+    bmesh.ops.delete(bm, geom=faces, context='FACES')
 
     new_faces = list({f for e in top_face.edges for f in e.link_faces})
     return bmesh.ops.dissolve_faces(bm, faces=new_faces).get('region')
@@ -90,10 +90,10 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     edges = filter_geom(ret['geom'], BMEdge)
     nfaces = filter_geom(ret['geom'], BMFace)
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, height))
-    bmesh.ops.delete(bm, geom=faces + nfaces, context=3)
+    bmesh.ops.delete(bm, geom=faces + nfaces, context='FACES_ONLY')
 
     # -- merge opposite verts
-    axis = 'x' if orient == 'LEFT' else 'y'
+    axis = 'x' if orient == 'HORIZONTAL' else 'y'
     _max = max([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
     _min = min([v for e in edges for v in e.verts], key=lambda v: getattr(v.co, axis))
     mid = getattr((_max.co + _min.co)/2, axis)
@@ -107,7 +107,7 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     faces = list(set([f for v in top_verts for f in v.link_faces if f.normal.z]))
     boundary_edges = [e for f in faces for e in f.edges
         if len(set(e.link_faces) - set(faces)) == 1]
-    bmesh.ops.delete(bm, geom=faces, context=5)
+    bmesh.ops.delete(bm, geom=faces, context='FACES')
 
     ret = bmesh.ops.extrude_edge_only(bm, edges=boundary_edges)
     verts = filter_geom(ret['geom'], BMVert)
@@ -164,7 +164,7 @@ def make_hip_roof(bm, faces, thick, outset, height, **kwargs):
 
     # create hip roof from skeleton
     # 1. -- remove face
-    bmesh.ops.delete(bm, geom=faces, context=3)
+    bmesh.ops.delete(bm, geom=faces, context='FACES_ONLY')
 
     # 2. -- determine height scale for skeleton
     height_scale = height/max([arc.height for arc in skeleton])

@@ -20,11 +20,11 @@ def bm_to_obj(bm, obj):
 
 def link_obj(obj):
     """ Link object to active scene """
-    bpy.context.scene.objects.link(obj)
-    bpy.context.scene.objects.active = obj
-    select(bpy.data.objects, False)
-    obj.select = True
-    obj.location = bpy.context.scene.cursor_location
+    bpy.context.scene.collection.objects.link(obj)
+    bpy.context.view_layer.objects.active = obj
+    select(bpy.context.view_layer.objects, False)
+    obj.select_set(True)
+    obj.location = bpy.context.scene.cursor.location
 
 def obj_clear_data(obj):
     """ Removes mesh geometry data from obj """

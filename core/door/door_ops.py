@@ -9,7 +9,7 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
     bl_label = "Add Door"
     bl_options = {'REGISTER', 'UNDO'}
 
-    props = bpy.props.PointerProperty(type=DoorProperty)
+    props : bpy.props.PointerProperty(type=DoorProperty)
 
     @classmethod
     def poll(cls, context):

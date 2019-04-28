@@ -6,16 +6,6 @@ import operator
 import itertools as it
 from collections import namedtuple
 
-try:
-    long
-except NameError:
-    long = int
-
-_use_slots = True
-_enable_swizzle_set = False
-
-if _enable_swizzle_set:
-    _use_slots = True
 
 class Vector2:
     __slots__ = ['x', 'y']
@@ -69,20 +59,6 @@ class Vector2:
         except ValueError:
             raise AttributeError(name)
 
-    if _enable_swizzle_set:
-        # This has detrimental performance on ordinary setattr as well
-        # if enabled
-        def __setattr__(self, name, value):
-            if len(name) == 1:
-                object.__setattr__(self, name, value)
-            else:
-                try:
-                    l = [self.x, self.y]
-                    for c, v in map(None, name, value):
-                        l['xy'.index(c)] = v
-                    self.x, self.y = l
-                except ValueError:
-                    raise AttributeError(name)
 
     def __add__(self, other):
         if isinstance(other, Vector2):
@@ -137,48 +113,48 @@ class Vector2:
                            other.y - self[1])
 
     def __mul__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(self.x * other,
                        self.y * other)
 
     __rmul__ = __mul__
 
     def __imul__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         self.x *= other
         self.y *= other
         return self
 
     def __div__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.div(self.x, other),
                        operator.div(self.y, other))
 
 
     def __rdiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.div(other, self.x),
                        operator.div(other, self.y))
 
     def __floordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.floordiv(self.x, other),
                        operator.floordiv(self.y, other))
 
 
     def __rfloordiv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.floordiv(other, self.x),
                        operator.floordiv(other, self.y))
 
     def __truediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.truediv(self.x, other),
                        operator.truediv(self.y, other))
 
 
     def __rtruediv__(self, other):
-        assert type(other) in (int, long, float)
+        assert type(other) in (int, float)
         return Vector2(operator.truediv(other, self.x),
                        operator.truediv(other, self.y))
 
@@ -473,10 +449,6 @@ class _EdgeEvent(namedtuple("_EdgeEvent", "distance intersection_point vertex_a 
 _OriginalEdge = namedtuple("_OriginalEdge", "edge bisector_left, bisector_right")
 
 Subtree = namedtuple("Subtree", "source, height, sinks")
-
-def _side(point, line):
-    a = line.p.x
-    b = line.p.y
 
 class _LAVertex:
     def __init__(self, point, edge_left, edge_right, direction_vectors=None):
@@ -774,7 +746,7 @@ class _LAV:
             yield cur
             cur = cur.next
             if cur == self.head:
-                raise StopIteration
+                return
 
     def _show(self):
         cur = self.head

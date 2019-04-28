@@ -1,7 +1,5 @@
 import bpy
-import bgl
 from mathutils import Vector
-from bpy_extras import view3d_utils
 
 
 def equal(a, b, eps=0.001):
@@ -61,8 +59,8 @@ def clean_scene():
     """ Delete all objects in the scene if any """
     scene = bpy.context.scene
 
-    if scene.objects:
-        active = scene.objects.active
+    if scene.collection.objects:
+        active = scene.collection.objects.active
         if active and active.mode == 'EDIT':
             bpy.ops.object.mode_set(mode='OBJECT')
 

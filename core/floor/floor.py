@@ -3,12 +3,14 @@ import bmesh
 from .floor_types import make_floors
 
 from ...utils import (
+    select,
     get_edit_mesh,
-    kwargs_from_props
+    kwargs_from_props,
     )
 
 
 class Floor:
+    has_mat_groups = False
 
     @classmethod
     def build(cls, context, props):
