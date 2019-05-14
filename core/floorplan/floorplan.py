@@ -53,4 +53,4 @@ class Floorplan:
 
         bm_to_obj(bm, obj)
         link_obj(obj)
-        create_default_materials(obj)
+        # create_default_materials(obj)
