@@ -5,11 +5,12 @@ from .door_props import DoorProperty
 
 class BTOOLS_OT_add_door(bpy.types.Operator):
     """ Creates doors on selected mesh faces """
+
     bl_idname = "btools.add_door"
     bl_label = "Add Door"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    props : bpy.props.PointerProperty(type=DoorProperty)
+    props: bpy.props.PointerProperty(type=DoorProperty)
 
     @classmethod
     def poll(cls, context):
@@ -21,4 +22,3 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
 
     def draw(self, context):
         self.props.draw(context, self.layout)
-

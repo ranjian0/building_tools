@@ -11,14 +11,11 @@ from ...utils import (
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
-    filter_horizontal_edges
-    )
+    filter_horizontal_edges,
+)
 
-from ..fill import (
-    fill_panel,
-    fill_glass_panes,
-    fill_louver,
-    )
+from ..fill import fill_panel, fill_glass_panes, fill_louver
+
 
 def make_door(bm, faces, **kwargs):
     """Create basic flush door
@@ -38,6 +35,7 @@ def make_door(bm, faces, **kwargs):
             face = make_door_frame(bm, face, **kwargs)
             make_door_fill(bm, face, **kwargs)
 
+
 def make_door_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
 
@@ -53,6 +51,7 @@ def make_door_split(bm, face, size, off, **kwargs):
     """
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
+
 def make_door_frame(bm, face, ft, fd, **kwargs):
     """Create extrude and inset around a face to make door frame
 
@@ -66,17 +65,20 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
     Returns:
         bmesh.types.BMFace: face after frame is created
     """
+
     def delete_hidden_face(_face):
         """ remove hidden bottom faces after frame extrusion """
-        bottom_edge = min(filter_horizontal_edges(_face.edges, _face.normal),
-                        key=lambda e : calc_edge_median(e).z)
-        hidden = min([f for f in bottom_edge.link_faces],
-                        key=lambda f : f.calc_center_median().z)
-        bmesh.ops.delete(bm, geom=[hidden], context='FACES')
+        bottom_edge = min(
+            filter_horizontal_edges(_face.edges, _face.normal),
+            key=lambda e: calc_edge_median(e).z,
+        )
+        hidden = min(
+            [f for f in bottom_edge.link_faces], key=lambda f: f.calc_center_median().z
+        )
+        bmesh.ops.delete(bm, geom=[hidden], context="FACES")
 
     # Frame outset
-    face = bmesh.ops.extrude_discrete_faces(bm,
-            faces=[face]).get('faces')[-1]
+    face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
     bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * fd)
     delete_hidden_face(face)
 
@@ -84,18 +86,17 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
     median = face.calc_center_median()
     if ft:
         # Vertical Splits
-        w, _  = calc_face_dimensions(face)
-        res   = split_quad(bm, face, True, 2)
-        edges = filter_geom(res['geom_inner'], BMEdge)
-        edges.sort(key=lambda e: getattr(calc_edge_median(e),
-                    'x' if face.normal.y else 'y'))
+        w, _ = calc_face_dimensions(face)
+        res = split_quad(bm, face, True, 2)
+        edges = filter_geom(res["geom_inner"], BMEdge)
+        edges.sort(
+            key=lambda e: getattr(calc_edge_median(e), "x" if face.normal.y else "y")
+        )
 
-        offsets = [(w/3), (w/3)]
+        offsets = [(w / 3), (w / 3)]
         for off, e in zip(offsets, edges):
             tvec = calc_edge_median(e) - median
-            bmesh.ops.translate(bm,
-                verts=e.verts,
-                vec=tvec.normalized() * (off-ft))
+            bmesh.ops.translate(bm, verts=e.verts, vec=tvec.normalized() * (off - ft))
 
         # Top horizontal split
         face = face_with_verts(bm, list({v for e in edges for v in e.verts}))
@@ -106,19 +107,21 @@ def make_door_frame(bm, face, ft, fd, **kwargs):
             _, v = bmesh.utils.edge_split(e, vert, ft / e.calc_length())
             new_verts.append(v)
 
-        res = bmesh.ops.connect_verts(bm, verts=new_verts).get('edges')
-        face = min(list({f for e in res for f in e.link_faces}),
-                key=lambda f: f.calc_center_median().z)
+        res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
+        face = min(
+            list({f for e in res for f in e.link_faces}),
+            key=lambda f: f.calc_center_median().z,
+        )
 
     # # Make frame extrude - frame depth
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if fd:
-        f = bmesh.ops.extrude_discrete_faces(bm,
-                faces=[face]).get('faces')[-1]
+        f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
         delete_hidden_face(f)
         return f
     return face
+
 
 def make_door_double(bm, face, hdd, **kwargs):
     """Split face vertically into two faces
@@ -133,12 +136,13 @@ def make_door_double(bm, face, hdd, **kwargs):
         list: face(s) after double door created
     """
     if hdd:
-        ret = bmesh.ops.subdivide_edges(bm,
-            edges=filter_horizontal_edges(face.edges, face.normal),
-            cuts=1).get('geom_inner')
+        ret = bmesh.ops.subdivide_edges(
+            bm, edges=filter_horizontal_edges(face.edges, face.normal), cuts=1
+        ).get("geom_inner")
 
         return list(filter_geom(ret, BMEdge)[-1].link_faces)
     return [face]
+
 
 def make_door_fill(bm, face, fill_type, **kwargs):
     """Create extra elements on face
@@ -149,14 +153,14 @@ def make_door_fill(bm, face, fill_type, **kwargs):
         fill_type (str): Type of elements to add
         **kwargs: Extra kwargs from DoorProperty
     """
-    if fill_type == 'NONE':
+    if fill_type == "NONE":
         pass
 
-    elif fill_type == 'PANELS':
+    elif fill_type == "PANELS":
         fill_panel(bm, face, **kwargs)
 
-    elif fill_type == 'GLASS PANES':
+    elif fill_type == "GLASS PANES":
         fill_glass_panes(bm, face, **kwargs)
 
-    elif fill_type == 'LOUVER':
+    elif fill_type == "LOUVER":
         fill_louver(bm, face, **kwargs)

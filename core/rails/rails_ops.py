@@ -5,11 +5,12 @@ from .rails_props import RailProperty
 
 class BTOOLS_OT_add_railing(bpy.types.Operator):
     """ Creates rails on selected mesh edges """
+
     bl_idname = "btools.add_railing"
     bl_label = "Add Railing"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    props : bpy.props.PointerProperty(type=RailProperty)
+    props: bpy.props.PointerProperty(type=RailProperty)
 
     @classmethod
     def poll(cls, context):
@@ -20,4 +21,3 @@ class BTOOLS_OT_add_railing(bpy.types.Operator):
 
     def draw(self, context):
         self.props.draw(context, self.layout)
-

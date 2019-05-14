@@ -1,16 +1,8 @@
 import bpy
 import bmesh
-from ...utils import (
-    split,
-    set_material,
-    get_edit_mesh,
-    )
+from ...utils import split, set_material, get_edit_mesh
 
-from ..fill import (
-    fill_bar,
-    fill_louver,
-    fill_glass_panes
-    )
+from ..fill import fill_bar, fill_louver, fill_glass_panes
 
 
 def make_window(bm, faces, **kwargs):
@@ -32,6 +24,7 @@ def make_window(bm, faces, **kwargs):
         face = make_window_frame(bm, face, **kwargs)
         make_window_fill(bm, face, **kwargs)
 
+
 def make_window_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
 
@@ -46,6 +39,7 @@ def make_window_split(bm, face, size, off, **kwargs):
         bmesh.types.BMFace: New face created after split
     """
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+
 
 def make_window_frame(bm, face, ft, fd, **kwargs):
     """Create extrude and inset around a face to make window frame
@@ -64,20 +58,19 @@ def make_window_frame(bm, face, ft, fd, **kwargs):
     set_material([face], "mat_window_frame")
 
     bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-    face = bmesh.ops.extrude_discrete_faces(bm,
-        faces=[face]).get('faces')[-1]
-    bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * fd/2)
+    face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+    bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * fd / 2)
 
     if ft:
         bmesh.ops.inset_individual(bm, faces=[face], thickness=ft)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if fd:
-        f = bmesh.ops.extrude_discrete_faces(bm,
-            faces=[face]).get('faces')[-1]
+        f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * fd)
         return f
     return face
+
 
 def make_window_fill(bm, face, fill_type, **kwargs):
     """Create extra elements on face
@@ -89,11 +82,11 @@ def make_window_fill(bm, face, fill_type, **kwargs):
         **kwargs: Extra kwargs from WindowProperty
     """
 
-    if fill_type == 'NONE':
-        set_material([face], 'mat_window_glass')
-    elif fill_type == 'GLASS PANES':
+    if fill_type == "NONE":
+        set_material([face], "mat_window_glass")
+    elif fill_type == "GLASS PANES":
         fill_glass_panes(bm, face, **kwargs)
-    elif fill_type == 'BAR':
+    elif fill_type == "BAR":
         fill_bar(bm, face, **kwargs)
-    elif fill_type == 'LOUVER':
+    elif fill_type == "LOUVER":
         fill_louver(bm, face, **kwargs)

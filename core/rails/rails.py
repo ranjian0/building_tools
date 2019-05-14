@@ -2,13 +2,10 @@ import bpy
 import bmesh
 
 from .rails_types import MakeRailing
-from ...utils import (
-    get_edit_mesh,
-    kwargs_from_props
-    )
+from ...utils import get_edit_mesh, kwargs_from_props
+
 
 class Rails:
-
     @classmethod
     def build(cls, context, props):
         me = get_edit_mesh()
@@ -17,8 +14,8 @@ class Rails:
         if cls.validate(bm):
             MakeRailing().from_selection(bm, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
-            return {'FINISHED'}
-        return {'CANCELLED'}
+            return {"FINISHED"}
+        return {"CANCELLED"}
 
     @classmethod
     def validate(cls, bm):

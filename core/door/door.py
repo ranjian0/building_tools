@@ -1,14 +1,10 @@
 import bmesh
 
 from .door_types import make_door
-from ...utils import (
-    get_edit_mesh,
-    kwargs_from_props,
-    )
+from ...utils import get_edit_mesh, kwargs_from_props
 
 
 class Door:
-
     @classmethod
     def build(cls, props):
         """Use door types and properties to generate geometry
@@ -23,8 +19,8 @@ class Door:
         if cls.validate(faces):
             make_door(bm, faces, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
-            return {'FINISHED'}
-        return {'CANCELLED'}
+            return {"FINISHED"}
+        return {"CANCELLED"}
 
     @classmethod
     def validate(cls, faces):
@@ -33,4 +29,3 @@ class Door:
             if not any([f.normal.z for f in faces]):
                 return True
         return False
-

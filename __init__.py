@@ -8,7 +8,7 @@ bl_info = {
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
-    "category": "Mesh"
+    "category": "Mesh",
 }
 
 import bpy
@@ -23,10 +23,11 @@ from .core import register_core, unregister_core
 
 class PANEL_PT_mesh_tools(bpy.types.Panel):
     """UI panel for building operators and properties"""
+
     bl_label = "Mesh Tools"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Building Tools'
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
 
     def draw(self, context):
         layout = self.layout
@@ -48,15 +49,15 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_stairs")
         col.operator("btools.add_roof")
 
+
 # =======================================================
 #
 #           REGISTER
 #
 # =======================================================
 
-classes = (
-    PANEL_PT_mesh_tools,
-)
+classes = (PANEL_PT_mesh_tools,)
+
 
 def register():
     register_core()
@@ -69,9 +70,12 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
+
 if __name__ == "__main__":
     # -- continuos updates with script watcher
-    import os; os.system("clear")
+    import os
+
+    os.system("clear")
     try:
         unregister()
     except Exception as e:

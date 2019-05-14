@@ -2,13 +2,15 @@ import bpy
 from .window import Window
 from .window_props import WindowProperty
 
+
 class BTOOLS_OT_add_window(bpy.types.Operator):
     """ Creates windows on selected mesh faces """
+
     bl_idname = "btools.add_window"
     bl_label = "Add Window"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    props : bpy.props.PointerProperty(type=WindowProperty)
+    props: bpy.props.PointerProperty(type=WindowProperty)
 
     @classmethod
     def poll(cls, context):
@@ -19,4 +21,3 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
 
     def draw(self, context):
         self.props.draw(context, self.layout)
-

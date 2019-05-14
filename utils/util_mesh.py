@@ -10,18 +10,22 @@ def get_edit_mesh():
     """ Get editmode mesh """
     return bpy.context.edit_object.data
 
+
 def make_mesh(name):
     """ Make new mesh data """
     return bpy.data.meshes.new(name)
+
 
 def select(elements, val=True):
     """ For each item in elements set select to val """
     for el in elements:
         el.select_set(val)
 
+
 def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable """
     return list(filter(lambda x: isinstance(x, _type), geom))
+
 
 def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value """
@@ -38,6 +42,7 @@ def filter_vertical_edges(edges, normal):
             res.append(e)
     return res
 
+
 def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value """
     res = []
@@ -53,13 +58,16 @@ def filter_horizontal_edges(edges, normal):
             res.append(e)
     return res
 
+
 def calc_edge_median(edge):
     """ Calculate the center position of edge """
-    return ft.reduce(operator.add, [v.co for v in edge.verts])/len(edge.verts)
+    return ft.reduce(operator.add, [v.co for v in edge.verts]) / len(edge.verts)
+
 
 def calc_verts_median(verts):
     """ Determine the median position of verts """
-    return ft.reduce(operator.add, [v.co for v in verts])/len(verts)
+    return ft.reduce(operator.add, [v.co for v in verts]) / len(verts)
+
 
 def calc_face_dimensions(face):
     """ Determine the width and height of face """
@@ -75,6 +83,7 @@ def face_with_verts(bm, verts, default=None):
             return face
     return default
 
+
 def split_quad(bm, face, vertical=False, cuts=4):
     """ Subdivide a quad's edges into even horizontal/vertical cuts """
 
@@ -87,16 +96,17 @@ def split_quad(bm, face, vertical=False, cuts=4):
         res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
     return res
 
+
 def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
 
     # scale svertical and shorizontal
-    scale       = 3      # number of cuts + 1
-    svertical   *= scale
+    scale = 3  # number of cuts + 1
+    svertical *= scale
     shorizontal *= scale
 
-    do_vertical     = svertical < scale
-    do_horizontal   = shorizontal < scale
+    do_vertical = svertical < scale
+    do_horizontal = shorizontal < scale
 
     face.select = False
     median = face.calc_center_median()
@@ -109,17 +119,19 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     if do_horizontal:
         # Determine horizontal edges
         # --  edges whose verts have similar z coord
-        horizontal = list(filter(lambda e: len(
-            set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
+        horizontal = list(
+            filter(
+                lambda e: len(set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges
+            )
+        )
 
         # Subdivide edges
         sp_res = bmesh.ops.subdivide_edges(bm, edges=horizontal, cuts=2)
-        verts = filter_geom(sp_res['geom_inner'], BMVert)
+        verts = filter_geom(sp_res["geom_inner"], BMVert)
 
         # Scale subdivide face
         T = Matrix.Translation(-median)
         bmesh.ops.scale(bm, vec=(shorizontal, shorizontal, 1), verts=verts, space=T)
-
 
     if do_vertical:
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
@@ -127,13 +139,16 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
 
         # Determine vertical edges
         # -- edges whose verts have similar x/y coord
-        other = list(filter(lambda e: len(
-            set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges))
+        other = list(
+            filter(
+                lambda e: len(set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges
+            )
+        )
         vertical = list(set(face.edges) - set(other))
 
         # Subdivide
         sp_res = bmesh.ops.subdivide_edges(bm, edges=vertical, cuts=2)
-        verts = filter_geom(sp_res['geom_inner'], BMVert)
+        verts = filter_geom(sp_res["geom_inner"], BMVert)
 
         # Scale subdivide face
         T = Matrix.Translation(-median)
@@ -155,6 +170,7 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     face = face_with_verts(bm, verts)
     return face
 
+
 def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
     """ Split the edges, offset amount from verts """
 
@@ -165,6 +181,6 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
         new_verts.append(v)
 
     if connect_verts:
-        res = bmesh.ops.connect_verts(bm, verts=new_verts).get('edges')
+        res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
         return res
     return new_verts

@@ -2,11 +2,7 @@ import bpy
 import bmesh
 from .floor_types import make_floors
 
-from ...utils import (
-    select,
-    get_edit_mesh,
-    kwargs_from_props,
-    )
+from ...utils import select, get_edit_mesh, kwargs_from_props
 
 
 class Floor:
@@ -31,8 +27,8 @@ class Floor:
                 edges = [e for e in bm.edges if e.is_boundary]
                 make_floors(bm, edges, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
-            return {'FINISHED'}
-        return {'CANCELLED'}
+            return {"FINISHED"}
+        return {"CANCELLED"}
 
     @classmethod
     def validate(cls, bm):

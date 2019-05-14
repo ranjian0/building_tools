@@ -5,11 +5,12 @@ from .balcony_props import BalconyProperty
 
 class BTOOLS_OT_add_balcony(bpy.types.Operator):
     """ Creates balcony on selected mesh faces """
+
     bl_idname = "btools.add_balcony"
     bl_label = "Add Balcony"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
-    props : bpy.props.PointerProperty(type=BalconyProperty)
+    props: bpy.props.PointerProperty(type=BalconyProperty)
 
     @classmethod
     def poll(cls, context):
@@ -20,4 +21,3 @@ class BTOOLS_OT_add_balcony(bpy.types.Operator):
 
     def draw(self, context):
         self.props.draw(context, self.layout)
-

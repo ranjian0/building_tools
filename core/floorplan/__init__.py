@@ -4,13 +4,13 @@ from .floorplan import Floorplan
 from .floorplan_ops import BTOOLS_OT_add_floorplan
 from .floorplan_props import FloorplanProperty
 
-classes = (
-    FloorplanProperty, BTOOLS_OT_add_floorplan
-)
+classes = (FloorplanProperty, BTOOLS_OT_add_floorplan)
+
 
 def register_floorplan():
     for cls in classes:
         bpy.utils.register_class(cls)
+
 
 def unregister_floorplan():
     for cls in classes:
