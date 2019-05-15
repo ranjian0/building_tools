@@ -46,14 +46,18 @@ def set_material(faces, name_or_index):
     if not obj:
         return
 
-    mat_idx = 0
+    mat_idx = -1
     if isinstance(name_or_index, str):
         name = name_or_index
         for i, mat in enumerate(obj.data.materials):
             if name in mat.name:
                 mat_idx = i
+                break
     elif isinstance(name_or_index, int):
         mat_idx = name_or_index
+
+    if mat_idx == -1:
+        return
 
     for f in faces:
         f.material_index = mat_idx
