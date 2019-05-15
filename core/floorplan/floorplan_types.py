@@ -45,7 +45,7 @@ def fp_composite(bm, width, length, tl1, tl2, tl3, tl4, **kwargs):
     .___......___.
     |   .    .   |
     |   .    .   |
-    |___,.....___.
+    .___......___.
         |    |
         |    |
         .____.
@@ -170,8 +170,8 @@ def fp_random(bm, seed, width, length, **kwargs):
     ref = list(bm.faces)[-1].calc_center_median()
     for edge in sample:
         # -- get edge center and length
-        cen = calc_edge_median(edge)
-        elen = edge.calc_length()
+        edge_median = calc_edge_median(edge)
+        edge_length = edge.calc_length()
 
         # -- subdivide
         res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
@@ -184,14 +184,19 @@ def fp_random(bm, seed, width, length, **kwargs):
             if new_verts[0].co.y == new_verts[1].co.y
             else Vector((0, 1, 0))
         )
-        scale_factor = clamp(random.random() * elen / new_edge.calc_length(), 1, 2.95)
+        scale_factor = clamp(
+            random.random() * edge_length / new_edge.calc_length(), 1, 2.95
+        )
         bmesh.ops.scale(
-            bm, verts=new_verts, vec=axis * scale_factor, space=Matrix.Translation(-cen)
+            bm,
+            verts=new_verts,
+            vec=axis * scale_factor,
+            space=Matrix.Translation(-edge_median),
         )
 
         # -- offset
         if random.choice([0, 1]):
-            max_offset = (elen - new_edge.calc_length()) / 2
+            max_offset = (edge_length - new_edge.calc_length()) / 2
             rand_offset = random.random() * max_offset
             bmesh.ops.translate(bm, verts=new_verts, vec=axis * rand_offset)
 
@@ -200,5 +205,6 @@ def fp_random(bm, seed, width, length, **kwargs):
         bmesh.ops.translate(
             bm,
             verts=filter_geom(res["geom"], BMVert),
-            vec=(cen - ref).normalized() * random.randrange(1, int(elen / 2)),
+            vec=(edge_median - ref).normalized()
+            * random.randrange(1, int(edge_length / 2)),
         )

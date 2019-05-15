@@ -15,7 +15,7 @@ from .generic import register_generic, unregister_generic
 # -- take care here --
 # -- ORDER MATTERS --
 
-register_funcs = [
+register_funcs = (
     register_generic,
     register_fill,
     register_rail,
@@ -26,9 +26,9 @@ register_funcs = [
     register_balcony,
     register_stairs,
     register_roof,
-]
+)
 
-unregister_funcs = [
+unregister_funcs = (
     unregister_generic,
     unregister_fill,
     unregister_rail,
@@ -39,7 +39,7 @@ unregister_funcs = [
     unregister_balcony,
     unregister_stairs,
     unregister_roof,
-]
+)
 
 
 def register_core():

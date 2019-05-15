@@ -113,14 +113,7 @@ def make_gable_roof(bm, faces, thick, outset, height, orient, **kwargs):
     verts = filter_geom(ret["geom"], BMVert)
     bmesh.ops.scale(bm, verts=verts, vec=(1 + outset, 1 + outset, 1))
     nedges = list(
-        set(
-            [
-                e
-                for v in verts
-                for e in v.link_edges
-                if all([v in verts for v in e.verts])
-            ]
-        )
+        {e for v in verts for e in v.link_edges if all([v in verts for v in e.verts])}
     )
 
     # -- fix roof slope at bottom edges
