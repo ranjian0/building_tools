@@ -74,11 +74,11 @@ def unregister():
 if __name__ == "__main__":
     # -- continuos updates with script watcher
     import os
-
     os.system("clear")
+
     try:
         unregister()
-    except Exception as e:
-        print(e)
+    except RuntimeError:
+        pass
     finally:
         register()
