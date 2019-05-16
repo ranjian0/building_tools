@@ -6,7 +6,7 @@ from ..fill import FillBars, FillLouver, FillGlassPanes
 
 
 class WindowProperty(bpy.types.PropertyGroup):
-    ft: FloatProperty(
+    frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.01,
         max=100.0,
@@ -14,7 +14,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         description="Thickness of window Frame",
     )
 
-    fd: FloatProperty(
+    frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
         max=100.0,
@@ -22,7 +22,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         description="Depth of window Frame",
     )
 
-    soff: PointerProperty(type=SizeOffsetProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
 
     fill_itemss = [
         ("NONE", "None", "", 0),
@@ -42,12 +42,12 @@ class WindowProperty(bpy.types.PropertyGroup):
     glass_fill: PointerProperty(type=FillGlassPanes)
 
     def draw(self, context, layout):
-        self.soff.draw(context, layout)
+        self.size_offset.draw(context, layout)
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "ft")
-        col.prop(self, "fd")
+        col.prop(self, "frame_thickness")
+        col.prop(self, "frame_depth")
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")
