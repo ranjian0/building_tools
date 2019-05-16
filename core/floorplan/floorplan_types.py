@@ -56,18 +56,15 @@ def create_composite_floorplan(bm, prop):
     base = plane(bm, prop.width, prop.length)
     median_reference = list(bm.faces)[-1].calc_center_median()
 
-    # Sort edges to make predictable winding
     edges = sort_edges_clockwise(bm.edges)
-
-    exts = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
+    extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     for idx, e in enumerate(edges):
-        if exts[idx] > 0:
+        if extrusion_lengths[idx] > 0.0:
             res = bmesh.ops.extrude_edge_only(bm, edges=[e])
             verts = filter_geom(res["geom"], BMVert)
 
-            v = calc_edge_median(e) - median_reference
-            v.normalize()
-            bmesh.ops.translate(bm, verts=verts, vec=v * exts[idx])
+            direction = (calc_edge_median(e) - median_reference).normalized()
+            bmesh.ops.translate(bm, verts=verts, vec=direction * extrusion_lengths[idx])
 
 
 def create_hshaped_floorplan(bm, prop):
@@ -93,44 +90,26 @@ def create_hshaped_floorplan(bm, prop):
     normal = face.normal
     median_reference = face.calc_center_median()
 
-    # make side extrusions
-    for edge in filter_vertical_edges(bm.edges, normal):
-        res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
-        verts = filter_geom(res["geom"], BMVert)
+    extrude_left_and_right_edges(bm, normal, median_reference)
+    upper_edges = determine_clockwise_top_edges_for_extrusion(bm, normal)
 
-        v = calc_edge_median(edge) - median_reference
-        v.normalize()
+    extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
+    extrusion_widths = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
+    for idx, edge in enumerate(upper_edges):
 
-        bmesh.ops.translate(bm, verts=verts, vec=v)
-
-    # Find all top edges and remove ones in the middle
-    op_edges = filter_horizontal_edges(bm.edges, normal)
-
-    # --remove mid row
-    op_edges.sort(key=lambda ed: calc_edge_median(ed).x)
-    op_edges = op_edges[:2] + op_edges[4:]
-
-    # -- make deterministic
-    op_edges = sort_edges_clockwise(op_edges)
-    lext = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
-    wext = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
-
-    for idx, edge in enumerate(op_edges):
-
-        if lext[idx] > 0:
+        if extrusion_lengths[idx] > 0.0:
             res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
             verts = filter_geom(res["geom"], BMVert)
-
-            v = calc_edge_median(edge) - median_reference
-            v.normalize()
+            v = (calc_edge_median(edge) - median_reference).normalized()
+            bmesh.ops.translate(
+                bm, verts=verts, vec=Vector((0, v.y, 0)) * extrusion_lengths[idx]
+            )
 
             filter_function = min if v.x > 0 else max
             mv1 = filter_function(list(edge.verts), key=lambda v: v.co.x)
             mv2 = filter_function(verts, key=lambda v: v.co.x)
-
-            bmesh.ops.translate(bm, verts=verts, vec=Vector((0, v.y, 0)) * lext[idx])
             bmesh.ops.translate(
-                bm, verts=[mv1, mv2], vec=Vector((-v.x, 0, 0)) * wext[idx]
+                bm, verts=[mv1, mv2], vec=Vector((-v.x, 0, 0)) * extrusion_widths[idx]
             )
 
 
@@ -142,55 +121,69 @@ def create_random_floorplan(bm, prop):
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     random.seed(prop.seed)
-    sc_x = Matrix.Scale(prop.width, 4, (1, 0, 0))
-    sc_y = Matrix.Scale(prop.length, 4, (0, 1, 0))
-    mat = sc_x @ sc_y
-    bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=1, matrix=mat)
+    scale_x = Matrix.Scale(prop.width, 4, (1, 0, 0))
+    scale_y = Matrix.Scale(prop.length, 4, (0, 1, 0))
+    bmesh.ops.create_grid(
+        bm, x_segments=1, y_segments=1, size=1, matrix=scale_x @ scale_y
+    )
 
-    sample = random.sample(list(bm.edges), random.randrange(1, len(bm.edges)))
-    ref = list(bm.faces)[-1].calc_center_median()
-    for edge in sample:
-        # -- get edge center and length
+    random_edges = random.sample(
+        list(bm.edges), random.randrange(len(bm.edges) // 3, len(bm.edges))
+    )
+    median_reference = list(bm.faces)[-1].calc_center_median()
+    for edge in random_edges:
         edge_median = calc_edge_median(edge)
         edge_length = edge.calc_length()
 
-        # -- subdivide
-        res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
-        new_verts = filter_geom(res["geom_inner"], BMVert)
-        new_edge = list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
+        middle_edge = subdivide_edge_twice_and_get_middle(bm, edge)
+        random_scale_and_translate(bm, middle_edge)
+        random_extrude(bm, middle_edge, (edge_median - median_reference).normalized())
 
-        # -- resize new edge
-        axis = (
-            Vector((1, 0, 0))
-            if new_verts[0].co.y == new_verts[1].co.y
-            else Vector((0, 1, 0))
-        )
-        scale_factor = clamp(
-            random.random() * edge_length / new_edge.calc_length(), 1, 2.95
-        )
-        bmesh.ops.scale(
-            bm,
-            verts=new_verts,
-            vec=axis * scale_factor,
-            space=Matrix.Translation(-edge_median),
-        )
 
-        # -- offset
-        if random.choice([0, 1]):
-            max_offset = (edge_length - new_edge.calc_length()) / 2
-            rand_offset = random.random() * max_offset
-            bmesh.ops.translate(bm, verts=new_verts, vec=axis * rand_offset)
-
-        # --extrude
-        res = bmesh.ops.extrude_edge_only(bm, edges=[new_edge])
-
-        try:
-            extrude_length = random.randrange(1, int(edge_length / 2))
-        except ValueError:
-            extrude_length = 1
-
+def extrude_left_and_right_edges(bm, normal, median_reference):
+    for edge in filter_vertical_edges(bm.edges, normal):
+        res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
+        verts = filter_geom(res["geom"], BMVert)
         bmesh.ops.translate(
             bm,
-            verts=filter_geom(res["geom"], BMVert),
-            vec=(edge_median - ref).normalized() * extrude_length,
+            verts=verts,
+            vec=(calc_edge_median(edge) - median_reference).normalized(),
         )
+
+
+def determine_clockwise_top_edges_for_extrusion(bm, normal):
+    all_upper_edges = filter_horizontal_edges(bm.edges, normal)
+    all_upper_edges.sort(key=lambda ed: calc_edge_median(ed).x)
+
+    upper_extreme_edges = all_upper_edges[:2] + all_upper_edges[4:]
+    return sort_edges_clockwise(upper_extreme_edges)
+
+
+def subdivide_edge_twice_and_get_middle(bm, edge):
+    res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
+    new_verts = filter_geom(res["geom_inner"], BMVert)
+    return list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
+
+
+def random_scale_and_translate(bm, middle_edge):
+    verts = list(middle_edge.verts)
+    length = middle_edge.calc_length()
+    median = calc_edge_median(middle_edge)
+
+    axis = Vector((1, 0, 0)) if verts[0].co.y == verts[1].co.y else Vector((0, 1, 0))
+    scale_factor = clamp(random.random() * 3, 1, 2.95)
+    bmesh.ops.scale(
+        bm, verts=verts, vec=axis * scale_factor, space=Matrix.Translation(-median)
+    )
+
+    if random.choice([0, 1]):
+        rand_offset = random.random() * length
+        bmesh.ops.translate(bm, verts=verts, vec=axis * rand_offset)
+
+
+def random_extrude(bm, middle_edge, direction):
+    res = bmesh.ops.extrude_edge_only(bm, edges=[middle_edge])
+    extrude_length = (random.random() * middle_edge.calc_length()) + 1.0
+    bmesh.ops.translate(
+        bm, verts=filter_geom(res["geom"], BMVert), vec=direction * extrude_length
+    )
