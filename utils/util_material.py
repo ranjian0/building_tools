@@ -1,9 +1,11 @@
 import bpy
 from enum import Enum
 
+
 class Material(Enum):
     SLAB = "mat_slab"
     WALL = "mat_wall"
+
 
 DEFAULT_MATERIALS = {
     Material.SLAB.value: (0.208, 0.183, 0.157),
@@ -18,6 +20,7 @@ DEFAULT_MATERIALS = {
     "mat_door_glass": (0, 0.1, 0.6),
 }
 
+
 def create_material(obj, name):
     if has_material(obj, name):
         return
@@ -30,7 +33,7 @@ def create_material(obj, name):
         return
 
     mat = bpy.data.materials.new(obj.name + "_" + name)
-    mat.diffuse_color = DEFAULT_MATERIALS.get(name, (0,0,0)) + (1,)
+    mat.diffuse_color = DEFAULT_MATERIALS.get(name, (0, 0, 0)) + (1,)
     mat.use_nodes = True
     link_mat(obj, mat)
 

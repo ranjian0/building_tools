@@ -9,13 +9,7 @@ from .floorplan_types import (
     fp_random,
 )
 
-from ...utils import (
-    link_obj,
-    make_mesh,
-    bm_to_obj,
-    make_object,
-    bm_from_obj,
-)
+from ...utils import link_obj, make_mesh, bm_to_obj, make_object, bm_from_obj
 
 
 class Floorplan:
