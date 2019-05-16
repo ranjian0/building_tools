@@ -25,20 +25,20 @@ def create_material(obj, name):
     if has_material(obj, name):
         return
 
-    # -- the material exists but not linked to object
+    # -- the material exists but is not linked to object
     # -- happens due to undo-redo esp when changing object data
     if name in bpy.data.materials.keys():
         mat = bpy.data.materials[name]
-        link_mat(obj, mat)
+        link_material(obj, mat)
         return
 
     mat = bpy.data.materials.new(obj.name + "_" + name)
     mat.diffuse_color = DEFAULT_MATERIALS.get(name, (0, 0, 0)) + (1,)
     mat.use_nodes = True
-    link_mat(obj, mat)
+    link_material(obj, mat)
 
 
-def link_mat(obj, mat):
+def link_material(obj, mat):
     if not has_material(obj, mat.name):
         obj.data.materials.append(mat)
 
