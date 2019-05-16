@@ -9,12 +9,12 @@ class Floor:
     has_mat_groups = False
 
     @classmethod
-    def build(cls, context, props):
+    def build(cls, context, prop):
         """Use floor types and properties to create geometry
 
         Args:
             context (bpy.context): blender context
-            props   (bpy.types.PropertyGroup): FloorProperty
+            prop   (bpy.types.PropertyGroup): FloorProperty
         """
 
         me = get_edit_mesh()
@@ -22,10 +22,10 @@ class Floor:
 
         if cls.validate(bm):
             if any([f for f in bm.faces if f.select]):
-                make_floors(bm, None, **kwargs_from_props(props))
+                make_floors(bm, None, prop)
             else:
                 edges = [e for e in bm.edges if e.is_boundary]
-                make_floors(bm, edges, **kwargs_from_props(props))
+                make_floors(bm, edges, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}

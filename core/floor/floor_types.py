@@ -5,9 +5,7 @@ from bmesh.types import BMVert, BMFace, BMEdge
 from ...utils import select, filter_geom, set_material
 
 
-def make_floors(
-    bm, edges, floor_count, floor_height, slab_thickness, slab_outset, **kwargs
-):
+def make_floors(bm, edges, prop):
     """Create extrusions of floor geometry from a floorplan
 
     Args:
@@ -21,7 +19,7 @@ def make_floors(
 
     """
     del_faces = []
-    if not edges:
+    if edges is None:
         # -- find boundary of selected faces
         del_faces = [f for f in bm.faces if f.select]
         all_edges = list({e for f in del_faces for e in f.edges})
@@ -33,9 +31,9 @@ def make_floors(
 
     # --extrude floors
     slab_faces = []
-    offsets = it.cycle([slab_thickness, floor_height])
-    for offset in it.islice(offsets, 0, floor_count * 2):
-        if offset == 0 and offset == slab_thickness:
+    offsets = it.cycle([prop.slab_thickness, prop.floor_height])
+    for offset in it.islice(offsets, 0, prop.floor_count * 2):
+        if offset == 0 and offset == prop.slab_thickness:
             continue
 
         ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
@@ -44,10 +42,10 @@ def make_floors(
         )
 
         edges = filter_geom(ext["geom"], bmesh.types.BMEdge)
-        if offset == slab_thickness:
+        if offset == prop.slab_thickness:
             slab_faces.extend(filter_geom(ext["geom"], bmesh.types.BMFace))
 
-    res = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-slab_outset)
+    res = bmesh.ops.inset_region(bm, faces=slab_faces, depth=-prop.slab_outset)
     slab_faces.extend(res["faces"])
     bmesh.ops.contextual_create(bm, geom=edges)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -58,5 +56,5 @@ def make_floors(
     wall_faces = [f for f in bm.faces if f not in slab_faces and not f.normal.z]
 
     # -- setup materials for slab and wall faces
-    set_material(slab_faces, "mat_slab")
-    set_material(wall_faces, "mat_wall")
+    # set_material(slab_faces, "mat_slab")
+    # set_material(wall_faces, "mat_wall")
