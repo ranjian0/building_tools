@@ -1,6 +1,6 @@
 import bpy
 import bmesh
-from .floor_types import make_floors
+from .floor_types import create_floors
 
 from ...utils import select, get_edit_mesh
 
@@ -22,10 +22,10 @@ class Floor:
 
         if cls.validate(bm):
             if any([f for f in bm.faces if f.select]):
-                make_floors(bm, None, prop)
+                create_floors(bm, None, prop)
             else:
                 edges = [e for e in bm.edges if e.is_boundary]
-                make_floors(bm, edges, prop)
+                create_floors(bm, edges, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
