@@ -9,36 +9,34 @@ from ...utils import (
     circle,
     filter_geom,
     calc_edge_median,
+    sort_edges_clockwise,
     filter_vertical_edges,
     filter_horizontal_edges,
 )
 
 
-def fp_rectangular(bm, width, length, **kwargs):
+def fp_rectangular(bm, prop):
     """Create plane in provided bmesh
 
     Args:
-        bm     (bmesh.types.BMesh): bmesh to create plane in
-        width  (float): width of plane
-        length (float): length of plane
+        bm (bmesh.types.BMesh): bmesh to create plane in
+        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
-    plane(bm, width, length)
+    plane(bm, prop.width, prop.length)
 
 
-def fp_circular(bm, radius, segs, cap_tris, **kwargs):
+def fp_circular(bm, prop):
     """Create circle in provided bmesh
 
     Args:
-        bm       (bmesh.types.BMESH): bmesh to create cirlce in
-        radius   (float): radius of circle
-        segs     (int): number of segments for circle
-        cap_tris (bool): whether to fill the circle with triangles
+        bm (bmesh.types.BMesh): bmesh to create circle in
+        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
-    circle(bm, radius, segs, cap_tris)
+    circle(bm, prop.radius, prop.segments, prop.cap_tris)
 
 
-def fp_composite(bm, width, length, tl1, tl2, tl3, tl4, **kwargs):
-    """Create a fan shape from rectangle
+def fp_composite(bm, prop):
+    """Create a fan shape from a rectangle
         .____.
         |    |
         |    |
@@ -51,35 +49,28 @@ def fp_composite(bm, width, length, tl1, tl2, tl3, tl4, **kwargs):
         .____.
 
     Args:
-        bm     (bmesh.types.BMesh): bmesh to create shape in
-        width  (float): width of inner rectangle
-        length (float): length of inner rectangle
-        tl1 (float): length of fan (bottom)
-        tl2 (float): length of fan (left)
-        tl3 (float): length of fan (right)
-        tl4 (float): length of fan (top)
+        bm (bmesh.types.BMesh): bmesh to create shape in
+        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
-    base = plane(bm, width, length)
-    ref = list(bm.faces)[-1].calc_center_median()
+    base = plane(bm, prop.width, prop.length)
+    median_reference = list(bm.faces)[-1].calc_center_median()
 
     # Sort edges to make predictable winding
-    edges = list(bm.edges)
-    edges.sort(key=lambda ed: calc_edge_median(ed).x)
-    edges.sort(key=lambda ed: calc_edge_median(ed).y)
+    edges = sort_edges_clockwise(bm.edges)
 
-    exts = [tl1, tl2, tl3, tl4]
+    exts = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     for idx, e in enumerate(edges):
         if exts[idx] > 0:
             res = bmesh.ops.extrude_edge_only(bm, edges=[e])
             verts = filter_geom(res["geom"], BMVert)
 
-            v = calc_edge_median(e) - ref
+            v = calc_edge_median(e) - median_reference
             v.normalize()
             bmesh.ops.translate(bm, verts=verts, vec=v * exts[idx])
 
 
-def fp_hshaped(bm, width, length, tl1, tl2, tl3, tl4, tw1, tw2, tw3, tw4, **kwargs):
+def fp_hshaped(bm, prop):
     """Create H_shaped geometry from a rectangle
 
     .___.      .___.
@@ -93,56 +84,49 @@ def fp_hshaped(bm, width, length, tl1, tl2, tl3, tl4, tw1, tw2, tw3, tw4, **kwar
     .___.      .___.
 
     Args:
-        bm     (bmesh.types.BMesh): bmesh to create shape in
-        width  (float): width of inner rectangle
-        length (float): length of inner rectangle
-        tl1 (float): length of fan (bottom-left)
-        tl2 (float): length of fan (bottom-right)
-        tl3 (float): length of fan (top-left)
-        tl4 (float): length of fan (top-right)
-        tw1 (float): width of fan (bottom-left)
-        tw2 (float): width of fan (bottom-right)
-        tw3 (float): width of fan (top-left)
-        tw4 (float): width of fan (top-right)
+        bm (bmesh.types.BMesh): bmesh to create shape in
+        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
-    base = plane(bm, width, length)
+    base = plane(bm, prop.width, prop.length)
     face = list(bm.faces)[-1]
-    ref = face.calc_center_median()
-    n = face.normal
+    normal = face.normal
+    median_reference = face.calc_center_median()
 
     # make side extrusions
-    for e in filter_vertical_edges(bm.edges, n):
-        res = bmesh.ops.extrude_edge_only(bm, edges=[e])
+    for edge in filter_vertical_edges(bm.edges, normal):
+        res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
         verts = filter_geom(res["geom"], BMVert)
 
-        v = calc_edge_median(e) - ref
+        v = calc_edge_median(edge) - median_reference
         v.normalize()
 
         bmesh.ops.translate(bm, verts=verts, vec=v)
 
-    # Find all top edges and filter ones in the middle
-    op_edges = filter_horizontal_edges(bm.edges, n)
-    # --filter mid row
+    # Find all top edges and remove ones in the middle
+    op_edges = filter_horizontal_edges(bm.edges, normal)
+
+    # --remove mid row
     op_edges.sort(key=lambda ed: calc_edge_median(ed).x)
     op_edges = op_edges[:2] + op_edges[4:]
-    # -- make deterministic
-    op_edges.sort(key=lambda ed: calc_edge_median(ed).y)
-    lext = [tl1, tl2, tl3, tl4]
-    wext = [tw1, tw2, tw3, tw4]
 
-    for idx, e in enumerate(op_edges):
+    # -- make deterministic
+    op_edges = sort_edges_clockwise(op_edges)
+    lext = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
+    wext = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
+
+    for idx, edge in enumerate(op_edges):
 
         if lext[idx] > 0:
-            res = bmesh.ops.extrude_edge_only(bm, edges=[e])
+            res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
             verts = filter_geom(res["geom"], BMVert)
 
-            v = calc_edge_median(e) - ref
+            v = calc_edge_median(edge) - median_reference
             v.normalize()
 
-            flt_func = min if v.x > 0 else max
-            mv1 = flt_func(list(e.verts), key=lambda v: v.co.x)
-            mv2 = flt_func(verts, key=lambda v: v.co.x)
+            filter_function = min if v.x > 0 else max
+            mv1 = filter_function(list(edge.verts), key=lambda v: v.co.x)
+            mv2 = filter_function(verts, key=lambda v: v.co.x)
 
             bmesh.ops.translate(bm, verts=verts, vec=Vector((0, v.y, 0)) * lext[idx])
             bmesh.ops.translate(
@@ -150,19 +134,16 @@ def fp_hshaped(bm, width, length, tl1, tl2, tl3, tl4, tw1, tw2, tw3, tw4, **kwar
             )
 
 
-def fp_random(bm, seed, width, length, **kwargs):
+def fp_random(bm, prop):
     """ Create randomly generated building footprint/floorplan
 
     Args:
-        bm     (bmesh.types.BMesh): bmesh to create plane in
-        seed   (int): random seed
-        width  (float): width of base plane
-        length (float): length of base plane
-
+        bm (bmesh.types.BMesh): bmesh to create plane in
+        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
-    random.seed(seed)
-    sc_x = Matrix.Scale(width, 4, (1, 0, 0))
-    sc_y = Matrix.Scale(length, 4, (0, 1, 0))
+    random.seed(prop.seed)
+    sc_x = Matrix.Scale(prop.width, 4, (1, 0, 0))
+    sc_y = Matrix.Scale(prop.length, 4, (0, 1, 0))
     mat = sc_x @ sc_y
     bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=1, matrix=mat)
 
@@ -202,9 +183,14 @@ def fp_random(bm, seed, width, length, **kwargs):
 
         # --extrude
         res = bmesh.ops.extrude_edge_only(bm, edges=[new_edge])
+
+        try:
+            extrude_length = random.randrange(1, int(edge_length / 2))
+        except ValueError:
+            extrude_length = 1
+
         bmesh.ops.translate(
             bm,
             verts=filter_geom(res["geom"], BMVert),
-            vec=(edge_median - ref).normalized()
-            * random.randrange(1, int(edge_length / 2)),
+            vec=(edge_median - ref).normalized() * extrude_length,
         )

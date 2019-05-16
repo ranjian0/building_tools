@@ -43,7 +43,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Radius", min=0.1, max=100.0, default=1.0, description="Radius of circle"
     )
 
-    segs: IntProperty(
+    segments: IntProperty(
         name="Segments",
         min=3,
         max=100,
@@ -52,22 +52,6 @@ class FloorplanProperty(bpy.types.PropertyGroup):
     )
 
     tw1: FloatProperty(
-        name="Tail Width",
-        min=0.0,
-        max=100.0,
-        default=1,
-        description="Width of floorplan segment",
-    )
-
-    tl1: FloatProperty(
-        name="Tail Length",
-        min=0.0,
-        max=100.0,
-        default=1,
-        description="Length of floorplan segment",
-    )
-
-    tw2: FloatProperty(
         name="Tail Width 1",
         min=0.0,
         max=100.0,
@@ -75,7 +59,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Width of floorplan segment",
     )
 
-    tl2: FloatProperty(
+    tl1: FloatProperty(
         name="Tail Length 1",
         min=0.0,
         max=100.0,
@@ -83,7 +67,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Length of floorplan segment",
     )
 
-    tw3: FloatProperty(
+    tw2: FloatProperty(
         name="Tail Width 2",
         min=0.0,
         max=100.0,
@@ -91,7 +75,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Width of floorplan segment",
     )
 
-    tl3: FloatProperty(
+    tl2: FloatProperty(
         name="Tail Length 2",
         min=0.0,
         max=100.0,
@@ -99,7 +83,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Length of floorplan segment",
     )
 
-    tw4: FloatProperty(
+    tw3: FloatProperty(
         name="Tail Width 3",
         min=0.0,
         max=100.0,
@@ -107,8 +91,24 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Width of floorplan segment",
     )
 
-    tl4: FloatProperty(
+    tl3: FloatProperty(
         name="Tail Length 3",
+        min=0.0,
+        max=100.0,
+        default=1,
+        description="Length of floorplan segment",
+    )
+
+    tw4: FloatProperty(
+        name="Tail Width 4",
+        min=0.0,
+        max=100.0,
+        default=1,
+        description="Width of floorplan segment",
+    )
+
+    tl4: FloatProperty(
+        name="Tail Length 4",
         min=0.0,
         max=100.0,
         default=1,
@@ -140,7 +140,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         elif self.type == "CIRCULAR":
             col = box.column(align=True)
             col.prop(self, "radius")
-            col.prop(self, "segs")
+            col.prop(self, "segments")
 
             row = box.row()
             row.prop(self, "cap_tris", toggle=True)
@@ -151,10 +151,10 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             row.prop(self, "length")
 
             col = box.column(align=True)
-            col.prop(self, "tl1")
-            col.prop(self, "tl2")
-            col.prop(self, "tl3")
-            col.prop(self, "tl4")
+            col.prop(self, "tl1", text="Fan Length 1")
+            col.prop(self, "tl2", text="Fan Length 2")
+            col.prop(self, "tl3", text="Fan Length 3")
+            col.prop(self, "tl4", text="Fan Length 4")
 
         elif self.type == "H-SHAPED":
             row = box.row(align=True)

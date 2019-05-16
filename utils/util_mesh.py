@@ -1,4 +1,5 @@
 import bpy
+import math
 import bmesh
 import operator
 import functools as ft
@@ -25,6 +26,18 @@ def select(elements, val=True):
 def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable """
     return list(filter(lambda x: isinstance(x, _type), geom))
+
+
+def sort_edges_clockwise(edges):
+    median_reference = ft.reduce(operator.add, map(calc_edge_median, edges)) / len(
+        edges
+    )
+
+    def sort_function(edge):
+        vector_difference = median_reference - calc_edge_median(edge)
+        return math.atan2(vector_difference.y, vector_difference.x)
+
+    return sorted(edges, key=sort_function, reverse=True)
 
 
 def filter_vertical_edges(edges, normal):

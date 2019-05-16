@@ -22,7 +22,7 @@ from ...utils import (
 
 class Floorplan:
     @classmethod
-    def build(cls, context, props):
+    def build(cls, context, prop):
         """Use floorplan types and properties to generate geometry
 
         Args:
@@ -34,22 +34,20 @@ class Floorplan:
         obj = make_object(name, make_mesh(name + "_mesh"))
         bm = bm_from_obj(obj)
 
-        kwargs = kwargs_from_props(props)
-        if props.type == "RECTANGULAR":
-            fp_rectangular(bm, **kwargs)
+        if prop.type == "RECTANGULAR":
+            fp_rectangular(bm, prop)
 
-        elif props.type == "CIRCULAR":
-            fp_circular(bm, **kwargs)
+        elif prop.type == "CIRCULAR":
+            fp_circular(bm, prop)
 
-        elif props.type == "COMPOSITE":
-            fp_composite(bm, **kwargs)
+        elif prop.type == "COMPOSITE":
+            fp_composite(bm, prop)
 
-        elif props.type == "H-SHAPED":
-            fp_hshaped(bm, **kwargs)
+        elif prop.type == "H-SHAPED":
+            fp_hshaped(bm, prop)
 
-        elif props.type == "RANDOM":
-            fp_random(bm, **kwargs)
+        elif prop.type == "RANDOM":
+            fp_random(bm, prop)
 
         bm_to_obj(bm, obj)
         link_obj(obj)
-        # create_default_materials(obj)
