@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from .floor_types import make_floors
 
-from ...utils import select, get_edit_mesh, kwargs_from_props
+from ...utils import select, get_edit_mesh
 
 
 class Floor:

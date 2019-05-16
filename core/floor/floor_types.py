@@ -2,7 +2,7 @@ import bmesh
 import itertools as it
 from bmesh.types import BMVert, BMFace, BMEdge
 
-from ...utils import select, filter_geom, set_material
+from ...utils import select, filter_geom, set_material, Material
 
 
 def make_floors(bm, edges, prop):
@@ -56,5 +56,5 @@ def make_floors(bm, edges, prop):
     wall_faces = [f for f in bm.faces if f not in slab_faces and not f.normal.z]
 
     # -- setup materials for slab and wall faces
-    # set_material(slab_faces, "mat_slab")
-    # set_material(wall_faces, "mat_wall")
+    set_material(slab_faces, Material.SLAB)
+    set_material(wall_faces, Material.WALL)

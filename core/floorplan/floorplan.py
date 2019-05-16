@@ -15,8 +15,6 @@ from ...utils import (
     bm_to_obj,
     make_object,
     bm_from_obj,
-    kwargs_from_props,
-    create_default_materials,
 )
 
 
