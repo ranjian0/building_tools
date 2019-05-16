@@ -2,11 +2,11 @@ import bpy
 import bmesh
 
 from .floorplan_types import (
-    fp_rectangular,
-    fp_circular,
-    fp_composite,
-    fp_hshaped,
-    fp_random,
+    create_random_floorplan,
+    create_hshaped_floorplan,
+    create_circular_floorplan,
+    create_composite_floorplan,
+    create_rectangular_floorplan,
 )
 
 from ...utils import link_obj, make_mesh, bm_to_obj, make_object, bm_from_obj
@@ -27,19 +27,19 @@ class Floorplan:
         bm = bm_from_obj(obj)
 
         if prop.type == "RECTANGULAR":
-            fp_rectangular(bm, prop)
+            create_rectangular_floorplan(bm, prop)
 
         elif prop.type == "CIRCULAR":
-            fp_circular(bm, prop)
+            create_circular_floorplan(bm, prop)
 
         elif prop.type == "COMPOSITE":
-            fp_composite(bm, prop)
+            create_composite_floorplan(bm, prop)
 
         elif prop.type == "H-SHAPED":
-            fp_hshaped(bm, prop)
+            create_hshaped_floorplan(bm, prop)
 
         elif prop.type == "RANDOM":
-            fp_random(bm, prop)
+            create_random_floorplan(bm, prop)
 
         bm_to_obj(bm, obj)
         link_obj(obj)

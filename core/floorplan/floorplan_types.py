@@ -15,7 +15,7 @@ from ...utils import (
 )
 
 
-def fp_rectangular(bm, prop):
+def create_rectangular_floorplan(bm, prop):
     """Create plane in provided bmesh
 
     Args:
@@ -25,7 +25,7 @@ def fp_rectangular(bm, prop):
     plane(bm, prop.width, prop.length)
 
 
-def fp_circular(bm, prop):
+def create_circular_floorplan(bm, prop):
     """Create circle in provided bmesh
 
     Args:
@@ -35,7 +35,7 @@ def fp_circular(bm, prop):
     circle(bm, prop.radius, prop.segments, prop.cap_tris)
 
 
-def fp_composite(bm, prop):
+def create_composite_floorplan(bm, prop):
     """Create a fan shape from a rectangle
         .____.
         |    |
@@ -70,7 +70,7 @@ def fp_composite(bm, prop):
             bmesh.ops.translate(bm, verts=verts, vec=v * exts[idx])
 
 
-def fp_hshaped(bm, prop):
+def create_hshaped_floorplan(bm, prop):
     """Create H_shaped geometry from a rectangle
 
     .___.      .___.
@@ -134,7 +134,7 @@ def fp_hshaped(bm, prop):
             )
 
 
-def fp_random(bm, prop):
+def create_random_floorplan(bm, prop):
     """ Create randomly generated building footprint/floorplan
 
     Args:
