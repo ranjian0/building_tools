@@ -48,17 +48,15 @@ def make_window_frame(bm, face, prop):
     Returns:
         bmesh.types.BMFace: face after frame is created
     """
-    bmesh.ops.remove_doubles(bm, verts=bm.verts)
     face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
     bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * prop.frame_depth / 2)
 
     if prop.frame_thickness > 0.0:
         bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.frame_thickness)
 
-    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if prop.frame_depth:
+    if prop.frame_depth > 0.0:
         f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
-        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.frame_depth)
+        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.frame_depth / 2)
         return f
     return face
 

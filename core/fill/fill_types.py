@@ -10,203 +10,105 @@ from ...utils import (
 )
 
 
-def fill_panel(bm, face, panel_x, panel_y, panel_b, panel_t, panel_d, **kwargs):
+def fill_panel(bm, face, prop):
     """Create panels on face
 
     Args:
-        bm   (bmesh.types.BMesh):  bmesh of current edit mesh
+        bm (bmesh.types.BMesh): bmesh of current edit mesh
         face (bmesh.types.BMFace): face to create panels on
-        panel_x (int):   number of horizontal panels
-        panel_y (int):   number of vertical panels
-        panel_b (float): border of panels from face edges
-        panel_t (float): thickness of panel inset
-        panel_d (float): depth of panel
-        **kwargs: Extra kwargs from FillPanel
+        prop (bpy.types.PropertyGroup): FillPanel
     """
+    if prop.panel_count_x + prop.panel_count_y == 0:
+        return
 
-    # Create main panel to hold child panels
-    bmesh.ops.inset_individual(bm, faces=[face], thickness=panel_b)
-
-    # Calculate edges to be subdivided
-    n = face.normal
-    vedgs = filter_vertical_edges(face.edges, n)
-    hedgs = list(set(face.edges) - set(vedgs))
-
-    vts = []
-    # Subdivide the edges
-    if panel_x:
-        res1 = bmesh.ops.subdivide_edges(bm, edges=vedgs, cuts=panel_x)
-        vts = filter_geom(res1["geom_inner"], BMVert)
-
-    if panel_y:
-        res2 = bmesh.ops.subdivide_edges(
-            bm,
-            edges=hedgs + filter_geom(res1["geom_inner"], BMEdge) if panel_x else hedgs,
-            cuts=panel_y,
-        )
-        vts = filter_geom(res2["geom_inner"], BMVert)
-
-    # Make panels
-    if vts:
-        faces = list(
-            filter(
-                lambda f: len(f.verts) == 4,
-                {f for v in vts for f in v.link_faces if f.normal == n},
-            )
-        )
-
-        bmesh.ops.inset_individual(bm, faces=faces, thickness=panel_t / 2)
-        bmesh.ops.translate(
-            bm, verts=list({v for f in faces for v in f.verts}), vec=n * panel_d
-        )
-
-    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.panel_border_size)
+    quads = subdivide_face_into_quads(bm, face, prop.panel_count_x, prop.panel_count_y)
+    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.panel_margin / 2)
+    bmesh.ops.translate(
+        bm,
+        verts=list({v for f in quads for v in f.verts}),
+        vec=face.normal * prop.panel_depth,
+    )
 
 
-def fill_glass_panes(bm, face, pane_x, pane_y, pane_t, pane_d, **kwargs):
+def fill_glass_panes(bm, face, prop):
     """Create glass panes on face
 
     Args:
         bm   (bmesh.types.BMesh):  bmesh of current edit mesh
         face (bmesh.types.BMFace): face to create glass panes on
-        pane_x (int): number of horizontal glass panes
-        pane_y (int): number of vertical glass panes
-        pane_t (float): thickness of glass pane borders
-        pane_d (float): depth of glass panes
-        **kwargs: Extra kwargs from FillGlassPanes
+        prop (bpy.types.PropertyGroup): FillGlassPanes
     """
+    if prop.pane_count_x + prop.pane_count_y == 0:
+        return
 
-    v_edges = filter_vertical_edges(face.edges, face.normal)
-    h_edges = filter_horizontal_edges(face.edges, face.normal)
-
-    edges = []
-    if pane_x:
-        res1 = bmesh.ops.subdivide_edges(bm, edges=v_edges, cuts=pane_x).get(
-            "geom_inner"
-        )
-        edges.extend(filter_geom(res1, BMEdge))
-
-    if pane_y:
-        res2 = bmesh.ops.subdivide_edges(
-            bm,
-            edges=h_edges + filter_geom(res1, BMEdge) if pane_x else h_edges,
-            cuts=pane_y,
-        ).get("geom_inner")
-        edges.extend(filter_geom(res2, BMEdge))
-
-    if edges:
-        pane_faces = list({f for ed in edges for f in ed.link_faces})
-        panes = bmesh.ops.inset_individual(bm, faces=pane_faces, thickness=pane_t)
-
-        for f in pane_faces:
-            bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * pane_d)
+    quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
+    panes = bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.pane_margin)
+    for f in quads:
+        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.pane_depth)
 
 
-def fill_bar(bm, face, bar_x, bar_y, bar_t, bar_d, **kwargs):
+def fill_bar(bm, face, prop):
     """Create bars on face
 
     Args:
         bm   (bmesh.types.BMesh): bmesh of current edit mesh
         face (bmesh.types.BMFace): face to create panels on
-        bar_x (int): number of horizontal bars
-        bar_y (int): number of vertical bars
-        bar_t (float): thickness of each bar
-        bar_d (float): depth of each bar
-        **kwargs: Extra kwargs from FillBar
+        prop (bpy.types.PropertyGroup): FillBars
     """
 
-    # Calculate center, width and height of face
     width, height = calc_face_dimensions(face)
-    fc = face.calc_center_median()
+    face_center = face.calc_center_median()
 
-    # Create Inner Frames
     # -- horizontal
-    offset = height / (bar_x + 1)
-    for i in range(bar_x):
-        # Duplicate
-        ret = bmesh.ops.duplicate(bm, geom=[face])
-        verts = filter_geom(ret["geom"], BMVert)
-
-        # Scale and translate
-        fs = bar_t / height
-        bmesh.ops.scale(bm, verts=verts, vec=(1, 1, fs), space=Matrix.Translation(-fc))
-        bmesh.ops.translate(
-            bm,
-            verts=verts,
-            vec=Vector((face.normal * bar_d / 2))
-            + Vector((0, 0, -height / 2 + (i + 1) * offset)),
+    offset = height / (prop.bar_count_x + 1)
+    for i in range(prop.bar_count_x):
+        scale = (1, 1, prop.bar_width / height)
+        position = Vector((face.normal * prop.bar_depth / 2)) + Vector(
+            (0, 0, -height / 2 + (i + 1) * offset)
         )
-
-        # Extrude
-        ext = bmesh.ops.extrude_edge_only(
+        duplicate = duplicate_face_translate_scale(
+            bm, face, position, scale, face_center
+        ).get('geom')
+        extrude_edges_to_depth(
             bm,
-            edges=filter_horizontal_edges(
-                filter_geom(ret["geom"], BMEdge), face.normal
-            ),
-        )
-        bmesh.ops.translate(
-            bm, verts=filter_geom(ext["geom"], BMVert), vec=-face.normal * bar_d / 2
+            filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal),
+            -face.normal * prop.bar_depth / 2,
         )
 
     # -- vertical
     eps = 0.015
-    offset = width / (bar_y + 1)
-    for i in range(bar_y):
-        # Duplicate
-        ret = bmesh.ops.duplicate(bm, geom=[face])
-        verts = filter_geom(ret["geom"], BMVert)
-
-        # Scale and Translate
-        fs = bar_t / width
-        bmesh.ops.scale(bm, verts=verts, vec=(fs, fs, 1), space=Matrix.Translation(-fc))
+    offset = width / (prop.bar_count_y + 1)
+    for i in range(prop.bar_count_y):
+        scale = (prop.bar_width / width, prop.bar_width / width, 1)
         perp = face.normal.cross(Vector((0, 0, 1)))
-        bmesh.ops.translate(
-            bm,
-            verts=verts,
-            vec=Vector((face.normal * ((bar_d / 2) - eps)))
-            + perp * (-width / 2 + ((i + 1) * offset)),
+        position = Vector((face.normal * ((prop.bar_depth / 2) - eps))) + perp * (
+            -width / 2 + ((i + 1) * offset)
         )
-
-        ext = bmesh.ops.extrude_edge_only(
+        duplicate = duplicate_face_translate_scale(
+            bm, face, position, scale, face_center
+        ).get('geom')
+        extrude_edges_to_depth(
             bm,
-            edges=filter_vertical_edges(filter_geom(ret["geom"], BMEdge), face.normal),
-        )
-        bmesh.ops.translate(
-            bm,
-            verts=filter_geom(ext["geom"], BMVert),
-            vec=-face.normal * ((bar_d / 2) - eps),
+            filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal),
+            -face.normal * ((prop.bar_depth / 2) - eps),
         )
 
 
-def fill_louver(bm, face, louver_m, louver_count, louver_d, louver_b, **kwargs):
+def fill_louver(bm, face, prop):
     """Create louvers from face
 
     Args:
         bm   (bmesh.types.BMesh): bmesh from current edit mesh
         face (bmesh.types.BMFace): face to operate on
-        louver_m (float): margin of louvers from face edges
-        louver_count (int): number of louvers
-        louver_d (float): depth of each louver
-        louver_b (float): border between consecutive louvers
-        **kwargs: Extra kwargs from FIllLouver
+        prop (bpy.types.PropertyGroup): FillLouver
     """
     normal = face.normal
-    # -- inset margin
-    if louver_m:
-        bmesh.ops.inset_individual(bm, faces=[face], thickness=louver_m)
+    if prop.louver_margin:
+        bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.louver_margin)
 
-    # -- cut vertical edges
-    count = (2 * louver_count) - 1
-    count = count if count % 2 == 0 else count + 1
-
-    res = bmesh.ops.subdivide_edges(
-        bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=count
-    )
-
-    # -- find louver faces
-    faces = list(
-        {f for e in filter_geom(res["geom_inner"], BMEdge) for f in e.link_faces}
-    )
+    segments = double_and_make_even(prop.louver_count)
+    faces = subdivide_face_into_vertical_segments(bm, face, segments)
     faces.sort(key=lambda f: f.calc_center_median().z)
     louver_faces = faces[1::2]
 
@@ -214,27 +116,71 @@ def fill_louver(bm, face, louver_m, louver_count, louver_d, louver_b, **kwargs):
     for face in louver_faces:
         bmesh.ops.scale(
             bm,
-            vec=(1, 1, 1 + louver_b),
+            vec=(1, 1, 1 + prop.louver_border),
             verts=face.verts,
             space=Matrix.Translation(-face.calc_center_median()),
         )
 
-    # -- extrude louver faces
-    res = bmesh.ops.extrude_discrete_faces(bm, faces=louver_faces)
-    bmesh.ops.translate(
-        bm,
-        vec=normal * louver_d,
+    extrude_faces_add_slope(bm, louver_faces, normal, prop.louver_depth)
+
+
+def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
+    v_edges = filter_vertical_edges(face.edges, face.normal)
+    h_edges = filter_horizontal_edges(face.edges, face.normal)
+
+    edges = []
+    if cuts_x > 0:
+        res = bmesh.ops.subdivide_edges(bm, edges=v_edges, cuts=cuts_x).get(
+            "geom_inner"
+        )
+        edges.extend(filter_geom(res, BMEdge))
+
+    if cuts_y > 0:
+        res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y).get(
+            "geom_inner"
+        )
+        edges.extend(filter_geom(res, BMEdge))
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
+    return list({f for ed in edges for f in ed.link_faces})
+
+
+def duplicate_face_translate_scale(bm, face, position, scale, scale_center):
+    ret = bmesh.ops.duplicate(bm, geom=[face])
+    verts = filter_geom(ret["geom"], BMVert)
+
+    bmesh.ops.scale(bm, verts=verts, vec=scale, space=Matrix.Translation(-scale_center))
+    bmesh.ops.translate(bm, verts=verts, vec=position)
+    return ret
+
+
+def extrude_edges_to_depth(bm, edges, depth):
+    ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
+    bmesh.ops.translate(bm, verts=filter_geom(ext["geom"], BMVert), vec=depth)
+
+
+def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
+    res = bmesh.ops.extrude_discrete_faces(bm, faces=faces)
+    bmesh.ops.translate(bm,
+        vec=extrude_normal * extrude_depth,
         verts=list({v for face in res["faces"] for v in face.verts}),
     )
 
-    # -- slope louver faces
     for face in res["faces"]:
         top_edge = max(
             filter_horizontal_edges(face.edges, face.normal),
             key=lambda e: calc_edge_median(e).z,
         )
-
-        bmesh.ops.translate(bm, vec=-face.normal * louver_d, verts=top_edge.verts)
-
-    # -- cleanup
+        bmesh.ops.translate(bm, vec=-face.normal * extrude_depth, verts=top_edge.verts)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
+
+
+def subdivide_face_into_vertical_segments(bm, face, segments):
+    res = bmesh.ops.subdivide_edges(
+        bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=segments
+    ).get('geom_inner')
+
+    return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
+
+def double_and_make_even(value):
+    double = value * 2
+    return double if double % 2 == 0 else double + 1

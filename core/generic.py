@@ -23,7 +23,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         description="Size of geometry",
     )
 
-    off: FloatVectorProperty(
+    offset: FloatVectorProperty(
         name="Offset",
         min=-1000.0,
         max=1000.0,
@@ -46,7 +46,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
             col.prop(self, "size", slider=True)
 
             col = row.column(align=True)
-            col.prop(self, "off")
+            col.prop(self, "offset")
 
 
 classes = (SizeOffsetProperty,)
