@@ -8,7 +8,7 @@ from ..fill import FillPanel, FillLouver, FillGlassPanes
 class DoorProperty(bpy.types.PropertyGroup):
     redo: BoolProperty()
 
-    ft: FloatProperty(
+    frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,
         max=2.99,
@@ -16,7 +16,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Thickness of inner door Frame",
     )
 
-    fd: FloatProperty(
+    frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
         max=100.0,
@@ -25,7 +25,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Depth of inner door Frame",
     )
 
-    hdd: BoolProperty(
+    has_double_door: BoolProperty(
         name="Double Door", default=False, description="If the door is split"
     )
 
@@ -42,7 +42,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Type of fill for door",
     )
 
-    soff: PointerProperty(type=SizeOffsetProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
 
     panel_fill: PointerProperty(type=FillPanel)
     glass_fill: PointerProperty(type=FillGlassPanes)
@@ -53,18 +53,18 @@ class DoorProperty(bpy.types.PropertyGroup):
         if self.redo:
             return
 
-        self.soff.size = (0.5, 1.0)
+        self.size_offset.size = (0.5, 1.0)
         self.redo = True
 
     def draw(self, context, layout):
-        self.soff.draw(context, layout)
+        self.size_offset.draw(context, layout)
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "ft")
-        col.prop(self, "fd")
+        col.prop(self, "frame_thickness")
+        col.prop(self, "frame_depth")
 
-        box.prop(self, "hdd", toggle=True)
+        box.prop(self, "has_double_door", toggle=True)
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")

@@ -17,7 +17,7 @@ class Door:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            make_door(bm, faces, **kwargs_from_props(props))
+            make_door(bm, faces, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
