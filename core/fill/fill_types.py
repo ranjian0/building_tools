@@ -69,7 +69,7 @@ def fill_bar(bm, face, prop):
         )
         duplicate = duplicate_face_translate_scale(
             bm, face, position, scale, face_center
-        ).get('geom')
+        ).get("geom")
         extrude_edges_to_depth(
             bm,
             filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal),
@@ -87,7 +87,7 @@ def fill_bar(bm, face, prop):
         )
         duplicate = duplicate_face_translate_scale(
             bm, face, position, scale, face_center
-        ).get('geom')
+        ).get("geom")
         extrude_edges_to_depth(
             bm,
             filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal),
@@ -160,7 +160,8 @@ def extrude_edges_to_depth(bm, edges, depth):
 
 def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
     res = bmesh.ops.extrude_discrete_faces(bm, faces=faces)
-    bmesh.ops.translate(bm,
+    bmesh.ops.translate(
+        bm,
         vec=extrude_normal * extrude_depth,
         verts=list({v for face in res["faces"] for v in face.verts}),
     )
@@ -177,9 +178,10 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 def subdivide_face_into_vertical_segments(bm, face, segments):
     res = bmesh.ops.subdivide_edges(
         bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=segments
-    ).get('geom_inner')
+    ).get("geom_inner")
 
     return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
+
 
 def double_and_make_even(value):
     double = value * 2
