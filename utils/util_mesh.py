@@ -43,7 +43,7 @@ def sort_edges_clockwise(edges):
 def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value """
     res = []
-    rnd = lambda val: round(val, 3)
+    rnd = ft.partial(round, ndigits=3)
 
     for e in edges:
         if normal.x:
@@ -59,7 +59,7 @@ def filter_vertical_edges(edges, normal):
 def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value """
     res = []
-    rnd = lambda val: round(val, 3)
+    rnd = ft.partial(round, ndigits=3)
 
     for e in edges:
         if normal.z:

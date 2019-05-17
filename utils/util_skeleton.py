@@ -1,4 +1,6 @@
-## Adapted from https://github.com/yonghah/polyskel
+"""
+Adapted from https://github.com/yonghah/polyskel
+"""
 
 import math
 import heapq

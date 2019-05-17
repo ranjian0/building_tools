@@ -1,3 +1,6 @@
+import bpy
+from .core import register_core, unregister_core
+
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
@@ -10,9 +13,6 @@ bl_info = {
     "tracker_url": "",
     "category": "Mesh",
 }
-
-import bpy
-from .core import register_core, unregister_core
 
 # =======================================================
 #
