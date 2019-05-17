@@ -1,20 +1,10 @@
 import bmesh
-import itertools as it
+import operator
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge
 
 from ..rails import MakeRailing
-from ...utils import (
-    split,
-    select,
-    split_quad,
-    filter_geom,
-    get_edit_mesh,
-    face_with_verts,
-    calc_edge_median,
-    filter_vertical_edges,
-    filter_horizontal_edges,
-)
+from ...utils import split, split_quad, filter_geom
 
 
 def make_stairs(
@@ -44,7 +34,7 @@ def make_stairs(
 
         f = make_stair_split(bm, f, **kwargs)
 
-        _key = lambda v: v.co.z
+        _key = operator.attrgetter("co.z")
         fheight = max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
 
         # -- options for railing

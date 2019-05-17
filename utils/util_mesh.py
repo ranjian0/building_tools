@@ -3,7 +3,7 @@ import math
 import bmesh
 import operator
 import functools as ft
-from mathutils import Matrix, Vector
+from mathutils import Matrix
 from bmesh.types import BMVert
 
 

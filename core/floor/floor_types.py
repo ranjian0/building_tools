@@ -1,9 +1,9 @@
 import bmesh
 import itertools as it
 import functools as ft
-from bmesh.types import BMVert, BMFace, BMEdge
+from bmesh.types import BMVert, BMEdge
 
-from ...utils import select, filter_geom, set_material, Material
+from ...utils import filter_geom, set_material, Material
 
 
 def create_floors(bm, edges, prop):
@@ -49,11 +49,9 @@ def extrude_slabs_and_floors(bm, edges, prop):
 
         extrusion = bmesh.ops.extrude_edge_only(bm, edges=edges)
         bmesh.ops.translate(
-            bm,
-            vec=(0, 0, offset),
-            verts=filter_geom(extrusion["geom"], bmesh.types.BMVert),
+            bm, vec=(0, 0, offset), verts=filter_geom(extrusion["geom"], BMVert)
         )
-        edges = filter_geom(extrusion["geom"], bmesh.types.BMEdge)
+        edges = filter_geom(extrusion["geom"], BMEdge)
     bmesh.ops.contextual_create(bm, geom=edges)
 
 

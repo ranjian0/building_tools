@@ -1,5 +1,4 @@
 import bpy
-import bmesh
 
 from .floorplan_types import (
     create_random_floorplan,

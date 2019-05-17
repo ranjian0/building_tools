@@ -1,13 +1,5 @@
 import bpy
-from bpy.props import (
-    IntProperty,
-    BoolProperty,
-    EnumProperty,
-    FloatProperty,
-    StringProperty,
-    PointerProperty,
-    FloatVectorProperty,
-)
+from bpy.props import BoolProperty, FloatVectorProperty
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):

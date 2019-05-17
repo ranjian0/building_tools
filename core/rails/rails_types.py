@@ -2,14 +2,11 @@ import math
 import bmesh
 import itertools as it
 
-from math import copysign
 from mathutils import Vector, Matrix
 
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     cube,
-    plane,
-    select,
     cylinder,
     filter_geom,
     face_with_verts,

@@ -785,7 +785,7 @@ class _LAV:
                 point, LineSegment2(prev, point), LineSegment2(point, next)
             )
             vertex.lav = lav
-            if lav.head == None:
+            if lav.head is None:
                 lav.head = vertex
                 vertex.prev = vertex.next = vertex
             else:

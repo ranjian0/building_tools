@@ -1,7 +1,6 @@
-import bpy
 import bmesh
+from ...utils import split
 from ..fill import fill_bar, fill_louver, fill_glass_panes
-from ...utils import split, set_material, get_edit_mesh
 
 
 def make_window(bm, faces, prop):

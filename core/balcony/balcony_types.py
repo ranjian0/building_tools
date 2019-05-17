@@ -2,7 +2,7 @@ import bmesh
 from bmesh.types import BMVert, BMFace
 
 from ..rails import MakeRailing
-from ...utils import split, filter_geom, get_edit_mesh, calc_edge_median
+from ...utils import split, filter_geom, calc_edge_median
 
 
 def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
@@ -21,7 +21,7 @@ def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
         )
 
         if railing:
-            face = filter_geom(ret["geom"], bmesh.types.BMFace)[-1]
+            face = filter_geom(ret["geom"], BMFace)[-1]
             top_verts = sorted(list(face.verts), key=lambda v: v.co.z)[2:]
             edges = list(
                 {

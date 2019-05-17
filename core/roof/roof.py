@@ -1,4 +1,3 @@
-import bpy
 import bmesh
 
 from .roof_types import make_roof

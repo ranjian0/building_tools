@@ -43,7 +43,7 @@ def fill_glass_panes(bm, face, prop):
         return
 
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
-    panes = bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.pane_margin)
+    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.pane_margin)
     for f in quads:
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.pane_depth)
 

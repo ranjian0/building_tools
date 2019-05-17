@@ -53,7 +53,7 @@ def create_composite_floorplan(bm, prop):
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
-    base = plane(bm, prop.width, prop.length)
+    plane(bm, prop.width, prop.length)
     median_reference = list(bm.faces)[-1].calc_center_median()
 
     edges = sort_edges_clockwise(bm.edges)
@@ -85,7 +85,7 @@ def create_hshaped_floorplan(bm, prop):
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
-    base = plane(bm, prop.width, prop.length)
+    plane(bm, prop.width, prop.length)
     face = list(bm.faces)[-1]
     normal = face.normal
     median_reference = face.calc_center_median()
@@ -133,7 +133,6 @@ def create_random_floorplan(bm, prop):
     median_reference = list(bm.faces)[-1].calc_center_median()
     for edge in random_edges:
         edge_median = calc_edge_median(edge)
-        edge_length = edge.calc_length()
 
         middle_edge = subdivide_edge_twice_and_get_middle(bm, edge)
         random_scale_and_translate(bm, middle_edge)

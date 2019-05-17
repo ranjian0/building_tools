@@ -1,20 +1,7 @@
-import bpy
-import math
 import bmesh
-import itertools as it
-
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
-from ...utils import (
-    equal,
-    select,
-    skeletonize,
-    filter_geom,
-    calc_edge_median,
-    calc_verts_median,
-    filter_vertical_edges,
-    filter_horizontal_edges,
-)
+from ...utils import equal, select, skeletonize, filter_geom, calc_edge_median
 
 
 def make_roof(bm, faces, type, **kwargs):

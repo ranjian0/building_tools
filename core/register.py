@@ -1,16 +1,13 @@
-import bpy
-
 from .fill import register_fill, unregister_fill
-from .rails import register_rail, unregister_rail
-
 from .door import register_door, unregister_door
-from .floor import register_floor, unregister_floor
-from .window import register_window, unregister_window
-from .floorplan import register_floorplan, unregister_floorplan
-from .balcony import register_balcony, unregister_balcony
-from .stairs import register_stairs, unregister_stairs
 from .roof import register_roof, unregister_roof
+from .rails import register_rail, unregister_rail
+from .floor import register_floor, unregister_floor
+from .stairs import register_stairs, unregister_stairs
+from .window import register_window, unregister_window
+from .balcony import register_balcony, unregister_balcony
 from .generic import register_generic, unregister_generic
+from .floorplan import register_floorplan, unregister_floorplan
 
 # -- take care here --
 # -- ORDER MATTERS --
