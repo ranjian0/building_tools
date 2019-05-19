@@ -15,7 +15,8 @@ def create_floors(bm, edges, prop):
     """Create extrusions of floor geometry from a floorplan
 
     Args:
-        bm (bmesh.types.BMesh): bmesh for the current editmesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        edges (list): boundary edges of editmode meshes
         prop (bpy.types.PropertyGroup): FloorPropertyGroup
 
     """
@@ -39,6 +40,13 @@ def create_floors(bm, edges, prop):
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
+    """extrude edges alternating between slab and floor heights
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        edges (list): boundary edges of editmode meshes
+        prop (bpy.types.PropertyGroup): FloorPropertyGroup
+    """
     offsets = it.cycle([prop.slab_thickness, prop.floor_height])
     for offset in it.islice(offsets, 0, prop.floor_count * 2):
         if offset == 0:
@@ -53,8 +61,18 @@ def extrude_slabs_and_floors(bm, edges, prop):
 
 
 def get_slab_and_wall_faces(bm, prop, start_height):
-    slabs, floors = [], []
-    slab_heights, floor_heights = [], []
+    """get faces that form slabs and walls
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        prop (bpy.types.PropertyGroup): FloorPropertyGroup
+        start_height (float): height to start making floors
+
+    Returns:
+        tuple(list, list): slab and wall faces
+    """
+    slabs, walls = [], []
+    slab_heights, wall_heights = [], []
     for idx in range(prop.floor_count):
         slab_heights.append(
             prop.slab_thickness / 2
@@ -62,7 +80,7 @@ def get_slab_and_wall_faces(bm, prop, start_height):
             + (idx * prop.floor_height)
             + start_height
         )
-        floor_heights.append(
+        wall_heights.append(
             prop.floor_height / 2
             + (idx * prop.floor_height)
             + ((idx + 1) * prop.slab_thickness)
@@ -74,11 +92,17 @@ def get_slab_and_wall_faces(bm, prop, start_height):
         face_location_z = round_4dp(face.calc_center_median().z)
         if face_location_z in map(round_4dp, slab_heights):
             slabs.append(face)
-        elif face_location_z in map(round_4dp, floor_heights):
-            floors.append(face)
-    return slabs, floors
+        elif face_location_z in map(round_4dp, wall_heights):
+            walls.append(face)
+    return slabs, walls
 
 
 def create_floor_materials(slab_faces, wall_faces):
+    """add materials to floor faces
+
+    Args:
+        slab_faces (list): all faces that form slabs
+        wall_faces (list): all faces that form walls
+    """
     set_material(slab_faces, Material.SLAB)
     set_material(wall_faces, Material.WALL)

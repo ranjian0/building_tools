@@ -1,6 +1,5 @@
 import bpy
 
-from .floor import Floor
 from .floor_ops import BTOOLS_OT_add_floors
 from .floor_props import FloorProperty
 
