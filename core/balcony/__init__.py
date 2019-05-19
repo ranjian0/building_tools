@@ -1,6 +1,5 @@
 import bpy
 
-from .balcony import Balcony
 from .balcony_ops import BTOOLS_OT_add_balcony
 from .balcony_props import BalconyProperty
 

@@ -72,7 +72,6 @@ def unregister():
 
 
 if __name__ == "__main__":
-    # -- continuos updates with script watcher
     import os
 
     os.system("clear")

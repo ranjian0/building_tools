@@ -1,6 +1,5 @@
 import bpy
 
-from .door import Door
 from .door_ops import BTOOLS_OT_add_door
 from .door_props import DoorProperty
 

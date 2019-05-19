@@ -29,6 +29,7 @@ def filter_geom(geom, _type):
 
 
 def sort_edges_clockwise(edges):
+    """ sort edges clockwise based on angle from their median center """
     median_reference = ft.reduce(operator.add, map(calc_edge_median, edges)) / len(
         edges
     )
@@ -200,6 +201,7 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
 
 
 def boundary_edges_from_face_selection(bm):
+    """ Find all edges that bound the current selected faces"""
     selected_faces = [f for f in bm.faces if f.select]
     all_edges = list({e for f in selected_faces for e in f.edges})
     edge_is_boundary = (

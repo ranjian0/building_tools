@@ -4,7 +4,6 @@ from mathutils import Matrix
 
 def cube(bm, width=2, length=2, height=2):
     """ Create a cube in the given bmesh"""
-
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
     sc_z = Matrix.Scale(height, 4, (0, 0, 1))
@@ -14,7 +13,6 @@ def cube(bm, width=2, length=2, height=2):
 
 def plane(bm, width=2, length=2):
     """ Create a plane in the given bmesh"""
-
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
     mat = sc_x @ sc_y
@@ -43,8 +41,6 @@ def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
 
 def cylinder(bm, radius=1, height=2, segs=10):
     """ Create cylinder in bmesh """
-
-    # -- circle
     circle = bmesh.ops.create_circle(
         bm, cap_ends=True, cap_tris=False, segments=segs, diameter=radius * 2
     )
