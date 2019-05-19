@@ -15,7 +15,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Type of roof to create",
     )
 
-    thick: FloatProperty(
+    thickness: FloatProperty(
         name="Thickness",
         min=0.01,
         max=1000.0,
@@ -50,12 +50,12 @@ class RoofProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.type == "FLAT":
             col = box.column(align=True)
-            col.prop(self, "thick")
+            col.prop(self, "thickness")
             col.prop(self, "outset")
 
         elif self.type == "GABLE":
             col = box.column(align=True)
-            col.prop(self, "thick")
+            col.prop(self, "thickness")
             col.prop(self, "outset")
             col.prop(self, "height")
 
@@ -64,6 +64,6 @@ class RoofProperty(bpy.types.PropertyGroup):
 
         else:
             col = box.column(align=True)
-            col.prop(self, "thick")
+            col.prop(self, "thickness")
             col.prop(self, "outset")
             col.prop(self, "height")

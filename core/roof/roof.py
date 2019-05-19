@@ -1,7 +1,7 @@
 import bmesh
 
 from .roof_types import make_roof
-from ...utils import get_edit_mesh, kwargs_from_props
+from ...utils import get_edit_mesh
 
 
 class Roof:
@@ -12,7 +12,7 @@ class Roof:
         faces = [f for f in bm.faces if f.select]
 
         if cls.validate(bm):
-            make_roof(bm, faces, **kwargs_from_props(props))
+            make_roof(bm, faces, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
