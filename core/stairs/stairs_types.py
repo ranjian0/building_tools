@@ -7,7 +7,7 @@ from ..rails import MakeRailing
 from ...utils import split, split_quad, filter_geom
 
 
-def make_stairs(
+def create_stairs(
     bm,
     faces,
     step_count,
@@ -32,7 +32,7 @@ def make_stairs(
     for f in faces:
         f.select = False
 
-        f = make_stair_split(bm, f, **kwargs)
+        f = create_stair_split(bm, f, **kwargs)
 
         _key = operator.attrgetter("co.z")
         fheight = max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
@@ -107,12 +107,12 @@ def make_stairs(
                 )
 
     if railing:
-        make_stairs_railing(
+        create_stairs_railing(
             bm, init_normal, top_faces, landing, stair_direction, **kwargs
         )
 
 
-def make_stair_split(bm, face, size, off, **kwargs):
+def create_stair_split(bm, face, size, off, **kwargs):
     """Use properties from SplitOffset to subdivide face into regular quads
 
     Args:
@@ -128,7 +128,7 @@ def make_stair_split(bm, face, size, off, **kwargs):
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
-def make_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwargs):
+def create_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwargs):
     """Create railing for stairs
 
     Args:
@@ -144,20 +144,20 @@ def make_stairs_railing(bm, normal, faces, has_landing, stair_direction, **kwarg
         landing_face, *step_faces = faces
 
         if stair_direction == "FRONT":
-            make_railing_front(bm, landing_face, normal, **kwargs)
+            create_railing_front(bm, landing_face, normal, **kwargs)
         elif stair_direction == "LEFT":
-            make_railing_left(bm, landing_face, normal, **kwargs)
+            create_railing_left(bm, landing_face, normal, **kwargs)
         elif stair_direction == "RIGHT":
-            make_railing_right(bm, landing_face, normal, **kwargs)
+            create_railing_right(bm, landing_face, normal, **kwargs)
 
     else:
         step_faces = faces
 
     # --create railing for steps
-    # make_step_railing(bm, normal, step_faces, has_landing, stair_direction, **kwargs)
+    # create_step_railing(bm, normal, step_faces, has_landing, stair_direction, **kwargs)
 
 
-def make_railing_front(bm, face, normal, **kwargs):
+def create_railing_front(bm, face, normal, **kwargs):
     """Create rails for landing when stair direction is front
 
     Args:
@@ -180,7 +180,7 @@ def make_railing_front(bm, face, normal, **kwargs):
     MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 
-def make_railing_left(bm, face, normal, **kwargs):
+def create_railing_left(bm, face, normal, **kwargs):
     """Create rails for landing when stair direction is left
 
     Args:
@@ -206,7 +206,7 @@ def make_railing_left(bm, face, normal, **kwargs):
     MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 
-def make_railing_right(bm, face, normal, **kwargs):
+def create_railing_right(bm, face, normal, **kwargs):
     """Create rails for landing when stair direction is right
 
     Args:
@@ -232,7 +232,7 @@ def make_railing_right(bm, face, normal, **kwargs):
     MakeRailing().from_edges(bm, valid_edges, **kwargs)
 
 
-def make_step_railing(bm, normal, faces, landing, direction, **kwargs):
+def create_step_railing(bm, normal, faces, landing, direction, **kwargs):
     """Create railing for stair steps
 
     Args:

@@ -1,5 +1,5 @@
 import bmesh
-from .window_types import make_window
+from .window_types import create_window
 from ...utils import get_edit_mesh
 
 
@@ -17,7 +17,7 @@ class Window:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            make_window(bm, faces, prop)
+            create_window(bm, faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}

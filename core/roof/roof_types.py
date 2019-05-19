@@ -6,7 +6,7 @@ from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import equal, select, skeletonize, filter_geom, calc_edge_median
 
 
-def make_roof(bm, faces, prop):
+def create_roof(bm, faces, prop):
     """Create different roof types
 
     Args:
@@ -18,14 +18,14 @@ def make_roof(bm, faces, prop):
 
     select(faces, False)
     if prop.type == "FLAT":
-        make_flat_roof(bm, faces, prop)
+        create_flat_roof(bm, faces, prop)
     elif prop.type == "GABLE":
-        make_gable_roof(bm, faces, prop)
+        create_gable_roof(bm, faces, prop)
     elif prop.type == "HIP":
-        make_hip_roof(bm, faces, prop)
+        create_hip_roof(bm, faces, prop)
 
 
-def make_flat_roof(bm, faces, prop):
+def create_flat_roof(bm, faces, prop):
     """Create a basic flat roof
 
     Args:
@@ -53,7 +53,7 @@ def make_flat_roof(bm, faces, prop):
     return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")
 
 
-def make_gable_roof(bm, faces, prop):
+def create_gable_roof(bm, faces, prop):
     """Create a gable roof
 
     Args:
@@ -80,7 +80,7 @@ def make_gable_roof(bm, faces, prop):
     fill_roof_faces_from_hang(bm, hang_edges, prop.thickness, axis)
 
 
-def make_hip_roof(bm, faces, prop):
+def create_hip_roof(bm, faces, prop):
     """Create a hip roof
 
     Args:
@@ -245,7 +245,7 @@ def create_hip_faces(bm, original_edges, skeleton_edges):
         ]
 
         if len(linked_skeleton_edges) == 2:
-            cycle_edges_make_polygon(bm, ed, skeleton_edges)
+            cycle_edges_create_polygon(bm, ed, skeleton_edges)
 
         # elif len(face_edges) == 1:
         #     # -- special case
@@ -277,7 +277,7 @@ def create_hip_faces(bm, original_edges, skeleton_edges):
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
 
-def DP_cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
+def DP_cycle_edges_create_polygon(bm, original_edge, skeleton_edges):
     start, end = original_edge.verts
 
     valid_start_edges = [e for e in start.link_edges if e in skeleton_edges]
@@ -301,7 +301,7 @@ def DP_cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
                 )
 
 
-def cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
+def cycle_edges_create_polygon(bm, original_edge, skeleton_edges):
     start, end = sorted(original_edge.verts, key=lambda v: v.co.x)
 
     current_vert = start
@@ -348,7 +348,7 @@ def find_closest_vert_in_edges(current_vert, compare_vert, edges):
 
 def DEPRECATED_hip_roof(bm, faces, prop):
 
-    faces = make_flat_roof(bm, faces, prop)
+    faces = create_flat_roof(bm, faces, prop)
     face = faces[-1]
     median = face.calc_center_median()
 

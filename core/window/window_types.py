@@ -3,7 +3,7 @@ from ...utils import split
 from ..fill import fill_bar, fill_louver, fill_glass_panes
 
 
-def make_window(bm, faces, prop):
+def create_window(bm, faces, prop):
     """Generate a basic window
 
     Args:
@@ -13,15 +13,15 @@ def make_window(bm, faces, prop):
     """
 
     for face in faces:
-        face = make_window_split(bm, face, prop.size_offset)
+        face = create_window_split(bm, face, prop.size_offset)
         if not face:
             continue
 
-        face = make_window_frame(bm, face, prop)
-        make_window_fill(bm, face, prop)
+        face = create_window_frame(bm, face, prop)
+        create_window_fill(bm, face, prop)
 
 
-def make_window_split(bm, face, prop):
+def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
 
     Args:
@@ -36,7 +36,7 @@ def make_window_split(bm, face, prop):
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
-def make_window_frame(bm, face, prop):
+def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
 
     Args:
@@ -60,7 +60,7 @@ def make_window_frame(bm, face, prop):
     return face
 
 
-def make_window_fill(bm, face, prop):
+def create_window_fill(bm, face, prop):
     """Create extra elements on face
 
     Args:

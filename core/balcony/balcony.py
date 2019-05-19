@@ -1,6 +1,6 @@
 import bmesh
 
-from .balcony_types import make_balcony
+from .balcony_types import create_balcony
 from ...utils import get_edit_mesh, kwargs_from_props
 
 
@@ -19,7 +19,7 @@ class Balcony:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            make_balcony(bm, faces, **kwargs_from_props(props))
+            create_balcony(bm, faces, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}

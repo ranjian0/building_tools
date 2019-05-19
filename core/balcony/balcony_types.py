@@ -5,7 +5,7 @@ from ..rails import MakeRailing
 from ...utils import split, filter_geom, calc_edge_median
 
 
-def make_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
+def create_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
     """Generate balcony geometry
 
     Args:

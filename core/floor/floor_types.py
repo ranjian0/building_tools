@@ -28,7 +28,7 @@ def create_floors(bm, edges, prop):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
-    make_floor_materials(slabs, walls)
+    create_floor_materials(slabs, walls)
 
 
 def find_boundary_edges_from_face_selection(bm):
@@ -80,6 +80,6 @@ def get_slab_and_wall_faces(bm, prop):
     return slabs, floors
 
 
-def make_floor_materials(slab_faces, wall_faces):
+def create_floor_materials(slab_faces, wall_faces):
     set_material(slab_faces, Material.SLAB)
     set_material(wall_faces, Material.WALL)

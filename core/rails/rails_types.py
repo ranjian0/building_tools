@@ -46,7 +46,7 @@ class MakeRailing:
         if len(lfaces) > 1:
             bmesh.ops.dissolve_faces(bmcopy, faces=lfaces)
 
-        self.make_railing(bm, edges, lfaces, **kwargs)
+        self.create_railing(bm, edges, lfaces, **kwargs)
         bmcopy.free()
 
     def from_edges(self, bm, edges, **kwargs):
@@ -55,7 +55,7 @@ class MakeRailing:
         lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
         lfaces = [f for f in lfaces if all([e in f.edges for e in edges])]
 
-        self.make_railing(bm, edges, lfaces, **kwargs)
+        self.create_railing(bm, edges, lfaces, **kwargs)
 
     def from_step_edges(
         self,
@@ -149,7 +149,7 @@ class MakeRailing:
         elif fill == "WALL":
             pass
 
-    def make_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
+    def create_railing(self, bm, edges, lfaces, remove_colinear, **kwargs):
         """Creates rails and posts along selected edges
 
         Args:
@@ -183,11 +183,11 @@ class MakeRailing:
             )
             loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
 
-        self.make_corner_post(bm, loops, **kwargs)
-        self.make_fill(bm, edges, **kwargs)
+        self.create_corner_post(bm, loops, **kwargs)
+        self.create_fill(bm, edges, **kwargs)
         bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
-    def make_corner_post(self, bm, loops, cpw, cph, has_decor, **kwargs):
+    def create_corner_post(self, bm, loops, cpw, cph, has_decor, **kwargs):
         """ Create Corner posts """
         num_poly = lambda ang: round((2 * math.pi) / (math.pi - ang))
         for loop in loops:
@@ -231,17 +231,17 @@ class MakeRailing:
                 matrix=Matrix.Rotation(math.atan2(dy, dx), 4, "Z"),
             )
 
-    def make_fill(self, bm, edges, fill, **kwargs):
+    def create_fill(self, bm, edges, fill, **kwargs):
         """ Create fill types for railing """
         for edge in edges:
             if fill == "RAILS":
-                self.make_fill_rails(bm, edge, **kwargs)
+                self.create_fill_rails(bm, edge, **kwargs)
             elif fill == "POSTS":
-                self.make_fill_posts(bm, edge, **kwargs)
+                self.create_fill_posts(bm, edge, **kwargs)
             elif fill == "WALL":
-                self.make_fill_walls(bm, edge, **kwargs)
+                self.create_fill_walls(bm, edge, **kwargs)
 
-    def make_fill_rails(self, bm, edge, cpw, cph, rd, rs, expand, **kwargs):
+    def create_fill_rails(self, bm, edge, cpw, cph, rd, rs, expand, **kwargs):
         v1, v2 = edge.verts
         dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
@@ -267,7 +267,7 @@ class MakeRailing:
         rail_count = int((cph / rs) * rd)
         array_elements(bm, rail, rail_count, start, stop)
 
-    def make_fill_posts(self, bm, edge, cpw, cph, pd, ps, rs, **kwargs):
+    def create_fill_posts(self, bm, edge, cpw, cph, pd, ps, rs, **kwargs):
         v1, v2 = edge.verts
         vec = (v1.co - v2.co).normalized()
         tan = edge_tangent(edge).normalized()
@@ -319,7 +319,7 @@ class MakeRailing:
             matrix=Matrix.Rotation(math.atan2(*vec.yx), 4, "Z"),
         )
 
-    def make_fill_walls(self, bm, edge, cph, cpw, ww, expand, **kwargs):
+    def create_fill_walls(self, bm, edge, cph, cpw, ww, expand, **kwargs):
         off = cpw
         if self.wall_switch:
             # - a cylinder corner post was created, determine length of side with cosine rule

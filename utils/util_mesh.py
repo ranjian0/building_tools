@@ -12,7 +12,7 @@ def get_edit_mesh():
     return bpy.context.edit_object.data
 
 
-def make_mesh(name):
+def create_mesh(name):
     """ Make new mesh data """
     return bpy.data.meshes.new(name)
 

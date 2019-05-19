@@ -4,7 +4,7 @@ import bmesh
 from .util_mesh import select
 
 
-def make_object(name, data=None):
+def create_object(name, data=None):
     """ Make new object data """
     return bpy.data.objects.new(name, data)
 

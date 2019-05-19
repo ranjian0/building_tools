@@ -1,6 +1,6 @@
 import bmesh
 
-from .stairs_types import make_stairs
+from .stairs_types import create_stairs
 from ...utils import get_edit_mesh, kwargs_from_props
 
 
@@ -18,7 +18,7 @@ class Stairs:
         faces = [f for f in bm.faces if f.select]
 
         if cls.validate(faces):
-            make_stairs(bm, faces, **kwargs_from_props(props))
+            create_stairs(bm, faces, **kwargs_from_props(props))
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
