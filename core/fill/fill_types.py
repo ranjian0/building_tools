@@ -14,7 +14,7 @@ def fill_panel(bm, face, prop):
     """Create panels on face
 
     Args:
-        bm (bmesh.types.BMesh): bmesh of current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to create panels on
         prop (bpy.types.PropertyGroup): FillPanel
     """
@@ -35,7 +35,7 @@ def fill_glass_panes(bm, face, prop):
     """Create glass panes on face
 
     Args:
-        bm   (bmesh.types.BMesh):  bmesh of current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to create glass panes on
         prop (bpy.types.PropertyGroup): FillGlassPanes
     """
@@ -52,7 +52,7 @@ def fill_bar(bm, face, prop):
     """Create bars on face
 
     Args:
-        bm   (bmesh.types.BMesh): bmesh of current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to create panels on
         prop (bpy.types.PropertyGroup): FillBars
     """
@@ -99,8 +99,8 @@ def fill_louver(bm, face, prop):
     """Create louvers from face
 
     Args:
-        bm   (bmesh.types.BMesh): bmesh from current edit mesh
-        face (bmesh.types.BMFace): face to operate on
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to create louvers on
         prop (bpy.types.PropertyGroup): FillLouver
     """
     normal = face.normal
@@ -125,6 +125,17 @@ def fill_louver(bm, face, prop):
 
 
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
+    """subdivide a face(quad) into more quads
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to operate on
+        cuts_x (int): number of horizontal cuts
+        cuts_y (int): number of vertical cuts
+
+    Returns:
+        list: new faces from subdivision
+    """
     v_edges = filter_vertical_edges(face.edges, face.normal)
     h_edges = filter_horizontal_edges(face.edges, face.normal)
 
@@ -145,6 +156,18 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
 
 
 def duplicate_face_translate_scale(bm, face, position, scale, scale_center):
+    """Duplicate a face and transform it
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to duplicate
+        position (vector): position of duplicate face
+        scale (tuple): scale of duplicate face
+        scale_center (vector): center of scaling operation
+
+    Returns:
+        dict geometry of duplicate face
+    """
     ret = bmesh.ops.duplicate(bm, geom=[face])
     verts = filter_geom(ret["geom"], BMVert)
 
@@ -154,11 +177,26 @@ def duplicate_face_translate_scale(bm, face, position, scale, scale_center):
 
 
 def extrude_edges_to_depth(bm, edges, depth):
+    """Extrude edges only
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        edges (list): edges to extrude
+        depth (float): depth to extrude to
+    """
     ext = bmesh.ops.extrude_edge_only(bm, edges=edges)
     bmesh.ops.translate(bm, verts=filter_geom(ext["geom"], BMVert), vec=depth)
 
 
 def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
+    """Extrude faces and move top edge back to form wedge.slope
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        faces (list): faces to extrude
+        extrude_normal (vector): direction of extrusion
+        extrude_depth (float): magnitude of extrusion
+    """
     res = bmesh.ops.extrude_discrete_faces(bm, faces=faces)
     bmesh.ops.translate(
         bm,
@@ -176,6 +214,16 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 
 
 def subdivide_face_into_vertical_segments(bm, face, segments):
+    """Cut a face(quad) vertically into multiple faces
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to operate on
+        segments (int): number of segments
+
+    Returns:
+        list: face segmets formed from subdivision
+    """
     res = bmesh.ops.subdivide_edges(
         bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=segments
     ).get("geom_inner")
@@ -184,5 +232,13 @@ def subdivide_face_into_vertical_segments(bm, face, segments):
 
 
 def double_and_make_even(value):
+    """multiply a number by 2 and make it even
+
+    Args:
+        value (int): value to operator on
+
+    Returns:
+        int: result after doubling and making even
+    """
     double = value * 2
     return double if double % 2 == 0 else double + 1
