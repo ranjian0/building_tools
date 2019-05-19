@@ -18,7 +18,9 @@ def create_door(bm, faces, prop):
     """Create basic flush door
 
     Args:
-        **kwargs: DoorProperty items
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        faces (list): selected faces
+        prop (bpy.types.PropertyGroup): DoorProperty
     """
 
     for face in faces:
@@ -37,11 +39,9 @@ def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
 
     Args:
-        bm   (bmesh.types.BMesh):  bmesh for current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to make split (must be quad)
-        size (vector2): proportion of the new face to old face
-        off  (vector3): how much to offset new face from center
-        **kwargs: Extra kwargs from DoorProperty
+        prop (bpy.types.PropertyGroup): SizeOffsetProperty
 
     Returns:
         bmesh.types.BMFace: New face created after split
@@ -54,11 +54,9 @@ def create_door_frame(bm, face, prop):
     """Create extrude and inset around a face to make door frame
 
     Args:
-        bm   (bmesh.types.BMesh): bmesh of current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to make frame for
-        ft (float): Thickness of the door frame
-        fd (float): Depth of the doorframe
-        **kwargs: Extra kwargs from DoorProperty
+        prop (bpy.types.PropertyGroup): DoorProperty
 
     Returns:
         bmesh.types.BMFace: face after frame is created
@@ -88,8 +86,10 @@ def create_door_double(bm, face, prop):
     """Split face vertically into two faces
 
     Args:
-        bm   (bmesh.types.BMesh): bmesh for current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to operate on
+        prop (bpy.types.PropertyGroup): DoorProperty
+
     Returns:
         list: face(s) after double door created
     """
@@ -106,8 +106,9 @@ def create_door_fill(bm, face, prop):
     """Create extra elements on face
 
     Args:
-        bm   (bmesh.types.BMesh): bmesh for current edit mesh
+        bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to operate on
+        prop (bpy.types.PropertyGroup): DoorProperty
     """
     if prop.fill_type == "NONE":
         pass
@@ -120,6 +121,12 @@ def create_door_fill(bm, face, prop):
 
 
 def delete_bottom_face(bm, face):
+    """delete a face that is hidden at the bottom of face
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face that has hidden face at the bottom
+    """
     bottom_edge = min(
         filter_horizontal_edges(face.edges, face.normal),
         key=lambda e: calc_edge_median(e).z,
@@ -131,6 +138,16 @@ def delete_bottom_face(bm, face):
 
 
 def extrude_face_and_delete_bottom(bm, face, extrude_depth):
+    """extrude a face, and delete another face hidden at the bottom of the extrusion
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to extrude
+        extrude_depth (float):
+
+    Returns:
+        bmesh.types.BMFace: new face from extrusion
+    """
     f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
     bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
     delete_bottom_face(bm, f)
@@ -138,6 +155,17 @@ def extrude_face_and_delete_bottom(bm, face, extrude_depth):
 
 
 def split_face_vertical_with_offset(bm, face, cuts, offsets):
+    """split a face(quad) vertically and move the new edges
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        face (bmesh.types.BMFace): face to split
+        cuts (int): number of splits
+        offsets (float): how far from the edges splits are
+
+    Returns:
+        list: new edges from split
+    """
     median = face.calc_center_median()
     res = split_quad(bm, face, True, cuts)
     edges = filter_geom(res["geom_inner"], BMEdge)
@@ -152,6 +180,16 @@ def split_face_vertical_with_offset(bm, face, cuts, offsets):
 
 
 def split_edges_horizontal_offset_top(bm, edges, offset):
+    """split a face(quad) horizontally and move the new edge
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        edges (TYPE): Description
+        offset (TYPE): Description
+
+    Returns:
+        bmesh.types.BMEdge: edge created during split
+    """
     face = face_with_verts(bm, list({v for e in edges for v in e.verts}))
     v_edges = filter_vertical_edges(face.edges, face.normal)
     new_verts = []
