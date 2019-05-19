@@ -1,7 +1,7 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
 
-from ..rails import MakeRailing
+from ..rails import CreateRailing
 from ...utils import split, filter_geom, calc_edge_median
 
 
@@ -50,6 +50,6 @@ def create_balcony(bm, faces, width, railing, size, off, open_side, **kwargs):
             elif open_side == "RIGHT":
                 r_edges = [front, left]
 
-            MakeRailing().from_edges(bm, r_edges, **kwargs)
+            CreateRailing().from_edges(bm, r_edges, **kwargs)
 
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")

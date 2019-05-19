@@ -1,9 +1,9 @@
 import bmesh
 import operator
 from mathutils import Vector
-from bmesh.types import BMVert, BMEdge
+from bmesh.types import BMVert
 
-from ..rails import MakeRailing
+from ..rails import CreateRailing
 from ...utils import split, split_quad, filter_geom
 
 
@@ -177,7 +177,7 @@ def create_railing_front(bm, face, normal, **kwargs):
                 if round(normal.cross(tan).z):
                     valid_edges.append(e)
 
-    MakeRailing().from_edges(bm, valid_edges, **kwargs)
+    CreateRailing().from_edges(bm, valid_edges, **kwargs)
 
 
 def create_railing_left(bm, face, normal, **kwargs):
@@ -203,7 +203,7 @@ def create_railing_left(bm, face, normal, **kwargs):
                 if round(normal.cross(tan).z) < 0:
                     valid_edges.append(e)
 
-    MakeRailing().from_edges(bm, valid_edges, **kwargs)
+    CreateRailing().from_edges(bm, valid_edges, **kwargs)
 
 
 def create_railing_right(bm, face, normal, **kwargs):
@@ -229,7 +229,7 @@ def create_railing_right(bm, face, normal, **kwargs):
                 if round(normal.cross(tan).z) > 0:
                     valid_edges.append(e)
 
-    MakeRailing().from_edges(bm, valid_edges, **kwargs)
+    CreateRailing().from_edges(bm, valid_edges, **kwargs)
 
 
 def create_step_railing(bm, normal, faces, landing, direction, **kwargs):
@@ -275,4 +275,4 @@ def create_step_railing(bm, normal, faces, landing, direction, **kwargs):
     elif direction == "RIGHT":
         valid_edges.extend(left_edges)
 
-    MakeRailing().from_step_edges(bm, valid_edges, normal, direction, **kwargs)
+    CreateRailing().from_step_edges(bm, valid_edges, normal, direction, **kwargs)

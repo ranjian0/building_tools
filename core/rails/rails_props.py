@@ -3,7 +3,7 @@ from bpy.props import FloatProperty, EnumProperty, BoolProperty
 
 
 class RailProperty(bpy.types.PropertyGroup):
-    ps: FloatProperty(
+    post_size: FloatProperty(
         name="Post Size",
         min=0.01,
         max=100.0,
@@ -11,7 +11,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Size of each post",
     )
 
-    pd: FloatProperty(
+    post_density: FloatProperty(
         name="Post Density",
         min=0.0,
         max=1.0,
@@ -19,7 +19,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Number of posts along each edge",
     )
 
-    rs: FloatProperty(
+    rail_size: FloatProperty(
         name="Rail Size",
         min=0.01,
         max=100.0,
@@ -27,7 +27,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Size of each rail",
     )
 
-    rd: FloatProperty(
+    rail_density: FloatProperty(
         name="Rail Density",
         min=0.0,
         max=1.0,
@@ -35,7 +35,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Number of rails over each edge",
     )
 
-    ww: FloatProperty(
+    wall_width: FloatProperty(
         name="Wall Width",
         min=0.0,
         max=100.0,
@@ -43,7 +43,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Width of each wall",
     )
 
-    cpw: FloatProperty(
+    corner_post_width: FloatProperty(
         name="Corner Post Width",
         min=0.01,
         max=100.0,
@@ -51,7 +51,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Width of each corner post",
     )
 
-    cph: FloatProperty(
+    corner_post_height: FloatProperty(
         name="Corner Post Height",
         min=0.01,
         max=100.0,
@@ -59,7 +59,7 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Height of each corner post",
     )
 
-    hcp: BoolProperty(
+    has_corner_post: BoolProperty(
         name="Corner Posts",
         default=True,
         description="Whether the railing has corner posts",
@@ -102,15 +102,15 @@ class RailProperty(bpy.types.PropertyGroup):
         box = layout.box()
         if self.fill == "POSTS":
             col = box.column(align=True)
-            col.prop(self, "pd")
-            col.prop(self, "ps")
+            col.prop(self, "post_density")
+            col.prop(self, "post_size")
 
             box1 = box.box()
             box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
-            col.prop(self, "cpw")
-            col.prop(self, "cph")
+            col.prop(self, "corner_post_width")
+            col.prop(self, "corner_post_height")
 
             row = box1.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
@@ -118,16 +118,16 @@ class RailProperty(bpy.types.PropertyGroup):
 
         elif self.fill == "RAILS":
             col = box.column(align=True)
-            col.prop(self, "rd")
-            col.prop(self, "rs")
+            col.prop(self, "rail_density")
+            col.prop(self, "rail_size")
             col.prop(self, "expand", text="Expand Rails", toggle=True)
 
             box1 = box.box()
             box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
-            col.prop(self, "cpw")
-            col.prop(self, "cph")
+            col.prop(self, "corner_post_width")
+            col.prop(self, "corner_post_height")
 
             row = box1.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
@@ -135,15 +135,15 @@ class RailProperty(bpy.types.PropertyGroup):
 
         elif self.fill == "WALL":
             col = box.column(align=True)
-            col.prop(self, "ww")
+            col.prop(self, "wall_width")
             col.prop(self, "expand", text="Expand Walls", toggle=True)
 
             box1 = box.box()
             box1.label(text="Corner Posts")
 
             col = box1.column(align=True)
-            col.prop(self, "cpw")
-            col.prop(self, "cph")
+            col.prop(self, "corner_post_width")
+            col.prop(self, "corner_post_height")
 
             row = box1.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
