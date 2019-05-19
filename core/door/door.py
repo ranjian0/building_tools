@@ -1,7 +1,7 @@
 import bmesh
 
-from .door_types import make_door
-from ...utils import get_edit_mesh, kwargs_from_props
+from .door_types import create_door
+from ...utils import get_edit_mesh
 
 
 class Door:
@@ -17,7 +17,7 @@ class Door:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            make_door(bm, faces, props)
+            create_door(bm, faces, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}

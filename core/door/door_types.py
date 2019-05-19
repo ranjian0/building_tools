@@ -14,7 +14,7 @@ from ...utils import (
 )
 
 
-def make_door(bm, faces, prop):
+def create_door(bm, faces, prop):
     """Create basic flush door
 
     Args:
@@ -22,18 +22,18 @@ def make_door(bm, faces, prop):
     """
 
     for face in faces:
-        face = make_door_split(bm, face, prop.size_offset)
+        face = create_door_split(bm, face, prop.size_offset)
         # -- check that split was successful
         if not face:
             continue
 
-        nfaces = make_door_double(bm, face, prop)
+        nfaces = create_door_double(bm, face, prop)
         for face in nfaces:
-            face = make_door_frame(bm, face, prop)
-            make_door_fill(bm, face, prop)
+            face = create_door_frame(bm, face, prop)
+            create_door_fill(bm, face, prop)
 
 
-def make_door_split(bm, face, prop):
+def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
 
     Args:
@@ -50,7 +50,7 @@ def make_door_split(bm, face, prop):
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
-def make_door_frame(bm, face, prop):
+def create_door_frame(bm, face, prop):
     """Create extrude and inset around a face to make door frame
 
     Args:
@@ -84,7 +84,7 @@ def make_door_frame(bm, face, prop):
     return face
 
 
-def make_door_double(bm, face, prop):
+def create_door_double(bm, face, prop):
     """Split face vertically into two faces
 
     Args:
@@ -102,7 +102,7 @@ def make_door_double(bm, face, prop):
     return [face]
 
 
-def make_door_fill(bm, face, prop):
+def create_door_fill(bm, face, prop):
     """Create extra elements on face
 
     Args:
