@@ -1,3 +1,5 @@
+"""Summary
+"""
 import bmesh
 from bmesh.types import BMVert
 from mathutils import Vector, Matrix
@@ -19,7 +21,7 @@ def create_rectangular_floorplan(bm, prop):
     """Create plane in provided bmesh
 
     Args:
-        bm (bmesh.types.BMesh): bmesh to create plane in
+        bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     plane(bm, prop.width, prop.length)
@@ -29,7 +31,7 @@ def create_circular_floorplan(bm, prop):
     """Create circle in provided bmesh
 
     Args:
-        bm (bmesh.types.BMesh): bmesh to create circle in
+        bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     circle(bm, prop.radius, prop.segments, prop.cap_tris)
@@ -49,7 +51,7 @@ def create_composite_floorplan(bm, prop):
         .____.
 
     Args:
-        bm (bmesh.types.BMesh): bmesh to create shape in
+        bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
@@ -81,7 +83,7 @@ def create_hshaped_floorplan(bm, prop):
     .___.      .___.
 
     Args:
-        bm (bmesh.types.BMesh): bmesh to create shape in
+        bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
 
@@ -91,11 +93,11 @@ def create_hshaped_floorplan(bm, prop):
     median_reference = face.calc_center_median()
 
     extrude_left_and_right_edges(bm, normal, median_reference)
-    upper_edges = determine_clockwise_top_edges_for_extrusion(bm, normal)
+    extreme_edges = determine_clockwise_extreme_edges_for_extrusion(bm, normal)
 
     extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     extrusion_widths = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
-    for idx, edge in enumerate(upper_edges):
+    for idx, edge in enumerate(extreme_edges):
 
         if extrusion_lengths[idx] > 0.0:
             res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
@@ -114,10 +116,10 @@ def create_hshaped_floorplan(bm, prop):
 
 
 def create_random_floorplan(bm, prop):
-    """ Create randomly generated building footprint/floorplan
+    """Create randomly generated building footprint/floorplan
 
     Args:
-        bm (bmesh.types.BMesh): bmesh to create plane in
+        bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     random.seed(prop.seed)
@@ -140,6 +142,13 @@ def create_random_floorplan(bm, prop):
 
 
 def extrude_left_and_right_edges(bm, normal, median_reference):
+    """Extrude the left and right edges of a plane
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        normal (vector): normal of the plane
+        median_reference (vector): center of the plane
+    """
     for edge in filter_vertical_edges(bm.edges, normal):
         res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
         verts = filter_geom(res["geom"], BMVert)
@@ -150,7 +159,16 @@ def extrude_left_and_right_edges(bm, normal, median_reference):
         )
 
 
-def determine_clockwise_top_edges_for_extrusion(bm, normal):
+def determine_clockwise_extreme_edges_for_extrusion(bm, normal):
+    """top and bottom extreme edges sorted clockwise
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        normal (vector): normal direction of plane containing edges
+
+    Returns:
+        list: extreme edges sorted clockwise
+    """
     all_upper_edges = filter_horizontal_edges(bm.edges, normal)
     all_upper_edges.sort(key=lambda ed: calc_edge_median(ed).x)
 
@@ -159,12 +177,27 @@ def determine_clockwise_top_edges_for_extrusion(bm, normal):
 
 
 def subdivide_edge_twice_and_get_middle(bm, edge):
+    """make two cuts to an edge and return middle edge
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        edge (bmesh.types.BMEdge): edge to subdivide
+
+    Returns:
+        bmesh.types.BMEdge: middle edge after cut
+    """
     res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
     new_verts = filter_geom(res["geom_inner"], BMVert)
     return list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
 
 
 def random_scale_and_translate(bm, middle_edge):
+    """scale and translate an edge randomly along its axis
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        middle_edge (bmesh.types.BMEdge): edge that is between two others
+    """
     verts = list(middle_edge.verts)
     length = middle_edge.calc_length()
     median = calc_edge_median(middle_edge)
@@ -181,6 +214,13 @@ def random_scale_and_translate(bm, middle_edge):
 
 
 def random_extrude(bm, middle_edge, direction):
+    """extrude an edge to a random size to make a plane
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh of editmode object
+        middle_edge (bmesh.types.BMEdge): edge that is between two others
+        direction (vector): direction of extrude
+    """
     res = bmesh.ops.extrude_edge_only(bm, edges=[middle_edge])
     extrude_length = (random.random() * middle_edge.calc_length()) + 1.0
     bmesh.ops.translate(
