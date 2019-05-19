@@ -1,6 +1,5 @@
 import bpy
 
-from .window import Window
 from .window_ops import BTOOLS_OT_add_window
 from .window_props import WindowProperty
 
