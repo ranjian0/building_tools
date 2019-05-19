@@ -197,3 +197,12 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
         res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
         return res
     return new_verts
+
+
+def boundary_edges_from_face_selection(bm):
+    selected_faces = [f for f in bm.faces if f.select]
+    all_edges = list({e for f in selected_faces for e in f.edges})
+    edge_is_boundary = (
+        lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
+    )
+    return [e for e in all_edges if edge_is_boundary(e)]

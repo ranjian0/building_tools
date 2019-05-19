@@ -3,7 +3,12 @@ import itertools as it
 import functools as ft
 from bmesh.types import BMVert, BMEdge
 
-from ...utils import filter_geom, set_material, Material
+from ...utils import (
+    Material,
+    filter_geom,
+    set_material,
+    boundary_edges_from_face_selection,
+)
 
 
 def create_floors(bm, edges, prop):
@@ -17,7 +22,7 @@ def create_floors(bm, edges, prop):
     start_height = 0.0
     faces_to_delete = []
     if edges is None:
-        edges = find_boundary_edges_from_face_selection(bm)
+        edges = boundary_edges_from_face_selection(bm)
         faces_to_delete = [f for f in bm.faces if f.select]
         start_height = faces_to_delete[-1].calc_center_median().z
 
@@ -31,16 +36,6 @@ def create_floors(bm, edges, prop):
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
     create_floor_materials(slabs, walls)
-
-
-def find_boundary_edges_from_face_selection(bm):
-    selected_faces = [f for f in bm.faces if f.select]
-    all_edges = list({e for f in selected_faces for e in f.edges})
-    edge_is_boundary = (
-        lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
-    )
-
-    return [e for e in all_edges if edge_is_boundary(e)]
 
 
 def extrude_slabs_and_floors(bm, edges, prop):

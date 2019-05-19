@@ -12,6 +12,7 @@ from ...utils import (
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
+    boundary_edges_from_face_selection
 )
 
 
@@ -30,13 +31,7 @@ class CreateRailing:
         bmcopy = bm.copy()
         rail_faces = [f for f in bmcopy.faces if f.select]
         if rail_faces:
-            # -- user selection if faces
-            all_edges = list({e for f in rail_faces for e in f.edges})
-            edges = [
-                e
-                for e in all_edges
-                if len(list({f for f in e.link_faces if f in rail_faces})) == 1
-            ]
+            edges = boundary_edges_from_face_selection(bm)
         else:
             # -- user selection is edges
             edges = [e for e in bmcopy.edges if e.select]
