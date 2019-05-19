@@ -42,7 +42,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Has Railing", default=True, description="Wether to stairs have a rails"
     )
 
-    soff: PointerProperty(type=SizeOffsetProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
     rail: PointerProperty(type=RailProperty)
 
     direction_items = [
@@ -63,11 +63,11 @@ class StairsProperty(bpy.types.PropertyGroup):
         if self.redo:
             return
 
-        self.soff.size = (0.5, 1.0)
+        self.size_offset.size = (0.5, 1.0)
         self.redo = True
 
     def draw(self, context, layout):
-        self.soff.draw(context, layout)
+        self.size_offset.draw(context, layout)
 
         col = layout.column(align=True)
         col.prop(self, "step_count")

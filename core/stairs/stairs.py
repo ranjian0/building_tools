@@ -1,12 +1,12 @@
 import bmesh
 
 from .stairs_types import create_stairs
-from ...utils import get_edit_mesh, kwargs_from_props
+from ...utils import get_edit_mesh
 
 
 class Stairs:
     @classmethod
-    def build(cls, context, props):
+    def build(cls, context, prop):
         """Use stair types and properties to generate geometry
 
         Args:
@@ -18,7 +18,7 @@ class Stairs:
         faces = [f for f in bm.faces if f.select]
 
         if cls.validate(faces):
-            create_stairs(bm, faces, **kwargs_from_props(props))
+            create_stairs(bm, faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
