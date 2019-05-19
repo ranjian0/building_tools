@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import *
+from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):

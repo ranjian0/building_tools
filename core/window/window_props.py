@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import *
+from bpy.props import FloatProperty, PointerProperty, EnumProperty
 
 from ..generic import SizeOffsetProperty
 from ..fill import FillBars, FillLouver, FillGlassPanes

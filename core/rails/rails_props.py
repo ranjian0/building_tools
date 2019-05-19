@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import *
+from bpy.props import FloatProperty, EnumProperty, BoolProperty
 
 
 class RailProperty(bpy.types.PropertyGroup):

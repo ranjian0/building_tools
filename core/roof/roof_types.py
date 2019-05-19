@@ -240,9 +240,9 @@ def create_hip_edges_and_verts(bm, skeleton, height_scale, median):
 def create_hip_faces(bm, original_edges, skeleton_edges):
     for ed in original_edges:
         # -- determine skeleton_edges linked to this original edge
-        linked_skeleton_edges = [e
-                                 for v in ed.verts
-                                 for e in set(v.link_edges).intersection(skeleton_edges)]
+        linked_skeleton_edges = [
+            e for v in ed.verts for e in set(v.link_edges).intersection(skeleton_edges)
+        ]
 
         if len(linked_skeleton_edges) == 2:
             cycle_edges_make_polygon(bm, ed, skeleton_edges)
@@ -288,8 +288,7 @@ def DP_cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
 
         # if edges have common vert, we have a triange
         if len(set(list(start_e.verts) + list(end_e.verts))) == 3:
-            bmesh.ops.contextual_create(bm,
-                                        geom=[original_edge, start_e, end_e])
+            bmesh.ops.contextual_create(bm, geom=[original_edge, start_e, end_e])
         else:
 
             # if other verts form and edge, we have a quad
@@ -297,8 +296,9 @@ def DP_cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
             other_vert_end = end_e.other_vert(end)
             edge = bm.edges.get([other_vert_start, other_vert_end], None)
             if edge is not None:
-                bmesh.ops.contextual_create(bm,
-                                            geom=[original_edge, start_e, end_e, edge])
+                bmesh.ops.contextual_create(
+                    bm, geom=[original_edge, start_e, end_e, edge]
+                )
 
 
 def cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
@@ -309,8 +309,11 @@ def cycle_edges_make_polygon(bm, original_edge, skeleton_edges):
     processed_edges = [original_edge]
     while True:
         # -- find closest vert
-        valid_edges = [e for e in current_vert.link_edges
-                       if e in skeleton_edges and e not in processed_edges]
+        valid_edges = [
+            e
+            for e in current_vert.link_edges
+            if e in skeleton_edges and e not in processed_edges
+        ]
         if not valid_edges:
             break
 

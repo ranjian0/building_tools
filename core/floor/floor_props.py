@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import *
+from bpy.props import IntProperty, FloatProperty
 
 
 class FloorProperty(bpy.types.PropertyGroup):
