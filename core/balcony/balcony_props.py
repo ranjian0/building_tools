@@ -33,10 +33,10 @@ class BalconyProperty(bpy.types.PropertyGroup):
     )
 
     rail: PointerProperty(type=RailProperty)
-    soff: PointerProperty(type=SizeOffsetProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def draw(self, context, layout):
-        self.soff.draw(context, layout)
+        self.size_offset.draw(context, layout)
 
         row = layout.row()
         row.prop(self, "width")

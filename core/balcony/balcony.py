@@ -1,17 +1,17 @@
 import bmesh
 
 from .balcony_types import create_balcony
-from ...utils import get_edit_mesh, kwargs_from_props
+from ...utils import get_edit_mesh
 
 
 class Balcony:
     @classmethod
-    def build(cls, context, props):
+    def build(cls, context, prop):
         """Use balcony types and properties to generate geomerty
 
         Args:
             context (bpy.context): blender context
-            props   (bpy.types.PropertyGroup): BalconyProperty
+            prop   (bpy.types.PropertyGroup): BalconyProperty
         """
 
         me = get_edit_mesh()
@@ -19,7 +19,7 @@ class Balcony:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            create_balcony(bm, faces, **kwargs_from_props(props))
+            create_balcony(bm, faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
