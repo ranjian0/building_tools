@@ -1,8 +1,7 @@
-import bpy
 import bmesh
 from .floor_types import create_floors
 
-from ...utils import get_edit_mesh
+from ...utils import select, get_edit_mesh
 
 
 class Floor:
@@ -23,6 +22,7 @@ class Floor:
         if cls.validate(bm):
             if any([f for f in bm.faces if f.select]):
                 create_floors(bm, None, prop)
+                select(bm.faces, False)
             else:
                 edges = [e for e in bm.edges if e.is_boundary]
                 create_floors(bm, edges, prop)
@@ -33,8 +33,10 @@ class Floor:
     @classmethod
     def validate(cls, bm):
         """ Validate input if any """
-        if len(list({v.co.z for v in bm.verts})) == 1:
-            return True
-        elif any([f for f in bm.faces if f.select]):
+        if any([f for f in bm.faces if f.select]):
+            selection = [f for f in bm.faces if f.select]
+            if len({round(v.co.z, 4) for f in selection for v in f.verts}) == 1:
+                return True
+        elif len({round(v.co.z, 4) for v in bm.verts}) == 1:
             return True
         return False

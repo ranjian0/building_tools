@@ -14,13 +14,15 @@ def create_floors(bm, edges, prop):
         prop (bpy.types.PropertyGroup): FloorPropertyGroup
 
     """
+    start_height = 0.0
     faces_to_delete = []
     if edges is None:
         edges = find_boundary_edges_from_face_selection(bm)
         faces_to_delete = [f for f in bm.faces if f.select]
+        start_height = faces_to_delete[-1].calc_center_median().z
 
     extrude_slabs_and_floors(bm, edges, prop)
-    slabs, walls = get_slab_and_wall_faces(bm, prop)
+    slabs, walls = get_slab_and_wall_faces(bm, prop, start_height)
     if prop.slab_outset > 0.0:
         result = bmesh.ops.inset_region(bm, faces=slabs, depth=-prop.slab_outset)
         slabs.extend(result["faces"])
@@ -55,7 +57,7 @@ def extrude_slabs_and_floors(bm, edges, prop):
     bmesh.ops.contextual_create(bm, geom=edges)
 
 
-def get_slab_and_wall_faces(bm, prop):
+def get_slab_and_wall_faces(bm, prop, start_height):
     slabs, floors = [], []
     slab_heights, floor_heights = [], []
     for idx in range(prop.floor_count):
@@ -63,11 +65,13 @@ def get_slab_and_wall_faces(bm, prop):
             prop.slab_thickness / 2
             + (idx * prop.slab_thickness)
             + (idx * prop.floor_height)
+            + start_height
         )
         floor_heights.append(
             prop.floor_height / 2
             + (idx * prop.floor_height)
             + ((idx + 1) * prop.slab_thickness)
+            + start_height
         )
 
     round_4dp = ft.partial(round, ndigits=4)
