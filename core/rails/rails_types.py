@@ -35,10 +35,7 @@ class CreateRailing:
         else:
             # -- user selection is edges
             edges = [e for e in bmcopy.edges if e.select]
-            verts = list({v for e in edges for v in e.verts})
-            rail_faces = list(
-                {f for v in verts for f in v.link_faces if f.normal.z}
-            )
+            rail_faces = upward_faces_from_edges(edges)
 
         if len(rail_faces) > 1:
             bmesh.ops.dissolve_faces(bmcopy, faces=rail_faces)
@@ -48,8 +45,7 @@ class CreateRailing:
 
     def from_edges(self, bm, edges, prop):
         """ Create railing from edges """
-        verts = list({v for e in edges for v in e.verts})
-        faces_from_edges = list({f for v in verts for f in v.link_faces if f.normal.z})
+        faces_from_edges = upward_faces_from_edges(edges)
         faces_from_edges = [
             f for f in faces_from_edges if all([e in f.edges for e in edges])
         ]
@@ -58,16 +54,14 @@ class CreateRailing:
 
     def from_step_edges(self, bm, edges, normal, direction, prop):
         """ Create railing from stair step edges """
-        verts = list({v for e in edges for v in e.verts})
-        lfaces = list({f for v in verts for f in v.link_faces if f.normal.z})
+        lfaces = upward_faces_from_edges(edges)
+
+        def edge_z(e):
+            return calc_edge_median(e).z
 
         # - find lowest edges
-        min_edge = min(edges, key=lambda e: calc_edge_median(e).z)
-        low_edges = [
-            e
-            for e in edges
-            if round(calc_edge_median(e).z, 3) == round(calc_edge_median(min_edge).z, 3)
-        ]
+        lowest_edge_z = edge_z(min(edges, key=lambda e: edge_z(e)))
+        low_edges = [e for e in edges if round(edge_z(e), 3) == round(lowest_edge_z, 3)]
 
         # -- add corner post
         for e in low_edges:
@@ -503,3 +497,8 @@ def array_elements(bm, elem, count, start, stop):
             bmesh.ops.translate(
                 bm, verts=filter_geom(ret["geom"], BMVert), vec=(dx * i, dy * i, dz * i)
             )
+
+
+def upward_faces_from_edges(edges):
+    verts = list({v for e in edges for v in e.verts})
+    return list({f for v in verts for f in v.link_faces if f.normal.z})
