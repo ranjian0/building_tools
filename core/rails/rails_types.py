@@ -110,7 +110,7 @@ class CreateRailing:
                 pos = (
                     cen
                     + off
-                    + Vector((0, 0, prop.corner_post_height / 2 - prop.rail / 2))
+                    + Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
                 )
 
                 post = create_cube(
@@ -118,7 +118,7 @@ class CreateRailing:
                     (
                         prop.post_size,
                         prop.post_size,
-                        prop.corner_post_height - prop.rail,
+                        prop.corner_post_height - prop.rail_size,
                     ),
                     pos,
                 )
@@ -139,7 +139,7 @@ class CreateRailing:
                 pos = cen + off
 
                 length = sum([e.calc_length() for e in group])
-                size = (length, 2 * prop.rail, prop.rail)
+                size = (length, 2 * prop.rail_size, prop.rail_size)
 
                 rail = cube(bm, *size)
                 bmesh.ops.translate(bm, vec=pos, verts=rail["verts"])
