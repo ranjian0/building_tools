@@ -69,7 +69,7 @@ def get_slab_and_wall_faces(bm, prop, start_height):
         start_height (float): height to start making floors
 
     Returns:
-        tuple(list, list): slab and wall faces
+        tuple(list(BMFace), list(BMFace)): slab and wall faces
     """
     slabs, walls = [], []
     slab_heights, wall_heights = [], []

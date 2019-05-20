@@ -80,7 +80,7 @@ def choose_edges_from_direction(direction, front, left, right):
         right (bmesh.types.BMEdge): right edge of balcony
 
     Returns:
-        list: edges that aro not in specified direction
+        list(bmesh.types.BMEdge): edges that aro not in specified direction
     """
     r_edges = []
     if direction == "NONE":

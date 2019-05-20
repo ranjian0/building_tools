@@ -167,7 +167,7 @@ def determine_clockwise_extreme_edges_for_extrusion(bm, normal):
         normal (vector): normal direction of plane containing edges
 
     Returns:
-        list: extreme edges sorted clockwise
+        list(bmesh.types.BMEdge): extreme edges sorted clockwise
     """
     all_upper_edges = filter_horizontal_edges(bm.edges, normal)
     all_upper_edges.sort(key=lambda ed: calc_edge_median(ed).x)

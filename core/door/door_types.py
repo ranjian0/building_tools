@@ -91,7 +91,7 @@ def create_door_double(bm, face, prop):
         prop (bpy.types.PropertyGroup): DoorProperty
 
     Returns:
-        list: face(s) after double door created
+        list(bmesh.types.BMFace): face(s) after double door created
     """
     if prop.has_double_door:
         ret = bmesh.ops.subdivide_edges(
@@ -164,7 +164,7 @@ def split_face_vertical_with_offset(bm, face, cuts, offsets):
         offsets (float): how far from the edges splits are
 
     Returns:
-        list: new edges from split
+        list(bmesh.types.BMEdge): new edges from split
     """
     median = face.calc_center_median()
     res = split_quad(bm, face, True, cuts)

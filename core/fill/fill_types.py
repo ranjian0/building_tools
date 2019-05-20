@@ -134,7 +134,7 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
         cuts_y (int): number of vertical cuts
 
     Returns:
-        list: new faces from subdivision
+        list(bmesh.types.BMFace): new faces from subdivision
     """
     v_edges = filter_vertical_edges(face.edges, face.normal)
     h_edges = filter_horizontal_edges(face.edges, face.normal)
