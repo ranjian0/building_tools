@@ -1,5 +1,6 @@
 import math
 import bmesh
+import operator
 import itertools as it
 
 from mathutils import Vector, Matrix
@@ -14,6 +15,9 @@ from ...utils import (
     calc_verts_median,
     boundary_edges_from_face_selection,
 )
+
+# TODO:
+# Use loops to create fill types
 
 
 class CreateRailing:
@@ -79,7 +83,7 @@ class CreateRailing:
                 pos,
             )
 
-            del_faces(bm, post, bottom=True, top=prop.has_decor)
+            delete_faces(bm, post, bottom=True, top=prop.has_decor)
             if prop.has_decor:
                 px, py, pz = pos
                 create_cube(
@@ -141,7 +145,7 @@ class CreateRailing:
 
                 rail = cube(bm, *size)
                 bmesh.ops.translate(bm, vec=pos, verts=rail["verts"])
-                del_faces(bm, rail, right=True)
+                delete_faces(bm, rail, right=True)
 
                 # --rotate
                 bmesh.ops.rotate(
@@ -243,14 +247,14 @@ class CreateRailing:
             )
 
         rail = cube(bm, *size)
-        del_faces(bm, rail, left=True, right=True)
+        delete_faces(bm, rail, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
 
         rail_count = int((prop.corner_post_height / prop.rail_size) * prop.rail_density)
         array_elements(bm, rail, rail_count, start, stop)
 
     def create_fill_posts(self, bm, edge, prop):
-        v1, v2 = edge.verts
+        v1, v2 = sort_edge_verts_by_orientation(edge)
         vec = (v2.co - v1.co).normalized()
         tan = edge_tangent(edge).normalized()
 
@@ -264,7 +268,7 @@ class CreateRailing:
         )
 
         post = cube(bm, *size)
-        del_faces(bm, post, top=True, bottom=True)
+        delete_faces(bm, post, top=True, bottom=True)
         align_geometry_to_edge(bm, post, edge)
 
         gap = vec * prop.corner_post_width / 2
@@ -284,7 +288,7 @@ class CreateRailing:
                 v = loop.vert
                 p = v.co + off + height_v
                 fill_post = create_cube(bm, size, p)
-                del_faces(bm, fill_post, top=True, bottom=True)
+                delete_faces(bm, fill_post, top=True, bottom=True)
 
         # -- add top rail
         pinch = 0.01  # offset to prevent z-buffer fighting
@@ -296,7 +300,7 @@ class CreateRailing:
         size = (edge.calc_length(), 2 * prop.rail_size, prop.rail_size)
 
         rail = create_cube(bm, size, rail_pos)
-        del_faces(bm, rail, left=True, right=True)
+        delete_faces(bm, rail, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
 
     def create_fill_walls(self, bm, edge, prop):
@@ -376,7 +380,7 @@ def create_wall(bm, start, end, height, width, tangent):
         bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
 
-def del_faces(bm, post, **directions):
+def delete_faces(bm, post, **directions):
     """ Delete flagged faces for the given post (cube geometry) """
 
     def D(direction):
@@ -424,7 +428,7 @@ def create_edge(bm, start, end):
 def add_cube_post(bm, width, height, position, has_decor):
     post = create_cube(bm, (width, width, height), position)
 
-    del_faces(bm, post, bottom=True, top=has_decor)
+    delete_faces(bm, post, bottom=True, top=has_decor)
     if has_decor:
         px, py, pz = position
         pz += height / 2 + width / 4
@@ -445,3 +449,13 @@ def align_geometry_to_edge(bm, geom, edge):
 
 def polygon_sides_from_angle(angle):
     return round((2 * math.pi) / (math.pi - angle))
+
+
+def sort_edge_verts_by_orientation(edge):
+    start, end = edge.verts
+    orient = end.co - start.co
+    if orient.x:
+        start, end = sorted(edge.verts, key=operator.attrgetter("co.x"))
+    elif orient.y:
+        start, end = sorted(edge.verts, key=operator.attrgetter("co.y"))
+    return start, end
