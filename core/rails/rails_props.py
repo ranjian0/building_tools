@@ -47,7 +47,7 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Corner Post Width",
         min=0.01,
         max=100.0,
-        default=0.15,
+        default=0.1,
         description="Width of each corner post",
     )
 
@@ -99,52 +99,47 @@ class RailProperty(bpy.types.PropertyGroup):
         row = layout.row()
         row.prop(self, "fill", text="")
 
-        box = layout.box()
         if self.fill == "POSTS":
-            col = box.column(align=True)
+            col = layout.column(align=True)
             col.prop(self, "post_density")
             col.prop(self, "post_size")
 
-            box1 = box.box()
-            box1.label(text="Corner Posts")
-
-            col = box1.column(align=True)
+            layout.label(text="Corner Posts")
+            col = layout.column(align=True)
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = box1.row(align=True)
+            row = layout.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
             row.prop(self, "has_decor", toggle=True)
 
         elif self.fill == "RAILS":
-            col = box.column(align=True)
+            col = layout.column(align=True)
             col.prop(self, "rail_density")
             col.prop(self, "rail_size")
             col.prop(self, "expand", text="Expand Rails", toggle=True)
 
-            box1 = box.box()
-            box1.label(text="Corner Posts")
+            layout.label(text="Corner Posts")
 
-            col = box1.column(align=True)
+            col = layout.column(align=True)
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = box1.row(align=True)
+            row = layout.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
             row.prop(self, "has_decor", toggle=True)
 
         elif self.fill == "WALL":
-            col = box.column(align=True)
+            col = layout.column(align=True)
             col.prop(self, "wall_width")
             col.prop(self, "expand", text="Expand Walls", toggle=True)
 
-            box1 = box.box()
-            box1.label(text="Corner Posts")
+            layout.label(text="Corner Posts")
 
-            col = box1.column(align=True)
+            col = layout.column(align=True)
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = box1.row(align=True)
+            row = layout.row(align=True)
             row.prop(self, "remove_colinear", toggle=True)
             row.prop(self, "has_decor", toggle=True)

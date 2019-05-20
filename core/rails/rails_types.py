@@ -12,7 +12,7 @@ from ...utils import (
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
-    boundary_edges_from_face_selection
+    boundary_edges_from_face_selection,
 )
 
 
@@ -28,20 +28,18 @@ class CreateRailing:
 
     def from_selection(self, bm, prop):
         """ Creates railing from user selection """
-        bmcopy = bm.copy()
-        rail_faces = [f for f in bmcopy.faces if f.select]
+        rail_faces = [f for f in bm.faces if f.select]
         if rail_faces:
             edges = boundary_edges_from_face_selection(bm)
         else:
             # -- user selection is edges
-            edges = [e for e in bmcopy.edges if e.select]
+            edges = [e for e in bm.edges if e.select]
             rail_faces = upward_faces_from_edges(edges)
 
         if len(rail_faces) > 1:
-            bmesh.ops.dissolve_faces(bmcopy, faces=rail_faces)
+            rail_faces = bmesh.ops.dissolve_faces(bm, faces=rail_faces).get("region")
 
         self.create_railing(bm, edges, rail_faces, prop)
-        bmcopy.free()
 
     def from_edges(self, bm, edges, prop):
         """ Create railing from edges """
@@ -172,7 +170,6 @@ class CreateRailing:
         for e in edges:
             for v in e.verts:
                 if len(v.link_loops) > 1:
-                    # - make sure we add loop whose face is in lfaces
                     loops.extend([l for l in v.link_loops if l.face in lfaces])
                 else:
                     loops.extend([l for l in v.link_loops])
@@ -181,16 +178,15 @@ class CreateRailing:
         if prop.remove_colinear:
             # TODO - make this work on loop with more than two links
             # - remove loops where edges are parallel, and both link_edges are in selection
-            flt_parallel = lambda loop: round(loop.calc_angle(), 3) == 3.142
-            flt_mid = (
-                lambda loop: loop.link_loop_next in loops
-                and loop.link_loop_prev in loops
+            is_parallel = lambda loop: round(loop.calc_angle(), 3) == 3.142
+            is_middle = lambda loop: (
+                loop.link_loop_next in loops and loop.link_loop_prev in loops
             )
 
             self.colinear_loops.extend(
-                [l for l in loops if (flt_parallel(l) and flt_mid(l))]
+                [l for l in loops if (is_parallel(l) and is_middle(l))]
             )
-            loops = [l for l in loops if not (flt_parallel(l) and flt_mid(l))]
+            loops = [l for l in loops if not (is_parallel(l) and is_middle(l))]
 
         self.create_corner_post(bm, loops, prop)
         self.create_fill(bm, edges, prop)
@@ -198,75 +194,29 @@ class CreateRailing:
 
     def create_corner_post(self, bm, loops, prop):
         """ Create Corner posts """
-        num_poly = lambda ang: round((2 * math.pi) / (math.pi - ang))
         for loop in loops:
             v = loop.vert
             e = loop.edge
 
             vec = loop.calc_tangent()
-            off = vec * math.sqrt(2 * ((prop.corner_post_width / 2) ** 2))
-            pos = v.co + off + Vector((0, 0, prop.corner_post_height / 2))
+            width, height = prop.corner_post_width, prop.corner_post_height
 
             angle = loop.calc_angle()
-            segments = num_poly(angle)
+            segments = polygon_sides_from_angle(angle)
             if segments == 4 or segments < 0:  # - (90 or 180)
-                post = create_cube(
-                    bm,
-                    (
-                        prop.corner_post_width,
-                        prop.corner_post_width,
-                        prop.corner_post_height,
-                    ),
-                    pos,
-                )
-
-                del_faces(bm, post, bottom=True, top=prop.has_decor)
-                if prop.has_decor:
-                    px, py, pz = pos
-                    create_cube(
-                        bm,
-                        (
-                            prop.corner_post_width * 2,
-                            prop.corner_post_width * 2,
-                            prop.corner_post_width / 2,
-                        ),
-                        (
-                            px,
-                            py,
-                            pz
-                            + prop.corner_post_height / 2
-                            + prop.corner_post_width / 4,
-                        ),
-                    )
-
+                off = vec * math.sqrt(2 * ((width / 2) ** 2))
+                pos = v.co + off + Vector((0, 0, height / 2))
+                post = add_cube_post(bm, width, height, pos, prop.has_decor)
             else:
-                pos = (
-                    v.co
-                    + (vec * prop.corner_post_width)
-                    + Vector((0, 0, prop.corner_post_height / 2))
-                )
-                post = create_cylinder(
-                    bm,
-                    prop.corner_post_width / 2,
-                    prop.corner_post_height,
-                    segments,
-                    pos,
-                )
+                pos = v.co + (vec * width) + Vector((0, 0, height / 2))
+                post = create_cylinder(bm, width / 2, height, segments, pos)
 
                 # -- store global state
                 self.wall_switch = True
                 self.num_corners = segments
                 self.corner_angle = math.pi - angle
 
-            # -- align
-            v1, v2 = e.verts
-            dx, dy = (v1.co - v2.co).normalized().xy
-            bmesh.ops.rotate(
-                bm,
-                verts=post["verts"],
-                cent=calc_verts_median(post["verts"]),
-                matrix=Matrix.Rotation(math.atan2(dy, dx), 4, "Z"),
-            )
+            align_geometry_to_edge(bm, post, e)
 
     def create_fill(self, bm, edges, prop):
         """ Create fill types for railing """
@@ -279,10 +229,7 @@ class CreateRailing:
                 self.create_fill_walls(bm, edge, prop)
 
     def create_fill_rails(self, bm, edge, prop):
-        v1, v2 = edge.verts
-        dx, dy = (v1.co - v2.co).normalized().xy
         tan = edge_tangent(edge)
-
         off = tan.normalized() * (prop.corner_post_width / 2)
         start = calc_edge_median(edge) + off
         stop = calc_edge_median(edge) + off + Vector((0, 0, prop.corner_post_height))
@@ -297,39 +244,19 @@ class CreateRailing:
 
         rail = cube(bm, *size)
         del_faces(bm, rail, left=True, right=True)
+        align_geometry_to_edge(bm, rail, edge)
 
-        bmesh.ops.rotate(
-            bm,
-            verts=rail["verts"],
-            cent=calc_verts_median(rail["verts"]),
-            matrix=Matrix.Rotation(math.atan2(dy, dx), 4, "Z"),
-        )
-
-        rail_count = int(
-            (prop.corner_post_height / prop.rail_size) * prop.rail_density
-        )
+        rail_count = int((prop.corner_post_height / prop.rail_size) * prop.rail_density)
         array_elements(bm, rail, rail_count, start, stop)
 
     def create_fill_posts(self, bm, edge, prop):
         v1, v2 = edge.verts
-        vec = (v1.co - v2.co).normalized()
+        vec = (v2.co - v1.co).normalized()
         tan = edge_tangent(edge).normalized()
 
         # -- add posts
         off = tan * (prop.corner_post_width / 2)
-        gap = vec * prop.corner_post_width
-        start = (
-            v1.co
-            + off
-            + Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
-            - gap
-        )
-        stop = (
-            v2.co
-            + off
-            + Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
-            + gap
-        )
+        height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
         size = (
             prop.post_size,
             prop.post_size,
@@ -338,15 +265,13 @@ class CreateRailing:
 
         post = cube(bm, *size)
         del_faces(bm, post, top=True, bottom=True)
+        align_geometry_to_edge(bm, post, edge)
 
-        bmesh.ops.rotate(
-            bm,
-            verts=post["verts"],
-            cent=calc_verts_median(post["verts"]),
-            matrix=Matrix.Rotation(math.atan2(*vec.yx), 4, "Z"),
-        )
-
-        post_count = int((edge.calc_length() / prop.post_size) * prop.post_density)
+        gap = vec * prop.corner_post_width / 2
+        start = v1.co + off + height_v + gap
+        stop = v2.co + off + height_v - gap
+        length = edge.calc_length() - prop.corner_post_width
+        post_count = round((length / prop.post_size) * prop.post_density)
         array_elements(bm, post, post_count, start, stop)
 
         # fill gaps created by remove colinear
@@ -357,11 +282,7 @@ class CreateRailing:
                     continue
 
                 v = loop.vert
-                p = (
-                    v.co
-                    + off
-                    + Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
-                )
+                p = v.co + off + height_v
                 fill_post = create_cube(bm, size, p)
                 del_faces(bm, fill_post, top=True, bottom=True)
 
@@ -376,13 +297,7 @@ class CreateRailing:
 
         rail = create_cube(bm, size, rail_pos)
         del_faces(bm, rail, left=True, right=True)
-
-        bmesh.ops.rotate(
-            bm,
-            verts=rail["verts"],
-            cent=calc_verts_median(rail["verts"]),
-            matrix=Matrix.Rotation(math.atan2(*vec.yx), 4, "Z"),
-        )
+        align_geometry_to_edge(bm, rail, edge)
 
     def create_fill_walls(self, bm, edge, prop):
         off = prop.corner_post_width
@@ -396,7 +311,7 @@ class CreateRailing:
         _dir = (v1.co - v2.co).normalized()
         tan = edge_tangent(edge)
 
-        if self.wall_switch:  # -- only for cyliner corner posts
+        if self.wall_switch:  # -- only for cylider corner posts
             start = v1.co - (_dir * off)
             end = v2.co + (_dir * off)
         else:
@@ -411,6 +326,7 @@ class CreateRailing:
 
 
 def edge_tangent(edge):
+    """ Find the tangent of an edge """
     tan = None
     for l in edge.link_loops:
         t = edge.calc_tangent(l)
@@ -426,18 +342,16 @@ def create_cube(bm, size, position):
     return post
 
 
-def create_cylinder(bm, r, h, segs, position):
+def create_cylinder(bm, radius, height, segs, position):
     """ Create cylinder at pos"""
-    cy = cylinder(bm, r, h, segs)
+    cy = cylinder(bm, radius, height, segs)
     bmesh.ops.translate(bm, verts=cy["verts"], vec=position)
     return cy
 
 
 def create_wall(bm, start, end, height, width, tangent):
     """ Extrude a wall of height from start to end """
-    start_v1 = bm.verts.new(start)
-    start_v2 = bm.verts.new(start + Vector((0, 0, height)))
-    start_edge = bm.edges.new((start_v1, start_v2))
+    start_edge = create_edge(bm, start, start + Vector((0, 0, height)))
 
     res = bmesh.ops.extrude_edge_only(bm, edges=[start_edge])
     bmesh.ops.translate(bm, vec=end - start, verts=filter_geom(res["geom"], BMVert))
@@ -464,6 +378,7 @@ def create_wall(bm, start, end, height, width, tangent):
 
 def del_faces(bm, post, **directions):
     """ Delete flagged faces for the given post (cube geometry) """
+
     def D(direction):
         return directions.get(direction, False)
 
@@ -483,22 +398,50 @@ def del_faces(bm, post, **directions):
 
 def array_elements(bm, elem, count, start, stop):
     """ Duplicate elements count-1 times between start and stop """
-    dx = (stop.x - start.x) / (count + 1)
-    dy = (stop.y - start.y) / (count + 1)
-    dz = (stop.z - start.z) / (count + 1)
-
+    step = (stop - start) / (count+1)
     for i in range(count):
         if i == 0:
-            px, py, pz = start.x + dx, start.y + dy, start.z + dz
-            bmesh.ops.translate(bm, verts=elem["verts"], vec=(px, py, pz))
+            bmesh.ops.translate(bm, verts=elem["verts"], vec=start + step)
         else:
             faces = list({f for v in elem["verts"] for f in v.link_faces})
             ret = bmesh.ops.duplicate(bm, geom=faces)
             bmesh.ops.translate(
-                bm, verts=filter_geom(ret["geom"], BMVert), vec=(dx * i, dy * i, dz * i)
+                bm, verts=filter_geom(ret["geom"], BMVert), vec=step * i
             )
 
 
 def upward_faces_from_edges(edges):
     verts = list({v for e in edges for v in e.verts})
     return list({f for v in verts for f in v.link_faces if f.normal.z})
+
+
+def create_edge(bm, start, end):
+    start_vert = bm.verts.new(start)
+    end_vert = bm.verts.new(end)
+    return bm.edges.new((start_vert, end_vert))
+
+
+def add_cube_post(bm, width, height, position, has_decor):
+    post = create_cube(bm, (width, width, height), position)
+
+    del_faces(bm, post, bottom=True, top=has_decor)
+    if has_decor:
+        px, py, pz = position
+        pz += height / 2 + width / 4
+        create_cube(bm, (width * 2, width * 2, width / 2), (px, py, pz))
+    return post
+
+
+def align_geometry_to_edge(bm, geom, edge):
+    v1, v2 = edge.verts
+    dx, dy = (v1.co - v2.co).normalized().xy
+    bmesh.ops.rotate(
+        bm,
+        verts=geom["verts"],
+        cent=calc_verts_median(geom["verts"]),
+        matrix=Matrix.Rotation(math.atan2(dy, dx), 4, "Z"),
+    )
+
+
+def polygon_sides_from_angle(angle):
+    return round((2 * math.pi) / (math.pi - angle))
