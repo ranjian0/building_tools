@@ -67,14 +67,8 @@ def fill_bar(bm, face, prop):
         position = Vector((face.normal * prop.bar_depth / 2)) + Vector(
             (0, 0, -height / 2 + (i + 1) * offset)
         )
-        duplicate = duplicate_face_translate_scale(
-            bm, face, position, scale, face_center
-        ).get("geom")
-        extrude_edges_to_depth(
-            bm,
-            filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal),
-            -face.normal * prop.bar_depth / 2,
-        )
+        create_bar_from_face(bm, face, face_center, position, scale,
+                             -face.normal * prop.bar_depth / 2)
 
     # -- vertical
     eps = 0.015
@@ -85,14 +79,8 @@ def fill_bar(bm, face, prop):
         position = Vector((face.normal * ((prop.bar_depth / 2) - eps))) + perp * (
             -width / 2 + ((i + 1) * offset)
         )
-        duplicate = duplicate_face_translate_scale(
-            bm, face, position, scale, face_center
-        ).get("geom")
-        extrude_edges_to_depth(
-            bm,
-            filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal),
-            -face.normal * ((prop.bar_depth / 2) - eps),
-        )
+        create_bar_from_face(bm, face, face_center, position, scale,
+                             -face.normal * ((prop.bar_depth / 2) - eps), True)
 
 
 def fill_louver(bm, face, prop):
@@ -242,3 +230,17 @@ def double_and_make_even(value):
     """
     double = value * 2
     return double if double % 2 == 0 else double + 1
+
+
+def create_bar_from_face(bm, face, face_median, bar_position, bar_scale, bar_depth,
+                         vertical=False):
+
+    duplicate = duplicate_face_translate_scale(
+        bm, face, bar_position, bar_scale, face_median
+    ).get("geom")
+    edges = (
+        filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal)
+        if vertical else
+        filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
+    )
+    extrude_edges_to_depth(bm, edges, bar_depth,)
