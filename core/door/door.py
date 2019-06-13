@@ -5,7 +5,6 @@ from ...utils import get_edit_mesh
 
 
 class Door:
-
     @classmethod
     def build(cls, props):
         """Use door types and properties to generate geometry

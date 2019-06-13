@@ -24,7 +24,7 @@ def create_balcony(bm, faces, prop):
         )
 
         if prop.railing:
-            add_railing_to_balcony_edges(bm, ret['geom'], f.normal, prop)
+            add_railing_to_balcony_edges(bm, ret["geom"], f.normal, prop)
 
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 
@@ -41,12 +41,7 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     face = filter_geom(balcony_geom, BMFace)[-1]
     top_verts = sorted(list(face.verts), key=lambda v: v.co.z)[2:]
     edges = list(
-        {
-            e
-            for v in top_verts
-            for e in v.link_edges
-            if e not in list(face.edges)
-        }
+        {e for v in top_verts for e in v.link_edges if e not in list(face.edges)}
     )
     sort_edges_from_normal_direction(edges, balcony_normal)
 

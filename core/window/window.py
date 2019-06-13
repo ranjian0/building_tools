@@ -4,7 +4,6 @@ from ...utils import get_edit_mesh
 
 
 class Window:
-
     @classmethod
     def build(cls, context, prop):
         """Use window types and properties to generate geometry
