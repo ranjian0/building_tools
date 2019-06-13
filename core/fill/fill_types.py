@@ -67,8 +67,8 @@ def fill_bar(bm, face, prop):
         position = Vector((face.normal * prop.bar_depth / 2)) + Vector(
             (0, 0, -height / 2 + (i + 1) * offset)
         )
-        create_bar_from_face(bm, face, face_center, position, scale,
-                             -face.normal * prop.bar_depth / 2)
+        depth = -face.normal * prop.bar_depth / 2
+        create_bar_from_face(bm, face, face_center, position, scale, depth)
 
     # -- vertical
     eps = 0.015
@@ -79,8 +79,8 @@ def fill_bar(bm, face, prop):
         position = Vector((face.normal * ((prop.bar_depth / 2) - eps))) + perp * (
             -width / 2 + ((i + 1) * offset)
         )
-        create_bar_from_face(bm, face, face_center, position, scale,
-                             -face.normal * ((prop.bar_depth / 2) - eps), True)
+        depth = -face.normal * ((prop.bar_depth / 2) - eps)
+        create_bar_from_face(bm, face, face_center, position, scale, depth, True)
 
 
 def fill_louver(bm, face, prop):
@@ -232,15 +232,23 @@ def double_and_make_even(value):
     return double if double % 2 == 0 else double + 1
 
 
-def create_bar_from_face(bm, face, face_median, bar_position, bar_scale, bar_depth,
-                         vertical=False):
+def create_bar_from_face(bm, face, median, position, scale, depth, vertical=False):
+    """Create bar geometry from a face
 
-    duplicate = duplicate_face_translate_scale(
-        bm, face, bar_position, bar_scale, face_median
-    ).get("geom")
-    edges = (
-        filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal)
-        if vertical else
-        filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
+    Args:
+        bm (bmesh.types.BMEsh): current editmode bmesh
+        face (vmesh.types.BMFace): face to create bar from
+        median (Vector): median location of the face
+        position (Vector): center location of the bar
+        scale (tuple): scale of the bar
+        depth (float): offset of the bar from the face
+        vertical (bool, optional): whether the bar is oriented vertically
+    """
+    duplicate = duplicate_face_translate_scale(bm, face, position, scale, median).get(
+        "geom"
     )
-    extrude_edges_to_depth(bm, edges, bar_depth,)
+    if vertical:
+        edges = filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal)
+    else:
+        edges = filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
+    extrude_edges_to_depth(bm, edges, depth)
