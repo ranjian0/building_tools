@@ -402,7 +402,7 @@ def delete_faces(bm, post, **directions):
 
 def array_elements(bm, elem, count, start, stop):
     """ Duplicate elements count-1 times between start and stop """
-    step = (stop - start) / (count+1)
+    step = (stop - start) / (count + 1)
     for i in range(count):
         if i == 0:
             bmesh.ops.translate(bm, verts=elem["verts"], vec=start + step)
