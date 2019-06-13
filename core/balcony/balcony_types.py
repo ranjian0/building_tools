@@ -30,7 +30,7 @@ def create_balcony(bm, faces, prop):
 
 
 def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
-    """Summary
+    """Add railing to the balcony
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
