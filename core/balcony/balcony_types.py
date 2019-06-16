@@ -13,7 +13,6 @@ def create_balcony(bm, faces, prop):
         faces (bmesh.types.BMFace): current selected faces
         prop (bpy.types.PropertyGroup): BalconyProperty
     """
-
     for f in faces:
         size, off = prop.size_offset.size, prop.size_offset.offset
         f = split(bm, f, size.y, size.x, off.x, off.y, off.z)
@@ -75,7 +74,7 @@ def choose_edges_from_direction(direction, front, left, right):
         right (bmesh.types.BMEdge): right edge of balcony
 
     Returns:
-        list(bmesh.types.BMEdge): edges that aro not in specified direction
+        list(bmesh.types.BMEdge): edges that are not along specified direction
     """
     r_edges = []
     if direction == "NONE":

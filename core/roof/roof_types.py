@@ -15,8 +15,6 @@ def create_roof(bm, faces, prop):
         type (str): type of roof to generate as defined in RoofProperty
         **kwargs: Extra kargs from RoofProperty
     """
-
-    select(faces, False)
     if prop.type == "FLAT":
         create_flat_roof(bm, faces, prop)
     elif prop.type == "GABLE":
@@ -87,7 +85,6 @@ def create_hip_roof(bm, faces, prop):
         bm (bmesh.types.BMesh): bmesh from current edit mesh
         faces (bmesh.types.BMFace): list of user selected faces
     """
-
     DEPRECATED_hip_roof(bm, faces, prop)
 
 

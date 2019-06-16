@@ -49,14 +49,13 @@ def fill_glass_panes(bm, face, prop):
 
 
 def fill_bar(bm, face, prop):
-    """Create bars on face
+    """Create horizontal and vertical bars along a face
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to create panels on
         prop (bpy.types.PropertyGroup): FillBars
     """
-
     width, height = calc_face_dimensions(face)
     face_center = face.calc_center_median()
 
@@ -177,7 +176,7 @@ def extrude_edges_to_depth(bm, edges, depth):
 
 
 def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
-    """Extrude faces and move top edge back to form wedge.slope
+    """Extrude faces and move top edge back to form a wedge slope
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object

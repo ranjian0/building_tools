@@ -54,7 +54,6 @@ def create_composite_floorplan(bm, prop):
         bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
-
     plane(bm, prop.width, prop.length)
     median_reference = list(bm.faces)[-1].calc_center_median()
 
@@ -86,7 +85,6 @@ def create_hshaped_floorplan(bm, prop):
         bm (bmesh.types.BMesh): bmesh of editmode object
         prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
-
     plane(bm, prop.width, prop.length)
     face = list(bm.faces)[-1]
     normal = face.normal

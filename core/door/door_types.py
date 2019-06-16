@@ -15,14 +15,13 @@ from ...utils import (
 
 
 def create_door(bm, faces, prop):
-    """Create basic flush door
+    """Create door from face selection
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
         faces (list): selected faces
         prop (bpy.types.PropertyGroup): DoorProperty
     """
-
     for face in faces:
         face = create_door_split(bm, face, prop.size_offset)
         # -- check that split was successful
@@ -51,7 +50,7 @@ def create_door_split(bm, face, prop):
 
 
 def create_door_frame(bm, face, prop):
-    """Create extrude and inset around a face to make door frame
+    """Extrude and inset face to make door frame
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
@@ -61,8 +60,6 @@ def create_door_frame(bm, face, prop):
     Returns:
         bmesh.types.BMFace: face after frame is created
     """
-
-    # Frame outset
     face = extrude_face_and_delete_bottom(bm, face, prop.frame_depth)
 
     if prop.frame_thickness > 0:
@@ -70,9 +67,7 @@ def create_door_frame(bm, face, prop):
         off = (w / 3) - prop.frame_thickness
         edges = split_face_vertical_with_offset(bm, face, 2, [off, off])
 
-        top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)[
-            -1
-        ]
+        top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
         face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
@@ -103,25 +98,25 @@ def create_door_double(bm, face, prop):
 
 
 def create_door_fill(bm, face, prop):
-    """Create extra elements on face
+    """Add decorative elements on door face
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
         face (bmesh.types.BMFace): face to operate on
         prop (bpy.types.PropertyGroup): DoorProperty
     """
-    if prop.fill_type == "NONE":
-        pass
-    elif prop.fill_type == "PANELS":
+    if prop.fill_type == "PANELS":
         fill_panel(bm, face, prop.panel_fill)
     elif prop.fill_type == "GLASS PANES":
         fill_glass_panes(bm, face, prop.glass_fill)
     elif prop.fill_type == "LOUVER":
         fill_louver(bm, face, prop.louver_fill)
+    else:
+        pass
 
 
 def delete_bottom_face(bm, face):
-    """delete a face that is hidden at the bottom of face
+    """delete the face that is at the bottom an extruded face
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
@@ -138,7 +133,7 @@ def delete_bottom_face(bm, face):
 
 
 def extrude_face_and_delete_bottom(bm, face, extrude_depth):
-    """extrude a face, and delete another face hidden at the bottom of the extrusion
+    """extrude a face and delete bottom face from new geometry
 
     Args:
         bm (bmesh.types.BMesh): bmesh of editmode object
@@ -199,4 +194,4 @@ def split_edges_horizontal_offset_top(bm, edges, offset):
         new_verts.append(v)
 
     res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
-    return res
+    return res[-1]

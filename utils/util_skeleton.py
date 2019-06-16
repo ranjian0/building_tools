@@ -85,9 +85,6 @@ class Vector2:
 
     def __sub__(self, other):
         if isinstance(other, Vector2):
-            # Vector - Vector -> Vector
-            # Vector - Point -> Point
-            # Point - Point -> Vector
             if self.__class__ is other.__class__:
                 _class = Vector2
             else:
@@ -511,16 +508,10 @@ class LAVertex:
     def next_event(self):
         events = []
         if self.is_reflex:
-            # a reflex vertex may generate a split event
-            # split events happen when a vertex hits an opposite edge, splitting the polygon in two.
             for edge in self.original_edges:
                 if edge.edge == self.edge_left or edge.edge == self.edge_right:
                     continue
 
-                # a potential b is at the intersection of between our own bisector and the bisector of the
-                # angle between the tested edge and any one of our own edges.
-
-                # we choose the "less parallel" edge (in order to exclude a potentially parallel edge)
                 leftdot = abs(
                     self.edge_left.v.normalized().dot(edge.edge.v.normalized())
                 )
@@ -528,7 +519,6 @@ class LAVertex:
                     self.edge_right.v.normalized().dot(edge.edge.v.normalized())
                 )
                 selfedge = self.edge_left if leftdot < rightdot else self.edge_right
-                # otheredge = self.edge_left if leftdot > rightdot else self.edge_right
 
                 i = Line2(selfedge).intersect(Line2(edge.edge))
                 if i is not None and not approximately_equals(i, self.point):
@@ -547,8 +537,6 @@ class LAVertex:
                     if b is None:
                         continue
 
-                    # check eligibility of b
-                    # a valid b should lie within the area limited by the edge and the bisectors of its two vertices:
                     xleft = (
                         cross(
                             edge.bisector_left.v.normalized(),

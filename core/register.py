@@ -9,9 +9,8 @@ from .balcony import register_balcony, unregister_balcony
 from .generic import register_generic, unregister_generic
 from .floorplan import register_floorplan, unregister_floorplan
 
-# -- take care here --
-# -- ORDER MATTERS --
 
+# -- ORDER MATTERS --
 register_funcs = (
     register_generic,
     register_fill,
