@@ -4,7 +4,7 @@ import operator
 import mathutils
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
-from ...utils import equal, select, skeletonize, filter_geom, calc_edge_median
+from ...utils import equal, select, validate, skeletonize, filter_geom, calc_edge_median
 
 
 def create_roof(bm, faces, prop):
@@ -92,7 +92,7 @@ def create_hip_roof(bm, faces, prop):
     median = face.calc_center_median()
 
     dissolve_lone_verts(bm, face, list(face.edges))
-    original_edges = [e for e in face.edges if e.is_valid]
+    original_edges = validate(face.edges)
 
     # get verts in anti-clockwise order
     verts = [v for v in sort_verts_by_loops(face)]
@@ -254,6 +254,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
                 skeleton_edges.extend(geom)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
+    skeleton_edges = validate(skeleton_edges)
     S_verts = {v for e in skeleton_edges for v in e.verts}
     O_verts = {v for e in original_edges for v in e.verts}
     skeleton_verts = [v for v in skeleton_verts if v in S_verts and v not in O_verts]
@@ -303,7 +304,7 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
                 new_edge, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
                 new_verts.append(new_vert)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
-    return list(filter(lambda v: v.is_valid, new_verts))
+    return validate(new_verts)
 
 
 def get_linked_edges(verts, filter_edges):
@@ -322,7 +323,7 @@ def find_closest_pair_edges(edges_a, edges_b):
 
 def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges):
     new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
-    skeleton_verts = list(filter(lambda v: v.is_valid, skeleton_verts)) + new_verts
+    skeleton_verts = validate(skeleton_verts) + new_verts
     return list(set(e for v in skeleton_verts for e in v.link_edges))
 
 
