@@ -23,6 +23,11 @@ def select(elements, val=True):
         el.select_set(val)
 
 
+def validate(elements):
+    """ Return only valid items in elements """
+    return list(filter(lambda el: el.is_valid, elements))
+
+
 def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable """
     return list(filter(lambda x: isinstance(x, _type), geom))
