@@ -3,3 +3,5 @@
 *.blend
 *.blend1
 *.txt
+*.sublime-project
+*.sublime-workspace
