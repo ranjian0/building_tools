@@ -91,23 +91,25 @@ def create_hip_roof(bm, faces, prop):
     face = faces[-1]
     median = face.calc_center_median()
 
+    dissolve_lone_verts(bm, face, list(face.edges))
+    original_edges = [e for e in face.edges if e.is_valid]
+
     # get verts in anti-clockwise order
-    original_edges = [e for e in face.edges]
     verts = [v for v in sort_verts_by_loops(face)]
     points = [v.co.to_tuple()[:2] for v in verts]
 
-    # compute skeleton
+    # compute straight skeleton
     skeleton = skeletonize(points, [])
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
     height_scale = prop.height / max([arc.height for arc in skeleton])
 
-    # 3. -- create edges and vertices
+    # -- create edges and vertices
     skeleton_edges = create_hiproof_verts_and_edges(
         bm, skeleton, original_edges, median, height_scale
     )
 
-    # 4. -- create faces
+    # -- create faces
     create_hiproof_faces(bm, original_edges, skeleton_edges)
 
 
@@ -233,20 +235,16 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
         source = arc.source
         vsource = vert_at_loc(source, bm.verts)
         if not vsource:
-            ht = (
-                height_scale
-                * [arc.height for arc in skeleton if arc.source == source][-1]
-            )
+            source_height = [arc.height for arc in skeleton if arc.source == source][-1]
+            ht = source_height * height_scale
             vsource = make_vert(bm, Vector((source.x, source.y, median.z + ht)))
             skeleton_verts.append(vsource)
 
         for sink in arc.sinks:
-            # -- create sink vert
             vs = vert_at_loc(sink, bm.verts)
             if not vs:
-                ht = height_scale * min(
-                    [arc.height for arc in skeleton if sink in arc.sinks]
-                )
+                sink_height = min([arc.height for arc in skeleton if sink in arc.sinks])
+                ht = height_scale * sink_height
                 vs = make_vert(bm, Vector((sink.x, sink.y, median.z + ht)))
             skeleton_verts.append(vs)
 
@@ -256,76 +254,34 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
                 skeleton_edges.extend(geom)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-    skeleton_verts = [
-        v
-        for v in skeleton_verts
-        if v in {v for e in skeleton_edges for v in e.verts}
-        and v not in {v for e in original_edges for v in e.verts}
-    ]
-    new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
-    skeleton_verts = list(filter(lambda v: v.is_valid, skeleton_verts)) + new_verts
-    skeleton_edges = list(set(e for v in skeleton_verts for e in v.link_edges))
-    return skeleton_edges
+    S_verts = {v for e in skeleton_edges for v in e.verts}
+    O_verts = {v for e in original_edges for v in e.verts}
+    skeleton_verts = [v for v in skeleton_verts if v in S_verts and v not in O_verts]
+    return join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges)
 
 
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
     for ed in original_edges:
         verts = ed.verts
         linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
-
-        if len(linked_skeleton_edges) == 0:
-            linked_original = get_linked_edges(verts, original_edges)
-            verts = [v for e in linked_original for v in e.verts if v not in verts]
-            linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
-        elif len(linked_skeleton_edges) == 1:
-            continue
-
         all_verts = [v for e in linked_skeleton_edges for v in e.verts]
         opposite_verts = list(set(all_verts) - set(verts))
 
         if len(opposite_verts) == 1:
-            # -- found triangle face
+            # -- triangle
             bmesh.ops.contextual_create(bm, geom=linked_skeleton_edges + [ed])
         else:
             edge = bm.edges.get(opposite_verts)
             if edge:
-                # -- found quad
+                # -- quad
                 geometry = linked_skeleton_edges + [ed, edge]
                 bmesh.ops.contextual_create(bm, geom=geometry)
             else:
-                v1, v2 = opposite_verts
-                next_skeleton_edges = list(
-                    set(skeleton_edges) - set(linked_skeleton_edges)
+                # -- polygon
+                edges = cycle_edges_form_polygon(
+                    bm, opposite_verts, skeleton_edges, linked_skeleton_edges
                 )
-                v1_edges = get_linked_edges([v1], next_skeleton_edges)
-                v2_edges = get_linked_edges([v2], next_skeleton_edges)
-                pair = find_closest_pair_edges(v1_edges, v2_edges)
-
-                all_verts = [v for e in pair for v in e.verts]
-                opposite_verts = list(set(all_verts) - set(opposite_verts))
-                if len(opposite_verts) == 1:
-                    geometry = [ed] + linked_skeleton_edges + list(pair)
-                    bmesh.ops.contextual_create(bm, geom=geometry)
-                else:
-                    edge = bm.edges.get(opposite_verts)
-                    if edge:
-                        geometry = list(pair) + linked_skeleton_edges + [ed, edge]
-                        bmesh.ops.contextual_create(bm, geom=geometry)
-                    else:
-                        v1, v2 = opposite_verts
-                        next_skeleton_edges = list(
-                            set(next_skeleton_edges)
-                            - set(linked_skeleton_edges + list(pair))
-                        )
-                        v1_edges = get_linked_edges([v1], next_skeleton_edges)
-                        v2_edges = get_linked_edges([v2], next_skeleton_edges)
-                        pair2 = find_closest_pair_edges(v1_edges, v2_edges)
-
-                        all_verts = [v for e in pair2 for v in e.verts]
-                        opposite_verts = list(set(all_verts) - set(opposite_verts))
-                        if len(opposite_verts) == 1:
-                            geometry = [ed] + linked_skeleton_edges + list(pair + pair2)
-                            bmesh.ops.contextual_create(bm, geom=geometry)
+                bmesh.ops.contextual_create(bm, geom=[ed] + edges)
 
 
 def make_vert(bm, location):
@@ -362,3 +318,43 @@ def find_closest_pair_edges(edges_a, edges_b):
 
     pairs = [(e1, e2) for e1 in edges_a for e2 in edges_b]
     return sorted(pairs, key=length_func)[0]
+
+
+def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges):
+    new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
+    skeleton_verts = list(filter(lambda v: v.is_valid, skeleton_verts)) + new_verts
+    return list(set(e for v in skeleton_verts for e in v.link_edges))
+
+
+def dissolve_lone_verts(bm, face, original_edges):
+    loops = {loop for v in face.verts for loop in v.link_loops if loop.face == face}
+
+    def is_parallel(loop):
+        return round(loop.calc_angle(), 3) == 3.142
+
+    parallel_verts = [loop.vert for loop in loops if is_parallel(loop)]
+    lone_edges = [
+        e for v in parallel_verts for e in v.link_edges if e not in original_edges
+    ]
+    bmesh.ops.dissolve_edges(bm, edges=lone_edges, use_verts=True)
+
+
+def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
+    v1, v2 = verts
+    next_skeleton_edges = list(set(skeleton_edges) - set(linked_edges))
+    v1_edges = get_linked_edges([v1], next_skeleton_edges)
+    v2_edges = get_linked_edges([v2], next_skeleton_edges)
+    pair = find_closest_pair_edges(v1_edges, v2_edges)
+
+    all_verts = [v for e in pair for v in e.verts]
+    verts = list(set(all_verts) - set(verts))
+    if len(verts) == 1:
+        return linked_edges + list(pair)
+    else:
+        edge = bm.edges.get(verts)
+        if edge:
+            return list(pair) + linked_edges + [edge]
+        else:
+            return cycle_edges_form_polygon(
+                bm, verts, skeleton_edges, linked_edges + list(pair)
+            )
