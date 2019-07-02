@@ -1,6 +1,6 @@
 import bmesh
 
-from .rails_types import CreateRailing
+from .rails_types import create_railing_from_selection
 from ...utils import get_edit_mesh
 
 
@@ -11,7 +11,7 @@ class Rails:
         bm = bmesh.from_edit_mesh(me)
 
         if cls.validate(bm):
-            CreateRailing().from_selection(bm, props)
+            create_railing_from_selection(bm, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}

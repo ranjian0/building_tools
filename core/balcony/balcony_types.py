@@ -1,7 +1,7 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
 
-from ..rails import CreateRailing
+from ..rails import create_railing_from_edges
 from ...utils import split, filter_geom, calc_edge_median
 
 
@@ -48,7 +48,7 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     front = bm.edges.get(top_verts)
     r_edges = choose_edges_from_direction(prop.open_side, front, left, right)
 
-    CreateRailing().from_edges(bm, r_edges, prop.rail)
+    create_railing_from_edges(bm, r_edges, prop.rail)
 
 
 def sort_edges_from_normal_direction(edges, normal):

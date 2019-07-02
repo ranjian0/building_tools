@@ -3,7 +3,7 @@ import bpy
 from .rails import Rails
 from .rails_ops import BTOOLS_OT_add_railing
 from .rails_props import RailProperty
-from .rails_types import CreateRailing
+from .rails_types import create_railing_from_edges, create_railing_from_step_edges
 
 classes = (RailProperty, BTOOLS_OT_add_railing)
 
