@@ -16,6 +16,8 @@
   * In blender, go to : User Preferences -> Add-ons -> install addon from file.
   * Select the downloaded zip file and you're good to go.
 
+  **Note : Support for the Blender 2.79 addon has been terminated**
+
 ## RoadMap
   * You can find the list of features and todos here: https://trello.com/b/CK0O4MjA
 
