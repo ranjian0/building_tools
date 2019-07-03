@@ -17,9 +17,6 @@ from ...utils import (
     boundary_edges_from_face_selection,
 )
 
-# TODO:
-# Use loops to create fill types
-
 
 class RailingData:
     def __init__(self):
