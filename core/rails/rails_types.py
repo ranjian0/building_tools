@@ -227,24 +227,14 @@ def create_fill_rails(bm, edge, prop):
 
 
 def create_fill_posts(bm, loop, prop, raildata):
+    edge = loop.edge
+    off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
+
     # -- add posts
     add_posts_along_edge(bm, loop, prop)
 
-    edge = loop.edge
     # -- fill gaps created by remove colinear
-    off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
-    height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
-    size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
-    if raildata.colinear_loops:
-        # -- fill spaces created by no corner posts
-        for loop in raildata.colinear_loops:
-            if loop.edge != edge:
-                continue
-
-            v = loop.vert
-            p = v.co + off + height_v
-            fill_post = create_cube(bm, size, p)
-            delete_faces(bm, fill_post, top=True, bottom=True)
+    fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
     # -- add top rail
     pinch = 0.01  # offset to prevent z-buffer fighting
@@ -433,13 +423,8 @@ def add_posts_along_edge(bm, loop, prop):
     delete_faces(bm, post, top=True, bottom=True)
     align_geometry_to_edge(bm, post, edge)
 
-    def gap_if_convex(loop):
-        if not loop.is_convex:
-            return vec * prop.corner_post_width * 1.5
-        return Vector()
-
-    start = v1.co + off + height_v + gap_if_convex(v1_loop)
-    stop = v2.co + off + height_v - gap_if_convex(v2_loop)
+    start = v1.co + off + height_v
+    stop = v2.co + off + height_v
     length = edge.calc_length()
     post_count = round((length / prop.post_size) * prop.post_density)
     array_elements(bm, post, post_count, start, stop)
@@ -449,3 +434,19 @@ def get_loop_for_vert(vert, loop):
     if loop.vert == vert:
         return loop
     return [l for l in loop.link_loops if l.vert == vert][-1]
+
+
+def fill_post_for_colinear_gap(bm, edge, prop, raildata):
+    off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
+    height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
+    size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
+    if raildata.colinear_loops:
+        # -- fill spaces created by no corner posts
+        for loop in raildata.colinear_loops:
+            if loop.edge != edge:
+                continue
+
+            v = loop.vert
+            p = v.co + off + height_v
+            fill_post = create_cube(bm, size, p)
+            delete_faces(bm, fill_post, top=True, bottom=True)
