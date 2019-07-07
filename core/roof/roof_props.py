@@ -11,7 +11,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     type: EnumProperty(
         name="Roof Type",
         items=roof_items,
-        default="HIP",
+        default="FLAT",
         description="Type of roof to create",
     )
 
@@ -26,7 +26,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     outset: FloatProperty(
         name="Outset",
         min=0.01,
-        max=1000.0,
+        max=1.0,
         default=0.1,
         description="Outset of roof hangs",
     )
