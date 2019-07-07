@@ -406,11 +406,8 @@ def sort_edge_verts_by_orientation(edge):
 def add_posts_along_edge(bm, loop, prop):
     edge = loop.edge
     v1, v2 = sort_edge_verts_by_orientation(edge)
-    v1_loop = get_loop_for_vert(v1, loop)
-    v2_loop = get_loop_for_vert(v2, loop)
 
     # -- add posts
-    vec = (v2.co - v1.co).normalized()
     tan = edge_tangent(edge).normalized()
     off = tan * (prop.corner_post_width / 2)
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
@@ -425,12 +422,6 @@ def add_posts_along_edge(bm, loop, prop):
     length = edge.calc_length()
     post_count = round((length / prop.post_size) * prop.post_density)
     array_elements(bm, post, post_count, start, stop)
-
-
-def get_loop_for_vert(vert, loop):
-    if loop.vert == vert:
-        return loop
-    return [l for l in loop.link_loops if l.vert == vert][-1]
 
 
 def fill_post_for_colinear_gap(bm, edge, prop, raildata):
