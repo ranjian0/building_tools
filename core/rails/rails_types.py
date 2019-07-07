@@ -160,7 +160,7 @@ def create_railing(bm, edges, lfaces, prop, raildata):
         loops = [l for l in loops if not (is_parallel(l) and is_middle(l))]
 
     create_corner_post(bm, loops, prop, raildata)
-    create_fill(bm, loops, prop, raildata)
+    create_fill(bm, edges, prop, raildata)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
@@ -190,15 +190,15 @@ def create_corner_post(bm, loops, prop, raildata):
         align_geometry_to_edge(bm, post, e)
 
 
-def create_fill(bm, loops, prop, raildata):
+def create_fill(bm, edges, prop, raildata):
     """ Create fill types for railing """
-    for loop in loops:
+    for edge in edges:
         if prop.fill == "RAILS":
-            create_fill_rails(bm, loop.edge, prop)
+            create_fill_rails(bm, edge, prop)
         elif prop.fill == "POSTS":
-            create_fill_posts(bm, loop, prop, raildata)
+            create_fill_posts(bm, edge, prop, raildata)
         elif prop.fill == "WALL":
-            create_fill_walls(bm, loop.edge, prop, raildata)
+            create_fill_walls(bm, edge, prop, raildata)
 
 
 def create_fill_rails(bm, edge, prop):
@@ -223,12 +223,11 @@ def create_fill_rails(bm, edge, prop):
     array_elements(bm, rail, rail_count, start, stop)
 
 
-def create_fill_posts(bm, loop, prop, raildata):
-    edge = loop.edge
+def create_fill_posts(bm, edge, prop, raildata):
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
 
     # -- add posts
-    add_posts_along_edge(bm, loop, prop)
+    add_posts_along_edge(bm, edge, prop)
 
     # -- fill gaps created by remove colinear
     fill_post_for_colinear_gap(bm, edge, prop, raildata)
@@ -403,8 +402,7 @@ def sort_edge_verts_by_orientation(edge):
     return start, end
 
 
-def add_posts_along_edge(bm, loop, prop):
-    edge = loop.edge
+def add_posts_along_edge(bm, edge, prop):
     v1, v2 = sort_edge_verts_by_orientation(edge)
 
     # -- add posts
