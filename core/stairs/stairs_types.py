@@ -29,7 +29,8 @@ def create_stairs(bm, faces, prop):
         init_normal = f.normal.copy()
 
         ext_face = f
-        for i in range(prop.step_count):
+        step_count = prop.step_count + (1 if prop.landing else 0)
+        for i in range(step_count):
             # extrude face
             n = ext_face.normal
             ext_width = (
@@ -80,13 +81,13 @@ def create_stairs(bm, faces, prop):
                 elif prop.stair_direction == "RIGHT":
                     ret_face = right
 
-            if i < (prop.step_count - 1):
+            if i < (step_count - 1):
                 # cut step height
                 res = split_quad(bm, ret_face, False, 1)
                 bmesh.ops.translate(
                     bm,
                     verts=filter_geom(res["geom_inner"], BMVert),
-                    vec=(0, 0, (fheight / 2) - (fheight / (prop.step_count - i))),
+                    vec=(0, 0, (fheight / 2) - (fheight / (step_count - i))),
                 )
 
                 # update ext_face
