@@ -50,8 +50,10 @@ def create_window_frame(bm, face, prop):
 
     normal = face.normal
     if prop.frame_thickness > 0.0:
-        res = bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.frame_thickness)
-        faces = res.get('faces')
+        res = bmesh.ops.inset_individual(
+            bm, faces=[face], thickness=prop.frame_thickness
+        )
+        faces = res.get("faces")
 
     if prop.window_depth > 0.0:
         face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
