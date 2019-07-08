@@ -1,5 +1,5 @@
 import bmesh
-from ...utils import split
+from ...utils import split, filter_geom
 from ..fill import fill_bar, fill_louver, fill_glass_panes
 
 
@@ -47,16 +47,21 @@ def create_window_frame(bm, face, prop):
     Returns:
         bmesh.types.BMFace: face after frame is created
     """
-    face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
-    bmesh.ops.translate(bm, verts=face.verts, vec=face.normal * prop.frame_depth / 2)
 
+    normal = face.normal
     if prop.frame_thickness > 0.0:
-        bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.frame_thickness)
+        res = bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.frame_thickness)
+        faces = res.get('faces')
+
+    if prop.window_depth > 0.0:
+        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+        bmesh.ops.translate(bm, verts=face.verts, vec=-normal * prop.window_depth)
 
     if prop.frame_depth > 0.0:
-        f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
-        bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.frame_depth / 2)
-        return f
+        geom = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
+        verts = filter_geom(geom, bmesh.types.BMVert)
+        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
+
     return face
 
 

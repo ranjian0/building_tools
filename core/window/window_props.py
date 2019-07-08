@@ -9,17 +9,25 @@ class WindowProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.01,
-        max=100.0,
-        default=0.1,
+        max=1.0,
+        default=0.15,
         description="Thickness of window Frame",
     )
 
     frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
-        max=100.0,
-        default=0.1,
+        max=0.5,
+        default=0.0,
         description="Depth of window Frame",
+    )
+
+    window_depth: FloatProperty(
+        name="Window Depth",
+        min=0.0,
+        max=0.5,
+        default=0.05,
+        description="Depth of window",
     )
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
@@ -46,8 +54,10 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "frame_thickness")
-        col.prop(self, "frame_depth")
+        col.prop(self, "window_depth", slider=True)
+        row = col.row(align=True)
+        row.prop(self, "frame_depth", slider=True)
+        row.prop(self, "frame_thickness", slider=True)
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")
