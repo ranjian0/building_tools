@@ -36,7 +36,7 @@ def create_floors(bm, edges, prop):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
-    create_floor_materials(slabs, walls)
+    # create_floor_materials(slabs, walls)
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
