@@ -57,40 +57,11 @@ def create_railing_from_edges(bm, edges, prop):
 
 
 def create_railing_from_step_edges(bm, edges, normal, direction, prop):
-    lfaces = upward_faces_from_edges(edges)
-
-    def edge_z(e):
-        return calc_edge_median(e).z
-
-    # - find lowest edges
-    lowest_edge_z = edge_z(min(edges, key=lambda e: edge_z(e)))
-    low_edges = [e for e in edges if round(edge_z(e), 3) == round(lowest_edge_z, 3)]
-
-    # -- add corner post
-    for e in low_edges:
-        loop = [l for l in e.link_loops if l.face in lfaces][-1]
-        cen = calc_edge_median(e)
-        tan = e.calc_tangent(loop)
-        off = tan * prop.corner_post_width / 2
-        pos = cen + off + Vector((0, 0, prop.corner_post_height / 2))
-
-        size = (prop.corner_post_width, prop.corner_post_width, prop.corner_post_height)
-        post = create_cube(bm, size, pos)
-
-        delete_faces(bm, post, bottom=True, top=prop.has_decor)
-        if prop.has_decor:
-            px, py, pz = pos
-            width = prop.corner_post_width
-
-            pos = (px, py, pz + prop.corner_post_height / 2 + width / 4)
-            create_cube(bm, (width * 2, width * 2, width / 2), pos)
-
-    # -- add fill types
+    linked_faces = upward_faces_from_edges(edges)
     if prop.fill == "POSTS":
-        other_edges = list(set(edges) - set(low_edges))
         # -- add mid posts
-        for e in other_edges:
-            loop = [l for l in e.link_loops if l.face in lfaces][-1]
+        for e in edges:
+            loop = [l for l in e.link_loops if l.face in linked_faces][-1]
             cen = calc_edge_median(e)
             tan = e.calc_tangent(loop)
             off = tan * prop.corner_post_width / 2
@@ -110,8 +81,11 @@ def create_railing_from_step_edges(bm, edges, normal, direction, prop):
             rail_groups.append(edges)
 
         for group in rail_groups:
+            edge = group[-1]
             cen = calc_verts_median([v for e in group for v in e.verts])
-            off = Vector((0, 0, prop.corner_post_height))
+            loop = [l for l in edge.link_loops if l.face in linked_faces][-1]
+            tan = edge.calc_tangent(loop)
+            off = Vector((0, 0, prop.corner_post_height)) + (tan * prop.rail_size)
             pos = cen + off
 
             length = sum([e.calc_length() for e in group])

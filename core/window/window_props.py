@@ -24,7 +24,7 @@ class WindowProperty(bpy.types.PropertyGroup):
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
-    fill_itemss = [
+    fill_items = [
         ("NONE", "None", "", 0),
         ("BAR", "Bar", "", 1),
         ("LOUVER", "Louver", "", 2),
@@ -32,7 +32,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     ]
     fill_type: EnumProperty(
         name="Fill Type",
-        items=fill_itemss,
+        items=fill_items,
         default="NONE",
         description="Type of fill for window",
     )
