@@ -25,15 +25,14 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         description="How much to offset geometry",
     )
 
-    collapsed: BoolProperty(default=True)
+    show_props: BoolProperty(default=False)
 
     def draw(self, context, layout):
-        box = layout.box()
-        box.prop(self, "collapsed", text="Size & Offset", toggle=True)
+        layout.prop(self, "show_props", text="Size & Offset", toggle=True)
 
-        if not self.collapsed:
+        if self.show_props:
+            box = layout.box()
             row = box.row(align=False)
-
             col = row.column(align=True)
             col.prop(self, "size", slider=True)
 
