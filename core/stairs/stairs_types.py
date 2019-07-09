@@ -97,8 +97,7 @@ def create_stairs(bm, faces, prop):
                 )
 
     if prop.railing:
-        # create_stairs_railing(bm, init_normal, top_faces, prop)
-        pass
+        create_stairs_railing(bm, init_normal, top_faces, prop)
 
 
 def create_stair_split(bm, face, prop):

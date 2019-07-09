@@ -57,52 +57,8 @@ def create_railing_from_edges(bm, edges, prop):
 
 
 def create_railing_from_step_edges(bm, edges, normal, direction, prop):
-    linked_faces = upward_faces_from_edges(edges)
     if prop.fill == "POSTS":
-        # -- add mid posts
-        for e in edges:
-            loop = [l for l in e.link_loops if l.face in linked_faces][-1]
-            cen = calc_edge_median(e)
-            tan = e.calc_tangent(loop)
-            off = tan * prop.corner_post_width / 2
-
-            height = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
-            size = (prop.post_size,) * 2 + (prop.corner_post_height - prop.rail_size,)
-            post = create_cube(bm, size, (cen + off + height))
-
-        # -- add rail
-        rail_groups = []
-        if direction == "FRONT":
-            ledges = edges[: int(len(edges) / 2)]
-            redges = edges[int(len(edges) / 2) :]
-            rail_groups.append(ledges)
-            rail_groups.append(redges)
-        else:
-            rail_groups.append(edges)
-
-        for group in rail_groups:
-            edge = group[-1]
-            cen = calc_verts_median([v for e in group for v in e.verts])
-            loop = [l for l in edge.link_loops if l.face in linked_faces][-1]
-            tan = edge.calc_tangent(loop)
-            off = Vector((0, 0, prop.corner_post_height)) + (tan * prop.rail_size)
-            pos = cen + off
-
-            length = sum([e.calc_length() for e in group])
-            size = (length, 2 * prop.rail_size, prop.rail_size)
-
-            rail = cube(bm, *size)
-            bmesh.ops.translate(bm, vec=pos, verts=rail["verts"])
-            delete_faces(bm, rail, right=True)
-
-            # --rotate
-            bmesh.ops.rotate(
-                bm,
-                verts=rail["verts"],
-                cent=calc_verts_median(rail["verts"]),
-                matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
-            )
-
+        fill_posts_for_step_edges(bm, edges, normal, direction, prop)
     elif prop.fill == "RAILS":
         pass
     elif prop.fill == "WALL":
@@ -410,3 +366,113 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
             p = v.co + off + height_v
             fill_post = create_cube(bm, size, p)
             delete_faces(bm, fill_post, top=True, bottom=True)
+
+
+def fill_posts_for_step_edges(bm, edges, normal, direction, prop):
+    """ Add posts for stair edges """
+
+    edge_groups = get_edge_groups_from_direction(edges, direction)
+    for group in edge_groups:
+        #   -- max and min coordinate for step edges
+        min_location, max_location = find_min_and_max_vert_locations(
+            [vert for edge in group for vert in edge.verts], normal
+        )
+        #   -- slope
+        slope = slope_between_vectors(max_location, min_location, normal)
+
+        #   -- tangent
+        reference = group[-1]
+        linked_faces = upward_faces_from_edges(group)
+        loop = next(l for l in reference.link_loops if l.face in linked_faces)
+        tangent = reference.calc_tangent(loop)
+
+        #   -- fill posts along each edge that get taller along slope
+        for edge in group:
+            add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop)
+
+        #   --  add a rail from min_location to max_location using slope
+        height = prop.corner_post_height - (prop.rail_size / 2)
+        offset = (tangent * prop.rail_size) + Vector((0, 0, height))
+        start = max_location + offset
+        end = min_location + offset
+        add_rail_with_slope(bm, start, end, slope, normal, prop)
+
+
+def get_edge_groups_from_direction(edges, direction):
+    edge_groups = []
+    if direction == "FRONT":
+        left_edges = edges[: int(len(edges) / 2)]
+        right_edges = edges[int(len(edges) / 2) :]
+        edge_groups.append(left_edges)
+        edge_groups.append(right_edges)
+    else:
+        edge_groups.append(edges)
+    return edge_groups
+
+
+def slope_between_vectors(start, end, normal):
+    change_z = start.z - end.z
+    if normal.x:
+        change_other = start.x - end.x
+    elif normal.y:
+        change_other = start.y - end.y
+    else:
+        return 1
+    return change_z / change_other
+
+
+def find_min_and_max_vert_locations(verts, normal):
+    v_location = [vert.co for vert in verts]
+    sort_key = operator.attrgetter("x" if normal.x else "y")
+    res = [function(v_location, key=sort_key) for function in (min, max)]
+    if sort_key(normal) > 0:
+        return res
+    return reversed(res)
+
+
+def normalized_edge_vector(edge):
+    v1, v2 = edge.verts
+    return (v2.co - v1.co).normalized()
+
+
+def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
+    post_count = round((edge.calc_length() / prop.post_size) * prop.post_density)
+    post_spacing = edge.calc_length() / post_count
+    post_height = prop.corner_post_height - prop.rail_size
+
+    vec = normalized_edge_vector(edge)
+    tan_offset = tangent * prop.corner_post_width / 2
+    post_offset = tan_offset + (-normal * prop.post_size / 2)
+
+    end, start = find_min_and_max_vert_locations(edge.verts, normal)
+    for i in range(post_count):
+        height = post_height + abs(slope * (i * post_spacing))
+        position = start + post_offset - (vec * (i * post_spacing))
+        position += Vector((0, 0, height / 2))
+        size = (prop.post_size,) * 2 + (height,)
+        create_cube(bm, size, position)
+
+
+def add_rail_with_slope(bm, start, end, slope, normal, prop):
+    length = (start - end).length + prop.rail_size
+    size = (length, 2 * prop.rail_size, prop.rail_size)
+    position = start.lerp(end, 0.5) - ((end - start).normalized() * prop.rail_size / 2)
+
+    rail = create_cube(bm, size, position)
+    delete_faces(bm, rail, right=True)
+
+    bmesh.ops.rotate(
+        bm,
+        verts=rail["verts"],
+        cent=calc_verts_median(rail["verts"]),
+        matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
+    )
+
+    axis = "Y" if normal.x else "X"
+    slope *= 1 if normal.y else -1  # -- figure out why???
+    bmesh.ops.rotate(
+        bm,
+        verts=rail["verts"],
+        cent=calc_verts_median(rail["verts"]),
+        matrix=Matrix.Rotation(math.atan(slope), 4, axis),
+    )
