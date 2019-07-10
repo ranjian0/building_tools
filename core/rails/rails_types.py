@@ -377,14 +377,10 @@ def fill_posts_for_step_edges(bm, edges, normal, direction, prop):
         min_location, max_location = find_min_and_max_vert_locations(
             [vert for edge in group for vert in edge.verts], normal
         )
-        #   -- slope
-        slope = slope_between_vectors(max_location, min_location, normal)
 
-        #   -- tangent
-        reference = group[-1]
-        linked_faces = upward_faces_from_edges(group)
-        loop = next(l for l in reference.link_loops if l.face in linked_faces)
-        tangent = reference.calc_tangent(loop)
+        #  -- slope and edge tangent
+        slope = slope_between_vectors(max_location, min_location, normal)
+        tangent = edge_tangent(group[-1]).normalized()
 
         #   -- fill posts along each edge that get taller along slope
         for edge in group:
