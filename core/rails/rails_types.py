@@ -163,10 +163,10 @@ def create_fill_posts(bm, edge, prop, raildata):
     fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
     # -- add top rail
-    pinch = 0.01  # offset to prevent z-buffer fighting
-    height_v = Vector((0, 0, prop.corner_post_height - prop.rail_size / 2 - pinch))
+    height_v = Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
     rail_pos = calc_edge_median(edge) + off + height_v
-    size = (edge.calc_length(), 2 * prop.rail_size, prop.rail_size)
+    rail_len = edge.calc_length() - prop.corner_post_width * 2
+    size = (rail_len, 2 * prop.rail_size, prop.rail_size)
 
     rail = create_cube(bm, size, rail_pos)
     delete_faces(bm, rail, left=True, right=True)
