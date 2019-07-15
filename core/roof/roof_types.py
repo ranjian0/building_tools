@@ -262,7 +262,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
 
 
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
-    for ed in original_edges:
+    for ed in validate(original_edges):
         verts = ed.verts
         linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
         all_verts = [v for e in linked_skeleton_edges for v in e.verts]
@@ -345,6 +345,8 @@ def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
     next_skeleton_edges = list(set(skeleton_edges) - set(linked_edges))
     v1_edges = get_linked_edges([v1], next_skeleton_edges)
     v2_edges = get_linked_edges([v2], next_skeleton_edges)
+    if not v1_edges or not v2_edges:
+        return linked_edges
     pair = find_closest_pair_edges(v1_edges, v2_edges)
 
     all_verts = [v for e in pair for v in e.verts]
