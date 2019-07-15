@@ -110,7 +110,7 @@ def create_corner_post(bm, loops, prop, raildata):
             post = add_cube_post(bm, width, height, pos, prop.has_decor)
         else:
             pos = v.co + (vec * width) + Vector((0, 0, height / 2))
-            post = create_cylinder(bm, width / 2, height, segments, pos)
+            post = create_cylinder(bm, width, height, segments, pos)
 
             # -- store global state
             raildata.wall_switch = True
