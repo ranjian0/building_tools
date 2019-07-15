@@ -122,14 +122,12 @@ def create_corner_post(bm, loops, prop, raildata):
 
 def create_fill(bm, edges, prop, raildata):
     """ Create fill types for railing """
-    for edge in edges:
-        if prop.fill == "WALL":
-            create_fill_walls(bm, edge, prop, raildata)
-
     if prop.fill == "POSTS":
         create_fill_posts(bm, edges, prop, raildata)
     elif prop.fill == "RAILS":
         create_fill_rails(bm, edges, prop)
+    elif prop.fill == "WALL":
+        create_fill_walls(bm, edges, prop, raildata)
 
 
 def create_fill_rails(bm, edges, prop):
@@ -180,31 +178,29 @@ def create_fill_posts(bm, edges, prop, raildata):
         align_geometry_to_edge(bm, rail, edge)
 
 
-def create_fill_walls(bm, edge, prop, raildata):
-    off = prop.corner_post_width
-    if raildata.wall_switch:
-        # - a cylinder corner post was created, determine length of side with cosine rule
-        val_a = 2 * (prop.corner_post_width ** 2)
-        val_b = val_a * math.cos(raildata.corner_angle)
-        off = math.sqrt(val_a - val_b)
+def create_fill_walls(bm, edges, prop, raildata):
+    loops = loops_from_edges(edges)
 
-    v1, v2 = edge.verts
-    _dir = (v1.co - v2.co).normalized()
-    tan = edge_tangent(edge)
+    for loop in loops:
+        edge = loop.edge
+        if edge not in edges:
+            continue
 
-    if raildata.wall_switch:
-        # -- only for cylider corner posts
-        start = v1.co - (_dir * off)
-        end = v2.co + (_dir * off)
-    else:
-        if prop.expand:
-            start = v1.co
-            end = v2.co
-        else:
-            start = v1.co - (_dir * off)
-            end = v2.co + (_dir * off)
+        off = prop.corner_post_width
+        if raildata.wall_switch:
+            # - a cylinder corner post was created, determine length of side with cosine rule
+            val_a = 2 * (prop.corner_post_width ** 2)
+            val_b = val_a * math.cos(raildata.corner_angle)
+            off = math.sqrt(val_a - val_b)
 
-    create_wall(bm, start, end, prop.corner_post_height, prop.wall_width, tan)
+        loop_a, loop_b = loop, loop.link_loop_next
+        vec = (loop_a.vert.co - loop_b.vert.co).normalized()
+        off_a = (vec * off) if loop_a.is_convex else Vector()
+        off_b = (vec * off) if loop_b.is_convex else Vector()
+
+        start = loop_a.vert.co - off_a
+        end = loop_b.vert.co + off_b
+        create_wall(bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge))
 
 
 def edge_tangent(edge):

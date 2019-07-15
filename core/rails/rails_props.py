@@ -131,7 +131,6 @@ class RailProperty(bpy.types.PropertyGroup):
         elif self.fill == "WALL":
             col = layout.column(align=True)
             col.prop(self, "wall_width")
-            col.prop(self, "expand", text="Expand Walls", toggle=True)
 
             layout.label(text="Corner Posts")
 
