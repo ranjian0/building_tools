@@ -117,7 +117,6 @@ class RailProperty(bpy.types.PropertyGroup):
             col = layout.column(align=True)
             col.prop(self, "rail_density")
             col.prop(self, "rail_size")
-            col.prop(self, "expand", text="Expand Rails", toggle=True)
 
             layout.label(text="Corner Posts")
 

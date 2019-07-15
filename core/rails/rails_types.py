@@ -123,35 +123,38 @@ def create_corner_post(bm, loops, prop, raildata):
 def create_fill(bm, edges, prop, raildata):
     """ Create fill types for railing """
     for edge in edges:
-        if prop.fill == "RAILS":
-            create_fill_rails(bm, edge, prop)
-        elif prop.fill == "WALL":
+        if prop.fill == "WALL":
             create_fill_walls(bm, edge, prop, raildata)
 
     if prop.fill == "POSTS":
         create_fill_posts(bm, edges, prop, raildata)
+    elif prop.fill == "RAILS":
+        create_fill_rails(bm, edges, prop)
 
 
-def create_fill_rails(bm, edge, prop):
-    tan = edge_tangent(edge)
-    off = tan.normalized() * (prop.corner_post_width / 2)
-    start = calc_edge_median(edge) + off
-    stop = calc_edge_median(edge) + off + Vector((0, 0, prop.corner_post_height))
-    if prop.expand:
-        size = (edge.calc_length(), prop.rail_size, prop.rail_size)
-    else:
-        size = (
-            edge.calc_length() - (prop.corner_post_width * 2),
-            prop.rail_size,
-            prop.rail_size,
-        )
+def create_fill_rails(bm, edges, prop):
+    loops = loops_from_edges(edges)
 
-    rail = cube(bm, *size)
-    delete_faces(bm, rail, left=True, right=True)
-    align_geometry_to_edge(bm, rail, edge)
+    for loop in loops:
+        edge = loop.edge
+        if edge not in edges:
+            continue
 
-    rail_count = int((prop.corner_post_height / prop.rail_size) * prop.rail_density)
-    array_elements(bm, rail, rail_count, start, stop)
+        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
+
+        start = rail_pos
+        stop = rail_pos + Vector((0, 0, prop.corner_post_height-prop.rail_size))
+
+        rail = cube(bm, *rail_size)
+        delete_faces(bm, rail, left=True, right=True)
+        align_geometry_to_edge(bm, rail, edge)
+        rail_count = int((prop.corner_post_height / prop.rail_size) * prop.rail_density)
+        array_elements(bm, rail, rail_count, start, stop)
+
+        # -- create top rail
+        rail = create_cube(bm, rail_size, stop + Vector((0, 0, prop.rail_size/2)))
+        delete_faces(bm, rail, left=True, right=True)
+        align_geometry_to_edge(bm, rail, edge)
 
 
 def create_fill_posts(bm, edges, prop, raildata):
@@ -169,21 +172,10 @@ def create_fill_posts(bm, edges, prop, raildata):
         fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
         # -- add top rail
-        height_v = Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
-        off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
-        convex_loops = [l.is_convex for l in (loop, loop.link_loop_next)]
-        num_convex = sum(convex_loops)
-        convex_offset = edge_vector(edge) * (
-            prop.corner_post_width / 2 * (2 - num_convex)
-        )
-        convex_offset *= 1 if convex_loops[0] else -1
-        convex_offset *= 0 if num_convex == 0 else 1
+        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
+        rail_pos += Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
 
-        rail_pos = calc_edge_median(edge) + off + height_v + convex_offset
-        rail_len = edge.calc_length() - prop.corner_post_width * num_convex
-        size = (rail_len, 2 * prop.rail_size, prop.rail_size)
-
-        rail = create_cube(bm, size, rail_pos)
+        rail = create_cube(bm, rail_size, rail_pos)
         delete_faces(bm, rail, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
 
@@ -507,3 +499,20 @@ def loops_from_edges(edges):
             else:
                 loops.extend([l for l in v.link_loops])
     return list(set(loops))
+
+
+def calc_rail_position_and_size_for_loop(loop, prop):
+    edge = loop.edge
+    off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
+    convex_loops = [l.is_convex for l in (loop, loop.link_loop_next)]
+    num_convex = sum(convex_loops)
+    convex_offset = edge_vector(edge) * (
+        prop.corner_post_width / 2 * (2 - num_convex)
+    )
+    convex_offset *= 1 if convex_loops[0] else -1
+    convex_offset *= 0 if num_convex == 0 else 1
+
+    rail_pos = calc_edge_median(edge) + off + convex_offset
+    rail_len = edge.calc_length() - prop.corner_post_width * num_convex
+    rail_size = (rail_len, 2 * prop.rail_size, prop.rail_size)
+    return rail_pos, rail_size
