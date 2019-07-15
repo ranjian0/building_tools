@@ -125,10 +125,11 @@ def create_fill(bm, edges, prop, raildata):
     for edge in edges:
         if prop.fill == "RAILS":
             create_fill_rails(bm, edge, prop)
-        elif prop.fill == "POSTS":
-            create_fill_posts(bm, edge, prop, raildata)
         elif prop.fill == "WALL":
             create_fill_walls(bm, edge, prop, raildata)
+
+    if prop.fill == "POSTS":
+        create_fill_posts(bm, edges, prop, raildata)
 
 
 def create_fill_rails(bm, edge, prop):
@@ -153,24 +154,38 @@ def create_fill_rails(bm, edge, prop):
     array_elements(bm, rail, rail_count, start, stop)
 
 
-def create_fill_posts(bm, edge, prop, raildata):
-    off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
+def create_fill_posts(bm, edges, prop, raildata):
+    loops = loops_from_edges(edges)
 
-    # -- add posts
-    add_posts_along_edge(bm, edge, prop)
+    for loop in loops:
+        edge = loop.edge
+        if edge not in edges:
+            continue
 
-    # -- fill gaps created by remove colinear
-    fill_post_for_colinear_gap(bm, edge, prop, raildata)
+        # -- add posts
+        add_posts_between_loops(bm, [loop, loop.link_loop_next], prop)
 
-    # -- add top rail
-    height_v = Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
-    rail_pos = calc_edge_median(edge) + off + height_v
-    rail_len = edge.calc_length() - prop.corner_post_width * 2
-    size = (rail_len, 2 * prop.rail_size, prop.rail_size)
+        # -- fill gaps created by remove colinear
+        fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
-    rail = create_cube(bm, size, rail_pos)
-    delete_faces(bm, rail, left=True, right=True)
-    align_geometry_to_edge(bm, rail, edge)
+        # -- add top rail
+        height_v = Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
+        off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
+        convex_loops = [l.is_convex for l in (loop, loop.link_loop_next)]
+        num_convex = sum(convex_loops)
+        convex_offset = edge_vector(edge) * (
+            prop.corner_post_width / 2 * (2 - num_convex)
+        )
+        convex_offset *= 1 if convex_loops[0] else -1
+        convex_offset *= 0 if num_convex == 0 else 1
+
+        rail_pos = calc_edge_median(edge) + off + height_v + convex_offset
+        rail_len = edge.calc_length() - prop.corner_post_width * num_convex
+        size = (rail_len, 2 * prop.rail_size, prop.rail_size)
+
+        rail = create_cube(bm, size, rail_pos)
+        delete_faces(bm, rail, left=True, right=True)
+        align_geometry_to_edge(bm, rail, edge)
 
 
 def create_fill_walls(bm, edge, prop, raildata):
@@ -332,21 +347,24 @@ def sort_edge_verts_by_orientation(edge):
     return start, end
 
 
-def add_posts_along_edge(bm, edge, prop):
-    v1, v2 = sort_edge_verts_by_orientation(edge)
+def add_posts_between_loops(bm, loops, prop):
+    loop_a, loop_b = loops
+    edge = loop_a.edge
 
-    # -- add posts
-    tan = edge_tangent(edge).normalized()
-    off = tan * (prop.corner_post_width / 2)
+    # -- create post geometry
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
     size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
-
     post = cube(bm, *size)
     delete_faces(bm, post, top=True, bottom=True)
     align_geometry_to_edge(bm, post, edge)
 
-    start = v1.co + off + height_v
-    stop = v2.co + off + height_v
+    # -- add posts array between loop_a and loop_b
+    off_a = loop_a.calc_tangent() * (prop.corner_post_width * 0.75)
+    start = loop_a.vert.co + off_a + height_v
+
+    off_b = loop_b.calc_tangent() * (prop.corner_post_width * 0.75)
+    stop = loop_b.vert.co + off_b + height_v
+
     length = edge.calc_length()
     post_count = round((length / prop.post_size) * prop.post_density)
     array_elements(bm, post, post_count, start, stop)
@@ -472,3 +490,20 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
         cent=calc_verts_median(rail["verts"]),
         matrix=Matrix.Rotation(math.atan(slope), 4, axis),
     )
+
+
+def edge_vector(edge):
+    v1, v2 = edge.verts
+    return (v2.co - v1.co).normalized()
+
+
+def loops_from_edges(edges):
+    lfaces = upward_faces_from_edges(edges)
+    loops = []
+    for e in edges:
+        for v in e.verts:
+            if len(v.link_loops) > 1:
+                loops.extend([l for l in v.link_loops if l.face in lfaces])
+            else:
+                loops.extend([l for l in v.link_loops])
+    return list(set(loops))
