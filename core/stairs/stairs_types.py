@@ -259,6 +259,4 @@ def create_step_railing(bm, normal, faces, prop):
     elif prop.stair_direction == "RIGHT":
         valid_edges.extend(left_edges)
 
-    create_railing_from_step_edges(
-        bm, valid_edges, normal, prop.stair_direction, prop.rail
-    )
+    create_railing_from_step_edges(bm, valid_edges, normal, prop)

@@ -56,12 +56,12 @@ def create_railing_from_edges(bm, edges, prop):
     create_railing(bm, edges, faces_from_edges, prop, RailingData())
 
 
-def create_railing_from_step_edges(bm, edges, normal, direction, prop):
-    if prop.fill == "POSTS":
-        fill_posts_for_step_edges(bm, edges, normal, direction, prop)
-    elif prop.fill == "RAILS":
+def create_railing_from_step_edges(bm, edges, normal, prop):
+    if prop.rail.fill == "POSTS":
+        fill_posts_for_step_edges(bm, edges, normal, prop)
+    elif prop.rail.fill == "RAILS":
         pass
-    elif prop.fill == "WALL":
+    elif prop.rail.fill == "WALL":
         pass
 
 
@@ -386,10 +386,10 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
             delete_faces(bm, fill_post, top=True, bottom=True)
 
 
-def fill_posts_for_step_edges(bm, edges, normal, direction, prop):
+def fill_posts_for_step_edges(bm, edges, normal, prop):
     """ Add posts for stair edges """
 
-    edge_groups = get_edge_groups_from_direction(edges, direction)
+    edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
     for group in edge_groups:
         #   -- max and min coordinate for step edges
         min_location, max_location = find_min_and_max_vert_locations(
@@ -402,14 +402,14 @@ def fill_posts_for_step_edges(bm, edges, normal, direction, prop):
 
         #   -- fill posts along each edge that get taller along slope
         for edge in group:
-            add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop)
+            add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop.rail)
 
         #   --  add a rail from min_location to max_location using slope
-        height = prop.corner_post_height - (prop.rail_size / 2)
-        offset = (tangent * prop.rail_size) + Vector((0, 0, height))
+        height = prop.rail.corner_post_height - (prop.rail.rail_size / 2)
+        offset = (tangent * prop.rail.rail_size) + Vector((0, 0, height))
         start = max_location + offset
         end = min_location + offset
-        add_rail_with_slope(bm, start, end, slope, normal, prop)
+        add_rail_with_slope(bm, start, end, slope, normal, prop.rail)
 
 
 def get_edge_groups_from_direction(edges, direction):
@@ -436,7 +436,7 @@ def slope_between_vectors(start, end, normal):
 
 
 def find_min_and_max_vert_locations(verts, normal):
-    v_location = [vert.co for vert in verts]
+    v_location = [vert.co.copy() for vert in verts]
     sort_key = operator.attrgetter("x" if normal.x else "y")
     res = [function(v_location, key=sort_key) for function in (min, max)]
     if sort_key(normal) > 0:
