@@ -65,12 +65,6 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Whether the railing has corner posts",
     )
 
-    expand: BoolProperty(
-        name="Expand",
-        default=False,
-        description="Whether to expand fill type to extremes",
-    )
-
     has_decor: BoolProperty(
         name="Has Decor", default=False, description="Whether corner posts have decor"
     )
