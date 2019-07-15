@@ -42,7 +42,7 @@ def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
 def cylinder(bm, radius=1, height=2, segs=10):
     """ Create cylinder in bmesh """
     circle = bmesh.ops.create_circle(
-        bm, cap_ends=True, cap_tris=False, segments=segs, diameter=radius * 2
+        bm, cap_ends=True, cap_tris=False, segments=segs, radius=radius
     )
 
     verts = circle["verts"]
