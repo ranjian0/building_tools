@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import BoolProperty, FloatProperty, EnumProperty, PointerProperty
 
-from ..generic import SizeOffsetProperty
+from ..generic import ArrayProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 
 
@@ -42,6 +42,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Type of fill for door",
     )
 
+    array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     panel_fill: PointerProperty(type=FillPanel)
@@ -58,6 +59,7 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
+        self.array.draw(context, layout)
 
         box = layout.box()
         col = box.column(align=True)
