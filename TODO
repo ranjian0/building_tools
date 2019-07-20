@@ -1,0 +1,35 @@
+DOOR:
+    - add attachments e.g door-handles
+    - add arch doors
+
+WINDOW:
+    - add arch window
+
+FLOORS:
+    - add columns
+
+ROOF:
+    - fix hiproof error for outset property
+
+RAILING:
+    - fix gaps caused by railing not reaching walls due to slabs
+
+BALCONY:
+    - create combined for faces that share an edge
+
+MATERIAL API:
+
+    - current plan is keep a record of faces(indices) for each tool
+    - add a material tab
+    - create presets for default materials (FLAT / PBR)
+    - apply the materials to the faces based on where they belong
+
+    - for material editing;
+        - FLAT - just a diffuse shader with color
+        - let user change color from the material tab
+
+        - PBR - Principled with diffuse, normal and roughness
+        - let user change textures
+        - let user change parameters - roughness, metallic factors
+
+
