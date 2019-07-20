@@ -23,15 +23,18 @@ def create_door(bm, faces, prop):
         prop (bpy.types.PropertyGroup): DoorProperty
     """
     for face in faces:
-        face = create_door_split(bm, face, prop.size_offset)
-        # -- check that split was successful
-        if not face:
-            continue
+        array_faces = create_door_array(bm, face, prop.array)
 
-        nfaces = create_door_double(bm, face, prop)
-        for face in nfaces:
-            face = create_door_frame(bm, face, prop)
-            create_door_fill(bm, face, prop)
+        for aface in array_faces:
+            face = create_door_split(bm, aface, prop.size_offset)
+            # -- check that split was successful
+            if not face:
+                continue
+
+            nfaces = create_door_double(bm, face, prop)
+            for face in nfaces:
+                face = create_door_frame(bm, face, prop)
+                create_door_fill(bm, face, prop)
 
 
 def create_door_split(bm, face, prop):
@@ -47,6 +50,25 @@ def create_door_split(bm, face, prop):
     """
     size, off = prop.size, prop.offset
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+
+
+def create_door_array(bm, face, prop):
+    """Use ArrayProperty to subdivide face horizontally/vertically for
+    further processing
+
+    Args:
+        bm (bmesh.types.BMesh): bmesh for current edit mesh
+        face (bmesh.types.BMFace): face to make split (must be quad)
+        prop (bpy.types.PropertyGroup): WindowPropertyGroup
+
+    Returns:
+        List(bmesh.types.BMFace): New faces created after subdivision
+    """
+    if prop.count <= 1 or not prop.show_props:
+        return [face]
+    res = split_quad(bm, face, not prop.direction == 'VERTICAL', prop.count-1)
+    inner_edges = filter_geom(res['geom_inner'], bmesh.types.BMEdge)
+    return list({f for e in inner_edges for f in e.link_faces})
 
 
 def create_door_frame(bm, face, prop):
