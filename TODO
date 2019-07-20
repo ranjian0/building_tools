@@ -8,8 +8,12 @@ WINDOW:
 FLOORS:
     - add columns
 
+FLOORPLANS:
+    - add support for floorplan with holes
+
 ROOF:
     - fix hiproof error for outset property
+    - support for hip-roof with holes
 
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
@@ -33,3 +37,17 @@ MATERIAL API:
         - let user change parameters - roughness, metallic factors
 
 
+
+REFACTOR AND STYLE:
+    - add docstrings to modules without them
+    - finish refactor to make functions 30 lines or less esp for XXX_types.py and utils (straight_skeleton)
+    - speaking of straight skeleton - refactor to work better with blender types eg. Vector
+
+
+UI:
+    - try an minify properties that take too much space esp door and window
+    - create tools for all the operators and add to the top bar
+
+
+#???
+    - Circular floorplan doesn't have any real use ??? Remove!
