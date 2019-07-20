@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import BoolProperty, FloatVectorProperty
+from bpy.props import IntProperty, EnumProperty, BoolProperty, FloatVectorProperty
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -40,7 +40,39 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
             col.prop(self, "offset")
 
 
-classes = (SizeOffsetProperty,)
+class ArrayProperty(bpy.types.PropertyGroup):
+    """ Convinience PropertyGroup used to array elements """
+
+    count: IntProperty(
+        name="Count", min=1, max=1000, default=3, description="Number of elements"
+    )
+
+    direction_items = [
+        ("VERTICAL", "Vertical", "", 0),
+        ("HORIZONTAL", "Horizontal", "", 1),
+    ]
+    direction: EnumProperty(
+        name="Axis",
+        items=direction_items,
+        default="HORIZONTAL",
+        description="Direction to array elements",
+    )
+
+    show_props: BoolProperty(default=False)
+
+    def draw(self, context, layout):
+        layout.prop(self, "show_props", text="Array Elements", toggle=True)
+
+        if self.show_props:
+            box = layout.box()
+            col = box.column(align=True)
+            # row = col.row(align=False)
+            # row.prop(self, "direction", expand=True)
+            row = col.row(align=False)
+            row.prop(self, "count")
+
+
+classes = (SizeOffsetProperty, ArrayProperty)
 
 
 def register_generic():
