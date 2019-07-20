@@ -19,7 +19,6 @@ class Roof:
 
     @classmethod
     def validate(cls, bm):
-        """ Ensure valid user selection if any """
         faces = [f for f in bm.faces if f.select]
         if faces:
             if all([f.normal.z for f in faces]):

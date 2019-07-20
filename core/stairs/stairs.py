@@ -7,12 +7,6 @@ from ...utils import get_edit_mesh
 class Stairs:
     @classmethod
     def build(cls, context, prop):
-        """Use stair types and properties to generate geometry
-
-        Args:
-            context (bpy.context): blender context
-            props   (bpy.types.PropertyGroup): StairsProperty
-        """
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
         faces = [f for f in bm.faces if f.select]

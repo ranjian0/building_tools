@@ -4,7 +4,6 @@ from .roof_props import RoofProperty
 
 
 class BTOOLS_OT_add_roof(bpy.types.Operator):
-    """ Creates roof on selected faces """
 
     bl_idname = "btools.add_roof"
     bl_label = "Add Roof"

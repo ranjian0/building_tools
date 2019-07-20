@@ -4,12 +4,7 @@ from ..fill import fill_bar, fill_louver, fill_glass_panes
 
 
 def create_window(bm, faces, prop):
-    """Generate a basic window
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-        faces (bmesh.types.BMFace): current selected faces
-        prop (bpy.types.PropertyGroup): WindowPropertyGroup
+    """Generate a window
     """
 
     for face in faces:
@@ -26,14 +21,6 @@ def create_window(bm, faces, prop):
 
 def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-        face (bmesh.types.BMFace): face to make split (must be quad)
-        prop (bpy.types.PropertyGroup): WindowPropertyGroup
-
-    Returns:
-        bmesh.types.BMFace: New face created after split
     """
     size, off = prop.size, prop.offset
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
@@ -42,14 +29,6 @@ def create_window_split(bm, face, prop):
 def create_window_array(bm, face, prop):
     """Use ArrayProperty to subdivide face horizontally/vertically for
     further processing
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-        face (bmesh.types.BMFace): face to make split (must be quad)
-        prop (bpy.types.PropertyGroup): WindowPropertyGroup
-
-    Returns:
-        List(bmesh.types.BMFace): New faces created after subdivision
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
@@ -60,14 +39,6 @@ def create_window_array(bm, face, prop):
 
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of current edit mesh
-        face (bmesh.types.BMFace): face to make frame for
-        prop (bpy.types.PropertyGroup): WindowPropertyGroup
-
-    Returns:
-        bmesh.types.BMFace: face after frame is created
     """
 
     normal = face.normal
@@ -91,11 +62,6 @@ def create_window_frame(bm, face, prop):
 
 def create_window_fill(bm, face, prop):
     """Create extra elements on face
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-        face (bmesh.types.BMFace): face to operate on
-        prop (bpy.types.PropertyGroup): WindowPropertyGroup
     """
 
     if prop.fill_type == "NONE":

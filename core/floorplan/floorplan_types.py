@@ -19,20 +19,12 @@ from ...utils import (
 
 def create_rectangular_floorplan(bm, prop):
     """Create plane in provided bmesh
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     plane(bm, prop.width, prop.length)
 
 
 def create_circular_floorplan(bm, prop):
     """Create circle in provided bmesh
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     circle(bm, prop.radius, prop.segments, prop.cap_tris)
 
@@ -50,9 +42,6 @@ def create_composite_floorplan(bm, prop):
         |    |
         .____.
 
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     plane(bm, prop.width, prop.length)
     median_reference = list(bm.faces)[-1].calc_center_median()
@@ -81,9 +70,6 @@ def create_hshaped_floorplan(bm, prop):
     |   |      |   |
     .___.      .___.
 
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
     """
     plane(bm, prop.width, prop.length)
     face = list(bm.faces)[-1]
@@ -114,11 +100,7 @@ def create_hshaped_floorplan(bm, prop):
 
 
 def create_random_floorplan(bm, prop):
-    """Create randomly generated building footprint/floorplan
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorplanPropertyGroup
+    """Create randomly generated building floorplan
     """
     random.seed(prop.seed)
     scale_x = Matrix.Scale(prop.width, 4, (1, 0, 0))
@@ -141,11 +123,6 @@ def create_random_floorplan(bm, prop):
 
 def extrude_left_and_right_edges(bm, normal, median_reference):
     """Extrude the left and right edges of a plane
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        normal (vector): normal of the plane
-        median_reference (vector): center of the plane
     """
     for edge in filter_vertical_edges(bm.edges, normal):
         res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
@@ -159,13 +136,6 @@ def extrude_left_and_right_edges(bm, normal, median_reference):
 
 def determine_clockwise_extreme_edges_for_extrusion(bm, normal):
     """top and bottom extreme edges sorted clockwise
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        normal (vector): normal direction of plane containing edges
-
-    Returns:
-        list(bmesh.types.BMEdge): extreme edges sorted clockwise
     """
     all_upper_edges = filter_horizontal_edges(bm.edges, normal)
     all_upper_edges.sort(key=lambda ed: calc_edge_median(ed).x)
@@ -176,13 +146,6 @@ def determine_clockwise_extreme_edges_for_extrusion(bm, normal):
 
 def subdivide_edge_twice_and_get_middle(bm, edge):
     """make two cuts to an edge and return middle edge
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        edge (bmesh.types.BMEdge): edge to subdivide
-
-    Returns:
-        bmesh.types.BMEdge: middle edge after cut
     """
     res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
     new_verts = filter_geom(res["geom_inner"], BMVert)
@@ -191,10 +154,6 @@ def subdivide_edge_twice_and_get_middle(bm, edge):
 
 def random_scale_and_translate(bm, middle_edge):
     """scale and translate an edge randomly along its axis
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        middle_edge (bmesh.types.BMEdge): edge that is between two others
     """
     verts = list(middle_edge.verts)
     length = middle_edge.calc_length()
@@ -213,11 +172,6 @@ def random_scale_and_translate(bm, middle_edge):
 
 def random_extrude(bm, middle_edge, direction):
     """extrude an edge to a random size to make a plane
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        middle_edge (bmesh.types.BMEdge): edge that is between two others
-        direction (vector): direction of extrude
     """
     res = bmesh.ops.extrude_edge_only(bm, edges=[middle_edge])
     extrude_length = (random.random() * middle_edge.calc_length()) + 1.0

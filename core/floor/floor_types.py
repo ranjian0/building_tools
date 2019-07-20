@@ -13,12 +13,6 @@ from ...utils import (
 
 def create_floors(bm, edges, prop):
     """Create extrusions of floor geometry from a floorplan
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        edges (list): boundary edges of editmode meshes
-        prop (bpy.types.PropertyGroup): FloorPropertyGroup
-
     """
     start_height = 0.0
     faces_to_delete = []
@@ -41,11 +35,6 @@ def create_floors(bm, edges, prop):
 
 def extrude_slabs_and_floors(bm, edges, prop):
     """extrude edges alternating between slab and floor heights
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        edges (list): boundary edges of editmode meshes
-        prop (bpy.types.PropertyGroup): FloorPropertyGroup
     """
     offsets = it.cycle([prop.slab_thickness, prop.floor_height])
     for offset in it.islice(offsets, 0, prop.floor_count * 2):
@@ -62,14 +51,6 @@ def extrude_slabs_and_floors(bm, edges, prop):
 
 def get_slab_and_wall_faces(bm, prop, start_height):
     """get faces that form slabs and walls
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        prop (bpy.types.PropertyGroup): FloorPropertyGroup
-        start_height (float): height to start making floors
-
-    Returns:
-        tuple(list(BMFace), list(BMFace)): slab and wall faces
     """
     slabs, walls = [], []
     slab_heights, wall_heights = [], []
@@ -99,10 +80,6 @@ def get_slab_and_wall_faces(bm, prop, start_height):
 
 def create_floor_materials(slab_faces, wall_faces):
     """add materials to floor faces
-
-    Args:
-        slab_faces (list): all faces that form slabs
-        wall_faces (list): all faces that form walls
     """
     set_material(slab_faces, Material.SLAB)
     set_material(wall_faces, Material.WALL)

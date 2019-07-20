@@ -8,13 +8,7 @@ from ...utils import equal, select, validate, skeletonize, filter_geom, calc_edg
 
 
 def create_roof(bm, faces, prop):
-    """Create different roof types
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh from current edit mesh
-        faces (bmesh.types.BMFace): list of user selected faces
-        type (str): type of roof to generate as defined in RoofProperty
-        **kwargs: Extra kargs from RoofProperty
+    """Create roof types
     """
     select(faces, False)
     if prop.type == "FLAT":
@@ -26,14 +20,7 @@ def create_roof(bm, faces, prop):
 
 
 def create_flat_roof(bm, faces, prop):
-    """Create a basic flat roof
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh from current edit mesh
-        faces (bmesh.types.BMFace): list of user selected faces
-
-    Returns:
-        list(bmesh.types.BMFace): Resulting top face
+    """Create a flat roof
     """
     ret = bmesh.ops.extrude_face_region(bm, geom=faces)
     bmesh.ops.translate(
@@ -55,10 +42,6 @@ def create_flat_roof(bm, faces, prop):
 
 def create_gable_roof(bm, faces, prop):
     """Create a gable roof
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh from current edit mesh
-        faces (bmesh.types.BMFace): list of user selected faces
     """
     if not is_rectangular(faces):
         return
@@ -82,10 +65,6 @@ def create_gable_roof(bm, faces, prop):
 
 def create_hip_roof(bm, faces, prop):
     """Create a hip roof
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh from current edit mesh
-        faces (bmesh.types.BMFace): list of user selected faces
     """
     faces = create_flat_roof(bm, faces, prop)
     face = faces[-1]
@@ -114,7 +93,8 @@ def create_hip_roof(bm, faces, prop):
 
 
 def is_rectangular(faces):
-    """ Determine if faces form a recatngular area """
+    """ Determine if faces form a rectangular area
+    """
     # TODO - using area to determine this can fail, better
     # have checks to determine if verts are only horizontally
     # and vertically aligned.
@@ -135,8 +115,8 @@ def is_rectangular(faces):
 
 
 def sort_verts_by_loops(face):
-    """ sort verts in face clockwise using loops """
-
+    """ sort verts in face clockwise using loops
+    """
     start_loop = max(face.loops, key=lambda loop: loop.vert.co.to_tuple()[:2])
 
     verts = []
@@ -149,8 +129,8 @@ def sort_verts_by_loops(face):
 
 
 def vert_at_loc(loc, verts, loc_z=None):
-    """ Find all verts at loc(x,y), return the one with highest z coord """
-
+    """ Find all verts at loc(x,y), return the one with highest z coord
+    """
     results = []
     for vert in verts:
         co = vert.co
@@ -167,6 +147,8 @@ def vert_at_loc(loc, verts, loc_z=None):
 
 
 def extrude_up_and_delete_faces(bm, faces, extrude_depth):
+    """ Extrude faces upwards and delete ones at top
+    """
     ret = bmesh.ops.extrude_face_region(bm, geom=faces)
     verts = filter_geom(ret["geom"], BMVert)
     edges = filter_geom(ret["geom"], BMEdge)
@@ -177,6 +159,8 @@ def extrude_up_and_delete_faces(bm, faces, extrude_depth):
 
 
 def merge_verts_along_axis(bm, verts, axis):
+    """ Merge verts that lie along given axis
+    """
     key_func = operator.attrgetter("co." + axis)
     _max = max(verts, key=key_func)
     _min = min(verts, key=key_func)
@@ -187,12 +171,17 @@ def merge_verts_along_axis(bm, verts, axis):
 
 
 def get_highest_z_facing_faces(bm):
+    """ Find the faces with highest z-coordinate
+    """
     maxz = max([v.co.z for v in bm.verts])
     top_verts = [v for v in bm.verts if v.co.z == maxz]
     return list(set([f for v in top_verts for f in v.link_faces if f.normal.z]))
 
 
 def create_roof_hangs(bm, edges, size):
+    """Extrude edges outwards and slope the downward to form proper
+    hangs
+    """
     ret = bmesh.ops.extrude_edge_only(bm, edges=edges)
     verts = filter_geom(ret["geom"], BMVert)
     bmesh.ops.scale(bm, verts=verts, vec=(1 + size, 1 + size, 1))
@@ -208,7 +197,9 @@ def create_roof_hangs(bm, edges, size):
 
 
 def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
-    # -- extrude edges upwards and fill face
+    """ Use edges formed for hang to form complete roof
+    """
+    # -- extrude edges upwards
     ret = bmesh.ops.extrude_edge_only(bm, edges=edges)
     verts = filter_geom(ret["geom"], BMVert)
     edges = filter_geom(ret["geom"], BMEdge)
@@ -229,6 +220,8 @@ def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
 
 
 def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_scale):
+    """ Create the vertices and edges from output of straight skeleton
+    """
     skeleton_edges = []
     skeleton_verts = []
     for arc in skeleton:
@@ -262,6 +255,8 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
 
 
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
+    """ Create faces formed from hiproof verts and edges
+    """
     for ed in validate(original_edges):
         verts = ed.verts
         linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
@@ -286,10 +281,15 @@ def create_hiproof_faces(bm, original_edges, skeleton_edges):
 
 
 def make_vert(bm, location):
+    """ Create a vertex at location
+    """
     return bmesh.ops.create_vert(bm, co=location).get("vert")[-1]
 
 
 def join_intersecting_verts_and_edges(bm, edges, verts):
+    """ Find all vertices that intersect/ lie at an edge and merge
+    them to that edge
+    """
     new_verts = []
     for v in verts:
         for e in edges:
@@ -308,11 +308,15 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
 
 
 def get_linked_edges(verts, filter_edges):
+    """ Find all the edges linked to verts that are also in filter edges
+    """
     linked_edges = [e for v in verts for e in v.link_edges]
     return list(filter(lambda e: e in filter_edges, linked_edges))
 
 
 def find_closest_pair_edges(edges_a, edges_b):
+    """ Find the edges in edges_a and edges_b that are closest to each other
+    """
     def length_func(pair):
         e1, e2 = pair
         return (calc_edge_median(e1) - calc_edge_median(e2)).length
@@ -322,12 +326,16 @@ def find_closest_pair_edges(edges_a, edges_b):
 
 
 def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges):
+    """ Join intersecting edges and verts and return all edges that are in skeleton_edges
+    """
     new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
     skeleton_verts = validate(skeleton_verts) + new_verts
     return list(set(e for v in skeleton_verts for e in v.link_edges))
 
 
 def dissolve_lone_verts(bm, face, original_edges):
+    """ Find all verts only connected to two edges and dissolve them
+    """
     loops = {loop for v in face.verts for loop in v.link_loops if loop.face == face}
 
     def is_parallel(loop):
@@ -341,6 +349,9 @@ def dissolve_lone_verts(bm, face, original_edges):
 
 
 def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
+    """ Move in opposite directions along edges linked to verts until
+    you form a polygon
+    """
     v1, v2 = verts
     next_skeleton_edges = list(set(skeleton_edges) - set(linked_edges))
     v1_edges = get_linked_edges([v1], next_skeleton_edges)

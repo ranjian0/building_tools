@@ -22,7 +22,8 @@ DEFAULT_MATERIALS = {
 
 
 def create_material(obj, name):
-    """ Create a material with name, and link to the obj """
+    """ Create a material with name, and link to the obj
+    """
     if has_material(obj, name):
         return
 
@@ -38,18 +39,21 @@ def create_material(obj, name):
 
 
 def link_material(obj, mat):
-    """ link material mat to obj """
+    """ link material mat to obj
+    """
     if not has_material(obj, mat.name):
         obj.data.materials.append(mat)
 
 
 def has_material(obj, name):
-    """ check if obj has a material with name """
+    """ check if obj has a material with name
+    """
     return name in obj.data.materials.keys()
 
 
 def set_material(faces, mat_enum):
-    """ Set the material id of faces to the matertial mat_enum """
+    """ Set the material id of faces to the matertial mat_enum
+    """
     name = mat_enum.value
     obj = bpy.context.object
     if obj is None:

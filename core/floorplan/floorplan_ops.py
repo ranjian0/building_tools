@@ -4,7 +4,6 @@ from .floorplan_props import FloorplanProperty
 
 
 class BTOOLS_OT_add_floorplan(bpy.types.Operator):
-    """ Create a floorplan object """
 
     bl_idname = "btools.add_floorplan"
     bl_label = "Create Floorplan"

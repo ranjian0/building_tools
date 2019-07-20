@@ -8,33 +8,39 @@ from bmesh.types import BMVert
 
 
 def get_edit_mesh():
-    """ Get editmode mesh """
+    """ Get editmode mesh
+    """
     return bpy.context.edit_object.data
 
 
 def create_mesh(name):
-    """ Make new mesh data """
+    """ Make new mesh data
+    """
     return bpy.data.meshes.new(name)
 
 
 def select(elements, val=True):
-    """ For each item in elements set select to val """
+    """ For each item in elements set select to val
+    """
     for el in elements:
         el.select_set(val)
 
 
 def validate(elements):
-    """ Return only valid items in elements """
+    """ Return only valid items in elements
+    """
     return list(filter(lambda el: el.is_valid, elements))
 
 
 def filter_geom(geom, _type):
-    """ Find all elements of type _type in geom iterable """
+    """ Find all elements of type _type in geom iterable
+    """
     return list(filter(lambda x: isinstance(x, _type), geom))
 
 
 def sort_edges_clockwise(edges):
-    """ sort edges clockwise based on angle from their median center """
+    """ sort edges clockwise based on angle from their median center
+    """
     median_reference = ft.reduce(operator.add, map(calc_edge_median, edges)) / len(
         edges
     )
@@ -47,7 +53,8 @@ def sort_edges_clockwise(edges):
 
 
 def filter_vertical_edges(edges, normal):
-    """ Determine edges that are vertical based on a normal value """
+    """ Determine edges that are vertical based on a normal value
+    """
     res = []
     rnd = ft.partial(round, ndigits=3)
 
@@ -63,7 +70,8 @@ def filter_vertical_edges(edges, normal):
 
 
 def filter_horizontal_edges(edges, normal):
-    """ Determine edges that are horizontal based on a normal value """
+    """ Determine edges that are horizontal based on a normal value
+    """
     res = []
     rnd = ft.partial(round, ndigits=3)
 
@@ -79,24 +87,28 @@ def filter_horizontal_edges(edges, normal):
 
 
 def calc_edge_median(edge):
-    """ Calculate the center position of edge """
+    """ Calculate the center position of edge
+    """
     return ft.reduce(operator.add, [v.co for v in edge.verts]) / len(edge.verts)
 
 
 def calc_verts_median(verts):
-    """ Determine the median position of verts """
+    """ Determine the median position of verts
+    """
     return ft.reduce(operator.add, [v.co for v in verts]) / len(verts)
 
 
 def calc_face_dimensions(face):
-    """ Determine the width and height of face """
+    """ Determine the width and height of face
+    """
     vertical = filter_vertical_edges(face.edges, face.normal)[-1]
     horizontal = filter_horizontal_edges(face.edges, face.normal)[-1]
     return horizontal.calc_length(), vertical.calc_length()
 
 
 def face_with_verts(bm, verts, default=None):
-    """ Find a face in the bmesh with the given verts"""
+    """ Find a face in the bmesh with the given verts
+    """
     for face in bm.faces:
         if len(set(list(face.verts) + verts)) == len(verts):
             return face
@@ -104,8 +116,8 @@ def face_with_verts(bm, verts, default=None):
 
 
 def split_quad(bm, face, vertical=False, cuts=4):
-    """ Subdivide a quad's edges into even horizontal/vertical cuts """
-
+    """ Subdivide a quad's edges into even horizontal/vertical cuts
+    """
     res = None
     if vertical:
         e = filter_horizontal_edges(face.edges, face.normal)
@@ -120,7 +132,6 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
     """ Split a quad into regular quad sections
     (basically an inset with only right-angled edges)
     """
-
     # scale svertical and shorizontal
     scale = 3  # number of cuts + 1
     svertical *= scale
@@ -193,8 +204,8 @@ def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
 
 
 def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
-    """ Split the edges, offset amount from verts """
-
+    """ Split the edges, offset amount from verts
+    """
     new_verts = []
     for idx, e in enumerate(edges):
         vert = verts[idx]
@@ -208,7 +219,8 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
 
 
 def boundary_edges_from_face_selection(bm):
-    """ Find all edges that bound the current selected faces"""
+    """ Find all edges that bound the current selected faces
+    """
     selected_faces = [f for f in bm.faces if f.select]
     all_edges = list({e for f in selected_faces for e in f.edges})
     edge_is_boundary = (

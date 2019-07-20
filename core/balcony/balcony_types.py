@@ -7,11 +7,6 @@ from ...utils import split, filter_geom, calc_edge_median
 
 def create_balcony(bm, faces, prop):
     """Generate balcony geometry
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        faces (bmesh.types.BMFace): current selected faces
-        prop (bpy.types.PropertyGroup): BalconyProperty
     """
     for f in faces:
         size, off = prop.size_offset.size, prop.size_offset.offset
@@ -30,12 +25,6 @@ def create_balcony(bm, faces, prop):
 
 def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     """Add railing to the balcony
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of editmode object
-        balcony_geom (list): list of geometry from balcony extrusion
-        balcony_normal (Vector): normal of face that balcony was created from
-        prop (bpy.types.PropertyGroup): BalconyProperty
     """
     face = filter_geom(balcony_geom, BMFace)[-1]
     top_verts = sorted(list(face.verts), key=lambda v: v.co.z)[2:]
@@ -53,10 +42,6 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
 
 def sort_edges_from_normal_direction(edges, normal):
     """sort edges based on normal direction
-
-    Args:
-        edges (list): edges to sort
-        normal (vector): normal direction
     """
     if normal.y:
         edges.sort(key=lambda e: calc_edge_median(e).x, reverse=normal.y < 0)
@@ -66,15 +51,6 @@ def sort_edges_from_normal_direction(edges, normal):
 
 def choose_edges_from_direction(direction, front, left, right):
     """filter out the edge specified by direction
-
-    Args:
-        direction (str): string direction of the edge to remove
-        front (bmesh.types.BMEdge): front edge of balcony
-        left (bmesh.types.BMEdge): left edge of balcony
-        right (bmesh.types.BMEdge): right edge of balcony
-
-    Returns:
-        list(bmesh.types.BMEdge): edges that are not along specified direction
     """
     r_edges = []
     if direction == "NONE":

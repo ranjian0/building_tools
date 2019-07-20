@@ -10,16 +10,6 @@ class Floor:
 
     @classmethod
     def build(cls, context, prop):
-        """Use floor types and properties to create geometry
-
-        Args:
-            context (bpy.context): blender context
-            prop (bpy.types.PropertyGroup): FloorProperty
-
-        Returns:
-            set(str): operator exit state
-        """
-
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
@@ -36,14 +26,6 @@ class Floor:
 
     @classmethod
     def validate(cls, bm):
-        """Validate input if any
-
-        Args:
-            bm (bmesh.types.BMesh): bmesh of editmode object
-
-        Returns:
-            bool: whethed the current edit mesh is valid
-        """
         if any([f for f in bm.faces if f.select]):
             selection = [f for f in bm.faces if f.select]
             if len({round(v.co.z, 4) for f in selection for v in f.verts}) == 1:

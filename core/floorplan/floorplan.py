@@ -14,13 +14,6 @@ from ...utils import link_obj, create_mesh, bm_to_obj, create_object, bm_from_ob
 class Floorplan:
     @classmethod
     def build(cls, context, prop):
-        """Use floorplan types and properties to generate geometry
-
-        Args:
-            context (bpy.context): blender context
-            props (bpy.types.PropertyGroup): FloorplanProperty
-        """
-
         name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
         bm = bm_from_obj(obj)

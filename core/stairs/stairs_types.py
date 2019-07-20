@@ -9,11 +9,6 @@ from ...utils import split, split_quad, filter_geom
 
 def create_stairs(bm, faces, prop):
     """Extrude steps from selected faces
-
-    Args:
-        bm (TYPE): Description
-        faces (TYPE): Description
-        prop (TYPE): Description
     """
 
     for f in faces:
@@ -102,14 +97,6 @@ def create_stairs(bm, faces, prop):
 
 def create_stair_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh for current edit mesh
-        face (bmesh.types.BMFace): face to make split (must be quad)
-        prop (TYPE): Description
-
-    Returns:
-        bmesh.types.BMFace: New face created after split
     """
     size, off = prop.size, prop.offset
     return split(bm, face, size.y, size.x, off.x, off.y, off.z)
@@ -117,12 +104,6 @@ def create_stair_split(bm, face, prop):
 
 def create_stairs_railing(bm, normal, faces, prop):
     """Create railing for stairs
-
-    Args:
-        bm (TYPE): Description
-        normal (Vector3): Normal direction for initial face of stairs
-        faces (list): top faces of the stairs
-        prop (TYPE): Description
     """
 
     # -- create railing for landing
@@ -145,12 +126,6 @@ def create_stairs_railing(bm, normal, faces, prop):
 
 def create_railing_front(bm, face, normal, prop):
     """Create rails for landing when stair direction is front
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of current edit object
-        face (bmesh.types.BMFace): Top face of the landing
-        normal (Vector3): Normal direction for the initial face of stairs
-        prop (TYPE): Description
     """
 
     # -- determine left and right edges
@@ -168,12 +143,6 @@ def create_railing_front(bm, face, normal, prop):
 
 def create_railing_left(bm, face, normal, prop):
     """Create rails for landing when stair direction is left
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of current edit object
-        face (bmesh.types.BMFace): Top face of the landing
-        normal (Vector3): Normal direction for the initial face of stairs
-        prop: extra kwargs from StairProperty
     """
 
     # -- determine front and left edges
@@ -194,12 +163,6 @@ def create_railing_left(bm, face, normal, prop):
 
 def create_railing_right(bm, face, normal, prop):
     """Create rails for landing when stair direction is right
-
-    Args:
-        bm (bmesh.types.BMesh): bmesh of current edit object
-        face (bmesh.types.BMFace): Top face of the landing
-        normal (Vector3): Normal direction for the initial face of stairs
-        prop: extra kwargs from StairProperty
     """
 
     # -- determine front and right edges
@@ -220,12 +183,6 @@ def create_railing_right(bm, face, normal, prop):
 
 def create_step_railing(bm, normal, faces, prop):
     """Create railing for stair steps
-
-    Args:
-        bm (bmesh.types.BMesh): current editmode bmesh
-        normal (Vector): Normal direction for the initial face of stairs
-        faces (bmesh.types.BMFace): Top faces for stairs
-        prop (TYPE): Description
     """
 
     # -- update normal based on stair direction

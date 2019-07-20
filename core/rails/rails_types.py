@@ -35,6 +35,8 @@ class RailingData:
 
 
 def create_railing_from_selection(bm, prop):
+    """ create railing from what user has selected
+    """
     rail_faces = [f for f in bm.faces if f.select]
     if rail_faces:
         edges = boundary_edges_from_face_selection(bm)
@@ -49,6 +51,8 @@ def create_railing_from_selection(bm, prop):
 
 
 def create_railing_from_edges(bm, edges, prop):
+    """ Create railing along edges
+    """
     faces_from_edges = upward_faces_from_edges(edges)
     faces_from_edges = [
         f for f in faces_from_edges if all([e in f.edges for e in edges])
@@ -57,6 +61,8 @@ def create_railing_from_edges(bm, edges, prop):
 
 
 def create_railing_from_step_edges(bm, edges, normal, prop):
+    """ Create railing from stairs
+    """
     if prop.rail.fill == "POSTS":
         fill_posts_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "RAILS":
@@ -95,6 +101,8 @@ def create_railing(bm, edges, lfaces, prop, raildata):
 
 
 def create_corner_post(bm, loops, prop, raildata):
+    """ Add post at each vert in loops
+    """
     for loop in loops:
         v = loop.vert
         e = loop.edge
@@ -121,7 +129,8 @@ def create_corner_post(bm, loops, prop, raildata):
 
 
 def create_fill(bm, edges, prop, raildata):
-    """ Create fill types for railing """
+    """ Create fill types for railing
+    """
     if prop.fill == "POSTS":
         create_fill_posts(bm, edges, prop, raildata)
     elif prop.fill == "RAILS":
@@ -131,6 +140,8 @@ def create_fill(bm, edges, prop, raildata):
 
 
 def create_fill_rails(bm, edges, prop):
+    """ Add rails between corner posts
+    """
     loops = loops_from_edges(edges)
 
     for loop in loops:
@@ -156,6 +167,8 @@ def create_fill_rails(bm, edges, prop):
 
 
 def create_fill_posts(bm, edges, prop, raildata):
+    """ Add posts between corner posts
+    """
     loops = loops_from_edges(edges)
 
     for loop in loops:
@@ -179,6 +192,8 @@ def create_fill_posts(bm, edges, prop, raildata):
 
 
 def create_fill_walls(bm, edges, prop, raildata):
+    """ Add walls between corner posts
+    """
     loops = loops_from_edges(edges)
 
     for loop in loops:
@@ -206,7 +221,8 @@ def create_fill_walls(bm, edges, prop, raildata):
 
 
 def edge_tangent(edge):
-    """ Find the tangent of an edge """
+    """ Find the tangent of an edge
+    """
     tan = None
     for l in edge.link_loops:
         t = edge.calc_tangent(l)
@@ -215,22 +231,32 @@ def edge_tangent(edge):
     return tan
 
 
+def edge_vector(edge):
+    """ Return the normalized vector between edge vertices
+    """
+    v1, v2 = edge.verts
+    return (v2.co - v1.co).normalized()
+
+
 def create_cube(bm, size, position):
-    """ Create cube with size and at position"""
+    """ Create cube with size and at position
+    """
     post = cube(bm, *size)
     bmesh.ops.translate(bm, verts=post["verts"], vec=position)
     return post
 
 
 def create_cylinder(bm, radius, height, segs, position):
-    """ Create cylinder at pos"""
+    """ Create cylinder at pos
+    """
     cy = cylinder(bm, radius, height, segs)
     bmesh.ops.translate(bm, verts=cy["verts"], vec=position)
     return cy
 
 
 def create_wall(bm, start, end, height, width, tangent):
-    """ Extrude a wall of height from start to end """
+    """ Extrude a wall of height from start to end
+    """
     start_edge = create_edge(bm, start, start + Vector((0, 0, height)))
 
     res = bmesh.ops.extrude_edge_only(bm, edges=[start_edge])
@@ -257,7 +283,8 @@ def create_wall(bm, start, end, height, width, tangent):
 
 
 def delete_faces(bm, post, **directions):
-    """ Delete flagged faces for the given post (cube geometry) """
+    """ Delete flagged faces for the given post (cube geometry)
+    """
 
     def D(direction):
         return directions.get(direction, False)
@@ -277,7 +304,8 @@ def delete_faces(bm, post, **directions):
 
 
 def array_elements(bm, elem, count, start, stop):
-    """ Duplicate elements count-1 times between start and stop """
+    """ Duplicate elements count-1 times between start and stop
+    """
     step = (stop - start) / (count + 1)
     for i in range(count):
         if i == 0:
@@ -291,17 +319,23 @@ def array_elements(bm, elem, count, start, stop):
 
 
 def upward_faces_from_edges(edges):
+    """ Find linked upward facing faces
+    """
     verts = list({v for e in edges for v in e.verts})
     return list({f for v in verts for f in v.link_faces if f.normal.z})
 
 
 def create_edge(bm, start, end):
+    """ Create and edge between start and end
+    """
     start_vert = bm.verts.new(start)
     end_vert = bm.verts.new(end)
     return bm.edges.new((start_vert, end_vert))
 
 
 def add_cube_post(bm, width, height, position, has_decor):
+    """ Create cube geometry at position
+    """
     post = create_cube(bm, (width, width, height), position)
 
     delete_faces(bm, post, bottom=True, top=has_decor)
@@ -313,6 +347,8 @@ def add_cube_post(bm, width, height, position, has_decor):
 
 
 def align_geometry_to_edge(bm, geom, edge):
+    """ Orient geom along an edge
+    """
     v1, v2 = edge.verts
     dx, dy = (v1.co - v2.co).normalized().xy
     bmesh.ops.rotate(
@@ -324,10 +360,15 @@ def align_geometry_to_edge(bm, geom, edge):
 
 
 def polygon_sides_from_angle(angle):
+    """ Determine the number of sides for a polygon with an interior
+    angle 'angle'
+    """
     return round((2 * math.pi) / (math.pi - angle))
 
 
 def sort_edge_verts_by_orientation(edge):
+    """ Sort the verts in an edge based on the axis its parallel to
+    """
     start, end = edge.verts
     orient = end.co - start.co
     if orient.x:
@@ -338,6 +379,8 @@ def sort_edge_verts_by_orientation(edge):
 
 
 def add_posts_between_loops(bm, loops, prop):
+    """ Create array for posts between loop verts
+    """
     loop_a, loop_b = loops
     edge = loop_a.edge
 
@@ -361,6 +404,9 @@ def add_posts_between_loops(bm, loops, prop):
 
 
 def fill_post_for_colinear_gap(bm, edge, prop, raildata):
+    """ Add a post where corner posts were removed due to belonging to
+    co-linear loops
+    """
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
     size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
@@ -377,8 +423,8 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
 
 
 def fill_posts_for_step_edges(bm, edges, normal, prop):
-    """ Add posts for stair edges """
-
+    """ Add posts for stair edges
+    """
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
     for group in edge_groups:
         #   -- max and min coordinate for step edges
@@ -405,6 +451,9 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
 
 
 def get_edge_groups_from_direction(edges, direction):
+    """ separate the edges based on given direction
+    see stairs_types.py to see how edge groups are formed
+    """
     edge_groups = []
     if direction == "FRONT":
         left_edges = edges[: int(len(edges) / 2)]
@@ -417,6 +466,9 @@ def get_edge_groups_from_direction(edges, direction):
 
 
 def slope_between_vectors(start, end, normal):
+    """ Calculate the slope between start and end
+    switch the 'run' based on normal for 'slope = rise/run'
+    """
     change_z = start.z - end.z
     if normal.x:
         change_other = start.x - end.x
@@ -428,6 +480,8 @@ def slope_between_vectors(start, end, normal):
 
 
 def find_min_and_max_vert_locations(verts, normal):
+    """ Find the minimum and maximum location in verts
+    """
     v_location = [vert.co.copy() for vert in verts]
     sort_key = operator.attrgetter("x" if normal.x else "y")
     res = [function(v_location, key=sort_key) for function in (min, max)]
@@ -436,17 +490,15 @@ def find_min_and_max_vert_locations(verts, normal):
     return reversed(res)
 
 
-def normalized_edge_vector(edge):
-    v1, v2 = edge.verts
-    return (v2.co - v1.co).normalized()
-
-
 def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
+    """
+    Add posts along an edge with increasing height based on slope
+    """
     post_count = round((edge.calc_length() / prop.post_size) * prop.post_density)
     post_spacing = edge.calc_length() / post_count
     post_height = prop.corner_post_height - prop.rail_size
 
-    vec = normalized_edge_vector(edge)
+    vec = edge_vector(edge)
     tan_offset = tangent * prop.corner_post_width / 2
     post_offset = tan_offset + (-normal * prop.post_size / 2)
 
@@ -460,6 +512,8 @@ def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
 
 
 def add_rail_with_slope(bm, start, end, slope, normal, prop):
+    """ Add a rail from start to end with a given slope
+    """
     length = (start - end).length + prop.rail_size
     size = (length, 2 * prop.rail_size, prop.rail_size)
     position = start.lerp(end, 0.5) - ((end - start).normalized() * prop.rail_size / 2)
@@ -484,12 +538,9 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
     )
 
 
-def edge_vector(edge):
-    v1, v2 = edge.verts
-    return (v2.co - v1.co).normalized()
-
-
 def loops_from_edges(edges):
+    """ Get all the loops that bound edges with upward faces
+    """
     lfaces = upward_faces_from_edges(edges)
     loops = []
     for e in edges:
@@ -502,6 +553,8 @@ def loops_from_edges(edges):
 
 
 def calc_rail_position_and_size_for_loop(loop, prop):
+    """ Add a rail with proper position and size along the loop's edge
+    """
     edge = loop.edge
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
     convex_loops = [l.is_convex for l in (loop, loop.link_loop_next)]
