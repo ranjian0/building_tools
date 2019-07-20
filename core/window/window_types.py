@@ -53,8 +53,8 @@ def create_window_array(bm, face, prop):
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
-    res = split_quad(bm, face, not prop.direction == 'VERTICAL', prop.count-1)
-    inner_edges = filter_geom(res['geom_inner'], bmesh.types.BMEdge)
+    res = split_quad(bm, face, not prop.direction == "VERTICAL", prop.count - 1)
+    inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 
 

@@ -117,7 +117,9 @@ def split_quad(bm, face, vertical=False, cuts=4):
 
 
 def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
-    """ Split a quad into regular quad sections (basically an inset with only right-angled edges) """
+    """ Split a quad into regular quad sections
+    (basically an inset with only right-angled edges)
+    """
 
     # scale svertical and shorizontal
     scale = 3  # number of cuts + 1
