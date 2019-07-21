@@ -5,9 +5,6 @@ DOOR:
 WINDOW:
     - add arch window
 
-FLOORS:
-    - add columns
-
 FLOORPLANS:
     - add support for floorplan with holes
 
