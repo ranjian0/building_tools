@@ -1,3 +1,6 @@
+GENERAL:
+    - keep a reference to an objects building properties
+
 DOOR:
     - add attachments e.g door-handles
     - add arch doors
