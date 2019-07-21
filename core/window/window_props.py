@@ -56,10 +56,10 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "window_depth", slider=True)
+        col.prop(self, "window_depth")
         row = col.row(align=True)
-        row.prop(self, "frame_depth", slider=True)
-        row.prop(self, "frame_thickness", slider=True)
+        row.prop(self, "frame_depth")
+        row.prop(self, "frame_thickness")
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")
