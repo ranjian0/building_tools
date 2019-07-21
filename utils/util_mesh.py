@@ -115,92 +115,80 @@ def face_with_verts(bm, verts, default=None):
     return default
 
 
-def split_quad(bm, face, vertical=False, cuts=4):
-    """ Subdivide a quad's edges into even horizontal/vertical cuts
+def subdivide_face_edges_vertical(bm, face, cuts=4):
+    """ Subdivide the vertical edges of a face
     """
-    res = None
-    if vertical:
-        e = filter_horizontal_edges(face.edges, face.normal)
-        res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-    else:
-        e = filter_vertical_edges(face.edges, face.normal)
-        res = bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-    return res
+    e = filter_horizontal_edges(face.edges, face.normal)
+    return bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
 
 
-def split(bm, face, svertical, shorizontal, offx=0, offy=0, offz=0):
-    """ Split a quad into regular quad sections
-    (basically an inset with only right-angled edges)
+def subdivide_face_edges_horizontal(bm, face, cuts=4):
+    """ Subdivide the horizontal edges of a face
     """
-    # scale svertical and shorizontal
-    scale = 3  # number of cuts + 1
-    svertical *= scale
-    shorizontal *= scale
+    e = filter_vertical_edges(face.edges, face.normal)
+    return bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
 
-    do_vertical = svertical < scale
-    do_horizontal = shorizontal < scale
 
-    face.select = False
-    median = face.calc_center_median()
+def inset_face_with_scale_offset(bm, face, scale_y, scale_x, offx=0, offy=0, offz=0):
+    """ Inset a face using right angled cuts, then offset and scale inner face
+    """
+    cuts = 2
+    scale = cuts + 1
+    scale_y *= scale
+    scale_x *= scale
 
-    # SKIP BOTH
-    # `````````
+    do_vertical = scale_y < scale
+    do_horizontal = scale_x < scale
+
     if not do_horizontal and not do_vertical:
         return face
 
-    if do_horizontal:
-        # Determine horizontal edges
-        # --  edges whose verts have similar z coord
-        horizontal = list(
-            filter(
-                lambda e: len(set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges
-            )
+    face.select = False
+    verts = subdivide_flagged_edges(
+        bm, face, do_horizontal, do_vertical, scale_x, scale_y
+    )
+    offset_flagged_verts(bm, verts, do_horizontal, do_vertical, offx, offy, offz)
+    return face_with_verts(bm, verts)
+
+
+def subdivide_flagged_edges(bm, face, cut_horizontal, cut_vertical, scale_x, scale_y):
+    """ Subdivide the edges of a face that are flagged
+    """
+    normal = face.normal
+    median = face.calc_center_median()
+    if cut_horizontal:
+        horizontal = filter_horizontal_edges(face.edges, normal)
+        verts = subdivide_edges_and_scale_inner(
+            bm, horizontal, (scale_x, scale_x, 1), median
         )
 
-        # Subdivide edges
-        sp_res = bmesh.ops.subdivide_edges(bm, edges=horizontal, cuts=2)
-        verts = filter_geom(sp_res["geom_inner"], BMVert)
-
-        # Scale subdivide face
-        T = Matrix.Translation(-median)
-        bmesh.ops.scale(bm, vec=(shorizontal, shorizontal, 1), verts=verts, space=T)
-
-    if do_vertical:
+    if cut_vertical:
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-        face = face_with_verts(bm, verts) if do_horizontal else face
+        face = face_with_verts(bm, verts) if cut_horizontal else face
+        vertical = filter_vertical_edges(face.edges, normal)
+        verts = subdivide_edges_and_scale_inner(bm, vertical, (1, 1, scale_y), median)
+    return verts
 
-        # Determine vertical edges
-        # -- edges whose verts have similar x/y coord
-        other = list(
-            filter(
-                lambda e: len(set([round(v.co.z, 1) for v in e.verts])) == 1, face.edges
-            )
-        )
-        vertical = list(set(face.edges) - set(other))
 
-        # Subdivide
-        sp_res = bmesh.ops.subdivide_edges(bm, edges=vertical, cuts=2)
-        verts = filter_geom(sp_res["geom_inner"], BMVert)
-
-        # Scale subdivide face
-        T = Matrix.Translation(-median)
-        bmesh.ops.scale(bm, vec=(1, 1, svertical), verts=verts, space=T)
-
-    # OFFSET VERTS
-    # ---------------------
-    # -- horizontal offset
-    if do_horizontal and do_vertical:
+def offset_flagged_verts(bm, verts, horizontal, vertical, offx, offy, offz):
+    """ Move the flagged vertices
+    """
+    if horizontal and vertical:
         link_edges = [e for v in verts for e in v.link_edges]
         all_verts = list({v for e in link_edges for v in e.verts})
         bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
-    elif do_horizontal and not do_vertical:
+    elif horizontal and not vertical:
         bmesh.ops.translate(bm, verts=verts, vec=(offx, offy, 0))
-
-    # -- vertical offset
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
 
-    face = face_with_verts(bm, verts)
-    return face
+
+def subdivide_edges_and_scale_inner(bm, edges, scale, scale_center):
+    """ subdivide the edges twice and scale the middle section
+    """
+    sp_res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=2)
+    verts = filter_geom(sp_res["geom_inner"], BMVert)
+    bmesh.ops.scale(bm, vec=scale, verts=verts, space=Matrix.Translation(-scale_center))
+    return verts
 
 
 def edge_split_offset(bm, edges, verts, offset, connect_verts=False):

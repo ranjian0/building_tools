@@ -3,14 +3,15 @@ from bmesh.types import BMEdge
 
 from ..fill import fill_panel, fill_glass_panes, fill_louver
 from ...utils import (
-    split,
-    split_quad,
     filter_geom,
     face_with_verts,
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
     filter_horizontal_edges,
+    inset_face_with_scale_offset,
+    subdivide_face_edges_vertical,
+    subdivide_face_edges_horizontal,
 )
 
 
@@ -36,7 +37,7 @@ def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     size, off = prop.size, prop.offset
-    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
 def create_door_array(bm, face, prop):
@@ -44,7 +45,7 @@ def create_door_array(bm, face, prop):
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
-    res = split_quad(bm, face, not prop.direction == "VERTICAL", prop.count - 1)
+    res = subdivide_face_edges_horizontal(bm, face, prop.count - 1)
     inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 
@@ -118,7 +119,7 @@ def split_face_vertical_with_offset(bm, face, cuts, offsets):
     """split a face(quad) vertically and move the new edges
     """
     median = face.calc_center_median()
-    res = split_quad(bm, face, True, cuts)
+    res = subdivide_face_edges_vertical(bm, face, cuts)
     edges = filter_geom(res["geom_inner"], BMEdge)
     edges.sort(
         key=lambda e: getattr(calc_edge_median(e), "x" if face.normal.y else "y")

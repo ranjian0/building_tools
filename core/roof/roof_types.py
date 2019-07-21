@@ -317,6 +317,7 @@ def get_linked_edges(verts, filter_edges):
 def find_closest_pair_edges(edges_a, edges_b):
     """ Find the edges in edges_a and edges_b that are closest to each other
     """
+
     def length_func(pair):
         e1, e2 = pair
         return (calc_edge_median(e1) - calc_edge_median(e2)).length

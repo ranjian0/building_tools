@@ -4,7 +4,11 @@ from mathutils import Vector
 from bmesh.types import BMVert
 
 from ..rails import create_railing_from_edges, create_railing_from_step_edges
-from ...utils import split, split_quad, filter_geom
+from ...utils import (
+    filter_geom,
+    inset_face_with_scale_offset,
+    subdivide_face_edges_horizontal,
+)
 
 
 def create_stairs(bm, faces, prop):
@@ -78,7 +82,7 @@ def create_stairs(bm, faces, prop):
 
             if i < (step_count - 1):
                 # cut step height
-                res = split_quad(bm, ret_face, False, 1)
+                res = subdivide_face_edges_horizontal(bm, ret_face, 1)
                 bmesh.ops.translate(
                     bm,
                     verts=filter_geom(res["geom_inner"], BMVert),
@@ -99,7 +103,7 @@ def create_stair_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     size, off = prop.size, prop.offset
-    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
 def create_stairs_railing(bm, normal, faces, prop):

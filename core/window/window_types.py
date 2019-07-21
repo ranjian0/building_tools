@@ -1,6 +1,10 @@
 import bmesh
-from ...utils import split, filter_geom, split_quad
 from ..fill import fill_bar, fill_louver, fill_glass_panes
+from ...utils import (
+    filter_geom,
+    inset_face_with_scale_offset,
+    subdivide_face_edges_horizontal,
+)
 
 
 def create_window(bm, faces, prop):
@@ -23,7 +27,7 @@ def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     size, off = prop.size, prop.offset
-    return split(bm, face, size.y, size.x, off.x, off.y, off.z)
+    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
 
 
 def create_window_array(bm, face, prop):
@@ -32,7 +36,7 @@ def create_window_array(bm, face, prop):
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
-    res = split_quad(bm, face, not prop.direction == "VERTICAL", prop.count - 1)
+    res = subdivide_face_edges_horizontal(bm, face, prop.count - 1)
     inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 

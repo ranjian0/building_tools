@@ -5,7 +5,6 @@ from ...utils import get_edit_mesh
 
 
 class Balcony:
-
     @classmethod
     def build(cls, context, prop):
         me = get_edit_mesh()
