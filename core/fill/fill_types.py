@@ -173,8 +173,8 @@ def create_bar_from_face(bm, face, median, position, scale, depth, vertical=Fals
     duplicate = duplicate_face_translate_scale(bm, face, position, scale, median).get(
         "geom"
     )
+    edges = filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
     if vertical:
         edges = filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal)
-    else:
-        edges = filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
+
     extrude_edges_to_depth(bm, edges, depth)
