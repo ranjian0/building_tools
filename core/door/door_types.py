@@ -42,7 +42,7 @@ def create_door_split(bm, face, prop):
 def create_door_array(bm, face, prop):
     """Use ArrayProperty to subdivide face horizontally/vertically for further processing
     """
-    if prop.count <= 1 or not prop.show_props:
+    if prop.count <= 1:
         return [face]
     res = subdivide_face_edges_vertical(bm, face, prop.count - 1)
     inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
