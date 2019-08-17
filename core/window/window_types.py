@@ -3,7 +3,7 @@ from ..fill import fill_bar, fill_louver, fill_glass_panes
 from ...utils import (
     filter_geom,
     inset_face_with_scale_offset,
-    subdivide_face_edges_horizontal,
+    subdivide_face_edges_vertical,
 )
 
 
@@ -36,7 +36,7 @@ def create_window_array(bm, face, prop):
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
-    res = subdivide_face_edges_horizontal(bm, face, prop.count - 1)
+    res = subdivide_face_edges_vertical(bm, face, prop.count - 1)
     inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 

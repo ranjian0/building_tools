@@ -11,7 +11,6 @@ from ...utils import (
     filter_horizontal_edges,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
-    subdivide_face_edges_horizontal,
 )
 
 
@@ -45,7 +44,7 @@ def create_door_array(bm, face, prop):
     """
     if prop.count <= 1 or not prop.show_props:
         return [face]
-    res = subdivide_face_edges_horizontal(bm, face, prop.count - 1)
+    res = subdivide_face_edges_vertical(bm, face, prop.count - 1)
     inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 
