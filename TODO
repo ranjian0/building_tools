@@ -42,8 +42,6 @@ MATERIAL API:
 
 
 REFACTOR AND STYLE:
-    - add docstrings to modules without them
-    - finish refactor to make functions 30 lines or less esp for XXX_types.py and utils (straight_skeleton)
     - speaking of straight skeleton - refactor to work better with blender types eg. Vector
 
 
