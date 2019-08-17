@@ -3,6 +3,8 @@ from bmesh.types import BMEdge
 
 from ..fill import fill_panel, fill_glass_panes, fill_louver
 from ...utils import (
+    arc_edge,
+    select,
     filter_geom,
     face_with_verts,
     calc_edge_median,
@@ -50,16 +52,40 @@ def create_door_array(bm, face, prop):
 def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
-    face = extrude_face_and_delete_bottom(bm, face, prop.frame_depth)
+
+    # -- dissolve bottom edge
+    bottom = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)
+    bmesh.ops.dissolve_edges(bm, edges=bottom[:1], use_verts=True)
+    face = [f for f in bm.faces if f.index == len(bm.faces)-1][-1]
+
+    # -- create arch
+    top = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
 
     normal = face.normal
     if prop.frame_thickness > 0:
+        edges = filter_vertical_edges(face.edges, normal)
+        top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
+        face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
+
         w = calc_face_dimensions(face)[0]
         off = (w / 3) - prop.frame_thickness
         edges = split_face_vertical_with_offset(bm, face, 2, [off, off])
 
-        top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
-        face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
+        face = list(set(edges[0].link_faces) & set(edges[1].link_faces))[-1]
+        top2 = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
+        verts = list({vert
+                      for v in top2.verts
+                      for e in v.link_edges
+                      for vert in e.verts if vert not in top2.verts})
+        top_verts = sorted(verts, key=lambda v : v.co.z)[2:]
+        for vert in top_verts:
+            upper_link = sorted([v for e in vert.link_edges
+                                for v in e.verts if v is not vert],
+                                key=lambda v : v.co.z)[-1]
+            bmesh.ops.pointmerge(bm, verts=[upper_link, vert], merge_co=upper_link.co)
+
+    for e in [top, top2]:
+        arc_edge(bm, e, prop.arch.resolution, prop.arch.height, prop.arch.offset)
 
     if prop.door_depth > 0.0:
         face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
@@ -81,6 +107,12 @@ def create_door_fill(bm, face, prop):
         fill_glass_panes(bm, face, prop.glass_fill)
     elif prop.fill_type == "LOUVER":
         fill_louver(bm, face, prop.louver_fill)
+
+
+def common_linked_top_edge(bm, edges):
+    top_verts = sorted([v for e in edges for v in e.verts],
+                       key=lambda v : v.co.z)[len(edges):]
+    return bm.edges.get(top_verts)
 
 
 def delete_bottom_face(bm, face):

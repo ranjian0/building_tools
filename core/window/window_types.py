@@ -1,7 +1,9 @@
 import bmesh
 from ..fill import fill_bar, fill_louver, fill_glass_panes
 from ...utils import (
+    arc_edge,
     filter_geom,
+    calc_edge_median,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
 )
@@ -45,10 +47,15 @@ def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
 
+    # -- create arch
+    top = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
+    arc_edge(bm, top, prop.arch.resolution, prop.arch.height, prop.arch.offset)
+
     normal = face.normal
     if prop.frame_thickness > 0.0:
         res = bmesh.ops.inset_individual(
-            bm, faces=[face], thickness=prop.frame_thickness
+            bm, faces=[face], thickness=prop.frame_thickness,
+            use_even_offset=True
         )
         faces = res.get("faces")
 

@@ -3,7 +3,7 @@ import math
 import bmesh
 import operator
 import functools as ft
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 from bmesh.types import BMVert
 
 
@@ -36,6 +36,24 @@ def filter_geom(geom, _type):
     """ Find all elements of type _type in geom iterable
     """
     return list(filter(lambda x: isinstance(x, _type), geom))
+
+
+def edge_tangent(edge):
+    """ Find the tangent of an edge
+    """
+    tan = None
+    for l in edge.link_loops:
+        t = edge.calc_tangent(l)
+        if not round(t.z):
+            tan = t
+    return tan
+
+
+def edge_vector(edge):
+    """ Return the normalized vector between edge vertices
+    """
+    v1, v2 = edge.verts
+    return (v2.co - v1.co).normalized()
 
 
 def sort_edges_clockwise(edges):
@@ -215,3 +233,24 @@ def boundary_edges_from_face_selection(bm):
         lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
     )
     return [e for e in all_edges if edge_is_boundary(e)]
+
+
+def arc_edge(bm, edge, resolution, height, offset):
+    """ Deform the given edge to form an arc
+    """
+    # Subdivide
+    ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
+
+    # Sort Verts
+    verts = list(
+        {v for e in filter_geom(ret['geom_split'], bmesh.types.BMEdge) for v in e.verts}
+    )
+    normal = edge_vector(edge).cross(Vector((0, 0, 1)))
+    verts.sort(key=lambda v: v.co.x if normal.y else lambda v: v.co.y)
+
+    # Offset verts along sin curve
+    angle = math.pi / (len(verts)-1)
+    for idx, v in enumerate(verts):
+        off = math.sin(angle*idx) * height
+        v.co.z -= offset
+        v.co.z += off

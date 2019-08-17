@@ -61,7 +61,7 @@ class ArchProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup to create arched features """
 
     resolution: IntProperty(
-        name="Arc Resolution", min=0, max=1000, default=5,
+        name="Arc Resolution", min=0, max=1000, default=0,
         description="Number of segements for the arc")
 
     offset: FloatProperty(

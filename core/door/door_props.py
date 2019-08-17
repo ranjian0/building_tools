@@ -59,7 +59,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         if self.redo:
             return
 
-        self.size_offset.size = (0.5, 1.0)
+        # self.size_offset.size = (0.5, 1.0)
         self.redo = True
 
     def draw(self, context, layout):

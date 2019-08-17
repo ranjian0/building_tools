@@ -11,6 +11,8 @@ from ...utils import (
     select,
     cylinder,
     filter_geom,
+    edge_vector,
+    edge_tangent,
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
@@ -218,24 +220,6 @@ def create_fill_walls(bm, edges, prop, raildata):
         create_wall(
             bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge)
         )
-
-
-def edge_tangent(edge):
-    """ Find the tangent of an edge
-    """
-    tan = None
-    for l in edge.link_loops:
-        t = edge.calc_tangent(l)
-        if not round(t.z):
-            tan = t
-    return tan
-
-
-def edge_vector(edge):
-    """ Return the normalized vector between edge vertices
-    """
-    v1, v2 = edge.verts
-    return (v2.co - v1.co).normalized()
 
 
 def create_cube(bm, size, position):
