@@ -46,7 +46,8 @@ def create_stairs(bm, faces, prop):
 
 
 def extrude_step(bm, step_idx, face, prop):
-    """ Extrude a stair step """
+    """ Extrude a stair step
+    """
     n = face.normal
     ext_width = (
         prop.landing_width if (prop.landing and step_idx == 0) else prop.step_width
@@ -57,7 +58,8 @@ def extrude_step(bm, step_idx, face, prop):
 
 
 def get_stair_face_from_direction(bm, ret_face, prop):
-    """ adjust ret_face based on stair direction """
+    """ adjust ret_face based on stair direction
+    """
     faces = list({f for e in ret_face.edges for f in e.link_faces})
     left_normal, right_normal = (
         ret_face.normal.cross(Vector((0, 0, 1))),
@@ -78,7 +80,8 @@ def get_stair_face_from_direction(bm, ret_face, prop):
 
 
 def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
-    """ cut the next face step height """
+    """ cut the next face step height
+    """
     res = subdivide_face_edges_horizontal(bm, ret_face, 1)
     bmesh.ops.translate(
         bm,
