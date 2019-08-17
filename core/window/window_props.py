@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import FloatProperty, PointerProperty, EnumProperty
 
-from ..generic import ArrayProperty, SizeOffsetProperty
+from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
 from ..fill import FillBars, FillLouver, FillGlassPanes
 
 
@@ -30,6 +30,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         description="Depth of window",
     )
 
+    arch: PointerProperty(type=ArchProperty)
     array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
@@ -53,6 +54,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
         self.array.draw(context, layout)
+        self.arch.draw(context, layout)
 
         box = layout.box()
         col = box.column(align=True)

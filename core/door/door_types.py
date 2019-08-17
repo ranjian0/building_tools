@@ -54,6 +54,7 @@ def create_door_frame(bm, face, prop):
     """
     face = extrude_face_and_delete_bottom(bm, face, prop.frame_depth)
 
+    normal = face.normal
     if prop.frame_thickness > 0:
         w = calc_face_dimensions(face)[0]
         off = (w / 3) - prop.frame_thickness
@@ -61,6 +62,10 @@ def create_door_frame(bm, face, prop):
 
         top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
         face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
+
+    if prop.door_depth > 0.0:
+        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+        bmesh.ops.translate(bm, verts=face.verts, vec=-normal * prop.door_depth)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if prop.frame_depth:
