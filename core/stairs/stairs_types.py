@@ -17,11 +17,10 @@ def create_stairs(bm, faces, prop):
 
     for f in faces:
         f.select = False
-
         f = create_stair_split(bm, f, prop.size_offset)
 
-        _key = operator.attrgetter("co.z")
-        fheight = max(f.verts, key=_key).co.z - min(f.verts, key=_key).co.z
+        get_z = operator.attrgetter("co.z")
+        fheight = max(f.verts, key=get_z).co.z - min(f.verts, key=get_z).co.z
 
         # -- options for railing
         top_faces = []
@@ -30,73 +29,67 @@ def create_stairs(bm, faces, prop):
         ext_face = f
         step_count = prop.step_count + (1 if prop.landing else 0)
         for i in range(step_count):
-            # extrude face
-            n = ext_face.normal
-            ext_width = (
-                prop.landing_width if (prop.landing and i == 0) else prop.step_width
-            )
-            ret_face = bmesh.ops.extrude_discrete_faces(bm, faces=[ext_face]).get(
-                "faces"
-            )[-1]
-
-            bmesh.ops.translate(bm, vec=n * ext_width, verts=ret_face.verts)
+            ret_face = extrude_step(bm, i, ext_face, prop)
 
             # -- keep reference to top faces for railing
-            top_faces.append(
-                list(
-                    {f for e in ret_face.edges for f in e.link_faces if f.normal.z > 0}
-                )[-1]
-            )
+            faces = {f for e in ret_face.edges for f in e.link_faces if f.normal.z > 0}
+            top_faces.append(list(faces)[-1])
 
             if prop.landing and i == 0:
-                # adjust ret_face based on stair direction
-
-                left_normal, right_normal = (
-                    ret_face.normal.cross(Vector((0, 0, 1))),
-                    ret_face.normal.cross(Vector((0, 0, -1))),
-                )
-                left = list(
-                    {
-                        f
-                        for e in ret_face.edges
-                        for f in e.link_faces
-                        if f.normal.to_tuple(4) == left_normal.to_tuple(4)
-                    }
-                )[-1]
-                right = list(
-                    {
-                        f
-                        for e in ret_face.edges
-                        for f in e.link_faces
-                        if f.normal.to_tuple(4) == right_normal.to_tuple(4)
-                    }
-                )[-1]
-
-                # set appropriate face for next extrusion
-                if prop.stair_direction == "FRONT":
-                    pass
-                elif prop.stair_direction == "LEFT":
-                    ret_face = left
-                elif prop.stair_direction == "RIGHT":
-                    ret_face = right
+                ret_face = get_stair_face_from_direction(bm, ret_face, prop)
 
             if i < (step_count - 1):
-                # cut step height
-                res = subdivide_face_edges_horizontal(bm, ret_face, 1)
-                bmesh.ops.translate(
-                    bm,
-                    verts=filter_geom(res["geom_inner"], BMVert),
-                    vec=(0, 0, (fheight / 2) - (fheight / (step_count - i))),
-                )
-
-                # update ext_face
-                ext_face = min(
-                    [f for f in filter_geom(res["geom_inner"], BMVert)[-1].link_faces],
-                    key=lambda f: f.calc_center_median().z,
-                )
+                ext_face = subdivide_next_step(bm, ret_face, fheight, step_count, i)
 
     if prop.railing:
         create_stairs_railing(bm, init_normal, top_faces, prop)
+
+
+def extrude_step(bm, step_idx, face, prop):
+    """ Extrude a stair step """
+    n = face.normal
+    ext_width = (
+        prop.landing_width if (prop.landing and step_idx == 0) else prop.step_width
+    )
+    ret_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+    bmesh.ops.translate(bm, vec=n * ext_width, verts=ret_face.verts)
+    return ret_face
+
+
+def get_stair_face_from_direction(bm, ret_face, prop):
+    """ adjust ret_face based on stair direction """
+    faces = list({f for e in ret_face.edges for f in e.link_faces})
+    left_normal, right_normal = (
+        ret_face.normal.cross(Vector((0, 0, 1))),
+        ret_face.normal.cross(Vector((0, 0, -1))),
+    )
+
+    def flt(f, normal):
+        return f.normal.to_tuple(4) == normal.to_tuple(4)
+
+    left = next(filter(lambda f : flt(f, left_normal), faces))
+    right = next(filter(lambda f : flt(f, right_normal), faces))
+
+    if prop.stair_direction == "LEFT":
+        return left
+    elif prop.stair_direction == "RIGHT":
+        return right
+    return ret_face
+
+
+def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
+    """ cut the next face step height """
+    res = subdivide_face_edges_horizontal(bm, ret_face, 1)
+    bmesh.ops.translate(
+        bm,
+        verts=filter_geom(res["geom_inner"], BMVert),
+        vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx))),
+    )
+
+    return min(
+        [f for f in filter_geom(res["geom_inner"], BMVert)[-1].link_faces],
+        key=lambda f: f.calc_center_median().z,
+    )
 
 
 def create_stair_split(bm, face, prop):
