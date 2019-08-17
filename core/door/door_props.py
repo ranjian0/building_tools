@@ -33,10 +33,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Depth of door",
     )
 
-    has_double_door: BoolProperty(
-        name="Double Door", default=False, description="If the door is split"
-    )
-
     fill_items = [
         ("NONE", "None", "", 0),
         ("PANELS", "Panels", "", 1),
@@ -77,8 +73,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "frame_thickness")
         row.prop(self, "frame_depth")
-
-        box.prop(self, "has_double_door", toggle=True)
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")

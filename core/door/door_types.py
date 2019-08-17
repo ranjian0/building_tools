@@ -26,10 +26,8 @@ def create_door(bm, faces, prop):
             if not face:
                 continue
 
-            nfaces = create_door_double(bm, face, prop)
-            for face in nfaces:
-                face = create_door_frame(bm, face, prop)
-                create_door_fill(bm, face, prop)
+            face = create_door_frame(bm, face, prop)
+            create_door_fill(bm, face, prop)
 
 
 def create_door_split(bm, face, prop):
@@ -72,18 +70,6 @@ def create_door_frame(bm, face, prop):
         f = extrude_face_and_delete_bottom(bm, face, -prop.frame_depth)
         return f
     return face
-
-
-def create_door_double(bm, face, prop):
-    """Split face vertically into two faces
-    """
-    if prop.has_double_door:
-        ret = bmesh.ops.subdivide_edges(
-            bm, edges=filter_horizontal_edges(face.edges, face.normal), cuts=1
-        ).get("geom_inner")
-
-        return list(filter_geom(ret, BMEdge)[-1].link_faces)
-    return [face]
 
 
 def create_door_fill(bm, face, prop):
