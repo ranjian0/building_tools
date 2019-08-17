@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import IntProperty, EnumProperty, BoolProperty, FloatVectorProperty
+from bpy.props import IntProperty, FloatProperty, BoolProperty, FloatVectorProperty
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -44,18 +44,7 @@ class ArrayProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used to array elements """
 
     count: IntProperty(
-        name="Count", min=1, max=1000, default=3, description="Number of elements"
-    )
-
-    direction_items = [
-        ("VERTICAL", "Vertical", "", 0),
-        ("HORIZONTAL", "Horizontal", "", 1),
-    ]
-    direction: EnumProperty(
-        name="Axis",
-        items=direction_items,
-        default="HORIZONTAL",
-        description="Direction to array elements",
+        name="Count", min=1, max=1000, default=1, description="Number of elements"
     )
 
     show_props: BoolProperty(default=False)
@@ -65,14 +54,38 @@ class ArrayProperty(bpy.types.PropertyGroup):
 
         if self.show_props:
             box = layout.box()
+            box.prop(self, "count")
+
+
+class ArchProperty(bpy.types.PropertyGroup):
+    """ Convinience PropertyGroup to create arched features """
+
+    resolution: IntProperty(
+        name="Arc Resolution", min=0, max=1000, default=5,
+        description="Number of segements for the arc")
+
+    offset: FloatProperty(
+        name="Arc Offset", min=0.01, max=1.0, default=0.5,
+        description="How far arc is from top")
+
+    height: FloatProperty(
+        name="Arc Height", min=0.01, max=100.0, default=0.5,
+        description="Radius of the arc")
+
+    show_props: BoolProperty(default=False)
+
+    def draw(self, context, layout):
+        layout.prop(self, "show_props", text="Arched", toggle=True)
+
+        if self.show_props:
+            box = layout.box()
             col = box.column(align=True)
-            # row = col.row(align=False)
-            # row.prop(self, "direction", expand=True)
-            row = col.row(align=False)
-            row.prop(self, "count")
+            col.prop(self, 'resolution')
+            col.prop(self, 'offset')
+            col.prop(self, 'height')
 
 
-classes = (SizeOffsetProperty, ArrayProperty)
+classes = (SizeOffsetProperty, ArrayProperty, ArchProperty)
 
 
 def register_generic():
