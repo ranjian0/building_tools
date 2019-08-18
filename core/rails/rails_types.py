@@ -1,22 +1,20 @@
 import math
 import bmesh
 import operator
-import itertools as it
 
 from mathutils import Vector, Matrix
 
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
-    cube,
     select,
     filter_geom,
     create_cube,
     edge_vector,
     edge_tangent,
     create_cylinder,
-    face_with_verts,
     calc_edge_median,
     calc_verts_median,
+    create_cube_without_faces,
     boundary_edges_from_face_selection,
 )
 
@@ -157,15 +155,14 @@ def create_fill_rails(bm, edges, prop):
         start = rail_pos
         stop = rail_pos + Vector((0, 0, prop.corner_post_height - prop.rail_size))
 
-        rail = cube(bm, *rail_size)
-        delete_faces(bm, rail, left=True, right=True)
+        rail = create_cube_without_faces(bm, rail_size, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
         rail_count = int((prop.corner_post_height / prop.rail_size) * prop.rail_density)
         array_elements(bm, rail, rail_count, start, stop)
 
         # -- create top rail
-        rail = create_cube(bm, rail_size, stop + Vector((0, 0, prop.rail_size / 2)))
-        delete_faces(bm, rail, left=True, right=True)
+        p = stop + Vector((0, 0, prop.rail_size / 2))
+        rail = create_cube_without_faces(bm, rail_size, p, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
         processed_edges.append(edge)
 
@@ -191,8 +188,7 @@ def create_fill_posts(bm, edges, prop, raildata):
         rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
         rail_pos += Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
 
-        rail = create_cube(bm, rail_size, rail_pos)
-        delete_faces(bm, rail, left=True, right=True)
+        rail = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
         processed_edges.append(edge)
 
@@ -260,27 +256,6 @@ def is_parallel(loop):
     return math.isclose(loop.calc_angle(), math.pi, rel_tol=1e-04)
 
 
-def delete_faces(bm, post, **directions):
-    """ Delete flagged faces for the given post (cube geometry)
-    """
-
-    def D(direction):
-        return directions.get(direction, False)
-
-    vts = post["verts"]
-    keys = ["z", "z", "x", "x", "y", "y"]
-    dirs = [D("top"), D("bottom"), D("left"), D("right"), D("front"), D("back")]
-    slcs = it.chain.from_iterable(it.repeat([slice(4, 8), slice(4)], 3))
-
-    faces = []
-    for direction, key, _slice in zip(dirs, keys, slcs):
-        if direction:
-            vts.sort(key=lambda v: getattr(v.co, key))
-            faces.append(face_with_verts(bm, vts[_slice]))
-
-    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
-
-
 def array_elements(bm, elem, count, start, stop):
     """ Duplicate elements count-1 times between start and stop
     """
@@ -314,9 +289,10 @@ def create_edge(bm, start, end):
 def add_cube_post(bm, width, height, position, has_decor):
     """ Create cube geometry at position
     """
-    post = create_cube(bm, (width, width, height), position)
+    post = create_cube_without_faces(
+        bm, (width, width, height), position, bottom=True, top=has_decor
+    )
 
-    delete_faces(bm, post, bottom=True, top=has_decor)
     if has_decor:
         px, py, pz = position
         pz += height / 2 + width / 4
@@ -365,8 +341,7 @@ def add_posts_between_loops(bm, loops, prop):
     # -- create post geometry
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
     size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
-    post = cube(bm, *size)
-    delete_faces(bm, post, top=True, bottom=True)
+    post = create_cube_without_faces(bm, size, top=True, bottom=True)
     align_geometry_to_edge(bm, post, edge)
 
     # -- add posts array between loop_a and loop_b
@@ -399,8 +374,7 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
 
             v = loop.vert
             p = v.co + off + height_v
-            fill_post = create_cube(bm, size, p)
-            delete_faces(bm, fill_post, top=True, bottom=True)
+            create_cube_without_faces(bm, size, p, top=True, bottom=True)
 
 
 def fill_posts_for_step_edges(bm, edges, normal, prop):
@@ -499,8 +473,7 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
     size = (length, 2 * prop.rail_size, prop.rail_size)
     position = start.lerp(end, 0.5) - ((end - start).normalized() * prop.rail_size / 2)
 
-    rail = create_cube(bm, size, position)
-    delete_faces(bm, rail, right=True)
+    rail = create_cube_without_faces(bm, size, position, right=True)
 
     bmesh.ops.rotate(
         bm,
