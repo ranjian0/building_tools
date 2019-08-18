@@ -1,5 +1,8 @@
 import bmesh
-from mathutils import Matrix
+import itertools as it
+from mathutils import Matrix, Vector
+
+from .util_mesh import face_with_verts
 
 
 def cube(bm, width=2, length=2, height=2):
@@ -59,3 +62,47 @@ def cylinder(bm, radius=1, height=2, segs=10):
     result = {"verts": verts + list(cylinder["faces"][-1].verts)}
     bmesh.ops.translate(bm, verts=result["verts"], vec=(0, 0, -height / 2))
     return result
+
+
+"""
+Convinience functions
+"""
+
+
+def create_cube(bm, size, position=Vector()):
+    """ Create cube with size and at position
+    """
+    geom = cube(bm, *size)
+    bmesh.ops.translate(bm, verts=geom["verts"], vec=position)
+    return geom
+
+
+def create_cylinder(bm, radius, height, segs, position=Vector()):
+    """ Create cylinder at position
+    """
+    cy = cylinder(bm, radius, height, segs)
+    bmesh.ops.translate(bm, verts=cy["verts"], vec=position)
+    return cy
+
+
+def create_cube_without_faces(bm, size, position=Vector(), **directions):
+    """ Create cube without faces in the given directions
+    """
+    cube = create_cube(bm, size, position)
+
+    def D(direction):
+        return directions.get(direction, False)
+
+    vts = cube["verts"]
+    keys = ["z", "z", "x", "x", "y", "y"]
+    dirs = [D("top"), D("bottom"), D("left"), D("right"), D("front"), D("back")]
+    slcs = it.chain.from_iterable(it.repeat([slice(4, 8), slice(4)], 3))
+
+    faces = []
+    for direction, key, _slice in zip(dirs, keys, slcs):
+        if direction:
+            vts.sort(key=lambda v: getattr(v.co, key))
+            faces.append(face_with_verts(bm, vts[_slice]))
+
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+    return cube

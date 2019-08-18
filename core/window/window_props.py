@@ -8,7 +8,7 @@ from ..fill import FillBars, FillLouver, FillGlassPanes
 class WindowProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
-        min=0.01,
+        min=0.0,
         max=1.0,
         default=0.15,
         description="Thickness of window Frame",
@@ -50,6 +50,9 @@ class WindowProperty(bpy.types.PropertyGroup):
     bar_fill: PointerProperty(type=FillBars)
     louver_fill: PointerProperty(type=FillLouver)
     glass_fill: PointerProperty(type=FillGlassPanes)
+
+    def has_arch(self):
+        return self.arch.resolution > 0
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
