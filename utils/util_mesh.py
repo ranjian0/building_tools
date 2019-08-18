@@ -236,19 +236,16 @@ def boundary_edges_from_face_selection(bm):
 
 
 def arc_edge(bm, edge, resolution, height, offset):
-    """ Deform the given edge to form an arc
+    """ SUbdivide the given edge and offset vertices to form an arc
     """
-    # Subdivide
+    normal = edge_vector(edge).cross(Vector((0, 0, 1)))
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
 
-    # Sort Verts
     verts = list(
         {v for e in filter_geom(ret['geom_split'], bmesh.types.BMEdge) for v in e.verts}
     )
-    normal = edge_vector(edge).cross(Vector((0, 0, 1)))
     verts.sort(key=lambda v: v.co.x if normal.y else lambda v: v.co.y)
 
-    # Offset verts along sin curve
     angle = math.pi / (len(verts)-1)
     for idx, v in enumerate(verts):
         off = math.sin(angle*idx) * height
