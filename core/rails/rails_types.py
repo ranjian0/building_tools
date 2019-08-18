@@ -9,10 +9,11 @@ from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     cube,
     select,
-    cylinder,
     filter_geom,
+    create_cube,
     edge_vector,
     edge_tangent,
+    create_cylinder,
     face_with_verts,
     calc_edge_median,
     calc_verts_median,
@@ -86,9 +87,6 @@ def create_railing(bm, edges, lfaces, prop, raildata):
     if prop.remove_colinear:
         # TODO - make this work on loop with more than two links
         # - remove loops where edges are parallel, and both link_edges are in selection
-        def is_parallel(loop):
-            return round(loop.calc_angle(), 3) == 3.142
-
         def is_middle(loop):
             return loop.link_loop_next in loops and loop.link_loop_prev in loops
 
@@ -116,6 +114,8 @@ def create_corner_post(bm, loops, prop, raildata):
         segments = polygon_sides_from_angle(angle)
         if segments == 4 or segments < 0:  # - (90 or 180)
             off = vec * math.sqrt(2 * ((width / 2) ** 2))
+            if is_parallel(loop):
+                off = vec * (width / 2)
             pos = v.co + off + Vector((0, 0, height / 2))
             post = add_cube_post(bm, width, height, pos, prop.has_decor)
         else:
@@ -146,9 +146,10 @@ def create_fill_rails(bm, edges, prop):
     """
     loops = loops_from_edges(edges)
 
+    processed_edges = []
     for loop in loops:
         edge = loop.edge
-        if edge not in edges:
+        if edge not in edges or edge in processed_edges:
             continue
 
         rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
@@ -166,6 +167,7 @@ def create_fill_rails(bm, edges, prop):
         rail = create_cube(bm, rail_size, stop + Vector((0, 0, prop.rail_size / 2)))
         delete_faces(bm, rail, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
+        processed_edges.append(edge)
 
 
 def create_fill_posts(bm, edges, prop, raildata):
@@ -173,9 +175,10 @@ def create_fill_posts(bm, edges, prop, raildata):
     """
     loops = loops_from_edges(edges)
 
+    processed_edges = []
     for loop in loops:
         edge = loop.edge
-        if edge not in edges:
+        if edge not in edges or edge in processed_edges:
             continue
 
         # -- add posts
@@ -191,6 +194,7 @@ def create_fill_posts(bm, edges, prop, raildata):
         rail = create_cube(bm, rail_size, rail_pos)
         delete_faces(bm, rail, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
+        processed_edges.append(edge)
 
 
 def create_fill_walls(bm, edges, prop, raildata):
@@ -222,22 +226,6 @@ def create_fill_walls(bm, edges, prop, raildata):
         )
 
 
-def create_cube(bm, size, position):
-    """ Create cube with size and at position
-    """
-    post = cube(bm, *size)
-    bmesh.ops.translate(bm, verts=post["verts"], vec=position)
-    return post
-
-
-def create_cylinder(bm, radius, height, segs, position):
-    """ Create cylinder at pos
-    """
-    cy = cylinder(bm, radius, height, segs)
-    bmesh.ops.translate(bm, verts=cy["verts"], vec=position)
-    return cy
-
-
 def create_wall(bm, start, end, height, width, tangent):
     """ Extrude a wall of height from start to end
     """
@@ -264,6 +252,12 @@ def create_wall(bm, start, end, height, width, tangent):
             if not f.normal.z and f not in filter_geom(res["geom"], BMFace)
         ]
         bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+
+
+def is_parallel(loop):
+    """ Determine if this loop's vert is between parallel edges
+    """
+    return math.isclose(loop.calc_angle(), math.pi, rel_tol=1e-04)
 
 
 def delete_faces(bm, post, **directions):
@@ -376,10 +370,13 @@ def add_posts_between_loops(bm, loops, prop):
     align_geometry_to_edge(bm, post, edge)
 
     # -- add posts array between loop_a and loop_b
-    off_a = loop_a.calc_tangent() * (prop.corner_post_width * 0.75)
+    def loop_factor(loop):
+        return 0.5 if is_parallel(loop) else 0.75
+
+    off_a = loop_a.calc_tangent() * (prop.corner_post_width * loop_factor(loop_a))
     start = loop_a.vert.co + off_a + height_v
 
-    off_b = loop_b.calc_tangent() * (prop.corner_post_width * 0.75)
+    off_b = loop_b.calc_tangent() * (prop.corner_post_width * loop_factor(loop_b))
     stop = loop_b.vert.co + off_b + height_v
 
     length = edge.calc_length()
