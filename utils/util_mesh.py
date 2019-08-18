@@ -244,7 +244,7 @@ def arc_edge(bm, edge, resolution, height, offset):
     verts = list(
         {v for e in filter_geom(ret['geom_split'], bmesh.types.BMEdge) for v in e.verts}
     )
-    verts.sort(key=lambda v: v.co.x if normal.y else lambda v: v.co.y)
+    verts.sort(key=lambda v: v.co.x if normal.y else v.co.y)
 
     angle = math.pi / (len(verts)-1)
     for idx, v in enumerate(verts):
