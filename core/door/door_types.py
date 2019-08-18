@@ -4,7 +4,6 @@ from bmesh.types import BMEdge
 from ..fill import fill_panel, fill_glass_panes, fill_louver
 from ...utils import (
     arc_edge,
-    select,
     filter_geom,
     face_with_verts,
     calc_edge_median,
