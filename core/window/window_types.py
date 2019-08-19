@@ -70,12 +70,12 @@ def create_window_frame(bm, face, prop):
 
 
 def create_window_frame_arched(bm, face, prop):
-    """ Arch the top edge of face then extrude and inset around a face to make window frame
+    """ Arch the top edge of face then extrude and make window frame
     """
-    top = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
+    top = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
     arc_edge(bm, top, prop.arch.resolution, prop.arch.height, prop.arch.offset)
 
-    faces = []
+    frame_faces = []
     normal = face.normal.copy()
     if prop.frame_thickness > 0.0:
         res = bmesh.ops.inset_individual(
@@ -84,23 +84,10 @@ def create_window_frame_arched(bm, face, prop):
         frame_faces = res.get('faces')
 
     verts = sorted(face.verts, key=lambda v: v.co.z)
-    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges')[-1]
-    faces = edge.link_faces
+    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges').pop()
 
-    if prop.window_depth > 0.0:
-        res = bmesh.ops.extrude_face_region(
-            bm, geom=faces).get("geom")
-        bmesh.ops.delete(bm, geom=faces, context='FACES')
-        faces = filter_geom(res, bmesh.types.BMFace)
-        verts = list({v for f in faces for v in f.verts})
-        bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.window_depth)
-
-    if frame_faces and prop.frame_depth > 0.0:
-        geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
-        verts = filter_geom(geom, bmesh.types.BMVert)
-        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
-
-    return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
+    fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
+    return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
 
 
 def create_window_fill(bm, face, prop):
@@ -117,6 +104,24 @@ def create_window_fill(bm, face, prop):
             add_extra_arch_bar(bm, face, prop.bar_fill)
     elif prop.fill_type == "LOUVER":
         fill_louver(bm, face, prop.louver_fill)
+
+
+def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
+    faces = None
+    if prop.window_depth > 0.0:
+        res = bmesh.ops.extrude_face_region(
+            bm, geom=window_faces).get("geom")
+        bmesh.ops.delete(bm, geom=window_faces, context='FACES')
+        faces = filter_geom(res, bmesh.types.BMFace)
+        verts = list({v for f in faces for v in f.verts})
+        bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.window_depth)
+
+    if frame_faces and prop.frame_depth > 0.0:
+        geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
+        verts = filter_geom(geom, bmesh.types.BMVert)
+        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
+
+    return faces
 
 
 def add_extra_arch_bar(bm, face, prop):
