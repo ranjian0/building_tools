@@ -194,7 +194,7 @@ def split_edges_horizontal_offset_top(bm, edges, offset):
     new_verts = []
     for e in v_edges:
         vert = max(list(e.verts), key=lambda v: v.co.z)
-        v = bmesh.utils.edge_split(e, vert, offset / e.calc_length()).pop()
+        v = bmesh.utils.edge_split(e, vert, offset / e.calc_length())[-1]
         new_verts.append(v)
 
     res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
