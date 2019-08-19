@@ -41,6 +41,8 @@ def fill_glass_panes(bm, face, prop):
 def fill_bar(bm, face, prop):
     """Create horizontal and vertical bars along a face
     """
+    if round(face.calc_area(), 2) < 1.0:
+        return
     width, height = calc_face_dimensions(face)
     face_center = face.calc_center_median()
 

@@ -1,6 +1,9 @@
 BUG::
     Door Array and Louver fill causes invalid geom/index error
 
+STAIRS:
+    - add railing types - wall and rails
+
 GENERAL:
     - keep a reference to an objects building properties
 
@@ -18,8 +21,6 @@ ROOF:
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
 
-STAIRS:
-    - add railing types - wall and rails
 
 MATERIAL API:
 

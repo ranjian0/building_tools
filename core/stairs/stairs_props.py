@@ -35,11 +35,11 @@ class StairsProperty(bpy.types.PropertyGroup):
     )
 
     landing: BoolProperty(
-        name="Has Landing", default=True, description="Wether to stairs have a landing"
+        name="Has Landing", default=True, description="Whether to stairs have a landing"
     )
 
     railing: BoolProperty(
-        name="Has Railing", default=True, description="Wether to stairs have a rails"
+        name="Has Railing", default=True, description="Whether to stairs have a rails"
     )
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
@@ -82,4 +82,4 @@ class StairsProperty(bpy.types.PropertyGroup):
             row = box.row()
             row.prop_menu_enum(self, "stair_direction")
 
-            layout.prop(self, "railing", toggle=True)
+        layout.prop(self, "railing", toggle=True)

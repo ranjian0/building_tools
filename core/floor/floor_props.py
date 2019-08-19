@@ -25,7 +25,7 @@ class FloorProperty(bpy.types.PropertyGroup):
 
     slab_outset: FloatProperty(
         name="Slab Outset",
-        min=-10.0,
+        min=0.0,
         max=10.0,
         default=0.1,
         description="Outset of each slab",
