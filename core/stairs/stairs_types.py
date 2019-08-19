@@ -69,8 +69,8 @@ def get_stair_face_from_direction(bm, ret_face, prop):
     def flt(f, normal):
         return f.normal.to_tuple(4) == normal.to_tuple(4)
 
-    left = next(filter(lambda f : flt(f, left_normal), faces))
-    right = next(filter(lambda f : flt(f, right_normal), faces))
+    left = next(filter(lambda f: flt(f, left_normal), faces))
+    right = next(filter(lambda f: flt(f, right_normal), faces))
 
     if prop.stair_direction == "LEFT":
         return left

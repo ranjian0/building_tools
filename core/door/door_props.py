@@ -24,11 +24,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     )
 
     door_depth: FloatProperty(
-        name="Door Depth",
-        min=0.0,
-        max=0.5,
-        default=0.05,
-        description="Depth of door",
+        name="Door Depth", min=0.0, max=0.5, default=0.05, description="Depth of door"
     )
 
     fill_items = [

@@ -53,7 +53,7 @@ def create_door_frame(bm, face, prop):
     # -- dissolve bottom edge
     bottom = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)
     bmesh.ops.dissolve_edges(bm, edges=bottom[:1], use_verts=True)
-    face = [f for f in bm.faces if f.index == len(bm.faces)-1].pop()
+    face = [f for f in bm.faces if f.index == len(bm.faces) - 1].pop()
 
     if prop.has_arch():
         return create_door_frame_arched(bm, face, prop)
@@ -64,8 +64,9 @@ def create_door_frame(bm, face, prop):
         face = make_door_inset(bm, face, prop)
 
         faces = [f for e in face.edges for f in e.link_faces]
-        frame_faces = list(filter(
-            lambda f : f is not face and f.normal == normal, faces))
+        frame_faces = list(
+            filter(lambda f: f is not face and f.normal == normal, faces)
+        )
 
     if prop.door_depth > 0.0:
         face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
@@ -92,8 +93,9 @@ def create_door_frame_arched(bm, face, prop):
         face = make_door_inset(bm, face, prop)
 
         faces = [f for e in face.edges for f in e.link_faces]
-        frame_faces = list(filter(
-            lambda f : f is not face and f.normal == normal, faces))
+        frame_faces = list(
+            filter(lambda f: f is not face and f.normal == normal, faces)
+        )
 
         top2 = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
         merge_corner_vertices(bm, top2)
@@ -104,7 +106,7 @@ def create_door_frame_arched(bm, face, prop):
         arc_edge(bm, e, arch.resolution, arch.height, arch.offset, arch.function)
 
     verts = sorted(face.verts, key=lambda v: v.co.z)
-    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges').pop()
+    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     faces = extrude_door_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
     return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
@@ -141,10 +143,10 @@ def merge_corner_vertices(bm, edge):
     verts = {vert for v in edge.verts for e in v.link_edges for vert in e.verts}
     verts = list(filter(lambda v: v not in edge.verts, verts))
 
-    top_verts = sorted(verts, key=lambda v : v.co.z)[2:]
+    top_verts = sorted(verts, key=lambda v: v.co.z)[2:]
     for vert in top_verts:
         upper_verts = [v for e in vert.link_edges for v in e.verts]
-        upper_link = sorted(upper_verts, key=lambda v : v.co.z).pop()
+        upper_link = sorted(upper_verts, key=lambda v: v.co.z).pop()
         bmesh.ops.pointmerge(bm, verts=[upper_link, vert], merge_co=upper_link.co)
 
 
@@ -153,9 +155,8 @@ def extrude_door_and_frame_depth(bm, door_faces, frame_faces, normal, prop):
     """
     faces = None
     if prop.door_depth > 0.0:
-        res = bmesh.ops.extrude_face_region(
-            bm, geom=door_faces).get("geom")
-        bmesh.ops.delete(bm, geom=door_faces, context='FACES')
+        res = bmesh.ops.extrude_face_region(bm, geom=door_faces).get("geom")
+        bmesh.ops.delete(bm, geom=door_faces, context="FACES")
         faces = filter_geom(res, bmesh.types.BMFace)
         verts = list({v for f in faces for v in f.verts})
         bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.door_depth)

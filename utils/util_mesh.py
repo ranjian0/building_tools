@@ -235,7 +235,7 @@ def boundary_edges_from_face_selection(bm):
     return [e for e in all_edges if edge_is_boundary(e)]
 
 
-def arc_edge(bm, edge, resolution, height, offset, function='SPHERE'):
+def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
     """ SUbdivide the given edge and offset vertices to form an arc
     """
     length = edge.calc_length()
@@ -244,27 +244,27 @@ def arc_edge(bm, edge, resolution, height, offset, function='SPHERE'):
 
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
     verts = list(
-        {v for e in filter_geom(ret['geom_split'], bmesh.types.BMEdge) for v in e.verts}
+        {v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}
     )
     verts.sort(key=lambda v: v.co.x if normal.y else v.co.y)
-    theta = math.pi / (len(verts)-1)
+    theta = math.pi / (len(verts) - 1)
 
     def arc_sine(verts):
         for idx, v in enumerate(verts):
             v.co.z -= offset
-            v.co.z += math.sin(theta*idx) * height
+            v.co.z += math.sin(theta * idx) * height
 
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
-            angle = math.pi - (theta*idx)
+            angle = math.pi - (theta * idx)
             v.co.z -= offset
             v.co.z += math.sin(angle) * height
             if normal.y:
-                v.co.x = median.x + math.cos(angle) * length/2
+                v.co.x = median.x + math.cos(angle) * length / 2
             else:
-                v.co.y = median.y + math.cos(angle) * length/2
+                v.co.y = median.y + math.cos(angle) * length / 2
 
-    {'SINE' : arc_sine, 'SPHERE' : arc_sphere}.get(function)(verts)
+    {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
 
 
 def extrude_face_and_delete_bottom(bm, face, extrude_depth):

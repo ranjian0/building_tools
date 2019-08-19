@@ -1,7 +1,11 @@
 import bpy
 from bpy.props import (
-    IntProperty, EnumProperty, FloatProperty, BoolProperty, FloatVectorProperty
-    )
+    IntProperty,
+    EnumProperty,
+    FloatProperty,
+    BoolProperty,
+    FloatVectorProperty,
+)
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -63,21 +67,30 @@ class ArchProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup to create arched features """
 
     resolution: IntProperty(
-        name="Arc Resolution", min=0, max=1000, default=0,
-        description="Number of segements for the arc")
+        name="Arc Resolution",
+        min=0,
+        max=1000,
+        default=0,
+        description="Number of segements for the arc",
+    )
 
     offset: FloatProperty(
-        name="Arc Offset", min=0.01, max=1.0, default=0.5,
-        description="How far arc is from top")
+        name="Arc Offset",
+        min=0.01,
+        max=1.0,
+        default=0.5,
+        description="How far arc is from top",
+    )
 
     height: FloatProperty(
-        name="Arc Height", min=0.01, max=100.0, default=0.5,
-        description="Radius of the arc")
+        name="Arc Height",
+        min=0.01,
+        max=100.0,
+        default=0.5,
+        description="Radius of the arc",
+    )
 
-    func_items = [
-        ("SINE", "Sine", "", 0),
-        ("SPHERE", "Sphere", "", 1),
-    ]
+    func_items = [("SINE", "Sine", "", 0), ("SPHERE", "Sphere", "", 1)]
     function: EnumProperty(
         name="Offset Function",
         items=func_items,
@@ -94,10 +107,10 @@ class ArchProperty(bpy.types.PropertyGroup):
             box = layout.box()
             col = box.column(align=True)
             row = col.row(align=True)
-            row.prop(self, 'function', expand=True)
-            col.prop(self, 'resolution')
-            col.prop(self, 'offset')
-            col.prop(self, 'height')
+            row.prop(self, "function", expand=True)
+            col.prop(self, "resolution")
+            col.prop(self, "offset")
+            col.prop(self, "height")
 
 
 classes = (SizeOffsetProperty, ArrayProperty, ArchProperty)

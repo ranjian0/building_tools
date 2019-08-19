@@ -52,10 +52,9 @@ def create_window_frame(bm, face, prop):
     normal = face.normal.copy()
     if prop.frame_thickness > 0.0:
         res = bmesh.ops.inset_individual(
-            bm, faces=[face], thickness=prop.frame_thickness,
-            use_even_offset=True
+            bm, faces=[face], thickness=prop.frame_thickness, use_even_offset=True
         )
-        faces = res.get('faces')
+        faces = res.get("faces")
 
     if prop.window_depth > 0.0:
         face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
@@ -82,10 +81,10 @@ def create_window_frame_arched(bm, face, prop):
         res = bmesh.ops.inset_individual(
             bm, faces=[face], thickness=prop.frame_thickness, use_even_offset=True
         )
-        frame_faces = res.get('faces')
+        frame_faces = res.get("faces")
 
     verts = sorted(face.verts, key=lambda v: v.co.z)
-    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges').pop()
+    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
     return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
@@ -110,9 +109,8 @@ def create_window_fill(bm, face, prop):
 def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
     faces = None
     if prop.window_depth > 0.0:
-        res = bmesh.ops.extrude_face_region(
-            bm, geom=window_faces).get("geom")
-        bmesh.ops.delete(bm, geom=window_faces, context='FACES')
+        res = bmesh.ops.extrude_face_region(bm, geom=window_faces).get("geom")
+        bmesh.ops.delete(bm, geom=window_faces, context="FACES")
         faces = filter_geom(res, bmesh.types.BMFace)
         verts = list({v for f in faces for v in f.verts})
         bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.window_depth)
@@ -127,14 +125,14 @@ def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
 
 def add_extra_arch_bar(bm, face, prop):
     top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)[-1]
-    bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth/4)
+    bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth / 4)
     if face.normal.y:
-        bar_size = (top_edge.calc_length(), prop.bar_depth/2, prop.bar_width)
-        back_face = 'back' if face.normal.y > 0 else 'front'
-        face_flags = {'left': True, 'right': True, back_face: True}
+        bar_size = (top_edge.calc_length(), prop.bar_depth / 2, prop.bar_width)
+        back_face = "back" if face.normal.y > 0 else "front"
+        face_flags = {"left": True, "right": True, back_face: True}
     else:
-        bar_size = (prop.bar_depth/2, top_edge.calc_length(), prop.bar_width)
-        back_face = 'right' if face.normal.x > 0 else 'left'
-        face_flags = {'front': True, 'back': True, back_face: True}
+        bar_size = (prop.bar_depth / 2, top_edge.calc_length(), prop.bar_width)
+        back_face = "right" if face.normal.x > 0 else "left"
+        face_flags = {"front": True, "back": True, back_face: True}
 
     create_cube_without_faces(bm, bar_size, bar_pos, **face_flags)
