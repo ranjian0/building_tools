@@ -44,7 +44,7 @@ def create_composite_floorplan(bm, prop):
 
     """
     plane(bm, prop.width, prop.length)
-    median_reference = list(bm.faces)[-1].calc_center_median()
+    median_reference = list(bm.faces).pop().calc_center_median()
 
     edges = sort_edges_clockwise(bm.edges)
     extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
@@ -72,7 +72,7 @@ def create_hshaped_floorplan(bm, prop):
 
     """
     plane(bm, prop.width, prop.length)
-    face = list(bm.faces)[-1]
+    face = list(bm.faces).pop()
     normal = face.normal
     median_reference = face.calc_center_median()
 
@@ -112,7 +112,7 @@ def create_random_floorplan(bm, prop):
     random_edges = random.sample(
         list(bm.edges), random.randrange(len(bm.edges) // 3, len(bm.edges))
     )
-    median_reference = list(bm.faces)[-1].calc_center_median()
+    median_reference = list(bm.faces).pop().calc_center_median()
     for edge in random_edges:
         edge_median = calc_edge_median(edge)
 
