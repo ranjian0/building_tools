@@ -251,3 +251,17 @@ def arc_edge(bm, edge, resolution, height, offset):
         off = math.sin(angle*idx) * height
         v.co.z -= offset
         v.co.z += off
+
+
+def extrude_face_and_delete_bottom(bm, face, extrude_depth):
+    """extrude a face and delete bottom face from new geometry
+    """
+    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+    bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
+    bottom_edge = min(
+        filter_horizontal_edges(face.edges, face.normal),
+        key=lambda e: calc_edge_median(e).z,
+    )
+    hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
+    bmesh.ops.delete(bm, geom=[hidden], context="FACES")
+    return f
