@@ -27,7 +27,7 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     """Add railing to the balcony
     """
     face = filter_geom(balcony_geom, BMFace)[-1]
-    top_verts = sorted(list(face.verts), key=lambda v: v.co.z)[2:]
+    top_verts = sorted(face.verts, key=lambda v: v.co.z)[2:]
     edges = list(
         {e for v in top_verts for e in v.link_edges if e not in list(face.edges)}
     )
