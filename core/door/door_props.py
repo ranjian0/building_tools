@@ -1,13 +1,11 @@
 import bpy
-from bpy.props import BoolProperty, FloatProperty, EnumProperty, PointerProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty
 
 from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 
 
 class DoorProperty(bpy.types.PropertyGroup):
-    redo: BoolProperty()
-
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,
@@ -54,13 +52,8 @@ class DoorProperty(bpy.types.PropertyGroup):
     glass_fill: PointerProperty(type=FillGlassPanes)
     louver_fill: PointerProperty(type=FillLouver)
 
-    def set_defaults(self):
-        """ Helper function to make convinient property adjustments """
-        if self.redo:
-            return
-
-        # self.size_offset.size = (0.5, 1.0)
-        self.redo = True
+    def has_arch(self):
+        return self.arch.resolution > 0
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
