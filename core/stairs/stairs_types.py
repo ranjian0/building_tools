@@ -33,7 +33,7 @@ def create_stairs(bm, faces, prop):
 
             # -- keep reference to top faces for railing
             faces = {f for e in ret_face.edges for f in e.link_faces if f.normal.z > 0}
-            top_faces.append(list(faces)[-1])
+            top_faces.append(list(faces).pop())
 
             if prop.landing and i == 0:
                 ret_face = get_stair_face_from_direction(bm, ret_face, prop)
@@ -52,7 +52,7 @@ def extrude_step(bm, step_idx, face, prop):
     ext_width = (
         prop.landing_width if (prop.landing and step_idx == 0) else prop.step_width
     )
-    ret_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+    ret_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
     bmesh.ops.translate(bm, vec=n * ext_width, verts=ret_face.verts)
     return ret_face
 
@@ -89,10 +89,8 @@ def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
         vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx))),
     )
 
-    return min(
-        [f for f in filter_geom(res["geom_inner"], BMVert)[-1].link_faces],
-        key=lambda f: f.calc_center_median().z,
-    )
+    return min(filter_geom(res["geom_inner"], BMVert).pop().link_faces,
+               key=lambda f: f.calc_center_median().z)
 
 
 def create_stair_split(bm, face, prop):

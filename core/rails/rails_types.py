@@ -231,7 +231,7 @@ def create_wall(bm, start, end, height, width, tangent):
     bmesh.ops.translate(bm, vec=end - start, verts=filter_geom(res["geom"], BMVert))
 
     if width:
-        face = filter_geom(res["geom"], BMFace)[-1]
+        face = filter_geom(res["geom"], BMFace).pop()
         if face.normal.to_tuple(3) != tangent.to_tuple(3):
             face.normal_flip()
         n = face.normal

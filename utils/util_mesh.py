@@ -119,8 +119,8 @@ def calc_verts_median(verts):
 def calc_face_dimensions(face):
     """ Determine the width and height of face
     """
-    vertical = filter_vertical_edges(face.edges, face.normal)[-1]
-    horizontal = filter_horizontal_edges(face.edges, face.normal)[-1]
+    vertical = filter_vertical_edges(face.edges, face.normal).pop()
+    horizontal = filter_horizontal_edges(face.edges, face.normal).pop()
     return horizontal.calc_length(), vertical.calc_length()
 
 
@@ -270,7 +270,7 @@ def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
 def extrude_face_and_delete_bottom(bm, face, extrude_depth):
     """extrude a face and delete bottom face from new geometry
     """
-    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
     bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
     bottom_edge = min(
         filter_horizontal_edges(face.edges, face.normal),

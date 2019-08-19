@@ -57,7 +57,7 @@ def create_window_frame(bm, face, prop):
         faces = res.get("faces")
 
     if prop.window_depth > 0.0:
-        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
         bmesh.ops.translate(bm, verts=face.verts, vec=-normal * prop.window_depth)
 
     if faces and prop.frame_depth > 0.0:
@@ -124,7 +124,7 @@ def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
 
 
 def add_extra_arch_bar(bm, face, prop):
-    top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)[-1]
+    top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
     bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth / 4)
     if face.normal.y:
         bar_size = (top_edge.calc_length(), prop.bar_depth / 2, prop.bar_width)

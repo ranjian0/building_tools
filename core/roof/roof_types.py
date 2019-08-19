@@ -27,7 +27,7 @@ def create_flat_roof(bm, faces, prop):
         bm, vec=(0, 0, prop.thickness), verts=filter_geom(ret["geom"], BMVert)
     )
 
-    top_face = filter_geom(ret["geom"], BMFace)[-1]
+    top_face = filter_geom(ret["geom"], BMFace).pop()
     link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
 
     bmesh.ops.inset_region(
@@ -228,7 +228,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
         source = arc.source
         vsource = vert_at_loc(source, bm.verts)
         if not vsource:
-            source_height = [arc.height for arc in skeleton if arc.source == source][-1]
+            source_height = [arc.height for arc in skeleton if arc.source == source].pop()
             ht = source_height * height_scale
             vsource = make_vert(bm, Vector((source.x, source.y, median.z + ht)))
             skeleton_verts.append(vsource)
@@ -283,7 +283,7 @@ def create_hiproof_faces(bm, original_edges, skeleton_edges):
 def make_vert(bm, location):
     """ Create a vertex at location
     """
-    return bmesh.ops.create_vert(bm, co=location).get("vert")[-1]
+    return bmesh.ops.create_vert(bm, co=location).get("vert").pop()
 
 
 def join_intersecting_verts_and_edges(bm, edges, verts):
