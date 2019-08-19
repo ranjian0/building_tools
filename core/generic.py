@@ -1,5 +1,7 @@
 import bpy
-from bpy.props import IntProperty, FloatProperty, BoolProperty, FloatVectorProperty
+from bpy.props import (
+    IntProperty, EnumProperty, FloatProperty, BoolProperty, FloatVectorProperty
+    )
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -72,6 +74,17 @@ class ArchProperty(bpy.types.PropertyGroup):
         name="Arc Height", min=0.01, max=100.0, default=0.5,
         description="Radius of the arc")
 
+    func_items = [
+        ("SINE", "Sine", "", 0),
+        ("SPHERE", "Sphere", "", 1),
+    ]
+    function: EnumProperty(
+        name="Offset Function",
+        items=func_items,
+        default="SPHERE",
+        description="Type of offset for arch",
+    )
+
     show_props: BoolProperty(default=False)
 
     def draw(self, context, layout):
@@ -80,6 +93,8 @@ class ArchProperty(bpy.types.PropertyGroup):
         if self.show_props:
             box = layout.box()
             col = box.column(align=True)
+            row = col.row(align=True)
+            row.prop(self, 'function', expand=True)
             col.prop(self, 'resolution')
             col.prop(self, 'offset')
             col.prop(self, 'height')

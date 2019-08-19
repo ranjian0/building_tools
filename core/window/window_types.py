@@ -72,8 +72,9 @@ def create_window_frame(bm, face, prop):
 def create_window_frame_arched(bm, face, prop):
     """ Arch the top edge of face then extrude and make window frame
     """
+    arch = prop.arch
     top = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
-    arc_edge(bm, top, prop.arch.resolution, prop.arch.height, prop.arch.offset)
+    arc_edge(bm, top, arch.resolution, arch.height, arch.offset, arch.function)
 
     frame_faces = []
     normal = face.normal.copy()

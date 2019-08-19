@@ -99,8 +99,9 @@ def create_door_frame_arched(bm, face, prop):
         merge_corner_vertices(bm, top2)
         arc_edges.append(top2)
 
+    arch = prop.arch
     for e in arc_edges:
-        arc_edge(bm, e, prop.arch.resolution, prop.arch.height, prop.arch.offset)
+        arc_edge(bm, e, arch.resolution, arch.height, arch.offset, arch.function)
 
     verts = sorted(face.verts, key=lambda v: v.co.z)
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges').pop()
