@@ -1,3 +1,6 @@
+BUG::
+    Door Array and Louver fill causes invalid geom/index error
+
 GENERAL:
     - keep a reference to an objects building properties
     - replace all [-1] with pop where possible
