@@ -149,7 +149,7 @@ def subdivide_edge_twice_and_get_middle(bm, edge):
     """
     res = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=2)
     new_verts = filter_geom(res["geom_inner"], BMVert)
-    return list(set(new_verts[0].link_edges) & set(new_verts[1].link_edges))[-1]
+    return (set(new_verts[0].link_edges) & set(new_verts[1].link_edges)).pop()
 
 
 def random_scale_and_translate(bm, middle_edge):
