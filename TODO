@@ -21,9 +21,6 @@ RAILING:
 STAIRS:
     - add railing types - wall and rails
 
-BALCONY:
-    - create combined for faces that share an edge
-
 MATERIAL API:
 
     - current plan is keep a record of faces(indices) for each tool
