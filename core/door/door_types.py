@@ -9,7 +9,6 @@ from ...utils import (
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
-    filter_horizontal_edges,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
 )
@@ -23,7 +22,6 @@ def create_door(bm, faces, prop):
 
         for aface in array_faces:
             face = create_door_split(bm, aface, prop.size_offset)
-            # -- check that split was successful
             if not face:
                 continue
 
@@ -35,7 +33,8 @@ def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     size, off = prop.size, prop.offset
-    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
+    size_y = min(size.y, 0.9999)
+    return inset_face_with_scale_offset(bm, face, size_y, size.x, off.x, off.y, off.z)
 
 
 def create_door_array(bm, face, prop):
@@ -51,50 +50,63 @@ def create_door_array(bm, face, prop):
 def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
-
     # -- dissolve bottom edge
-    bottom = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)
+    bottom = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)
     bmesh.ops.dissolve_edges(bm, edges=bottom[:1], use_verts=True)
-    face = [f for f in bm.faces if f.index == len(bm.faces)-1][-1]
+    face = [f for f in bm.faces if f.index == len(bm.faces)-1].pop()
 
-    # -- create arch
-    top = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
+    if prop.has_arch():
+        return create_door_frame_arched(bm, face, prop)
 
-    normal = face.normal
+    frame_faces = []
+    normal = face.normal.copy()
     if prop.frame_thickness > 0:
-        edges = filter_vertical_edges(face.edges, normal)
-        top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
-        face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
+        face = make_door_inset(bm, face, prop)
 
-        w = calc_face_dimensions(face)[0]
-        off = (w / 3) - prop.frame_thickness
-        edges = split_face_vertical_with_offset(bm, face, 2, [off, off])
-
-        face = list(set(edges[0].link_faces) & set(edges[1].link_faces))[-1]
-        top2 = sorted([e for e in face.edges], key=lambda ed: calc_edge_median(ed).z)[-1]
-        verts = list({vert
-                      for v in top2.verts
-                      for e in v.link_edges
-                      for vert in e.verts if vert not in top2.verts})
-        top_verts = sorted(verts, key=lambda v : v.co.z)[2:]
-        for vert in top_verts:
-            upper_link = sorted([v for e in vert.link_edges
-                                for v in e.verts if v is not vert],
-                                key=lambda v : v.co.z)[-1]
-            bmesh.ops.pointmerge(bm, verts=[upper_link, vert], merge_co=upper_link.co)
-
-    for e in [top, top2]:
-        arc_edge(bm, e, prop.arch.resolution, prop.arch.height, prop.arch.offset)
+        faces = [f for e in face.edges for f in e.link_faces]
+        frame_faces = list(filter(
+            lambda f : f is not face and f.normal == normal, faces))
 
     if prop.door_depth > 0.0:
-        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
+        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
         bmesh.ops.translate(bm, verts=face.verts, vec=-normal * prop.door_depth)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if prop.frame_depth:
-        f = extrude_face_and_delete_bottom(bm, face, -prop.frame_depth)
-        return f
+    if frame_faces and prop.frame_depth > 0.0:
+        geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
+        verts = filter_geom(geom, bmesh.types.BMVert)
+        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
     return face
+
+
+def create_door_frame_arched(bm, face, prop):
+    """ Arch the top edge of face and make door frame
+    """
+    arc_edges = []
+    top = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
+    arc_edges.append(top)
+
+    frame_faces = []
+    normal = face.normal.copy()
+    if prop.frame_thickness > 0:
+        face = make_door_inset(bm, face, prop)
+
+        faces = [f for e in face.edges for f in e.link_faces]
+        frame_faces = list(filter(
+            lambda f : f is not face and f.normal == normal, faces))
+
+        top2 = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
+        merge_corner_vertices(bm, top2)
+        arc_edges.append(top2)
+
+    for e in arc_edges:
+        arc_edge(bm, e, prop.arch.resolution, prop.arch.height, prop.arch.offset)
+
+    verts = sorted(face.verts, key=lambda v: v.co.z)
+    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get('edges').pop()
+
+    faces = extrude_door_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
+    return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
 
 
 def create_door_fill(bm, face, prop):
@@ -108,32 +120,52 @@ def create_door_fill(bm, face, prop):
         fill_louver(bm, face, prop.louver_fill)
 
 
-def common_linked_top_edge(bm, edges):
-    top_verts = sorted([v for e in edges for v in e.verts],
-                       key=lambda v : v.co.z)[len(edges):]
-    return bm.edges.get(top_verts)
-
-
-def delete_bottom_face(bm, face):
-    """delete the face that is at the bottom an extruded face
+def make_door_inset(bm, face, prop):
+    """Make one horizontal cut and two vertical cuts on face
     """
-    bottom_edge = min(
-        filter_horizontal_edges(face.edges, face.normal),
-        key=lambda e: calc_edge_median(e).z,
-    )
-    hidden = min(
-        [f for f in bottom_edge.link_faces], key=lambda f: f.calc_center_median().z
-    )
-    bmesh.ops.delete(bm, geom=[hidden], context="FACES")
+    edges = filter_vertical_edges(face.edges, face.normal)
+    top_edge = split_edges_horizontal_offset_top(bm, edges, prop.frame_thickness)
+    face = min(top_edge.link_faces, key=lambda f: f.calc_center_median().z)
+
+    w = calc_face_dimensions(face)[0]
+    off = (w / 3) - prop.frame_thickness
+    edges = split_face_vertical_with_offset(bm, face, 2, [off, off])
+    face = (set(edges[0].link_faces) & set(edges[1].link_faces)).pop()
+    return face
 
 
-def extrude_face_and_delete_bottom(bm, face, extrude_depth):
-    """extrude a face and delete bottom face from new geometry
+def merge_corner_vertices(bm, edge):
+    """ Merge highest verts linked to edge with verts above them
     """
-    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[-1]
-    bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
-    delete_bottom_face(bm, f)
-    return f
+    verts = {vert for v in edge.verts for e in v.link_edges for vert in e.verts}
+    verts = list(filter(lambda v: v not in edge.verts, verts))
+
+    top_verts = sorted(verts, key=lambda v : v.co.z)[2:]
+    for vert in top_verts:
+        upper_verts = [v for e in vert.link_edges for v in e.verts]
+        upper_link = sorted(upper_verts, key=lambda v : v.co.z).pop()
+        bmesh.ops.pointmerge(bm, verts=[upper_link, vert], merge_co=upper_link.co)
+
+
+def extrude_door_and_frame_depth(bm, door_faces, frame_faces, normal, prop):
+    """ Create extrusions for door depth and frame depth
+    """
+    faces = None
+    if prop.door_depth > 0.0:
+        res = bmesh.ops.extrude_face_region(
+            bm, geom=door_faces).get("geom")
+        bmesh.ops.delete(bm, geom=door_faces, context='FACES')
+        faces = filter_geom(res, bmesh.types.BMFace)
+        verts = list({v for f in faces for v in f.verts})
+        bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.door_depth)
+
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    if frame_faces and prop.frame_depth > 0.0:
+        geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
+        verts = filter_geom(geom, bmesh.types.BMVert)
+        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
+
+    return faces
 
 
 def split_face_vertical_with_offset(bm, face, cuts, offsets):
