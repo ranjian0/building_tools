@@ -153,11 +153,13 @@ def arc_frame_edges(bm, edges, frame_faces, prop):
     new_edges = []
     for e in edges:
         res = arc_edge(bm, e, prop.resolution, prop.height, prop.offset, prop.function)
-        new_edges.extend(filter_geom(res['geom_split'], bmesh.types.BMEdge))
+        new_edges.extend(filter_geom(res["geom_split"], bmesh.types.BMEdge))
 
     res = bmesh.ops.bridge_loops(bm, edges=new_edges)
-    bmesh.ops.delete(bm, geom=[f for f in frame_faces if len(f.verts) > 4], context='FACES')
-    return validate(set(frame_faces + res['faces']))
+    bmesh.ops.delete(
+        bm, geom=[f for f in frame_faces if len(f.verts) > 4], context="FACES"
+    )
+    return validate(set(frame_faces + res["faces"]))
 
 
 def extrude_door_and_frame_depth(bm, door_faces, frame_faces, normal, prop):

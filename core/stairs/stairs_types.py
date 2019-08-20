@@ -89,8 +89,10 @@ def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
         vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx))),
     )
 
-    return min(filter_geom(res["geom_inner"], BMVert).pop().link_faces,
-               key=lambda f: f.calc_center_median().z)
+    return min(
+        filter_geom(res["geom_inner"], BMVert).pop().link_faces,
+        key=lambda f: f.calc_center_median().z,
+    )
 
 
 def create_stair_split(bm, face, prop):
