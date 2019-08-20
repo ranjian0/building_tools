@@ -1,7 +1,9 @@
 import bmesh
 import operator
+import functools
 from mathutils import Vector
 from bmesh.types import BMVert
+from collections import defaultdict
 
 from ..rails import create_railing_from_edges, create_railing_from_step_edges
 from ...utils import (
@@ -110,75 +112,18 @@ def create_stairs_railing(bm, normal, faces, prop):
     if prop.landing:
         landing_face, *step_faces = faces
 
+        EDGES = functools.partial(edges_from_direction, landing_face, normal)
         if prop.stair_direction == "FRONT":
-            create_railing_front(bm, landing_face, normal, prop.rail)
+            create_railing_from_edges(bm, EDGES(["LEFT", "RIGHT"]), prop.rail)
         elif prop.stair_direction == "LEFT":
-            create_railing_left(bm, landing_face, normal, prop.rail)
+            create_railing_from_edges(bm, EDGES(["FRONT", "RIGHT"]), prop.rail)
         elif prop.stair_direction == "RIGHT":
-            create_railing_right(bm, landing_face, normal, prop.rail)
-
+            create_railing_from_edges(bm, EDGES(["LEFT", "FRONT"]), prop.rail)
     else:
         step_faces = faces
 
     # --create railing for steps
     create_step_railing(bm, normal, step_faces, prop)
-
-
-def create_railing_front(bm, face, normal, prop):
-    """Create rails for landing when stair direction is front
-    """
-
-    # -- determine left and right edges
-    valid_edges = []
-    valid_loops = [l for l in face.loops]
-    for e in face.edges:
-        for loop in e.link_loops:
-            if loop in valid_loops:
-                tan = e.calc_tangent(loop)
-                if round(normal.cross(tan).z):
-                    valid_edges.append(e)
-
-    create_railing_from_edges(bm, valid_edges, prop)
-
-
-def create_railing_left(bm, face, normal, prop):
-    """Create rails for landing when stair direction is left
-    """
-
-    # -- determine front and left edges
-    valid_edges = []
-    valid_loops = [l for l in face.loops]
-    for e in face.edges:
-        for loop in e.link_loops:
-            if loop in valid_loops:
-                tan = e.calc_tangent(loop)
-                if tan == -normal:
-                    valid_edges.append(e)
-
-                if round(normal.cross(tan).z) < 0:
-                    valid_edges.append(e)
-
-    create_railing_from_edges(bm, valid_edges, prop)
-
-
-def create_railing_right(bm, face, normal, prop):
-    """Create rails for landing when stair direction is right
-    """
-
-    # -- determine front and right edges
-    valid_edges = []
-    valid_loops = [l for l in face.loops]
-    for e in face.edges:
-        for loop in e.link_loops:
-            if loop in valid_loops:
-                tan = e.calc_tangent(loop)
-                if tan == -normal:
-                    valid_edges.append(e)
-
-                if round(normal.cross(tan).z) > 0:
-                    valid_edges.append(e)
-
-    create_railing_from_edges(bm, valid_edges, prop)
 
 
 def create_step_railing(bm, normal, faces, prop):
@@ -192,20 +137,11 @@ def create_step_railing(bm, normal, faces, prop):
         normal = normal.cross(Vector((0, 0, -1)))
 
     # -- get all left and right edges
-    left_edges = []
-    right_edges = []
-
+    left_edges, right_edges = [], []
     for face in faces:
-        for edge in face.edges:
-            for loop in edge.link_loops:
-                if loop in [l for l in face.loops]:
-                    tan = edge.calc_tangent(loop)
-
-                    if round(normal.cross(tan).z) < 0:
-                        right_edges.append(edge)
-
-                    if round(normal.cross(tan).z) > 0:
-                        left_edges.append(edge)
+        EDGES = functools.partial(edges_from_direction, face, normal)
+        left_edges.extend(EDGES(["LEFT"]))
+        right_edges.extend(EDGES(["RIGHT"]))
 
     # -- filter edges based on direction
     valid_edges = []
@@ -217,3 +153,25 @@ def create_step_railing(bm, normal, faces, prop):
         valid_edges.extend(left_edges)
 
     create_railing_from_step_edges(bm, valid_edges, normal, prop)
+
+
+def edges_from_direction(face, normal, direction):
+    edges = defaultdict(list)
+    edges.fromkeys(["FRONT", "LEFT", "RIGHT"])
+
+    valid_loops = [l for l in face.loops]
+    for e in face.edges:
+        for loop in e.link_loops:
+            if loop in valid_loops:
+                tan = e.calc_tangent(loop)
+                if tan == -normal:
+                    edges["FRONT"].append(e)
+
+                if round(normal.cross(tan).z) < 0:
+                    edges["RIGHT"].append(e)
+
+                if round(normal.cross(tan).z) > 0:
+                    edges["LEFT"].append(e)
+
+    direction = list(direction) if not isinstance(direction, list) else direction
+    return sum([edges[d] for d in direction], [])

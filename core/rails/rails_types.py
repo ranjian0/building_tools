@@ -226,7 +226,7 @@ def create_fill_walls(bm, edges, prop, raildata):
         wall(delete_faces=["bottom", "left", "right"])
 
 
-def create_wall(bm, start, end, height, width, tangent, delete_faces=["bottom"]):
+def create_wall(bm, start, end, height, width, tangent):
     """ Extrude a wall of height from start to end
     """
     start_edge = create_edge(bm, start, start + Vector((0, 0, height)))
@@ -457,14 +457,13 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
     """
     rail = prop.rail
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
-    for group in edge_groups:
-        for edge in group:
-            tan = edge_tangent(edge)
-            start, end = [v.co for v in edge.verts]
-            wall = create_wall(
-                bm, start, end, rail.corner_post_height, rail.wall_width, tan
-            )
-            wall(delete_faces=["bottom", "right"])
+    for edge in [e for group in edge_groups for e in group]:
+        tan = edge_tangent(edge)
+        start, end = [v.co for v in edge.verts]
+        wall = create_wall(
+            bm, start, end, rail.corner_post_height, rail.wall_width, tan
+        )
+        wall(delete_faces=["bottom", "right"])
 
 
 def get_edge_groups_from_direction(edges, direction):
