@@ -67,7 +67,7 @@ def create_railing_from_step_edges(bm, edges, normal, prop):
     if prop.rail.fill == "POSTS":
         fill_posts_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "RAILS":
-        pass
+        fill_rails_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "WALL":
         pass
 
@@ -405,6 +405,37 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
         add_rail_with_slope(bm, start, end, slope, normal, prop.rail)
 
 
+def fill_rails_for_step_edges(bm, edges, normal, prop):
+    """ Add rails for stair edges
+    """
+    rail = prop.rail
+    edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
+    for group in edge_groups:
+        #   -- max and min coordinate for step edges
+        min_location, max_location = find_min_and_max_vert_locations(
+            [vert for edge in group for vert in edge.verts], normal
+        )
+
+        step_size = (max_location.z - min_location.z) / (prop.step_count - 1)
+        max_location.z += step_size
+
+        #  -- slope and edge tangent
+        tangent = edge_tangent(group[-1]).normalized()
+        tangent_offset = tangent * rail.corner_post_width / 2
+        slope = slope_between_vectors(max_location, min_location, normal)
+
+        #  -- add corner post at max location
+        post_w, post_h = rail.corner_post_width, rail.corner_post_height
+        post_pos = max_location + Vector((0, 0, post_h / 2 - step_size))
+        post_pos += tangent_offset + (normal * -post_w / 2)
+        add_cube_post(bm, post_w, post_h, post_pos, rail.has_decor)
+
+        #   --  add a rails
+        array_sloped_rails(
+            bm, min_location, max_location, step_size, slope, normal, tangent, rail
+        )
+
+
 def get_edge_groups_from_direction(edges, direction):
     """ separate the edges based on given direction
     see stairs_types.py to see how edge groups are formed
@@ -522,3 +553,20 @@ def calc_rail_position_and_size_for_loop(loop, prop):
     rail_len = edge.calc_length() - prop.corner_post_width * num_convex
     rail_size = (rail_len, 2 * prop.rail_size, prop.rail_size)
     return rail_pos, rail_size
+
+
+def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, rail):
+
+    height = rail.corner_post_height - (rail.rail_size / 2)
+    tangent_offset = tangent * rail.corner_post_width / 2
+    offset = tangent_offset + Vector((0, 0, height - step_size))
+
+    start, end = max_loc + offset, min_loc + offset
+    start -= normal * (rail.corner_post_width + rail.rail_size * 0.75)
+
+    rail_count = int((rail.corner_post_height / rail.rail_size) * rail.rail_density)
+    step = (height - step_size) / (rail_count + 1)
+    for i in range(rail_count + 1):
+        add_rail_with_slope(bm, start, end, slope, normal, rail)
+        start -= Vector((0, 0, 1)) * step
+        end -= Vector((0, 0, 1)) * step
