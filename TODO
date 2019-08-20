@@ -1,18 +1,5 @@
-STAIRS:
-    - add railing types - wall and rails
-
 GENERAL:
     - keep a reference to an objects building properties
-
-DOOR:
-    - add attachments e.g door-handles
-
-FLOORPLANS:
-    - add support for floorplan with holes
-
-ROOF:
-    - fix hiproof error for outset property
-    - support for hip-roof with holes
 
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
