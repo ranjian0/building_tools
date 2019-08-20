@@ -69,7 +69,7 @@ def create_railing_from_step_edges(bm, edges, normal, prop):
     elif prop.rail.fill == "RAILS":
         fill_rails_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "WALL":
-        pass
+        fill_walls_for_step_edges(bm, edges, normal, prop)
 
 
 def create_railing(bm, edges, lfaces, prop, raildata):
@@ -219,10 +219,11 @@ def create_fill_walls(bm, edges, prop, raildata):
         end = loop_b.vert.co + off_b
         create_wall(
             bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge)
+            , delete_faces=["bottom", "left", "right"]
         )
 
 
-def create_wall(bm, start, end, height, width, tangent):
+def create_wall(bm, start, end, height, width, tangent, delete_faces=['bottom']):
     """ Extrude a wall of height from start to end
     """
     start_edge = create_edge(bm, start, start + Vector((0, 0, height)))
@@ -239,15 +240,21 @@ def create_wall(bm, start, end, height, width, tangent):
         res = bmesh.ops.extrude_face_region(bm, geom=[face])
         bmesh.ops.translate(bm, vec=-n * width, verts=filter_geom(res["geom"], BMVert))
 
-        # delete hidden geom
+        # delete hidden faces
         edges = filter_geom(res["geom"], BMEdge)
-        faces = [
-            f
-            for e in edges
-            for f in e.link_faces
-            if not f.normal.z and f not in filter_geom(res["geom"], BMFace)
-        ]
-        bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+        faces = [f for e in edges for f in e.link_faces]
+        faces_to_delete = []
+        if "bottom" in delete_faces:
+            faces_to_delete.extend([f for f in faces if f.normal.z < 0])
+
+        n = tangent.cross(Vector((0, 0, 1)))
+        attr = "x" if n.x else "y"
+        if "left" in delete_faces:
+            faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) < 0])
+        if "right" in delete_faces:
+            faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) > 0])
+
+        bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES_ONLY")
 
 
 def is_parallel(loop):
@@ -434,6 +441,21 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
         array_sloped_rails(
             bm, min_location, max_location, step_size, slope, normal, tangent, rail
         )
+
+
+def fill_walls_for_step_edges(bm, edges, normal, prop):
+    """ Add wall for stair edges
+    """
+    rail = prop.rail
+    edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
+    for group in edge_groups:
+        for edge in group:
+            tan = edge_tangent(edge)
+            start, end = [v.co for v in edge.verts]
+            create_wall(
+                bm, start, end, rail.corner_post_height, rail.wall_width, tan,
+                delete_faces=["bottom", "right"]
+            )
 
 
 def get_edge_groups_from_direction(edges, direction):
