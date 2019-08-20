@@ -83,3 +83,6 @@ class StairsProperty(bpy.types.PropertyGroup):
             row.prop_menu_enum(self, "stair_direction")
 
         layout.prop(self, "railing", toggle=True)
+        if self.railing:
+            box = layout.box()
+            self.rail.draw(context, box)
