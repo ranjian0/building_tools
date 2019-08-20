@@ -451,7 +451,7 @@ def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
     """
     post_count = round((edge.calc_length() / prop.post_size) * prop.post_density)
     post_spacing = edge.calc_length() / post_count
-    post_height = prop.corner_post_height - prop.rail_size
+    post_height = prop.corner_post_height - (prop.rail_size / 2)
 
     vec = edge_vector(edge)
     tan_offset = tangent * prop.corner_post_width / 2
@@ -472,6 +472,7 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
     length = (start - end).length + prop.rail_size
     size = (length, 2 * prop.rail_size, prop.rail_size)
     position = start.lerp(end, 0.5) - ((end - start).normalized() * prop.rail_size / 2)
+    position += (-normal * 0.0025)  # MAGIC - moves the rail abit to remove empty gaps
 
     rail = create_cube_without_faces(bm, size, position, right=True)
 
