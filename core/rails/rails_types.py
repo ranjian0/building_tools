@@ -1,6 +1,7 @@
 import math
 import bmesh
 import operator
+import functools
 
 from mathutils import Vector, Matrix
 
@@ -217,13 +218,13 @@ def create_fill_walls(bm, edges, prop, raildata):
 
         start = loop_a.vert.co - off_a
         end = loop_b.vert.co + off_b
-        create_wall(
+        wall = create_wall(
             bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge)
-            , delete_faces=["bottom", "left", "right"]
         )
+        wall(delete_faces=["bottom", "left", "right"])
 
 
-def create_wall(bm, start, end, height, width, tangent, delete_faces=['bottom']):
+def create_wall(bm, start, end, height, width, tangent, delete_faces=["bottom"]):
     """ Extrude a wall of height from start to end
     """
     start_edge = create_edge(bm, start, start + Vector((0, 0, height)))
@@ -242,19 +243,24 @@ def create_wall(bm, start, end, height, width, tangent, delete_faces=['bottom'])
 
         # delete hidden faces
         edges = filter_geom(res["geom"], BMEdge)
-        faces = [f for e in edges for f in e.link_faces]
-        faces_to_delete = []
-        if "bottom" in delete_faces:
-            faces_to_delete.extend([f for f in faces if f.normal.z < 0])
+        return functools.partial(delete_linked_wall_faces, bm, edges, tangent)
+    return lambda **kwargs: None
 
-        n = tangent.cross(Vector((0, 0, 1)))
-        attr = "x" if n.x else "y"
-        if "left" in delete_faces:
-            faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) < 0])
-        if "right" in delete_faces:
-            faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) > 0])
 
-        bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES_ONLY")
+def delete_linked_wall_faces(bm, edges, tangent, delete_faces=["bottom"]):
+    faces = [f for e in edges for f in e.link_faces]
+    faces_to_delete = []
+    if "bottom" in delete_faces:
+        faces_to_delete.extend([f for f in faces if f.normal.z < 0])
+
+    n = tangent.cross(Vector((0, 0, 1)))
+    attr = "x" if n.x else "y"
+    if "left" in delete_faces:
+        faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) < 0])
+    if "right" in delete_faces:
+        faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) > 0])
+
+    bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES_ONLY")
 
 
 def is_parallel(loop):
@@ -452,10 +458,10 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
         for edge in group:
             tan = edge_tangent(edge)
             start, end = [v.co for v in edge.verts]
-            create_wall(
-                bm, start, end, rail.corner_post_height, rail.wall_width, tan,
-                delete_faces=["bottom", "right"]
+            wall = create_wall(
+                bm, start, end, rail.corner_post_height, rail.wall_width, tan
             )
+            wall(delete_faces=["bottom", "right"])
 
 
 def get_edge_groups_from_direction(edges, direction):
