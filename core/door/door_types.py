@@ -51,9 +51,9 @@ def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
     # -- dissolve bottom edge
-    bottom = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)
-    bmesh.ops.dissolve_edges(bm, edges=bottom[:1], use_verts=True)
-    face = [f for f in bm.faces if f.index == len(bm.faces) - 1].pop()
+    edges = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z)
+    bmesh.ops.dissolve_edges(bm, edges=edges[:1], use_verts=True)
+    face = min(edges.pop().link_faces, key=lambda f: f.calc_center_median().z)
 
     if prop.has_arch():
         return create_door_frame_arched(bm, face, prop)
