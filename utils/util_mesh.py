@@ -265,6 +265,7 @@ def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
                 v.co.y = median.y + math.cos(angle) * length / 2
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
+    return ret
 
 
 def extrude_face_and_delete_bottom(bm, face, extrude_depth):

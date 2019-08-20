@@ -3,6 +3,7 @@ from bmesh.types import BMEdge
 
 from ..fill import fill_panel, fill_glass_panes, fill_louver
 from ...utils import (
+    validate,
     arc_edge,
     filter_geom,
     face_with_verts,
@@ -101,9 +102,7 @@ def create_door_frame_arched(bm, face, prop):
         merge_corner_vertices(bm, top2)
         arc_edges.append(top2)
 
-    arch = prop.arch
-    for e in arc_edges:
-        arc_edge(bm, e, arch.resolution, arch.height, arch.offset, arch.function)
+    frame_faces = arc_frame_edges(bm, arc_edges, frame_faces, prop.arch)
 
     verts = sorted(face.verts, key=lambda v: v.co.z)
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
@@ -148,6 +147,17 @@ def merge_corner_vertices(bm, edge):
         upper_verts = [v for e in vert.link_edges for v in e.verts]
         upper_link = sorted(upper_verts, key=lambda v: v.co.z).pop()
         bmesh.ops.pointmerge(bm, verts=[upper_link, vert], merge_co=upper_link.co)
+
+
+def arc_frame_edges(bm, edges, frame_faces, prop):
+    new_edges = []
+    for e in edges:
+        res = arc_edge(bm, e, prop.resolution, prop.height, prop.offset, prop.function)
+        new_edges.extend(filter_geom(res['geom_split'], bmesh.types.BMEdge))
+
+    res = bmesh.ops.bridge_loops(bm, edges=new_edges)
+    bmesh.ops.delete(bm, geom=[f for f in frame_faces if len(f.verts) > 4], context='FACES')
+    return validate(set(frame_faces + res['faces']))
 
 
 def extrude_door_and_frame_depth(bm, door_faces, frame_faces, normal, prop):
