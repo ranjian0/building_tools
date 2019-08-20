@@ -60,3 +60,22 @@ def kwargs_from_props(props):
             # property group within this property
             result.update(kwargs_from_props(prop))
     return result
+
+
+def loop_successive(collection, inner_attr_a, inner_attr_b=None, inner_attr_c=None):
+    """ Loop through a collection and successive interior attributes and return
+        inner most items
+    """
+    elements = []
+    for item in collection:
+        for inner_a in getattr(item, inner_attr_a):
+            if inner_attr_b:
+                for inner_b in getattr(inner_a, inner_attr_b):
+                    if inner_attr_c:
+                        for inner_c in getattr(inner_b, inner_attr_c):
+                            elements.append(inner_c)
+                    else:
+                        elements.append(inner_b)
+            else:
+                elements.append(inner_a)
+    return list(set(elements))
