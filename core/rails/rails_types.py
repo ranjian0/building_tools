@@ -74,6 +74,8 @@ def create_railing_from_step_edges(bm, edges, normal, prop):
 
 
 def create_railing(bm, edges, lfaces, prop, raildata):
+    """ Perform all railing procedures
+    """
     loops = []
     for e in edges:
         for v in e.verts:
@@ -248,6 +250,8 @@ def create_wall(bm, start, end, height, width, tangent, delete_faces=["bottom"])
 
 
 def delete_linked_wall_faces(bm, edges, tangent, delete_faces=["bottom"]):
+    """ Delete faces linked to edges with normal flagged in delete_faces
+    """
     faces = [f for e in edges for f in e.link_faces]
     faces_to_delete = []
     if "bottom" in delete_faces:
@@ -327,8 +331,7 @@ def align_geometry_to_edge(bm, geom, edge):
 
 
 def polygon_sides_from_angle(angle):
-    """ Determine the number of sides for a polygon with an interior
-    angle 'angle'
+    """ Determine the number of sides for a polygon with an interior angle 'angle'
     """
     return round((2 * math.pi) / (math.pi - angle))
 
@@ -584,6 +587,8 @@ def calc_rail_position_and_size_for_loop(loop, prop):
 
 
 def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, rail):
+    """ Create an array of sloped rails
+    """
 
     height = rail.corner_post_height - (rail.rail_size / 2)
     tangent_offset = tangent * rail.corner_post_width / 2
