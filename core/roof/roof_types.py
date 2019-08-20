@@ -228,8 +228,8 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
         source = arc.source
         vsource = vert_at_loc(source, bm.verts)
         if not vsource:
-            source_height = [arc.height for arc in skeleton if arc.source == source].pop()
-            ht = source_height * height_scale
+            source_height = [arc.height for arc in skeleton if arc.source == source]
+            ht = source_height.pop() * height_scale
             vsource = make_vert(bm, Vector((source.x, source.y, median.z + ht)))
             skeleton_verts.append(vsource)
 
