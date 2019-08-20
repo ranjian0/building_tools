@@ -236,7 +236,7 @@ def boundary_edges_from_face_selection(bm):
 
 
 def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
-    """ SUbdivide the given edge and offset vertices to form an arc
+    """ Subdivide the given edge and offset vertices to form an arc
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)

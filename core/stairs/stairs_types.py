@@ -74,27 +74,18 @@ def get_stair_face_from_direction(bm, ret_face, prop):
     left = next(filter(lambda f: flt(f, left_normal), faces))
     right = next(filter(lambda f: flt(f, right_normal), faces))
 
-    if prop.stair_direction == "LEFT":
-        return left
-    elif prop.stair_direction == "RIGHT":
-        return right
-    return ret_face
+    return {"LEFT": left, "RIGHT": right}.get(prop.stair_direction, ret_face)
 
 
 def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
     """ cut the next face step height
     """
     res = subdivide_face_edges_horizontal(bm, ret_face, 1)
+    verts = filter_geom(res["geom_inner"], BMVert)
     bmesh.ops.translate(
-        bm,
-        verts=filter_geom(res["geom_inner"], BMVert),
-        vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx))),
+        bm, verts=verts, vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx)))
     )
-
-    return min(
-        filter_geom(res["geom_inner"], BMVert).pop().link_faces,
-        key=lambda f: f.calc_center_median().z,
-    )
+    return min(verts.pop().link_faces, key=lambda f: f.calc_center_median().z)
 
 
 def create_stair_split(bm, face, prop):
@@ -107,11 +98,9 @@ def create_stair_split(bm, face, prop):
 def create_stairs_railing(bm, normal, faces, prop):
     """Create railing for stairs
     """
-
     # -- create railing for landing
     if prop.landing:
-        landing_face, *step_faces = faces
-
+        landing_face = faces.pop(0)
         EDGES = functools.partial(edges_from_direction, landing_face, normal)
         if prop.stair_direction == "FRONT":
             create_railing_from_edges(bm, EDGES(["LEFT", "RIGHT"]), prop.rail)
@@ -119,11 +108,9 @@ def create_stairs_railing(bm, normal, faces, prop):
             create_railing_from_edges(bm, EDGES(["FRONT", "RIGHT"]), prop.rail)
         elif prop.stair_direction == "RIGHT":
             create_railing_from_edges(bm, EDGES(["LEFT", "FRONT"]), prop.rail)
-    else:
-        step_faces = faces
 
     # --create railing for steps
-    create_step_railing(bm, normal, step_faces, prop)
+    create_step_railing(bm, normal, faces, prop)
 
 
 def create_step_railing(bm, normal, faces, prop):
@@ -144,14 +131,11 @@ def create_step_railing(bm, normal, faces, prop):
         right_edges.extend(EDGES(["RIGHT"]))
 
     # -- filter edges based on direction
-    valid_edges = []
-    if prop.stair_direction == "FRONT":
-        valid_edges.extend(left_edges + right_edges)
-    elif prop.stair_direction == "LEFT":
-        valid_edges.extend(right_edges)
-    elif prop.stair_direction == "RIGHT":
-        valid_edges.extend(left_edges)
-
+    valid_edges = {
+        "LEFT": right_edges,
+        "RIGHT": left_edges,
+        "FRONT": left_edges + right_edges,
+    }.get(prop.stair_direction)
     create_railing_from_step_edges(bm, valid_edges, normal, prop)
 
 
@@ -173,5 +157,4 @@ def edges_from_direction(face, normal, direction):
                 if round(normal.cross(tan).z) > 0:
                     edges["LEFT"].append(e)
 
-    direction = list(direction) if not isinstance(direction, list) else direction
-    return sum([edges[d] for d in direction], [])
+    return sum([edges[d] for d in list(direction)], [])

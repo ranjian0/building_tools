@@ -205,11 +205,8 @@ def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
     edges = filter_geom(ret["geom"], BMEdge)
     bmesh.ops.translate(bm, verts=verts, vec=(0, 0, roof_thickness))
 
-    valid_edges = [
-        e
-        for e in edges
-        if calc_edge_median(e).z != min([v.co.z for e in edges for v in e.verts])
-    ]
+    min_z = min([v.co.z for e in edges for v in e.verts])
+    valid_edges = list(filter(lambda e: calc_edge_median(e).z != min_z, edges))
     edge_loc = set([getattr(calc_edge_median(e), axis) for e in valid_edges])
 
     # -- fill faces

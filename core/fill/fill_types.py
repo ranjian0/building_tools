@@ -72,7 +72,7 @@ def fill_bar(bm, face, prop):
 def fill_louver(bm, face, prop):
     """Create louvers from face
     """
-    normal = face.normal
+    normal = face.normal.copy()
     if prop.louver_margin:
         bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.louver_margin)
 
@@ -101,16 +101,12 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
 
     edges = []
     if cuts_x > 0:
-        res = bmesh.ops.subdivide_edges(bm, edges=v_edges, cuts=cuts_x).get(
-            "geom_inner"
-        )
-        edges.extend(filter_geom(res, BMEdge))
+        res = bmesh.ops.subdivide_edges(bm, edges=v_edges, cuts=cuts_x)
+        edges.extend(filter_geom(res["geom_inner"], BMEdge))
 
     if cuts_y > 0:
-        res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y).get(
-            "geom_inner"
-        )
-        edges.extend(filter_geom(res, BMEdge))
+        res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y)
+        edges.extend(filter_geom(res["geom_inner"], BMEdge))
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
     return list({f for ed in edges for f in ed.link_faces})
 
@@ -172,11 +168,8 @@ def double_and_make_even(value):
 def create_bar_from_face(bm, face, median, position, scale, depth, vertical=False):
     """Create bar geometry from a face
     """
-    duplicate = duplicate_face_translate_scale(bm, face, position, scale, median).get(
-        "geom"
+    dup = duplicate_face_translate_scale(bm, face, position, scale, median).get("geom")
+    edges = [filter_horizontal_edges, filter_vertical_edges][vertical](
+        filter_geom(dup, BMEdge), face.normal
     )
-    edges = filter_horizontal_edges(filter_geom(duplicate, BMEdge), face.normal)
-    if vertical:
-        edges = filter_vertical_edges(filter_geom(duplicate, BMEdge), face.normal)
-
     extrude_edges_to_depth(bm, edges, depth)

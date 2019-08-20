@@ -19,7 +19,6 @@ def create_balcony(bm, faces, prop):
 
         if prop.railing:
             add_railing_to_balcony_edges(bm, ret["geom"], f.normal, prop)
-
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 
 
@@ -36,7 +35,6 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     left, right = edges
     front = bm.edges.get(top_verts)
     r_edges = choose_edges_from_direction(prop.open_side, front, left, right)
-
     create_railing_from_edges(bm, r_edges, prop.rail)
 
 
@@ -52,13 +50,9 @@ def sort_edges_from_normal_direction(edges, normal):
 def choose_edges_from_direction(direction, front, left, right):
     """filter out the edge specified by direction
     """
-    r_edges = []
-    if direction == "NONE":
-        r_edges = [left, right, front]
-    elif direction == "FRONT":
-        r_edges = [left, right]
-    elif direction == "LEFT":
-        r_edges = [front, right]
-    elif direction == "RIGHT":
-        r_edges = [front, left]
-    return r_edges
+    return {
+        "LEFT": [front, right],
+        "FRONT": [left, right],
+        "RIGHT": [front, left],
+        "NONE": [left, right, front],
+    }.get(direction)
