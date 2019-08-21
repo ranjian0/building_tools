@@ -31,8 +31,8 @@ def create_floors(bm, edges, prop):
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
 
-    add_faces_to_group(bm, slabs, FaceGroups.SLAB)
-    add_faces_to_group(bm, walls, FaceGroups.WALL)
+    add_faces_to_group(bm, slabs, FaceGroups.SLABS)
+    add_faces_to_group(bm, walls, FaceGroups.WALLS)
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
