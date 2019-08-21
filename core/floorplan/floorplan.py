@@ -8,7 +8,14 @@ from .floorplan_types import (
     create_rectangular_floorplan,
 )
 
-from ...utils import link_obj, create_mesh, bm_to_obj, create_object, bm_from_obj
+from ...utils import (
+    link_obj,
+    bm_to_obj,
+    bm_from_obj,
+    create_mesh,
+    create_object,
+    create_face_maps_for_object,
+)
 
 
 class Floorplan:
@@ -16,6 +23,7 @@ class Floorplan:
     def build(cls, context, prop):
         name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
+        create_face_maps_for_object(obj)
         bm = bm_from_obj(obj)
 
         if prop.type == "RECTANGULAR":
