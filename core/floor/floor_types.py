@@ -3,12 +3,7 @@ import itertools as it
 import functools as ft
 from bmesh.types import BMVert, BMEdge
 
-from ...utils import (
-    Material,
-    filter_geom,
-    set_material,
-    boundary_edges_from_face_selection,
-)
+from ...utils import filter_geom, boundary_edges_from_face_selection
 
 
 def create_floors(bm, edges, prop):
@@ -30,7 +25,6 @@ def create_floors(bm, edges, prop):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
-    # create_floor_materials(slabs, walls)
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
@@ -76,10 +70,3 @@ def get_slab_and_wall_faces(bm, prop, start_height):
         elif face_location_z in map(round_4dp, wall_heights):
             walls.append(face)
     return slabs, walls
-
-
-def create_floor_materials(slab_faces, wall_faces):
-    """add materials to floor faces
-    """
-    set_material(slab_faces, Material.SLAB)
-    set_material(wall_faces, Material.WALL)
