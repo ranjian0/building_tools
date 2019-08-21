@@ -22,7 +22,9 @@ def facegroup(group):
 
             new_faces = set(bm.faces) - faces
             add_faces_to_group(bm, new_faces, group)
+
         return wrapper
+
     return outer
 
 
