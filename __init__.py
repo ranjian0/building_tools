@@ -49,13 +49,65 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_roof")
 
 
+class BTOOLS_UL_fmaps(bpy.types.UIList):
+    def draw_item(self, _context, layout, _data, item, icon, *args):
+        fmap = item
+        obj = _context.object
+        if fmap.name in obj.user_facemaps.keys():
+            if self.layout_type in {"DEFAULT", "COMPACT"}:
+                layout.prop(fmap, "name", text="", emboss=False, icon="FACE_MAPS")
+            elif self.layout_type == "GRID":
+                layout.alignment = "CENTER"
+                layout.label(text="", icon_value=icon)
+
+
+class PANEL_PT_material_tools(bpy.types.Panel):
+
+    bl_label = "Material Tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == "MESH"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Face Maps")
+
+        ob = context.object
+        facemap = ob.face_maps.active
+
+        rows = 2
+        if facemap:
+            rows = 4
+
+        row = layout.row()
+        args = ob, "face_maps", ob.face_maps, "active_index"
+        row.template_list("BTOOLS_UL_fmaps", "", *args, rows=rows)
+
+        if ob.face_maps and (ob.mode == "EDIT" and ob.type == "MESH"):
+            row = layout.row()
+
+            sub = row.row(align=True)
+            sub.operator("object.face_map_assign", text="Assign")
+            sub.operator("object.face_map_remove_from", text="Remove")
+
+            sub = row.row(align=True)
+            sub.operator("object.face_map_select", text="Select")
+            sub.operator("object.face_map_deselect", text="Deselect")
+
+
 # =======================================================
 #
 #           REGISTER
 #
 # =======================================================
 
-classes = (PANEL_PT_mesh_tools,)
+classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools, BTOOLS_UL_fmaps)
 
 
 def register():
