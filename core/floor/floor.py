@@ -5,9 +5,6 @@ from ...utils import select, get_edit_mesh
 
 
 class Floor:
-
-    has_mat_groups = False
-
     @classmethod
     def build(cls, context, prop):
         me = get_edit_mesh()
