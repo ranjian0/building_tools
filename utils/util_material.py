@@ -1,48 +1,76 @@
 import bpy
 import bmesh
-from enum import Enum
+from enum import Enum, auto
 from functools import wraps
 
 from .util_object import bm_from_obj, bm_to_obj
 
 
-class FaceGroups(Enum):
-    SLAB = 0
-    WALL = 1
+class AutoIndex(Enum):
+    def _generate_next_value_(name, start, count, last_values):
+        return count
 
 
-def facegroup(group):
+class FaceMap(AutoIndex):
+    """ Enum provides names for face_maps and index values """
+
+    SLABS = auto()
+    WALLS = auto()
+
+    WINDOW = auto()
+    WINDOW_BARS = auto()
+    WINDOW_PANES = auto()
+    WINDOW_FRAMES = auto()
+    WINDOW_LOUVERS = auto()
+
+    DOOR = auto
+    DOOR_PANES = auto()
+    DOOR_PANELS = auto()
+    DOOR_FRAMES = auto()
+    DOOR_LOUVERS = auto()
+
+
+def facemap(group, skip=None):
+    """ Finds all newly created faces in a function and adds them to a face_map
+        called group.name
+
+        if skip is provided, then all faces in the face_map called skip.name
+        will not be altered
+    """
+
     def outer(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             bm = [arg for arg in args if isinstance(arg, bmesh.types.BMesh)].pop()
             faces = set(bm.faces)
 
-            func(*args, **kwargs)
+            result = func(*args, **kwargs)
 
             new_faces = set(bm.faces) - faces
-            add_faces_to_group(bm, new_faces, group)
+            add_facemap(bm, new_faces, group, skip)
+            return result
 
         return wrapper
 
     return outer
 
 
-def add_faces_to_group(bm, faces, group):
+def add_facemap(bm, faces, group, skip=None):
     face_map = bm.faces.layers.face_map.active
     for face in faces:
-        face[face_map] = group.value
+        if not (skip and face[face_map] == skip.value):
+            face[face_map] = group.value
 
 
-def create_face_maps_for_object(obj):
+def create_facemaps_for_object(obj):
     # -- verify face map
     bm = bm_from_obj(obj)
     bm.faces.layers.face_map.verify()
     bm_to_obj(bm, obj)
 
     # -- add face maps
-    for group in FaceGroups:
-        obj.face_maps.new(name=group.name.lower())
+    for fm in FaceMap:
+        obj.face_maps.new(name=fm.name.lower())
 
 
 DEFAULT_MATERIALS = {
