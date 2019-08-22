@@ -2,8 +2,9 @@ import bpy
 from bpy.props import (
     IntProperty,
     EnumProperty,
-    FloatProperty,
     BoolProperty,
+    FloatProperty,
+    StringProperty,
     FloatVectorProperty,
 )
 
@@ -113,14 +114,22 @@ class ArchProperty(bpy.types.PropertyGroup):
             col.prop(self, "height")
 
 
-classes = (SizeOffsetProperty, ArrayProperty, ArchProperty)
+class UserFaceMaps(bpy.types.PropertyGroup):
+    name: StringProperty()
+
+
+classes = (SizeOffsetProperty, ArrayProperty, ArchProperty, UserFaceMaps)
 
 
 def register_generic():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    bpy.types.Object.user_facemaps = bpy.props.CollectionProperty(type=UserFaceMaps)
+
 
 def unregister_generic():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    del bpy.types.Object.user_facemaps
