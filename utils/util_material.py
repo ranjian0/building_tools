@@ -12,7 +12,7 @@ class AutoIndex(Enum):
 
 
 class FaceMap(AutoIndex):
-    """ Enum provides names for face_maps and index values """
+    """ Enum provides names for face_maps """
 
     SLABS = auto()
     WALLS = auto()
@@ -90,6 +90,7 @@ def add_facemap_for_groups(groups):
 
 
 def verify_facemaps_for_object(obj):
+    """ Ensure object has a facemap layer """
     bm = bm_from_obj(obj)
     bm.faces.layers.face_map.verify()
     bm_to_obj(bm, obj)
