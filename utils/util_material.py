@@ -62,15 +62,11 @@ def add_facemap(bm, faces, group, skip=None):
             face[face_map] = group.value
 
 
-def create_facemaps_for_object(obj):
+def verify_facemaps_for_object(obj):
     # -- verify face map
     bm = bm_from_obj(obj)
     bm.faces.layers.face_map.verify()
     bm_to_obj(bm, obj)
-
-    # -- add face maps
-    for fm in FaceMap:
-        obj.face_maps.new(name=fm.name.lower())
 
 
 DEFAULT_MATERIALS = {
