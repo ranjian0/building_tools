@@ -71,7 +71,6 @@ def add_faces_to_map(bm, faces, group, skip=None):
         return True
 
     for face in list(filter(remove_skipped, faces)):
-        assert face[face_map] != 2, f"Fuck! {group_index} {skip}"
         face[face_map] = group_index
 
 
@@ -79,8 +78,8 @@ def add_facemap_for_groups(groups):
     """ Creates a face_map called group.name.lower if none exists
         in the active object
     """
-    groups = list(groups)
     obj = bpy.context.object
+    groups = groups if isinstance(groups, (list, tuple)) else [groups]
 
     for group in groups:
         if not obj.face_maps.get(group.name.lower()):
