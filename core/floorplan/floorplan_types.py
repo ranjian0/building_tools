@@ -1,5 +1,3 @@
-"""Summary
-"""
 import bmesh
 from bmesh.types import BMVert
 from mathutils import Vector, Matrix
