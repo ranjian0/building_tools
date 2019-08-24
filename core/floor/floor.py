@@ -11,7 +11,7 @@ class Floor:
         bm = bmesh.from_edit_mesh(me)
 
         if cls.validate(bm):
-            cls.add_floor_facemaps(context.object)
+            cls.add_floor_facemaps()
             if any([f for f in bm.faces if f.select]):
                 create_floors(bm, None, prop)
                 select(bm.faces, False)
@@ -23,7 +23,7 @@ class Floor:
         return {"CANCELLED"}
 
     @classmethod
-    def add_floor_facemaps(cls, obj):
+    def add_floor_facemaps(cls):
         groups = FaceMap.SLABS, FaceMap.WALLS
         add_facemap_for_groups(groups)
 
