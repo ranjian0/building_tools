@@ -74,7 +74,6 @@ class PANEL_PT_material_tools(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="Face Maps")
 
         ob = context.object
         facemap = ob.face_maps.active
@@ -82,6 +81,11 @@ class PANEL_PT_material_tools(bpy.types.Panel):
         rows = 2
         if facemap:
             rows = 4
+
+        if not len(ob.face_maps):
+            return
+
+        layout.label(text="Face Maps")
 
         row = layout.row()
         args = ob, "face_maps", ob.face_maps, "active_index"
