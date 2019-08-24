@@ -21,7 +21,8 @@ class Window:
     def set_facemaps(cls, obj):
         fmaps = FaceMap.WINDOW, FaceMap.WINDOW_FRAMES
         for fm in fmaps:
-            obj.face_maps.new(name=fm.name.lower())
+            if not obj.face_maps.get(fm.name.lower()):
+                obj.face_maps.new(name=fm.name.lower())
 
     @classmethod
     def validate(cls, faces):

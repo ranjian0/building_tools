@@ -26,7 +26,8 @@ class Floor:
     def set_facemaps(cls, obj):
         fmaps = FaceMap.SLABS, FaceMap.WALLS
         for fm in fmaps:
-            obj.face_maps.new(name=fm.name.lower())
+            if obj.face_maps.get(fm.name.lower()):
+                obj.face_maps.new(name=fm.name.lower())
 
     @classmethod
     def validate(cls, bm):
