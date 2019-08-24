@@ -43,16 +43,6 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_roof")
 
 
-class BTOOLS_UL_fmaps(bpy.types.UIList):
-    def draw_item(self, _context, layout, _data, item, icon, skip, _skip, _skip_):
-        fmap = item
-        if self.layout_type in {"DEFAULT", "COMPACT"}:
-            layout.prop(fmap, "name", text="", emboss=False, icon="FACE_MAPS")
-        elif self.layout_type == "GRID":
-            layout.alignment = "CENTER"
-            layout.label(text="", icon_value=icon)
-
-
 class PANEL_PT_material_tools(bpy.types.Panel):
 
     bl_label = "Material Tools"
@@ -101,7 +91,7 @@ class PANEL_PT_material_tools(bpy.types.Panel):
             sub.operator("object.face_map_deselect", text="Deselect")
 
 
-classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools, BTOOLS_UL_fmaps)
+classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools)
 
 
 def register():
