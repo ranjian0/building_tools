@@ -5,8 +5,8 @@ from bmesh.types import BMVert, BMEdge
 
 from ...utils import (
     FaceMap,
-    add_facemap,
     filter_geom,
+    add_faces_to_map,
     boundary_edges_from_face_selection,
 )
 
@@ -31,8 +31,8 @@ def create_floors(bm, edges, prop):
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
 
-    add_facemap(bm, slabs, FaceMap.SLABS)
-    add_facemap(bm, walls, FaceMap.WALLS)
+    add_faces_to_map(bm, slabs, FaceMap.SLABS)
+    add_faces_to_map(bm, walls, FaceMap.WALLS)
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
