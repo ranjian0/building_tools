@@ -30,12 +30,12 @@ class FaceMap(AutoIndex):
     DOOR_LOUVERS = auto()
 
 
-def facemap(group, skip=None):
+def map_new_faces(group, skip=None):
     """ Finds all newly created faces in a function and adds them to a face_map
-        called group.name
+        called group.name.lower()
 
         if skip is provided, then all faces in the face_map called skip.name
-        will not be altered
+        will not be added to the face_map
     """
 
     def outer(func):
@@ -47,7 +47,7 @@ def facemap(group, skip=None):
             result = func(*args, **kwargs)
 
             new_faces = set(bm.faces) - faces
-            add_facemap(bm, list(new_faces), group, skip)
+            add_faces_to_map(bm, list(new_faces), group, skip)
             return result
 
         return wrapper
@@ -55,7 +55,12 @@ def facemap(group, skip=None):
     return outer
 
 
-def add_facemap(bm, faces, group, skip=None):
+def add_faces_to_map(bm, faces, group, skip=None):
+    """ Sets the face_map index of faces to the index of the face_map called
+        group.name.lower()
+
+        see map_new_faces for the option *skip*
+    """
     face_map = bm.faces.layers.face_map.active
 
     group_index = -1
@@ -70,6 +75,18 @@ def add_facemap(bm, faces, group, skip=None):
 
     for face in list(filter(remove_skipped, faces)):
         face[face_map] = group_index
+
+
+def add_facemap_for_groups(groups):
+    """ Creates a face_map called group.name.lower if none exists
+        in the active object
+    """
+    groups = list(groups)
+    obj = bpy.context.object
+
+    for group in groups:
+        if not obj.face_maps.get(group.name.lower()):
+            obj.face_maps.new(name=group.name.lower())
 
 
 def verify_facemaps_for_object(obj):
