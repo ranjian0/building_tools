@@ -47,7 +47,7 @@ def facemap(group, skip=None):
             result = func(*args, **kwargs)
 
             new_faces = set(bm.faces) - faces
-            add_facemap(bm, new_faces, group, skip)
+            add_facemap(bm, list(new_faces), group, skip)
             return result
 
         return wrapper
@@ -57,13 +57,22 @@ def facemap(group, skip=None):
 
 def add_facemap(bm, faces, group, skip=None):
     face_map = bm.faces.layers.face_map.active
-    for face in faces:
-        if not (skip and face[face_map] == skip.value):
-            face[face_map] = group.value
+
+    group_index = -1
+    for name, fmap in bpy.context.object.face_maps.items():
+        if fmap.name == group.name.lower():
+            group_index = fmap.index
+
+    def remove_skipped(f):
+        if skip:
+            return not (f[face_map] == skip.value)
+        return True
+
+    for face in list(filter(remove_skipped, faces)):
+        face[face_map] = group_index
 
 
 def verify_facemaps_for_object(obj):
-    # -- verify face map
     bm = bm_from_obj(obj)
     bm.faces.layers.face_map.verify()
     bm_to_obj(bm, obj)
