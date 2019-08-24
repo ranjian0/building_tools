@@ -26,7 +26,7 @@ class Floor:
     def set_facemaps(cls, obj):
         fmaps = FaceMap.SLABS, FaceMap.WALLS
         for fm in fmaps:
-            if obj.face_maps.get(fm.name.lower()):
+            if not obj.face_maps.get(fm.name.lower()):
                 obj.face_maps.new(name=fm.name.lower())
 
     @classmethod
