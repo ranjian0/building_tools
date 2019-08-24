@@ -62,18 +62,16 @@ def add_faces_to_map(bm, faces, group, skip=None):
         see map_new_faces for the option *skip*
     """
     face_map = bm.faces.layers.face_map.active
-
-    group_index = -1
-    for name, fmap in bpy.context.object.face_maps.items():
-        if fmap.name == group.name.lower():
-            group_index = fmap.index
+    group_index = face_map_index_from_name(group.name.lower())
 
     def remove_skipped(f):
         if skip:
-            return not (f[face_map] == skip.value)
+            skip_index = face_map_index_from_name(skip.name.lower())
+            return not (f[face_map] == skip_index)
         return True
 
     for face in list(filter(remove_skipped, faces)):
+        assert face[face_map] != 2, f"Fuck! {group_index} {skip}"
         face[face_map] = group_index
 
 
@@ -94,6 +92,13 @@ def verify_facemaps_for_object(obj):
     bm = bm_from_obj(obj)
     bm.faces.layers.face_map.verify()
     bm_to_obj(bm, obj)
+
+
+def face_map_index_from_name(name):
+    for _, fmap in bpy.context.object.face_maps.items():
+        if fmap.name == name:
+            return fmap.index
+    return -1
 
 
 DEFAULT_MATERIALS = {
