@@ -3,7 +3,7 @@ import bmesh
 from enum import Enum, auto
 from functools import wraps
 
-from .util_object import bm_from_obj, bm_to_obj
+from .util_mesh import get_edit_mesh
 
 
 class AutoIndex(Enum):
@@ -88,9 +88,10 @@ def add_facemap_for_groups(groups):
 
 def verify_facemaps_for_object(obj):
     """ Ensure object has a facemap layer """
-    bm = bm_from_obj(obj)
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
     bm.faces.layers.face_map.verify()
-    bm_to_obj(bm, obj)
+    bmesh.update_edit_mesh(me, True)
 
 
 def face_map_index_from_name(name):

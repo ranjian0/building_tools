@@ -13,7 +13,7 @@ from ...utils import (
 class Floor:
     @classmethod
     def build(cls, context, prop):
-        verify_facemaps_for_object(context.objext)
+        verify_facemaps_for_object(context.object)
 
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
