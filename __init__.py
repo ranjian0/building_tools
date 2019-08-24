@@ -78,6 +78,8 @@ class PANEL_PT_material_tools(bpy.types.Panel):
         col = row.column(align=True)
         col.operator("object.face_map_add", icon='ADD', text="")
         col.operator("object.face_map_remove", icon='REMOVE', text="")
+        col.separator()
+        col.operator("btools.face_map_clear", icon='TRASH', text="")
 
         if ob.face_maps and (ob.mode == "EDIT" and ob.type == "MESH"):
             row = layout.row()

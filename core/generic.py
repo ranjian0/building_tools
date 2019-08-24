@@ -1,4 +1,5 @@
 import bpy
+import bmesh
 from bpy.props import (
     IntProperty,
     EnumProperty,
@@ -6,6 +7,8 @@ from bpy.props import (
     FloatProperty,
     FloatVectorProperty,
 )
+
+from ..utils import get_edit_mesh
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -113,7 +116,46 @@ class ArchProperty(bpy.types.PropertyGroup):
             col.prop(self, "height")
 
 
-classes = (SizeOffsetProperty, ArrayProperty, ArchProperty)
+class BTOOLS_UL_fmaps(bpy.types.UIList):
+    def draw_item(self, _context, layout, _data, item, icon, skip, _skip, _skip_):
+        fmap = item
+        if self.layout_type in {"DEFAULT", "COMPACT"}:
+            layout.prop(fmap, "name", text="", emboss=False, icon="FACE_MAPS")
+        elif self.layout_type == "GRID":
+            layout.alignment = "CENTER"
+            layout.label(text="", icon_value=icon)
+
+
+class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
+    """Remove all empty face maps"""
+    bl_idname = "btools.face_map_clear"
+    bl_label = "Clear face maps"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == "MESH"
+
+    def execute(self, context):
+        obj = context.object
+        me = get_edit_mesh()
+        bm = bmesh.from_edit_mesh(me)
+
+        face_map = bm.faces.layers.face_map.active
+        map_all_indices = {f.index for _, f in obj.face_maps.items()}
+        map_used_indices = {f[face_map] for f in bm.faces}
+
+        tag_remove = map_all_indices - map_used_indices
+        tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove]
+        for fmap in tag_remove_maps:
+            obj.face_maps.remove(fmap)
+
+        bmesh.update_edit_mesh(me, True)
+        return {'FINISHED'}
+
+
+classes = (SizeOffsetProperty, ArrayProperty, ArchProperty, BTOOLS_UL_fmaps, BTOOLS_OT_fmaps_clear)
 
 
 def register_generic():
