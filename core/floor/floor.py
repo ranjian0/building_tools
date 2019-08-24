@@ -1,12 +1,20 @@
 import bmesh
 from .floor_types import create_floors
 
-from ...utils import select, get_edit_mesh, FaceMap, add_facemap_for_groups
+from ...utils import (
+    select,
+    FaceMap,
+    get_edit_mesh,
+    add_facemap_for_groups,
+    verify_facemaps_for_object,
+)
 
 
 class Floor:
     @classmethod
     def build(cls, context, prop):
+        verify_facemaps_for_object(context.objext)
+
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
