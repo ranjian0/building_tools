@@ -1,7 +1,10 @@
 import bmesh
 from ..fill import fill_bar, fill_louver, fill_glass_panes
 from ...utils import (
+    facemap,
+    FaceMap,
     arc_edge,
+    add_facemap,
     filter_geom,
     calc_edge_median,
     create_cube_without_faces,
@@ -25,6 +28,7 @@ def create_window(bm, faces, prop):
             create_window_fill(bm, face, prop)
 
 
+@facemap(FaceMap.WALLS)
 def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
@@ -42,6 +46,7 @@ def create_window_array(bm, face, prop):
     return list({f for e in inner_edges for f in e.link_faces})
 
 
+@facemap(FaceMap.WINDOW_FRAMES, skip=FaceMap.WINDOW)
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
@@ -65,6 +70,7 @@ def create_window_frame(bm, face, prop):
         verts = filter_geom(geom, bmesh.types.BMVert)
         bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
 
+    add_facemap(bm, [face], FaceMap.WINDOW)
     return face
 
 
@@ -87,6 +93,8 @@ def create_window_frame_arched(bm, face, prop):
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
+
+    add_facemap(bm, fcs, FaceMap.WINDOW)
     return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
 
 
@@ -123,6 +131,7 @@ def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
     return faces
 
 
+@facemap(FaceMap.WINDOW_BARS)
 def add_extra_arch_bar(bm, face, prop):
     top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
     bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth / 4)
