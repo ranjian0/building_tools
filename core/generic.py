@@ -128,6 +128,7 @@ class BTOOLS_UL_fmaps(bpy.types.UIList):
 
 class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
     """Remove all empty face maps"""
+
     bl_idname = "btools.face_map_clear"
     bl_label = "Clear face maps"
     bl_options = {"REGISTER", "UNDO"}
@@ -152,10 +153,16 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
             obj.face_maps.remove(fmap)
 
         bmesh.update_edit_mesh(me, True)
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
-classes = (SizeOffsetProperty, ArrayProperty, ArchProperty, BTOOLS_UL_fmaps, BTOOLS_OT_fmaps_clear)
+classes = (
+    ArchProperty,
+    ArrayProperty,
+    BTOOLS_UL_fmaps,
+    SizeOffsetProperty,
+    BTOOLS_OT_fmaps_clear,
+)
 
 
 def register_generic():
