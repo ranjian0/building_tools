@@ -1,6 +1,6 @@
 import bmesh
 from .window_types import create_window
-from ...utils import get_edit_mesh, FaceMap
+from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups
 
 
 class Window:
@@ -11,18 +11,16 @@ class Window:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            cls.set_facemaps(context.object)
+            cls.add_window_facemaps(context.object)
             create_window(bm, faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
 
     @classmethod
-    def set_facemaps(cls, obj):
-        fmaps = FaceMap.WINDOW, FaceMap.WINDOW_FRAMES
-        for fm in fmaps:
-            if not obj.face_maps.get(fm.name.lower()):
-                obj.face_maps.new(name=fm.name.lower())
+    def add_window_facemaps(cls, obj):
+        groups = FaceMap.WINDOW, FaceMap.WINDOW_FRAMES
+        add_facemap_for_groups(groups)
 
     @classmethod
     def validate(cls, faces):

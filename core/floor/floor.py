@@ -1,7 +1,7 @@
 import bmesh
 from .floor_types import create_floors
 
-from ...utils import select, get_edit_mesh, FaceMap
+from ...utils import select, get_edit_mesh, FaceMap, add_facemap_for_groups
 
 
 class Floor:
@@ -11,7 +11,7 @@ class Floor:
         bm = bmesh.from_edit_mesh(me)
 
         if cls.validate(bm):
-            cls.set_facemaps(context.object)
+            cls.add_floor_facemaps(context.object)
             if any([f for f in bm.faces if f.select]):
                 create_floors(bm, None, prop)
                 select(bm.faces, False)
@@ -23,11 +23,9 @@ class Floor:
         return {"CANCELLED"}
 
     @classmethod
-    def set_facemaps(cls, obj):
-        fmaps = FaceMap.SLABS, FaceMap.WALLS
-        for fm in fmaps:
-            if not obj.face_maps.get(fm.name.lower()):
-                obj.face_maps.new(name=fm.name.lower())
+    def add_floor_facemaps(cls, obj):
+        groups = FaceMap.SLABS, FaceMap.WALLS
+        add_facemap_for_groups(groups)
 
     @classmethod
     def validate(cls, bm):
