@@ -1,12 +1,14 @@
 import bmesh
 from .floor_types import create_floors
 
-from ...utils import select, get_edit_mesh
+from ...utils import select, get_edit_mesh, FaceMap
 
 
 class Floor:
     @classmethod
     def build(cls, context, prop):
+        cls.set_facemaps(context.object)
+
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
@@ -20,6 +22,12 @@ class Floor:
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
+
+    @classmethod
+    def set_facemaps(cls, obj):
+        fmaps = FaceMap.SLABS, FaceMap.WALLS
+        for fm in fmaps:
+            obj.face_maps.new(name=fm.name.lower())
 
     @classmethod
     def validate(cls, bm):
