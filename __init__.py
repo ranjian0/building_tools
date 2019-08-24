@@ -50,15 +50,13 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
 
 
 class BTOOLS_UL_fmaps(bpy.types.UIList):
-    def draw_item(self, _context, layout, _data, item, icon, *args):
+    def draw_item(self, _context, layout, _data, item, icon, skip, _skip, _skip_):
         fmap = item
-        obj = _context.object
-        if fmap.name in obj.user_facemaps.keys():
-            if self.layout_type in {"DEFAULT", "COMPACT"}:
-                layout.prop(fmap, "name", text="", emboss=False, icon="FACE_MAPS")
-            elif self.layout_type == "GRID":
-                layout.alignment = "CENTER"
-                layout.label(text="", icon_value=icon)
+        if self.layout_type in {"DEFAULT", "COMPACT"}:
+            layout.prop(fmap, "name", text="", emboss=False, icon="FACE_MAPS")
+        elif self.layout_type == "GRID":
+            layout.alignment = "CENTER"
+            layout.label(text="", icon_value=icon)
 
 
 class PANEL_PT_material_tools(bpy.types.Panel):
