@@ -7,8 +7,6 @@ from ...utils import select, get_edit_mesh, FaceMap
 class Floor:
     @classmethod
     def build(cls, context, prop):
-        cls.set_facemaps(context.object)
-
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
@@ -19,6 +17,7 @@ class Floor:
             else:
                 edges = [e for e in bm.edges if e.is_boundary]
                 create_floors(bm, edges, prop)
+            cls.set_facemaps(context.object)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
