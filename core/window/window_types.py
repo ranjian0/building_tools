@@ -1,12 +1,13 @@
 import bmesh
-from ..fill import fill_bar, fill_louver, fill_glass_panes
+from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ...utils import (
-    facemap,
     FaceMap,
     arc_edge,
-    add_facemap,
     filter_geom,
+    map_new_faces,
+    add_faces_to_map,
     calc_edge_median,
+    add_facemap_for_groups,
     create_cube_without_faces,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
@@ -28,7 +29,7 @@ def create_window(bm, faces, prop):
             create_window_fill(bm, face, prop)
 
 
-@facemap(FaceMap.WALLS)
+@map_new_faces(FaceMap.WALLS)
 def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
@@ -46,7 +47,7 @@ def create_window_array(bm, face, prop):
     return list({f for e in inner_edges for f in e.link_faces})
 
 
-@facemap(FaceMap.WINDOW_FRAMES, skip=FaceMap.WINDOW)
+@map_new_faces(FaceMap.WINDOW_FRAMES, skip=FaceMap.WINDOW)
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
@@ -70,7 +71,7 @@ def create_window_frame(bm, face, prop):
         verts = filter_geom(geom, bmesh.types.BMVert)
         bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
 
-    add_facemap(bm, [face], FaceMap.WINDOW)
+    add_faces_to_map(bm, [face], FaceMap.WINDOW)
     return face
 
 
@@ -94,7 +95,7 @@ def create_window_frame_arched(bm, face, prop):
 
     fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
 
-    add_facemap(bm, fcs, FaceMap.WINDOW)
+    add_faces_to_map(bm, fcs, FaceMap.WINDOW)
     return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
 
 
@@ -102,16 +103,17 @@ def create_window_fill(bm, face, prop):
     """Create extra elements on face
     """
 
-    if prop.fill_type == "NONE":
-        pass
-    elif prop.fill_type == "GLASS PANES":
-        fill_glass_panes(bm, face, prop.glass_fill)
+    if prop.fill_type == "GLASS PANES":
+        add_facemap_for_groups(FaceMap.WINDOW_PANES)
+        fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.WINDOW)
     elif prop.fill_type == "BAR":
+        add_facemap_for_groups(FaceMap.WINDOW_BARS)
         fill_bar(bm, face, prop.bar_fill)
         if prop.has_arch():
             add_extra_arch_bar(bm, face, prop.bar_fill)
     elif prop.fill_type == "LOUVER":
-        fill_louver(bm, face, prop.louver_fill)
+        add_facemap_for_groups(FaceMap.WINDOW_LOUVERS)
+        fill_louver(bm, face, prop.louver_fill, user=FillUser.WINDOW)
 
 
 def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
@@ -131,7 +133,7 @@ def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
     return faces
 
 
-@facemap(FaceMap.WINDOW_BARS)
+@map_new_faces(FaceMap.WINDOW_BARS)
 def add_extra_arch_bar(bm, face, prop):
     top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
     bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth / 4)
