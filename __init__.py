@@ -14,12 +14,6 @@ bl_info = {
     "category": "Mesh",
 }
 
-# =======================================================
-#
-#           PANEL UI
-#
-# =======================================================
-
 
 class PANEL_PT_mesh_tools(bpy.types.Panel):
 
@@ -85,11 +79,15 @@ class PANEL_PT_material_tools(bpy.types.Panel):
         if not len(ob.face_maps):
             return
 
-        layout.label(text="Face Maps")
+        layout.label(text="Material Face Maps")
 
         row = layout.row()
         args = ob, "face_maps", ob.face_maps, "active_index"
         row.template_list("BTOOLS_UL_fmaps", "", *args, rows=rows)
+
+        col = row.column(align=True)
+        col.operator("object.face_map_add", icon='ADD', text="")
+        col.operator("object.face_map_remove", icon='REMOVE', text="")
 
         if ob.face_maps and (ob.mode == "EDIT" and ob.type == "MESH"):
             row = layout.row()
@@ -102,12 +100,6 @@ class PANEL_PT_material_tools(bpy.types.Panel):
             sub.operator("object.face_map_select", text="Select")
             sub.operator("object.face_map_deselect", text="Deselect")
 
-
-# =======================================================
-#
-#           REGISTER
-#
-# =======================================================
 
 classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools, BTOOLS_UL_fmaps)
 
