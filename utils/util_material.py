@@ -39,6 +39,9 @@ class FaceMap(AutoIndex):
     STAIRS_RAILING_WALLS = auto()
     STAIRS_RAILING_RAILS = auto()
 
+    ROOF = auto()
+    ROOF_HANGS = auto()
+
 
 def map_new_faces(group, skip=None):
     """ Finds all newly created faces in a function and adds them to a face_map
