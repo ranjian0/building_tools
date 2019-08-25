@@ -135,7 +135,7 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
         res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y)
         edges.extend(filter_geom(res["geom_inner"], BMEdge))
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
-    return list({f for ed in edges for f in ed.link_faces})
+    return list({f for ed in validate(edges) for f in ed.link_faces})
 
 
 def duplicate_face_translate_scale(bm, face, position, scale, scale_center):
