@@ -69,10 +69,13 @@ def create_railing_from_step_edges(bm, edges, normal, prop):
     """ Create railing from stairs
     """
     if prop.rail.fill == "POSTS":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         fill_posts_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "RAILS":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         fill_rails_for_step_edges(bm, edges, normal, prop)
     elif prop.rail.fill == "WALL":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
         fill_walls_for_step_edges(bm, edges, normal, prop)
 
 
@@ -405,6 +408,7 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
             create_cube_without_faces(bm, size, p, top=True, bottom=True)
 
 
+@map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
 def fill_posts_for_step_edges(bm, edges, normal, prop):
     """ Add posts for stair edges
     """
@@ -433,6 +437,7 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
         add_rail_with_slope(bm, start, end, slope, normal, prop.rail)
 
 
+@map_new_faces(FaceMap.RAILING_RAILS, skip=FaceMap.RAILING_POSTS)
 def fill_rails_for_step_edges(bm, edges, normal, prop):
     """ Add rails for stair edges
     """
@@ -456,7 +461,9 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
         post_w, post_h = rail.corner_post_width, rail.corner_post_height
         post_pos = max_location + Vector((0, 0, post_h / 2 - step_size))
         post_pos += tangent_offset + (normal * -post_w / 2)
-        add_cube_post(bm, post_w, post_h, post_pos, rail.has_decor)
+
+        post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
+        post(bm, post_w, post_h, post_pos, rail.has_decor)
 
         #   --  add a rails
         array_sloped_rails(
@@ -464,6 +471,7 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
         )
 
 
+@map_new_faces(FaceMap.RAILING_WALLS)
 def fill_walls_for_step_edges(bm, edges, normal, prop):
     """ Add wall for stair edges
     """
@@ -539,6 +547,7 @@ def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
         create_cube(bm, size, position)
 
 
+@map_new_faces(FaceMap.RAILING_RAILS)
 def add_rail_with_slope(bm, start, end, slope, normal, prop):
     """ Add a rail from start to end with a given slope
     """
