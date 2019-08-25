@@ -420,8 +420,8 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
         min_location, max_location = find_min_and_max_vert_locations(
             [vert for edge in group for vert in edge.verts], normal
         )
-        step_size = (max_location.z - min_location.z) / (prop.step_count - 1)
-        max_location.z += step_size
+        step_size = abs((max_location.z - min_location.z) / (prop.step_count - 1))
+        min_location.z += step_size
 
         #  -- slope and edge tangent
         slope = slope_between_vectors(max_location, min_location, normal)
@@ -433,7 +433,7 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
 
         #   --  add a rail from min_location to max_location using slope
         height = prop.rail.corner_post_height - (prop.rail.rail_size / 2)
-        offset = (tangent * prop.rail.rail_size) + Vector((0, 0, height - step_size))
+        offset = (tangent * prop.rail.rail_size) + Vector((0, 0, height))
         start = max_location + offset
         end = min_location + offset
         add_rail_with_slope(bm, start, end, slope, normal, prop.rail)
@@ -528,7 +528,7 @@ def slope_between_vectors(start, end, normal):
 
 
 def find_min_and_max_vert_locations(verts, normal):
-    """ Find the minimum and maximum location in verts
+    """ Find the minimum and maximum location in verts based on normal direction
     """
     v_location = [vert.co.copy() for vert in verts]
     sort_key = operator.attrgetter("x" if normal.x else "y")
