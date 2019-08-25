@@ -1,14 +1,9 @@
-GENERAL:
-    - keep a reference to an objects building properties
-
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
 
 
 MATERIAL API:
 
-    - current plan is keep a record of faces(indices) for each tool
-    - add a material tab
     - create presets for default materials (FLAT / PBR)
     - apply the materials to the faces based on where they belong
 
