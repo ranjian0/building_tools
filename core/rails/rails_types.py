@@ -483,7 +483,7 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
         wall = create_wall(
             bm, start, end, rail.corner_post_height, rail.wall_width, tan
         )
-        wall(delete_faces=["bottom", "right"])
+        wall(delete_faces=["bottom", "right" if sum(normal) < 0 else "left"])
 
 
 def get_edge_groups_from_direction(edges, direction):
