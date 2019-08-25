@@ -29,15 +29,12 @@ class FaceMap(AutoIndex):
     DOOR_FRAMES = auto()
     DOOR_LOUVERS = auto()
 
-    BALCONY = auto()
-    BALCONY_RAILING_POSTS = auto()
-    BALCONY_RAILING_WALLS = auto()
-    BALCONY_RAILING_RAILS = auto()
-
     STAIRS = auto()
-    STAIRS_RAILING_POSTS = auto()
-    STAIRS_RAILING_WALLS = auto()
-    STAIRS_RAILING_RAILS = auto()
+    BALCONY = auto()
+
+    RAILING_POSTS = auto()
+    RAILING_WALLS = auto()
+    RAILING_RAILS = auto()
 
     ROOF = auto()
     ROOF_HANGS = auto()

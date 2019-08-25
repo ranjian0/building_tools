@@ -8,13 +8,16 @@ from mathutils import Vector, Matrix
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     select,
+    FaceMap,
     filter_geom,
     create_cube,
     edge_vector,
     edge_tangent,
+    map_new_faces,
     create_cylinder,
     calc_edge_median,
     calc_verts_median,
+    add_facemap_for_groups,
     create_cube_without_faces,
     boundary_edges_from_face_selection,
 )
@@ -101,9 +104,11 @@ def create_railing(bm, edges, lfaces, prop, raildata):
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
+@map_new_faces(FaceMap.RAILING_POSTS)
 def create_corner_post(bm, loops, prop, raildata):
     """ Add post at each vert in loops
     """
+    add_facemap_for_groups(FaceMap.RAILING_POSTS)
     for loop in loops:
         v = loop.vert
         e = loop.edge
@@ -135,13 +140,17 @@ def create_fill(bm, edges, prop, raildata):
     """ Create fill types for railing
     """
     if prop.fill == "POSTS":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_posts(bm, edges, prop, raildata)
     elif prop.fill == "RAILS":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_rails(bm, edges, prop)
     elif prop.fill == "WALL":
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
         create_fill_walls(bm, edges, prop, raildata)
 
 
+@map_new_faces(FaceMap.RAILING_RAILS)
 def create_fill_rails(bm, edges, prop):
     """ Add rails between corner posts
     """
@@ -170,6 +179,7 @@ def create_fill_rails(bm, edges, prop):
         processed_edges.append(edge)
 
 
+@map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
 def create_fill_posts(bm, edges, prop, raildata):
     """ Add posts between corner posts
     """
@@ -191,11 +201,13 @@ def create_fill_posts(bm, edges, prop, raildata):
         rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
         rail_pos += Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
 
-        rail = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
+        rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
+        rail = rail(bm, rail_size, rail_pos, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
         processed_edges.append(edge)
 
 
+@map_new_faces(FaceMap.RAILING_WALLS)
 def create_fill_walls(bm, edges, prop, raildata):
     """ Add walls between corner posts
     """
