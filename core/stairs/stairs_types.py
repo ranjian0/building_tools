@@ -43,8 +43,10 @@ def create_stairs(bm, faces, prop):
             if prop.landing and i == 0:
                 ret_face = get_stair_face_from_direction(bm, ret_face, prop)
 
-            if i < (step_count - 1):
+            if i < (step_count - 1) and not (prop.landing and i == 0):
                 ext_face = subdivide_next_step(bm, ret_face, fheight, step_count, i)
+                continue
+            ext_face = ret_face
 
     if prop.railing:
         create_stairs_railing(bm, init_normal, top_faces, prop)
@@ -83,7 +85,7 @@ def get_stair_face_from_direction(bm, ret_face, prop):
 def subdivide_next_step(bm, ret_face, fheight, step_count, step_idx):
     """ cut the next face step height
     """
-    res = subdivide_face_edges_horizontal(bm, ret_face, 1)
+    res = subdivide_face_edges_horizontal(bm, ret_face, cuts=1)
     verts = filter_geom(res["geom_inner"], BMVert)
     bmesh.ops.translate(
         bm, verts=verts, vec=(0, 0, (fheight / 2) - (fheight / (step_count - step_idx)))
