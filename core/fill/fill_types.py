@@ -4,6 +4,7 @@ from mathutils import Vector, Matrix
 from bmesh.types import BMEdge, BMVert
 from ...utils import (
     FaceMap,
+    validate,
     filter_geom,
     map_new_faces,
     add_faces_to_map,
@@ -116,7 +117,7 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     usergroup = [FaceMap.WINDOW_LOUVERS, FaceMap.DOOR_LOUVERS][user == FillUser.DOOR]
     extrude = map_new_faces(usergroup)(extrude_faces_add_slope)
     extrude(bm, louver_faces, normal, prop.louver_depth)
-    add_faces_to_map(bm, faces[::2], usergroup)
+    add_faces_to_map(bm, validate(faces[::2]), usergroup)
 
 
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
