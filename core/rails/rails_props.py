@@ -65,10 +65,6 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Whether the railing has corner posts",
     )
 
-    has_decor: BoolProperty(
-        name="Has Decor", default=False, description="Whether corner posts have decor"
-    )
-
     remove_colinear: BoolProperty(
         name="Remove Colinear",
         default=False,
@@ -103,10 +99,6 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = layout.row(align=True)
-            row.prop(self, "remove_colinear", toggle=True)
-            row.prop(self, "has_decor", toggle=True)
-
         elif self.fill == "RAILS":
             col = layout.column(align=True)
             col.prop(self, "rail_density")
@@ -118,10 +110,6 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = layout.row(align=True)
-            row.prop(self, "remove_colinear", toggle=True)
-            row.prop(self, "has_decor", toggle=True)
-
         elif self.fill == "WALL":
             col = layout.column(align=True)
             col.prop(self, "wall_width")
@@ -132,6 +120,4 @@ class RailProperty(bpy.types.PropertyGroup):
             col.prop(self, "corner_post_width")
             col.prop(self, "corner_post_height")
 
-            row = layout.row(align=True)
-            row.prop(self, "remove_colinear", toggle=True)
-            row.prop(self, "has_decor", toggle=True)
+        layout.prop(self, "remove_colinear", toggle=True)
