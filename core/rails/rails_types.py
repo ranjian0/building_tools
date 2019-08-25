@@ -641,11 +641,11 @@ def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, 
 def slope_step_walls(bm, faces, normal, step_size):
     """ Make wall slope along step edges """
     axis = "x" if normal.x else "y"
-    func = min if sum(normal) < 0 else max
+    func = max if sum(normal) < 0 else min
 
     for face in faces:
         pos = func([getattr(calc_edge_median(e), axis) for e in face.edges])
         e = [e for e in face.edges if getattr(calc_edge_median(e), axis) == pos].pop()
 
         for v in e.verts:
-            v.co.z -= step_size
+            v.co.z += step_size
