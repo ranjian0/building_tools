@@ -9,6 +9,7 @@ from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     select,
     FaceMap,
+    validate,
     filter_geom,
     create_cube,
     edge_vector,
@@ -280,6 +281,7 @@ def delete_linked_wall_faces(bm, edges, tangent, delete_faces=["bottom"]):
         faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) > 0])
 
     bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES_ONLY")
+    return validate(faces)
 
 
 def is_parallel(loop):
@@ -477,13 +479,23 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
     """
     rail = prop.rail
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
-    for edge in [e for group in edge_groups for e in group]:
-        tan = edge_tangent(edge)
-        start, end = [v.co for v in edge.verts]
-        wall = create_wall(
-            bm, start, end, rail.corner_post_height, rail.wall_width, tan
+    for group in edge_groups:
+        min_location, max_location = find_min_and_max_vert_locations(
+            [vert for edge in group for vert in edge.verts], normal
         )
-        wall(delete_faces=["bottom", "right" if sum(normal) < 0 else "left"])
+        step_size = abs((max_location.z - min_location.z) / (prop.step_count - 1))
+
+        for edge in group:
+            tan = edge_tangent(edge)
+            start, end = [v.co for v in edge.verts]
+            wall = create_wall(
+                bm, start, end, rail.corner_post_height, rail.wall_width, tan
+            )
+            inner = "right" if sum(normal) < 0 else "left"
+            faces = wall(delete_faces=["bottom", inner])
+
+            up_faces = [f for f in faces if f.normal.z > 0]
+            slope_step_walls(bm, up_faces, normal, step_size)
 
 
 def get_edge_groups_from_direction(edges, direction):
@@ -623,3 +635,17 @@ def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, 
         add_rail_with_slope(bm, start, end, slope, normal, rail)
         start -= Vector((0, 0, 1)) * step
         end -= Vector((0, 0, 1)) * step
+
+
+def slope_step_walls(bm, faces, normal, step_size):
+    """ Make wall slope along step edges """
+    axis = "x" if normal.x else "y"
+    func = max if sum(normal) < 0 else min
+
+    for face in faces:
+        pos = func([getattr(calc_edge_median(e), axis) for e in face.edges])
+        e = [e for e in face.edges if getattr(calc_edge_median(e), axis) == pos].pop()
+        print(step_size)
+
+        for v in e.verts:
+            v.co.z += step_size
