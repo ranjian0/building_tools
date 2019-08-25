@@ -2,7 +2,13 @@ import bmesh
 from bmesh.types import BMVert, BMFace
 
 from ..rails import create_railing_from_edges
-from ...utils import filter_geom, calc_edge_median, inset_face_with_scale_offset
+from ...utils import (
+    FaceMap,
+    filter_geom,
+    calc_edge_median,
+    add_faces_to_map,
+    inset_face_with_scale_offset,
+)
 
 
 def create_balcony(bm, faces, prop):
@@ -12,7 +18,10 @@ def create_balcony(bm, faces, prop):
         size, off = prop.size_offset.size, prop.size_offset.offset
         f = inset_face_with_scale_offset(bm, f, size.y, size.x, off.x, off.y, off.z)
 
+        add_faces_to_map(bm, [f], FaceMap.BALCONY)
         ret = bmesh.ops.extrude_face_region(bm, geom=[f])
+
+        map_balcony_faces(bm, ret)
         bmesh.ops.translate(
             bm, verts=filter_geom(ret["geom"], BMVert), vec=-f.normal * prop.width
         )
@@ -56,3 +65,13 @@ def choose_edges_from_direction(direction, front, left, right):
         "RIGHT": [front, left],
         "NONE": [left, right, front],
     }.get(direction)
+
+
+def map_balcony_faces(bm, geom):
+    new_faces = {
+        face
+        for f in filter_geom(geom["geom"], BMFace)
+        for e in f.edges
+        for face in e.link_faces
+    }
+    add_faces_to_map(bm, new_faces, FaceMap.BALCONY)

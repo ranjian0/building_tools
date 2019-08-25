@@ -29,6 +29,11 @@ class FaceMap(AutoIndex):
     DOOR_FRAMES = auto()
     DOOR_LOUVERS = auto()
 
+    BALCONY = auto()
+    BALCONY_RAILING_POSTS = auto()
+    BALCONY_RAILING_WALLS = auto()
+    BALCONY_RAILING_RAILS = auto()
+
 
 def map_new_faces(group, skip=None):
     """ Finds all newly created faces in a function and adds them to a face_map
