@@ -127,7 +127,7 @@ def create_corner_post(bm, loops, prop, raildata):
             if is_parallel(loop):
                 off = vec * (width / 2)
             pos = v.co + off + Vector((0, 0, height / 2))
-            post = add_cube_post(bm, width, height, pos, prop.has_decor)
+            post = add_cube_post(bm, width, height, pos)
         else:
             pos = v.co + (vec * width) + Vector((0, 0, height / 2))
             post = create_cylinder(bm, width, height, segments, pos)
@@ -320,17 +320,12 @@ def create_edge(bm, start, end):
     return bm.edges.new((start_vert, end_vert))
 
 
-def add_cube_post(bm, width, height, position, has_decor):
+def add_cube_post(bm, width, height, position):
     """ Create cube geometry at position
     """
     post = create_cube_without_faces(
-        bm, (width, width, height), position, bottom=True, top=has_decor
+        bm, (width, width, height), position, bottom=True
     )
-
-    if has_decor:
-        px, py, pz = position
-        pz += height / 2 + width / 4
-        create_cube(bm, (width * 2, width * 2, width / 2), (px, py, pz))
     return post
 
 
