@@ -496,6 +496,7 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
 
             up_faces = [f for f in faces if f.normal.z > 0]
             slope_step_walls(bm, up_faces, normal, step_size)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
 
 
 def get_edge_groups_from_direction(edges, direction):
@@ -640,12 +641,11 @@ def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, 
 def slope_step_walls(bm, faces, normal, step_size):
     """ Make wall slope along step edges """
     axis = "x" if normal.x else "y"
-    func = max if sum(normal) < 0 else min
+    func = min if sum(normal) < 0 else max
 
     for face in faces:
         pos = func([getattr(calc_edge_median(e), axis) for e in face.edges])
         e = [e for e in face.edges if getattr(calc_edge_median(e), axis) == pos].pop()
-        print(step_size)
 
         for v in e.verts:
-            v.co.z += step_size
+            v.co.z -= step_size
