@@ -7,7 +7,9 @@ from collections import defaultdict
 
 from ..rails import create_railing_from_edges, create_railing_from_step_edges
 from ...utils import (
+    FaceMap,
     filter_geom,
+    add_faces_to_map,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
 )
@@ -21,6 +23,7 @@ def create_stairs(bm, faces, prop):
         f.select = False
         f = create_stair_split(bm, f, prop.size_offset)
 
+        add_faces_to_map(bm, [f], FaceMap.STAIRS)
         get_z = operator.attrgetter("co.z")
         fheight = max(f.verts, key=get_z).co.z - min(f.verts, key=get_z).co.z
 
