@@ -6,6 +6,8 @@ from ..rails import RailProperty
 
 
 class BalconyProperty(bpy.types.PropertyGroup):
+    redo: BoolProperty()
+
     width: FloatProperty(
         name="Balcony Width",
         min=0.01,
@@ -34,6 +36,14 @@ class BalconyProperty(bpy.types.PropertyGroup):
 
     rail: PointerProperty(type=RailProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
+
+    def set_defaults(self):
+        """ Helper function to make convinient property adjustments """
+        if self.redo:
+            return
+
+        self.size_offset.size = (0.5, 1.0)
+        self.redo = True
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
