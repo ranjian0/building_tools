@@ -68,6 +68,7 @@ def choose_edges_from_direction(direction, front, left, right):
 
 
 def map_balcony_faces(bm, geom):
+    """ Add balcony faces to their facemap """
     new_faces = {
         face
         for f in filter_geom(geom["geom"], BMFace)
