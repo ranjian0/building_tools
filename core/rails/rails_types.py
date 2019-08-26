@@ -460,7 +460,7 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
         post_pos += tangent_offset + (normal * -post_w / 2)
 
         post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
-        post(bm, post_w, post_h, post_pos, rail.has_decor)
+        post(bm, post_w, post_h, post_pos)
 
         #   --  add a rails
         array_sloped_rails(
