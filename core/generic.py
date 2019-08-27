@@ -144,11 +144,10 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(me)
 
         face_map = bm.faces.layers.face_map.active
-        map_all_indices = {f.index for _, f in obj.face_maps.items()}
-        map_used_indices = {f[face_map] for f in bm.faces}
+        used_indices = {f[face_map] for f in bm.faces}
+        all_indices = {f.index for _, f in obj.face_maps.items()}
 
-        tag_remove = map_all_indices - map_used_indices
-        tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove]
+        tag_remove_maps = [obj.face_maps[idx] for idx in (all_indices - used_indices)]
         for fmap in tag_remove_maps:
             obj.face_maps.remove(fmap)
 
