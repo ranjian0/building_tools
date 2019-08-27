@@ -1,8 +1,13 @@
 import bmesh
+from enum import Enum, auto
 from mathutils import Vector, Matrix
 from bmesh.types import BMEdge, BMVert
 from ...utils import (
+    FaceMap,
+    validate,
     filter_geom,
+    map_new_faces,
+    add_faces_to_map,
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
@@ -10,6 +15,12 @@ from ...utils import (
 )
 
 
+class FillUser(Enum):
+    DOOR = auto()
+    WINDOW = auto()
+
+
+@map_new_faces(FaceMap.DOOR_FRAMES, skip=FaceMap.DOOR_PANELS)
 def fill_panel(bm, face, prop):
     """Create panels on face
     """
@@ -24,26 +35,37 @@ def fill_panel(bm, face, prop):
         verts=list({v for f in quads for v in f.verts}),
         vec=face.normal * prop.panel_depth,
     )
+    add_faces_to_map(bm, quads, FaceMap.DOOR_PANELS)
 
 
-def fill_glass_panes(bm, face, prop):
+def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     """Create glass panes on face
     """
     if prop.pane_count_x + prop.pane_count_y == 0:
         return
 
+    userframe = FaceMap.DOOR_FRAMES if user == FillUser.DOOR else FaceMap.WINDOW_FRAMES
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
-    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.pane_margin)
+
+    inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
+    inset(bm, faces=quads, thickness=prop.pane_margin)
+
     for f in quads:
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.pane_depth)
 
+    usergroup = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
+    add_faces_to_map(bm, quads, usergroup)
 
+
+@map_new_faces(FaceMap.WINDOW_BARS)
 def fill_bar(bm, face, prop):
     """Create horizontal and vertical bars along a face
     """
-    if round(face.calc_area(), 2) < 1.0:
+    try:
+        width, height = calc_face_dimensions(face)
+    except IndexError:
+        # -- face is too small / has no width or height after sizeoffset prop adjusted
         return
-    width, height = calc_face_dimensions(face)
     face_center = face.calc_center_median()
 
     # -- horizontal
@@ -69,12 +91,14 @@ def fill_bar(bm, face, prop):
         create_bar_from_face(bm, face, face_center, position, scale, depth, True)
 
 
-def fill_louver(bm, face, prop):
+def fill_louver(bm, face, prop, user=FillUser.DOOR):
     """Create louvers from face
     """
     normal = face.normal.copy()
     if prop.louver_margin:
-        bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.louver_margin)
+        uframe = [FaceMap.WINDOW_FRAMES, FaceMap.DOOR_FRAMES][user == FillUser.DOOR]
+        inset = map_new_faces(uframe)(bmesh.ops.inset_individual)
+        inset(bm, faces=[face], thickness=prop.louver_margin)
 
     segments = double_and_make_even(prop.louver_count)
     faces = subdivide_face_into_vertical_segments(bm, face, segments)
@@ -90,7 +114,10 @@ def fill_louver(bm, face, prop):
             space=Matrix.Translation(-face.calc_center_median()),
         )
 
-    extrude_faces_add_slope(bm, louver_faces, normal, prop.louver_depth)
+    usergroup = [FaceMap.WINDOW_LOUVERS, FaceMap.DOOR_LOUVERS][user == FillUser.DOOR]
+    extrude = map_new_faces(usergroup)(extrude_faces_add_slope)
+    extrude(bm, louver_faces, normal, prop.louver_depth)
+    add_faces_to_map(bm, validate(faces[::2]), usergroup)
 
 
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
@@ -108,7 +135,7 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
         res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y)
         edges.extend(filter_geom(res["geom_inner"], BMEdge))
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
-    return list({f for ed in edges for f in ed.link_faces})
+    return list({f for ed in validate(edges) for f in ed.link_faces})
 
 
 def duplicate_face_translate_scale(bm, face, position, scale, scale_center):

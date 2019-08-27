@@ -1,7 +1,7 @@
 import bmesh
 
 from .roof_types import create_roof
-from ...utils import get_edit_mesh
+from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups
 
 
 class Roof:
@@ -12,10 +12,15 @@ class Roof:
         faces = [f for f in bm.faces if f.select]
 
         if cls.validate(bm):
+            cls.add_roof_facemaps()
             create_roof(bm, faces, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
+
+    @classmethod
+    def add_roof_facemaps(cls):
+        add_facemap_for_groups(FaceMap.ROOF)
 
     @classmethod
     def validate(cls, bm):

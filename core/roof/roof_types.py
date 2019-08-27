@@ -4,7 +4,18 @@ import operator
 import mathutils
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
-from ...utils import equal, select, validate, skeletonize, filter_geom, calc_edge_median
+from ...utils import (
+    equal,
+    select,
+    FaceMap,
+    validate,
+    skeletonize,
+    filter_geom,
+    map_new_faces,
+    calc_edge_median,
+    add_faces_to_map,
+    add_facemap_for_groups,
+)
 
 
 def create_roof(bm, faces, prop):
@@ -14,11 +25,14 @@ def create_roof(bm, faces, prop):
     if prop.type == "FLAT":
         create_flat_roof(bm, faces, prop)
     elif prop.type == "GABLE":
+        add_facemap_for_groups(FaceMap.ROOF_HANGS)
         create_gable_roof(bm, faces, prop)
     elif prop.type == "HIP":
+        add_facemap_for_groups(FaceMap.ROOF_HANGS)
         create_hip_roof(bm, faces, prop)
 
 
+@map_new_faces(FaceMap.ROOF)
 def create_flat_roof(bm, faces, prop):
     """Create a flat roof
     """
@@ -66,7 +80,8 @@ def create_gable_roof(bm, faces, prop):
 def create_hip_roof(bm, faces, prop):
     """Create a hip roof
     """
-    faces = create_flat_roof(bm, faces, prop)
+    roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(create_flat_roof)
+    faces = roof_hang(bm, faces, prop)
     face = faces[-1]
     median = face.calc_center_median()
 
@@ -146,6 +161,7 @@ def vert_at_loc(loc, verts, loc_z=None):
     return None
 
 
+@map_new_faces(FaceMap.WALLS)
 def extrude_up_and_delete_faces(bm, faces, extrude_depth):
     """ Extrude faces upwards and delete ones at top
     """
@@ -178,6 +194,7 @@ def get_highest_z_facing_faces(bm):
     return list(set([f for v in top_verts for f in v.link_faces if f.normal.z]))
 
 
+@map_new_faces(FaceMap.ROOF_HANGS)
 def create_roof_hangs(bm, edges, size):
     """Extrude edges outwards and slope the downward to form proper
     hangs
@@ -212,7 +229,9 @@ def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
     # -- fill faces
     for loc in edge_loc:
         edges = [e for e in valid_edges if getattr(calc_edge_median(e), axis) == loc]
-        bmesh.ops.contextual_create(bm, geom=edges)
+        ret = bmesh.ops.contextual_create(bm, geom=edges)
+        add_faces_to_map(bm, ret["faces"], FaceMap.ROOF)
+
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
 
@@ -251,6 +270,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
     return join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges)
 
 
+@map_new_faces(FaceMap.ROOF)
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
     """ Create faces formed from hiproof verts and edges
     """

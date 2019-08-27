@@ -1,15 +1,19 @@
 import bmesh
 from bmesh.types import BMEdge
 
-from ..fill import fill_panel, fill_glass_panes, fill_louver
+from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
 from ...utils import (
+    FaceMap,
     validate,
     arc_edge,
     filter_geom,
+    map_new_faces,
     face_with_verts,
+    add_faces_to_map,
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
+    add_facemap_for_groups,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
 )
@@ -30,6 +34,7 @@ def create_door(bm, faces, prop):
             create_door_fill(bm, face, prop)
 
 
+@map_new_faces(FaceMap.WALLS)
 def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
@@ -48,6 +53,7 @@ def create_door_array(bm, face, prop):
     return list({f for e in inner_edges for f in e.link_faces})
 
 
+@map_new_faces(FaceMap.DOOR_FRAMES, skip=FaceMap.DOOR)
 def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
@@ -78,6 +84,8 @@ def create_door_frame(bm, face, prop):
         geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
         verts = filter_geom(geom, bmesh.types.BMVert)
         bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
+
+    add_faces_to_map(bm, [face], FaceMap.DOOR)
     return face
 
 
@@ -108,6 +116,8 @@ def create_door_frame_arched(bm, face, prop):
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     faces = extrude_door_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
+
+    add_faces_to_map(bm, faces, FaceMap.DOOR)
     return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
 
 
@@ -115,11 +125,14 @@ def create_door_fill(bm, face, prop):
     """Add decorative elements on door face
     """
     if prop.fill_type == "PANELS":
+        add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, prop.panel_fill)
     elif prop.fill_type == "GLASS PANES":
-        fill_glass_panes(bm, face, prop.glass_fill)
+        add_facemap_for_groups(FaceMap.DOOR_PANES)
+        fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.DOOR)
     elif prop.fill_type == "LOUVER":
-        fill_louver(bm, face, prop.louver_fill)
+        add_facemap_for_groups(FaceMap.DOOR_LOUVERS)
+        fill_louver(bm, face, prop.louver_fill, user=FillUser.DOOR)
 
 
 def make_door_inset(bm, face, prop):

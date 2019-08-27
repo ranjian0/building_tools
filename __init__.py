@@ -14,12 +14,6 @@ bl_info = {
     "category": "Mesh",
 }
 
-# =======================================================
-#
-#           PANEL UI
-#
-# =======================================================
-
 
 class PANEL_PT_mesh_tools(bpy.types.Panel):
 
@@ -49,13 +43,57 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_roof")
 
 
-# =======================================================
-#
-#           REGISTER
-#
-# =======================================================
+class PANEL_PT_material_tools(bpy.types.Panel):
 
-classes = (PANEL_PT_mesh_tools,)
+    bl_label = "Material Tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == "MESH"
+
+    def draw(self, context):
+        layout = self.layout
+
+        ob = context.object
+        facemap = ob.face_maps.active
+
+        rows = 2
+        if facemap:
+            rows = 4
+
+        if not len(ob.face_maps):
+            return
+
+        layout.label(text="Material Face Maps")
+
+        row = layout.row()
+        args = ob, "face_maps", ob.face_maps, "active_index"
+        row.template_list("BTOOLS_UL_fmaps", "", *args, rows=rows)
+
+        col = row.column(align=True)
+        col.operator("object.face_map_add", icon="ADD", text="")
+        col.operator("object.face_map_remove", icon="REMOVE", text="")
+        col.separator()
+        col.operator("btools.face_map_clear", icon="TRASH", text="")
+
+        if ob.face_maps and (ob.mode == "EDIT" and ob.type == "MESH"):
+            row = layout.row()
+
+            sub = row.row(align=True)
+            sub.operator("object.face_map_assign", text="Assign")
+            sub.operator("object.face_map_remove_from", text="Remove")
+
+            sub = row.row(align=True)
+            sub.operator("object.face_map_select", text="Select")
+            sub.operator("object.face_map_deselect", text="Deselect")
+
+
+classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools)
 
 
 def register():
