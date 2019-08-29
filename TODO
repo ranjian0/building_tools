@@ -1,7 +1,5 @@
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
-    - bug with remove colinear, sometimes filler posts are not added
-    - adjust the rail length for corner posts that have colinear loops
 
 ROOF:
     - XXX support gable roof for complex shapes
