@@ -66,15 +66,22 @@ def create_gable_roof(bm, faces, prop):
 
     edges = extrude_up_and_delete_faces(bm, faces, prop.height)
     merge_verts_along_axis(bm, set(v for e in edges for v in e.verts), axis)
+    roof_faces = list({f for e in edges for f in e.link_faces})
+    bmesh.ops.dissolve_degenerate(bm, dist=0.01, edges=edges)
 
-    roof_faces = get_highest_z_facing_faces(bm)
-    boundary_edges = [
-        e for f in roof_faces for e in f.edges if e.calc_face_angle(1000.0) < math.pi
-    ]
-    bmesh.ops.delete(bm, geom=roof_faces, context="FACES")
+    if prop.roof_hangs:
 
-    hang_edges = create_roof_hangs(bm, boundary_edges, prop.outset)
-    fill_roof_faces_from_hang(bm, hang_edges, prop.thickness, axis)
+        def has_one_roof_face(e):
+            return not all([f in roof_faces for f in e.link_faces])
+
+        roof_faces = [f for f in validate(roof_faces) if f.normal.z]
+        boundary_edges = [
+            e for f in roof_faces for e in f.edges if has_one_roof_face(e)
+        ]
+        bmesh.ops.delete(bm, geom=roof_faces, context="FACES")
+
+        hang_edges = create_roof_hangs(bm, boundary_edges, prop.outset)
+        fill_roof_faces_from_hang(bm, hang_edges, prop.thickness, axis)
 
 
 def create_hip_roof(bm, faces, prop):
@@ -184,14 +191,6 @@ def merge_verts_along_axis(bm, verts, axis):
     for v in verts:
         setattr(v.co, axis, mid)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
-
-
-def get_highest_z_facing_faces(bm):
-    """ Find the faces with highest z-coordinate
-    """
-    maxz = max([v.co.z for v in bm.verts])
-    top_verts = [v for v in bm.verts if v.co.z == maxz]
-    return list(set([f for v in top_verts for f in v.link_faces if f.normal.z]))
 
 
 @map_new_faces(FaceMap.ROOF_HANGS)
