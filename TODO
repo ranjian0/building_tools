@@ -1,8 +1,24 @@
 RAILING:
     - fix gaps caused by railing not reaching walls due to slabs
+    - bug with remove colinear, sometimes filler posts are not added
+    - adjust the rail length for corner posts that have colinear loops
 
+ROOF:
+    - XXX support gable roof for complex shapes
+    - fix: gable roof uses highest z coordinates for calculations,
+            may not be wise to assume a roof is always being created
+            on the highest face of the building e.g for patio roof
+    - gable roof : option to disable roof hangs may come in handy
+
+FLOORS:
+    - add option to add extra roof slab (may be useful)
+
+    - COLUMNS : I keep dismissing this feature and then running into
+                multiple usecases for it e.g support beams for patio roof,
+                plus keeping a uniform look for buildings (slabs and columns)
 
 MATERIAL API:
+    - UI option to set a material for given facemap
 
     - create presets for default materials (FLAT / PBR)
     - apply the materials to the faces based on where they belong
@@ -15,6 +31,15 @@ MATERIAL API:
         - let user change textures
         - let user change parameters - roughness, metallic factors
 
+    - XXX LONG TERM:
+        Since the addon operates in editmode, editing multiple buildings
+        may pose challenges with the current facemap system.
+
+        EITHER - only allow creation of one building for each blender object
+        OR - figure out how to store facemaps for multiple buildings in the
+             same object.
+
+        THIS NEEDS FURTHER CONSIDERATION!!
 
 
 REFACTOR AND STYLE:
