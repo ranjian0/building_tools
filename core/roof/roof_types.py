@@ -1,4 +1,3 @@
-import math
 import bmesh
 import operator
 import mathutils
