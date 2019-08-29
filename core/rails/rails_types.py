@@ -220,9 +220,10 @@ def create_fill_walls(bm, edges, prop, raildata):
     """
     loops = loops_from_edges(edges)
 
+    processed_edges = []
     for loop in loops:
         edge = loop.edge
-        if edge not in edges:
+        if edge not in edges or edge in processed_edges:
             continue
 
         off = prop.corner_post_width
@@ -243,6 +244,7 @@ def create_fill_walls(bm, edges, prop, raildata):
             bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge)
         )
         wall(delete_faces=["bottom", "left", "right"])
+        processed_edges.append(edge)
 
 
 def create_wall(bm, start, end, height, width, tangent):
