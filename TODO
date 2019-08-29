@@ -3,10 +3,6 @@ RAILING:
 
 ROOF:
     - XXX support gable roof for complex shapes
-    - fix: gable roof uses highest z coordinates for calculations,
-            may not be wise to assume a roof is always being created
-            on the highest face of the building e.g for patio roof
-    - gable roof : option to disable roof hangs may come in handy
 
 FLOORS:
     - add option to add extra roof slab (may be useful)
