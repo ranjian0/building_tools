@@ -95,15 +95,15 @@ def create_railing(bm, edges, lfaces, prop, raildata):
                 loops.extend([l for l in v.link_loops])
     loops = list(set(loops))
 
-    if prop.remove_colinear:
-        # TODO - make this work on loop with more than two links
-        # - remove loops where edges are parallel, and both link_edges are in selection
-        def is_middle(loop):
-            return loop.link_loop_next in loops and loop.link_loop_prev in loops
+    # TODO - make this work on loop with more than two links
+    # - remove loops where edges are parallel, and both link_edges are in selection
+    def is_middle(loop):
+        return loop.link_loop_next in loops and loop.link_loop_prev in loops
 
-        raildata.colinear_loops.extend(
-            [l for l in loops if (is_parallel(l) and is_middle(l))]
-        )
+    raildata.colinear_loops.extend(
+        [l for l in loops if (is_parallel(l) and is_middle(l))]
+    )
+    if prop.remove_colinear:
         loops = [l for l in loops if not (is_parallel(l) and is_middle(l))]
 
     create_corner_post(bm, loops, prop, raildata)
@@ -205,7 +205,7 @@ def create_fill_posts(bm, edges, prop, raildata):
         fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
         # -- add top rail
-        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
+        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop, raildata)
         rail_pos += Vector((0, 0, prop.corner_post_height - prop.rail_size / 2))
 
         rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
@@ -397,15 +397,12 @@ def fill_post_for_colinear_gap(bm, edge, prop, raildata):
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
     size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
-    if raildata.colinear_loops:
-        # -- fill spaces created by no corner posts
+    if prop.remove_colinear:
         for loop in raildata.colinear_loops:
-            if loop.edge != edge:
-                continue
-
-            v = loop.vert
-            p = v.co + off + height_v
-            create_cube_without_faces(bm, size, p, top=True, bottom=True)
+            if loop.edge == edge or loop.link_loop_prev.edge == edge:
+                v = loop.vert
+                p = v.co + off + height_v
+                create_cube_without_faces(bm, size, p, top=True, bottom=True)
 
 
 @map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
@@ -600,8 +597,8 @@ def loops_from_edges(edges):
     return list(set(loops))
 
 
-def calc_rail_position_and_size_for_loop(loop, prop):
-    """ Add a rail with proper position and size along the loop's edge
+def calc_rail_position_and_size_for_loop(loop, prop, raildata=None):
+    """ Calculate proper position and size for a rail along the loop's edge
     """
     edge = loop.edge
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
@@ -613,6 +610,22 @@ def calc_rail_position_and_size_for_loop(loop, prop):
 
     rail_pos = calc_edge_median(edge) + off + convex_offset
     rail_len = edge.calc_length() - prop.corner_post_width * num_convex
+    if raildata and not prop.remove_colinear:
+        is_colinear = (
+            loop in raildata.colinear_loops,
+            loop.link_loop_next in raildata.colinear_loops,
+        )
+        if any(is_colinear):
+            rail_len -= prop.corner_post_width/2
+            colinear_offset = edge_vector(edge) * (prop.corner_post_width / 4)
+            if is_colinear[0]:
+                rail_pos += colinear_offset
+            if is_colinear[1]:
+                rail_pos -= colinear_offset
+
+        if all(is_colinear):
+            rail_len -= prop.corner_post_width/2
+
     rail_size = (rail_len, 2 * prop.rail_size, prop.rail_size)
     return rail_pos, rail_size
 
