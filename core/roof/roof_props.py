@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import EnumProperty, FloatProperty
+from bpy.props import EnumProperty, FloatProperty, BoolProperty
 
 
 class RoofProperty(bpy.types.PropertyGroup):
@@ -44,6 +44,10 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Orientation of gable", items=o_types, default="HORIZONTAL"
     )
 
+    roof_hangs: BoolProperty(
+        name="Roof Hangs", default=True, description="Whether to add roof hangs"
+    )
+
     def draw(self, context, layout):
         layout.prop(self, "type", text="")
 
@@ -54,13 +58,15 @@ class RoofProperty(bpy.types.PropertyGroup):
             col.prop(self, "outset")
 
         elif self.type == "GABLE":
+            row = box.row(align=True)
+            row.prop(self, "orient", expand=True)
+
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
             col.prop(self, "height")
 
-            row = box.row(align=True)
-            row.prop(self, "orient", expand=True)
+            box.prop(self, "roof_hangs", toggle=True)
 
         else:
             col = box.column(align=True)
