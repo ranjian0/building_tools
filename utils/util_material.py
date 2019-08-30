@@ -94,6 +94,7 @@ def add_facemap_for_groups(groups):
     for group in groups:
         if not obj.face_maps.get(group.name.lower()):
             obj.face_maps.new(name=group.name.lower())
+            obj.facemap_materials.add()
 
 
 def verify_facemaps_for_object(obj):
@@ -104,25 +105,32 @@ def verify_facemaps_for_object(obj):
     bmesh.update_edit_mesh(me, True)
 
 
+def set_material_for_active_facemap(material, context):
+    obj = context.object
+    index = obj.face_maps.active_index
+    active_facemap = obj.face_maps[index]
+
+    link_material(obj, material)
+    mat_id = [
+        idx for idx, mat in enumerate(obj.data.materials) if mat == material
+    ].pop()
+
+    me = get_edit_mesh()
+    bm = bmesh.from_edit_mesh(me)
+
+    face_map = bm.faces.layers.face_map.active
+    for face in bm.faces:
+        if face[face_map] == active_facemap.index:
+            face.material_index = mat_id
+
+    bmesh.update_edit_mesh(me, True)
+
+
 def face_map_index_from_name(name):
     for _, fmap in bpy.context.object.face_maps.items():
         if fmap.name == name:
             return fmap.index
     return -1
-
-
-DEFAULT_MATERIALS = {
-    "mat_slab": (0.208, 0.183, 0.157),
-    "mat_wall": (0.190, 0.117, 0.04),
-    "mat_window_frame": (0.8, 0.8, 0.8),
-    "mat_window_pane": (0, 0.6, 0),
-    "mat_window_bars": (0, 0.7, 0),
-    "mat_window_glass": (0, 0.1, 0.6),
-    "mat_door_frame": (0.8, 0.8, 0.8),
-    "mat_door_pane": (0.13, 0.05, 0),
-    "mat_door_groove": (0.13, 0.05, 0),
-    "mat_door_glass": (0, 0.1, 0.6),
-}
 
 
 def create_material(obj, name):
@@ -172,3 +180,17 @@ def set_material(faces, mat_enum):
 
     for f in faces:
         f.material_index = mat_idx
+
+
+DEFAULT_MATERIALS = {
+    "mat_slab": (0.208, 0.183, 0.157),
+    "mat_wall": (0.190, 0.117, 0.04),
+    "mat_window_frame": (0.8, 0.8, 0.8),
+    "mat_window_pane": (0, 0.6, 0),
+    "mat_window_bars": (0, 0.7, 0),
+    "mat_window_glass": (0, 0.1, 0.6),
+    "mat_door_frame": (0.8, 0.8, 0.8),
+    "mat_door_pane": (0.13, 0.05, 0),
+    "mat_door_groove": (0.13, 0.05, 0),
+    "mat_door_glass": (0, 0.1, 0.6),
+}

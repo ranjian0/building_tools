@@ -69,7 +69,7 @@ class PANEL_PT_material_tools(bpy.types.Panel):
         if not len(ob.face_maps):
             return
 
-        layout.label(text="Material Face Maps")
+        layout.label(text="Face Maps")
 
         row = layout.row()
         args = ob, "face_maps", ob.face_maps, "active_index"
@@ -91,6 +91,12 @@ class PANEL_PT_material_tools(bpy.types.Panel):
             sub = row.row(align=True)
             sub.operator("object.face_map_select", text="Select")
             sub.operator("object.face_map_deselect", text="Deselect")
+
+        layout.label(text="Material")
+        if ob.face_maps:
+            face_map_index = ob.face_maps.active_index
+            face_map_material = ob.facemap_materials[face_map_index]
+            layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 
 classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools)

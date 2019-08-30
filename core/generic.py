@@ -5,10 +5,12 @@ from bpy.props import (
     EnumProperty,
     BoolProperty,
     FloatProperty,
+    PointerProperty,
+    CollectionProperty,
     FloatVectorProperty,
 )
 
-from ..utils import get_edit_mesh
+from ..utils import get_edit_mesh, set_material_for_active_facemap
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -145,11 +147,17 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
 
         face_map = bm.faces.layers.face_map.active
         used_indices = {f[face_map] for f in bm.faces}
-        all_indices = {f.index for _, f in obj.face_maps.items()}
+        all_indices = {f.index for f in obj.face_maps}
+        tag_remove_indices = all_indices - used_indices
 
-        tag_remove_maps = [obj.face_maps[idx] for idx in (all_indices - used_indices)]
+        # -- remove face maps
+        tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove_indices]
         for fmap in tag_remove_maps:
             obj.face_maps.remove(fmap)
+
+        # -- remove facemap materials:
+        for idx in reversed(list(tag_remove_indices)):
+            obj.facemap_materials.remove(idx)
 
         bmesh.update_edit_mesh(me, True)
         return {"FINISHED"}
@@ -159,13 +167,26 @@ class TrackedProperty(bpy.types.PropertyGroup):
     """ Convinience property group to keep track of properties being
         shared between modules
     """
-
     slab_outset: FloatProperty()
+
+
+def update_facemap_material(self, context):
+    """ Assign the updated material to all faces belonging to active facemap
+    """
+    set_material_for_active_facemap(self.material, context)
+    return None
+
+
+class FaceMapMaterial(bpy.types.PropertyGroup):
+    """ Tracks materials for each facemap created for an object
+    """
+    material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
 
 classes = (
     ArchProperty,
     ArrayProperty,
+    FaceMapMaterial,
     TrackedProperty,
     BTOOLS_UL_fmaps,
     SizeOffsetProperty,
@@ -177,13 +198,13 @@ def register_generic():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.tracked_properties = bpy.props.PointerProperty(
-        type=TrackedProperty
-    )
+    bpy.types.Object.tracked_properties = PointerProperty(type=TrackedProperty)
+    bpy.types.Object.facemap_materials = CollectionProperty(type=FaceMapMaterial)
 
 
 def unregister_generic():
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
+    del bpy.types.Object.facemap_materials
     del bpy.types.Object.tracked_properties
