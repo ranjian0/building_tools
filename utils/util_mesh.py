@@ -280,3 +280,56 @@ def extrude_face_and_delete_bottom(bm, face, extrude_depth):
     hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
     bmesh.ops.delete(bm, geom=[hidden], context="FACES")
     return f
+
+
+def move_slab_splitface_to_wall(bm, face):
+    """ Align a face that was split from a slab to building wall
+    """
+    if face.normal.z:
+        return face
+
+    slab_outset = bpy.context.object.tracked_properties.slab_outset
+    if slab_outset <= 0.00001:
+        return face
+
+    slab_facemap = bpy.context.object.face_maps.get("slabs")
+    if not slab_facemap:
+        return face
+
+    active_face_map = bm.faces.layers.face_map.active
+    if face[active_face_map] != slab_facemap.index:
+        return face
+
+    target_edges = filter_horizontal_edges(face.edges, face.normal.copy())
+    sort_axis = "x" if face.normal.x else "y"
+
+    new_verts = []
+    target_faces = [face]
+    for edge in target_edges:
+        other_face = (set(edge.link_faces) - set([face])).pop()
+        func = min if getattr(face.normal, sort_axis) > 0 else max
+        other_edge = func(
+            other_face.edges, key=lambda e: getattr(calc_edge_median(e), sort_axis)
+        )
+
+        new_edges = []
+        for v in edge.verts:
+            other_close_vert = min(
+                other_edge.verts, key=lambda ov: (ov.co - v.co).length
+            )
+            split_point = v.co + (-face.normal * slab_outset)
+            split_factor = (other_close_vert.co - split_point).length / other_edge.calc_length()
+
+            e, new_vert = bmesh.utils.edge_split(other_edge, other_close_vert, split_factor)
+            e = bmesh.ops.connect_vert_pair(bm, verts=[v, new_vert]).get("edges").pop()
+            new_edges.append(e)
+            new_verts.append(new_vert)
+
+        target_faces.append(
+            (set(new_edges[0].link_faces) & set(new_edges[1].link_faces)).pop()
+        )
+
+    bmesh.ops.delete(bm, geom=target_faces, context="FACES_ONLY")
+    bmesh.ops.delete(bm, geom=target_edges, context="EDGES")
+    ret = bmesh.ops.contextual_create(bm, geom=new_verts)
+    return ret.get("faces").pop()
