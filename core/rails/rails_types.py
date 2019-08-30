@@ -460,9 +460,25 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
         post_w, post_h = rail.corner_post_width, rail.corner_post_height
         post_pos = max_location + Vector((0, 0, post_h / 2 - step_size))
         post_pos += tangent_offset + (normal * -post_w / 2)
+        if not prop.landing:
+            post_pos += Vector((0, 0, rail.rail_size / 4))
+            post_h += rail.rail_size / 2
 
         post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
         post(bm, post_w, post_h, post_pos)
+
+        #  -- add corner post at min location
+        #     only if there is no landing
+        if not prop.landing:
+            post_pos = min_location + Vector((0, 0, post_h / 2))
+            post_pos += tangent_offset + (normal * post_w / 2)
+            post_pos += Vector((0, 0, rail.rail_size / 4))
+            post_h += rail.rail_size / 2
+
+            post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
+            post(bm, post_w, post_h, post_pos)
+
+            min_location += (normal * post_w)
 
         #   --  add a rails
         array_sloped_rails(
@@ -660,3 +676,4 @@ def slope_step_walls(bm, faces, normal, step_size):
 
         for v in e.verts:
             v.co.z += step_size
+
