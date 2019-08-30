@@ -5,11 +5,6 @@ STAIRS:
     - bridge edge loops to fill gaps caused by sloping
 
 
-FLOORS:
-    - COLUMNS : I keep dismissing this feature and then running into
-                multiple usecases for it e.g support beams for patio roof,
-                plus keeping a uniform look for buildings (slabs and columns)
-
 MATERIAL API:
     - create presets for default materials (FLAT / PBR)
 
