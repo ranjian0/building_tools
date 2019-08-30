@@ -1,8 +1,18 @@
+BUG:
+    - move_slabface_to_wall prevents splitoffset from working properly
+      (may need to solve this issue the hard way after all)
+
 ROOF:
     - XXX support gable roof for complex shapes
 
 STAIRS:
     - bridge edge loops to fill gaps caused by sloping
+
+    - if landing is procided, perhaps option to slim down the stairs
+      should be there
+
+      plus, when 'move_slabface_to_wall' is used, and stair direction is
+      not front, stairs intersect with the slab
 
 
 MATERIAL API:
