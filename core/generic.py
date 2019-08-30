@@ -167,6 +167,7 @@ class TrackedProperty(bpy.types.PropertyGroup):
     """ Convinience property group to keep track of properties being
         shared between modules
     """
+
     slab_outset: FloatProperty()
 
 
@@ -180,6 +181,7 @@ def update_facemap_material(self, context):
 class FaceMapMaterial(bpy.types.PropertyGroup):
     """ Tracks materials for each facemap created for an object
     """
+
     material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
 

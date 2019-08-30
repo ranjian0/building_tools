@@ -49,9 +49,7 @@ def create_railing_from_selection(bm, prop):
     else:
         edges = [e for e in bm.edges if e.select]
         rail_faces = upward_faces_from_edges(edges)
-        rail_faces = [
-            f for f in rail_faces if all([e in f.edges for e in edges])
-        ]
+        rail_faces = [f for f in rail_faces if all([e in f.edges for e in edges])]
 
     if len(rail_faces) > 1:
         rail_faces = bmesh.ops.dissolve_faces(bm, faces=rail_faces).get("region")
@@ -328,9 +326,7 @@ def create_edge(bm, start, end):
 def add_cube_post(bm, width, height, position):
     """ Create cube geometry at position
     """
-    post = create_cube_without_faces(
-        bm, (width, width, height), position, bottom=True
-    )
+    post = create_cube_without_faces(bm, (width, width, height), position, bottom=True)
     return post
 
 
@@ -478,7 +474,7 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
             post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
             post(bm, post_w, post_h, post_pos)
 
-            min_location += (normal * post_w)
+            min_location += normal * post_w
 
         #   --  add a rails
         array_sloped_rails(
@@ -632,7 +628,7 @@ def calc_rail_position_and_size_for_loop(loop, prop, raildata=None):
             loop.link_loop_next in raildata.colinear_loops,
         )
         if any(is_colinear):
-            rail_len -= prop.corner_post_width/2
+            rail_len -= prop.corner_post_width / 2
             colinear_offset = edge_vector(edge) * (prop.corner_post_width / 4)
             if is_colinear[0]:
                 rail_pos += colinear_offset
@@ -640,7 +636,7 @@ def calc_rail_position_and_size_for_loop(loop, prop, raildata=None):
                 rail_pos -= colinear_offset
 
         if all(is_colinear):
-            rail_len -= prop.corner_post_width/2
+            rail_len -= prop.corner_post_width / 2
 
     rail_size = (rail_len, 2 * prop.rail_size, prop.rail_size)
     return rail_pos, rail_size
@@ -676,4 +672,3 @@ def slope_step_walls(bm, faces, normal, step_size):
 
         for v in e.verts:
             v.co.z += step_size
-

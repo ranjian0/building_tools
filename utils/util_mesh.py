@@ -343,9 +343,7 @@ def cut_edge_based_on_other_edge(bm, edge, other_edge, cut_direction):
     target_faces = []
     for v in edge.verts:
         split_point = v.co + cut_direction
-        e, new_vert = split_edge_at_point_from_closest_vert(
-            other_edge, v, split_point
-        )
+        e, new_vert = split_edge_at_point_from_closest_vert(other_edge, v, split_point)
         e = bmesh.ops.connect_vert_pair(bm, verts=[v, new_vert]).get("edges").pop()
         new_edges.append(e)
         new_verts.append(new_vert)
