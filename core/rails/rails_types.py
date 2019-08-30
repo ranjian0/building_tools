@@ -544,14 +544,13 @@ def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
     post_spacing = edge.calc_length() / post_count
     post_height = prop.corner_post_height - (prop.rail_size / 2)
 
-    vec = edge_vector(edge)
     tan_offset = tangent * prop.corner_post_width / 2
     post_offset = tan_offset + (-normal * prop.post_size / 2)
 
     end, start = find_min_and_max_vert_locations(edge.verts, normal)
     for i in range(post_count):
         height = post_height + abs(slope * (i * post_spacing))
-        position = start + post_offset - (vec * (i * post_spacing))
+        position = start + post_offset - (normal * (i * post_spacing))
         position += Vector((0, 0, height / 2))
         size = (prop.post_size,) * 2 + (height,)
         create_cube(bm, size, position)
