@@ -23,9 +23,22 @@ def create_floors(bm, edges, prop):
 
     extrude_slabs_and_floors(bm, edges, prop)
     slabs, walls = get_slab_and_wall_faces(bm, prop, start_height)
-    if prop.slab_outset > 0.0:
-        result = bmesh.ops.inset_region(bm, faces=slabs, depth=-prop.slab_outset)
-        slabs.extend(result["faces"])
+
+    # XXX CAREFUL NOTE XXX
+    #   (this solves alot of issues across the whole addon)
+    #   This first inset is a very decisive and it's distance is not arbitrary either
+    #   0.00011 is just a tad above the default distance for blender's remove_doubles,
+    #
+    #   This insets acts as a boundary region between slabs and floors and hence it's
+    #   a buffer to separate geometry created on walls from geometry created on slabs
+    #   especially usefull due to how 'inset_face_with_scale_offset' and
+    #   'move_slab_splitface_to_wall' work.
+    result_a = bmesh.ops.inset_region(bm, faces=slabs, depth=-0.00011)
+    #
+    # XXX END NOTE XXX
+
+    result_b = bmesh.ops.inset_region(bm, faces=slabs, depth=-prop.slab_outset)
+    slabs.extend(result_a["faces"] + result_b["faces"])
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     if faces_to_delete:
