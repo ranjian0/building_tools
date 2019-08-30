@@ -119,13 +119,9 @@ def create_stairs_railing(bm, normal, faces, prop):
     # -- create railing for landing
     if prop.landing:
         landing_face = faces.pop(0)
-        EDGES = functools.partial(edges_from_direction, landing_face, normal)
-        if prop.stair_direction == "FRONT":
-            create_railing_from_edges(bm, EDGES(["LEFT", "RIGHT"]), prop.rail)
-        elif prop.stair_direction == "LEFT":
-            create_railing_from_edges(bm, EDGES(["FRONT", "RIGHT"]), prop.rail)
-        elif prop.stair_direction == "RIGHT":
-            create_railing_from_edges(bm, EDGES(["LEFT", "FRONT"]), prop.rail)
+        directions = set(["FRONT", "LEFT", "RIGHT"]) - set([prop.stair_direction])
+        edges = edges_from_direction(landing_face, normal, directions)
+        create_railing_from_edges(bm, edges, prop.rail)
 
     # --create railing for steps
     create_step_railing(bm, normal, faces, prop)
