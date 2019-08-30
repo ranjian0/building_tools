@@ -7,6 +7,7 @@ from ...utils import (
     filter_geom,
     calc_edge_median,
     add_faces_to_map,
+    move_slab_splitface_to_wall,
     inset_face_with_scale_offset,
 )
 
@@ -17,6 +18,7 @@ def create_balcony(bm, faces, prop):
     for f in faces:
         size, off = prop.size_offset.size, prop.size_offset.offset
         f = inset_face_with_scale_offset(bm, f, size.y, size.x, off.x, off.y, off.z)
+        f = move_slab_splitface_to_wall(bm, f)
 
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
         ret = bmesh.ops.extrude_face_region(bm, geom=[f])

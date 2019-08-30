@@ -10,6 +10,7 @@ from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
+    move_slab_splitface_to_wall,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
 )
@@ -22,6 +23,7 @@ def create_stairs(bm, faces, prop):
     for f in faces:
         f.select = False
         f = create_stair_split(bm, f, prop.size_offset)
+        f = move_slab_splitface_to_wall(bm, f)
 
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
