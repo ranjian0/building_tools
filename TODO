@@ -1,6 +1,3 @@
-RAILING:
-    - fix gaps caused by railing not reaching walls due to slabs
-
 ROOF:
     - XXX support gable roof for complex shapes
 
