@@ -16,18 +16,7 @@ FLOORS:
                 plus keeping a uniform look for buildings (slabs and columns)
 
 MATERIAL API:
-    - UI option to set a material for given facemap
-
     - create presets for default materials (FLAT / PBR)
-    - apply the materials to the faces based on where they belong
-
-    - for material editing;
-        - FLAT - just a diffuse shader with color
-        - let user change color from the material tab
-
-        - PBR - Principled with diffuse, normal and roughness
-        - let user change textures
-        - let user change parameters - roughness, metallic factors
 
     - XXX LONG TERM:
         Since the addon operates in editmode, editing multiple buildings
