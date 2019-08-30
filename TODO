@@ -6,8 +6,6 @@ STAIRS:
 
 
 FLOORS:
-    - add option to add extra roof slab (may be useful)
-
     - COLUMNS : I keep dismissing this feature and then running into
                 multiple usecases for it e.g support beams for patio roof,
                 plus keeping a uniform look for buildings (slabs and columns)
