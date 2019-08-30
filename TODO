@@ -4,6 +4,10 @@ ROOF:
 STAIRS:
     - bridge edge loops to fill gaps caused by sloping
 
+    - if no landing and railing fill type is rails,
+      add corner posts at the top
+
+
 FLOORS:
     - add option to add extra roof slab (may be useful)
 
