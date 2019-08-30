@@ -14,6 +14,7 @@ class Floor:
     @classmethod
     def build(cls, context, prop):
         verify_facemaps_for_object(context.object)
+        context.object.tracked_properties.slab_outset = prop.slab_outset
 
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)

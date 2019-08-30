@@ -155,9 +155,18 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         return {"FINISHED"}
 
 
+class TrackedProperty(bpy.types.PropertyGroup):
+    """ Convinience property group to keep track of properties being
+        shared between modules
+    """
+
+    slab_outset: FloatProperty()
+
+
 classes = (
     ArchProperty,
     ArrayProperty,
+    TrackedProperty,
     BTOOLS_UL_fmaps,
     SizeOffsetProperty,
     BTOOLS_OT_fmaps_clear,
@@ -168,7 +177,13 @@ def register_generic():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    bpy.types.Object.tracked_properties = bpy.props.PointerProperty(
+        type=TrackedProperty
+    )
+
 
 def unregister_generic():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    del bpy.types.Object.tracked_properties
