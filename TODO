@@ -4,6 +4,9 @@ RAILING:
 ROOF:
     - XXX support gable roof for complex shapes
 
+STAIRS:
+    - bridge edge loops to fill gaps caused by sloping
+
 FLOORS:
     - add option to add extra roof slab (may be useful)
 
