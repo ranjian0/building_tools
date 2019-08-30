@@ -25,6 +25,6 @@ class Window:
     @classmethod
     def validate(cls, faces):
         if faces:
-            if not any([f.normal.z for f in faces]):
+            if not any([round(f.normal.z, 1) for f in faces]):
                 return True
         return False

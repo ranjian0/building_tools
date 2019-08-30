@@ -27,6 +27,6 @@ class Balcony:
     def validate(cls, faces):
         if faces:
             # -- ensure none are upward facing
-            if not any([f.normal.z for f in faces]):
+            if not any([round(f.normal.z, 1) for f in faces]):
                 return True
         return False
