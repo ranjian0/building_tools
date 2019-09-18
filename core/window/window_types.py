@@ -94,9 +94,10 @@ def create_window_frame_arched(bm, face, prop):
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
-
-    add_faces_to_map(bm, fcs, FaceMap.WINDOW)
-    return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
+    if fcs:
+        add_faces_to_map(bm, fcs, FaceMap.WINDOW)
+        return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
+    return min(edge.link_faces, key=lambda f: f.calc_center_median().z)
 
 
 def create_window_fill(bm, face, prop):
@@ -105,6 +106,8 @@ def create_window_fill(bm, face, prop):
 
     if prop.fill_type == "GLASS PANES":
         add_facemap_for_groups(FaceMap.WINDOW_PANES)
+        if prop.has_arch():
+            pane_arch_face(bm, face, prop.glass_fill)
         fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.WINDOW)
     elif prop.fill_type == "BAR":
         add_facemap_for_groups(FaceMap.WINDOW_BARS)
@@ -147,3 +150,16 @@ def add_extra_arch_bar(bm, face, prop):
         face_flags = {"front": True, "back": True, back_face: True}
 
     create_cube_without_faces(bm, bar_size, bar_pos, **face_flags)
+
+
+@map_new_faces(FaceMap.WINDOW_PANES)
+def pane_arch_face(bm, face, prop):
+    edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
+    arch_face = sorted(edge.link_faces, key=lambda f: f.calc_center_median().z).pop()
+    add_faces_to_map(bm, [arch_face], FaceMap.WINDOW)
+    bmesh.ops.inset_individual(
+        bm, faces=[arch_face], thickness=prop.pane_margin * 0.75, use_even_offset=True
+    )
+    bmesh.ops.translate(
+        bm, verts=arch_face.verts, vec=-arch_face.normal * prop.pane_depth
+    )

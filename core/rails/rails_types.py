@@ -11,7 +11,6 @@ from ...utils import (
     FaceMap,
     validate,
     filter_geom,
-    create_cube,
     edge_vector,
     edge_tangent,
     map_new_faces,
@@ -25,19 +24,43 @@ from ...utils import (
 
 
 class RailingData:
-    def __init__(self):
-        self.wall_switch = False
-        self.corner_angle = 0
-        self.num_corners = 1
-        self.colinear_loops = []
+    """ Manage shared railing data/states """
+
+    def __init__(self, prop):
+        self.prop = prop
+        self.loops = []
+        self.loops_edges = []
 
     def __repr__(self):
-        return (
-            f"Wall Switch   >-{self.wall_switch}\n"
-            + f"Corner Angle  >-{self.corner_angle}\n"
-            + f"Num Corners   >-{self.num_corners}\n"
-            + f"Loops         >-{self.colinear_loops}"
-        )
+        return f"RailingData<{self.prop}>"
+
+    @property
+    def loops_colinear(self):
+        def is_middle(loop):
+            has_next = loop.link_loop_next in self.loops
+            has_previous = loop.link_loop_prev in self.loops
+            return has_next and has_previous
+
+        return [l for l in self.loops if (is_parallel(l) and is_middle(l))]
+
+    def segments(self, loop):
+        angle = loop.calc_angle()
+        return polygon_sides_from_angle(round(angle, 4))
+
+    def corner_post_is_cube(self, loop):
+        return self.segments(loop) == 4 or self.segments(loop) == math.inf
+
+    def corner_post_is_cylinder(self, loop):
+        triangle = self.segments(loop) == 3
+        polygon = self.segments(loop) > 4 and self.segments(loop) != math.inf
+        return polygon or triangle
+
+    def corner_post_size(self, loop):
+        if self.corner_post_is_cylinder(loop):
+            val_a = 2 * (self.prop.corner_post_width ** 2)
+            val_b = val_a * math.cos(math.pi - loop.calc_angle())
+            return math.sqrt(val_a - val_b)
+        return self.prop.corner_post_width
 
 
 def create_railing_from_selection(bm, prop):
@@ -54,7 +77,7 @@ def create_railing_from_selection(bm, prop):
     if len(rail_faces) > 1:
         rail_faces = bmesh.ops.dissolve_faces(bm, faces=rail_faces).get("region")
     select(rail_faces, False)
-    create_railing(bm, edges, rail_faces, prop, RailingData())
+    create_railing(bm, edges, rail_faces, prop, RailingData(prop))
 
 
 def create_railing_from_edges(bm, edges, prop):
@@ -64,7 +87,7 @@ def create_railing_from_edges(bm, edges, prop):
     faces_from_edges = [
         f for f in faces_from_edges if all([e in f.edges for e in edges])
     ]
-    create_railing(bm, edges, faces_from_edges, prop, RailingData())
+    create_railing(bm, edges, faces_from_edges, prop, RailingData(prop))
 
 
 def create_railing_from_step_edges(bm, edges, normal, prop):
@@ -91,83 +114,76 @@ def create_railing(bm, edges, lfaces, prop, raildata):
                 loops.extend([l for l in v.link_loops if l.face in lfaces])
             else:
                 loops.extend([l for l in v.link_loops])
+
     loops = list(set(loops))
+    raildata.loops = loops
+    raildata.loops_edges = list(filter(lambda l: l.edge in edges, loops))
 
-    # TODO - make this work on loop with more than two links
-    # - remove loops where edges are parallel, and both link_edges are in selection
-    def is_middle(loop):
-        return loop.link_loop_next in loops and loop.link_loop_prev in loops
-
-    raildata.colinear_loops.extend(
-        [l for l in loops if (is_parallel(l) and is_middle(l))]
-    )
-    if prop.remove_colinear:
-        loops = [l for l in loops if not (is_parallel(l) and is_middle(l))]
-
-    create_corner_post(bm, loops, prop, raildata)
-    create_fill(bm, edges, prop, raildata)
+    create_corner_post(bm, raildata)
+    create_fill(bm, raildata)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
-def create_corner_post(bm, loops, prop, raildata):
+def create_corner_post(bm, raildata):
     """ Add post at each vert in loops
     """
+    prop = raildata.prop
     add_facemap_for_groups(FaceMap.RAILING_POSTS)
-    for loop in loops:
+    for loop in raildata.loops:
+        if prop.remove_colinear and loop in raildata.loops_colinear:
+            continue
+
         v = loop.vert
         e = loop.edge
 
         vec = loop.calc_tangent()
         width, height = prop.corner_post_width, prop.corner_post_height
 
-        angle = loop.calc_angle()
-        segments = polygon_sides_from_angle(angle)
-        if segments == 4 or segments < 0:  # - (90 or 180)
+        if raildata.corner_post_is_cube(loop):
             off = vec * math.sqrt(2 * ((width / 2) ** 2))
             if is_parallel(loop):
                 off = vec * (width / 2)
             pos = v.co + off + Vector((0, 0, height / 2))
             post = add_cube_post(bm, width, height, pos)
-        else:
+        elif raildata.corner_post_is_cylinder(loop):
             pos = v.co + (vec * width) + Vector((0, 0, height / 2))
-            post = create_cylinder(bm, width, height, segments, pos)
-
-            # -- store global state
-            raildata.wall_switch = True
-            raildata.num_corners = segments
-            raildata.corner_angle = math.pi - angle
+            post = create_cylinder(bm, width, height, raildata.segments(loop), pos)
+            bmesh.ops.rotate(
+                bm,
+                verts=post["verts"],
+                cent=calc_verts_median(post["verts"]),
+                matrix=Matrix.Rotation(loop.calc_angle() / 2, 4, "Z"),
+            )
+        else:
+            raise ValueError(f"Invalid Loop data {loop} : angle:{loop.calc_angle()}")
 
         align_geometry_to_edge(bm, post, e)
 
 
-def create_fill(bm, edges, prop, raildata):
+def create_fill(bm, raildata):
     """ Create fill types for railing
     """
+    prop = raildata.prop
     if prop.fill == "POSTS":
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
-        create_fill_posts(bm, edges, prop, raildata)
+        create_fill_posts(bm, raildata)
     elif prop.fill == "RAILS":
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
-        create_fill_rails(bm, edges, prop)
+        create_fill_rails(bm, raildata)
     elif prop.fill == "WALL":
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
-        create_fill_walls(bm, edges, prop, raildata)
+        create_fill_walls(bm, raildata)
 
 
 @map_new_faces(FaceMap.RAILING_RAILS)
-def create_fill_rails(bm, edges, prop):
+def create_fill_rails(bm, raildata):
     """ Add rails between corner posts
     """
-    loops = loops_from_edges(edges)
-
-    processed_edges = []
-    for loop in loops:
+    prop = raildata.prop
+    for loop in raildata.loops_edges:
         edge = loop.edge
-        if edge not in edges or edge in processed_edges:
-            continue
-
-        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
+        rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop, raildata)
 
         start = rail_pos
         stop = rail_pos + Vector((0, 0, prop.corner_post_height - prop.rail_size))
@@ -181,25 +197,18 @@ def create_fill_rails(bm, edges, prop):
         p = stop + Vector((0, 0, prop.rail_size / 2))
         rail = create_cube_without_faces(bm, rail_size, p, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
-        processed_edges.append(edge)
 
 
 @map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
-def create_fill_posts(bm, edges, prop, raildata):
+def create_fill_posts(bm, raildata):
     """ Add posts between corner posts
     """
-    loops = loops_from_edges(edges)
-
-    processed_edges = []
-    for loop in loops:
+    prop = raildata.prop
+    for loop in raildata.loops_edges:
         edge = loop.edge
-        if edge not in edges or edge in processed_edges:
-            continue
 
         # -- add posts
         add_posts_between_loops(bm, [loop, loop.link_loop_next], prop)
-
-        # -- fill gaps created by remove colinear
         fill_post_for_colinear_gap(bm, edge, prop, raildata)
 
         # -- add top rail
@@ -209,27 +218,16 @@ def create_fill_posts(bm, edges, prop, raildata):
         rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
         rail = rail(bm, rail_size, rail_pos, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
-        processed_edges.append(edge)
 
 
 @map_new_faces(FaceMap.RAILING_WALLS)
-def create_fill_walls(bm, edges, prop, raildata):
+def create_fill_walls(bm, raildata):
     """ Add walls between corner posts
     """
-    loops = loops_from_edges(edges)
-
-    processed_edges = []
-    for loop in loops:
+    prop = raildata.prop
+    for loop in raildata.loops_edges:
         edge = loop.edge
-        if edge not in edges or edge in processed_edges:
-            continue
-
-        off = prop.corner_post_width
-        if raildata.wall_switch:
-            # - a cylinder corner post was created, determine length of side with cosine rule
-            val_a = 2 * (prop.corner_post_width ** 2)
-            val_b = val_a * math.cos(raildata.corner_angle)
-            off = math.sqrt(val_a - val_b)
+        off = raildata.corner_post_size(loop)
 
         loop_a, loop_b = loop, loop.link_loop_next
         vec = (loop_a.vert.co - loop_b.vert.co).normalized()
@@ -242,7 +240,6 @@ def create_fill_walls(bm, edges, prop, raildata):
             bm, start, end, prop.corner_post_height, prop.wall_width, edge_tangent(edge)
         )
         wall(delete_faces=["bottom", "left", "right"])
-        processed_edges.append(edge)
 
 
 def create_wall(bm, start, end, height, width, tangent):
@@ -276,14 +273,15 @@ def delete_linked_wall_faces(bm, edges, tangent, delete_faces=["bottom"]):
     if "bottom" in delete_faces:
         faces_to_delete.extend([f for f in faces if f.normal.z < 0])
 
-    n = tangent.cross(Vector((0, 0, 1)))
-    attr = "x" if n.x else "y"
-    if "left" in delete_faces:
-        faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) < 0])
-    if "right" in delete_faces:
-        faces_to_delete.extend([f for f in faces if getattr(f.normal, attr) > 0])
+    n_l = tangent.cross(Vector((0, 0, 1))).to_tuple(2)
+    n_r = tangent.cross(Vector((0, 0, -1))).to_tuple(2)
 
-    bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES_ONLY")
+    if "left" in delete_faces:
+        faces_to_delete.extend([f for f in faces if f.normal.to_tuple(2) == n_l])
+    if "right" in delete_faces:
+        faces_to_delete.extend([f for f in faces if f.normal.to_tuple(2) == n_r])
+
+    bmesh.ops.delete(bm, geom=list(set(faces_to_delete)), context="FACES_ONLY")
     return validate(faces)
 
 
@@ -346,7 +344,10 @@ def align_geometry_to_edge(bm, geom, edge):
 def polygon_sides_from_angle(angle):
     """ Determine the number of sides for a polygon with an interior angle 'angle'
     """
-    return round((2 * math.pi) / (math.pi - angle))
+    pi = round(math.pi, 4)
+    if angle == pi:
+        return math.inf
+    return round((2 * pi) / (pi - angle))
 
 
 def sort_edge_verts_by_orientation(edge):
@@ -389,14 +390,13 @@ def add_posts_between_loops(bm, loops, prop):
 
 
 def fill_post_for_colinear_gap(bm, edge, prop, raildata):
-    """ Add a post where corner posts were removed due to belonging to
-    co-linear loops
+    """ Add a post where corner posts were removed due to belonging to co-linear loops
     """
     off = edge_tangent(edge).normalized() * (prop.corner_post_width / 2)
     height_v = Vector((0, 0, prop.corner_post_height / 2 - prop.rail_size / 2))
     size = (prop.post_size, prop.post_size, prop.corner_post_height - prop.rail_size)
     if prop.remove_colinear:
-        for loop in raildata.colinear_loops:
+        for loop in raildata.loops_colinear:
             if loop.edge == edge or loop.link_loop_prev.edge == edge:
                 v = loop.vert
                 p = v.co + off + height_v
@@ -410,14 +410,14 @@ def fill_posts_for_step_edges(bm, edges, normal, prop):
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
     for group in edge_groups:
         #   -- max and min coordinate for step edges
-        min_location, max_location = find_min_and_max_vert_locations(
-            [vert for edge in group for vert in edge.verts], normal
+        min_location, max_location = min_max_vert_locations(
+            [vert for edge in group for vert in edge.verts]
         )
         step_size = abs((max_location.z - min_location.z) / (prop.step_count - 1))
         min_location.z += step_size
 
         #  -- slope and edge tangent
-        slope = slope_between_vectors(max_location, min_location, normal)
+        slope = slope_between_vectors(max_location, min_location)
         tangent = edge_tangent(group[-1]).normalized()
 
         #   -- fill posts along each edge that get taller along slope
@@ -439,44 +439,27 @@ def fill_rails_for_step_edges(bm, edges, normal, prop):
     rail = prop.rail
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
     for group in edge_groups:
-        #   -- max and min coordinate for step edges
-        min_location, max_location = find_min_and_max_vert_locations(
-            [vert for edge in group for vert in edge.verts], normal
+        tangent = edge_tangent(group[-1]).normalized()
+        min_location, max_location = min_max_vert_locations(
+            [vert for edge in group for vert in edge.verts]
         )
 
         step_size = (max_location.z - min_location.z) / (prop.step_count - 1)
         max_location.z += step_size
 
-        #  -- slope and edge tangent
-        tangent = edge_tangent(group[-1]).normalized()
-        tangent_offset = tangent * rail.corner_post_width / 2
-        slope = slope_between_vectors(max_location, min_location, normal)
-
         #  -- add corner post at max location
-        post_w, post_h = rail.corner_post_width, rail.corner_post_height
-        post_pos = max_location + Vector((0, 0, post_h / 2 - step_size))
-        post_pos += tangent_offset + (normal * -post_w / 2)
+        add_corner_post_for_last_fill_rail_step(
+            bm, max_location, step_size, tangent, normal, prop
+        )
+
+        #  -- add corner post at min location if there is no landing
         if not prop.landing:
-            post_pos += Vector((0, 0, rail.rail_size / 4))
-            post_h += rail.rail_size / 2
+            add_corner_post_for_start_fill_rail_step(
+                bm, min_location, step_size, tangent, normal, prop
+            )
+            min_location += normal * rail.corner_post_width
 
-        post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
-        post(bm, post_w, post_h, post_pos)
-
-        #  -- add corner post at min location
-        #     only if there is no landing
-        if not prop.landing:
-            post_pos = min_location + Vector((0, 0, post_h / 2))
-            post_pos += tangent_offset + (normal * post_w / 2)
-            post_pos += Vector((0, 0, rail.rail_size / 4))
-            post_h += rail.rail_size / 2
-
-            post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
-            post(bm, post_w, post_h, post_pos)
-
-            min_location += normal * post_w
-
-        #   --  add a rails
+        slope = slope_between_vectors(max_location, min_location)
         array_sloped_rails(
             bm, min_location, max_location, step_size, slope, normal, tangent, rail
         )
@@ -489,8 +472,8 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
     rail = prop.rail
     edge_groups = get_edge_groups_from_direction(edges, prop.stair_direction)
     for group in edge_groups:
-        min_location, max_location = find_min_and_max_vert_locations(
-            [vert for edge in group for vert in edge.verts], normal
+        min_location, max_location = min_max_vert_locations(
+            [vert for edge in group for vert in edge.verts]
         )
         step_size = abs((max_location.z - min_location.z) / (prop.step_count - 1))
 
@@ -500,7 +483,7 @@ def fill_walls_for_step_edges(bm, edges, normal, prop):
             wall = create_wall(
                 bm, start, end, rail.corner_post_height, rail.wall_width, tan
             )
-            inner = "right" if sum(normal) < 0 else "left"
+            inner = "right" if normal.cross(tan).z > 0.0 else "left"
             faces = wall(delete_faces=["bottom", inner])
 
             up_faces = [f for f in faces if f.normal.z > 0]
@@ -523,29 +506,18 @@ def get_edge_groups_from_direction(edges, direction):
     return edge_groups
 
 
-def slope_between_vectors(start, end, normal):
+def slope_between_vectors(start, end):
     """ Calculate the slope between start and end
-    switch the 'run' based on normal for 'slope = rise/run'
     """
-    change_z = start.z - end.z
-    if normal.x:
-        change_other = start.x - end.x
-    elif normal.y:
-        change_other = start.y - end.y
-    else:
-        return 1
-    return change_z / change_other
+    change = start - end
+    return change.z / change.xy.length
 
 
-def find_min_and_max_vert_locations(verts, normal):
+def min_max_vert_locations(verts):
     """ Find the minimum and maximum location in verts based on normal direction
     """
-    v_location = [vert.co.copy() for vert in verts]
-    sort_key = operator.attrgetter("x" if normal.x else "y")
-    res = [function(v_location, key=sort_key) for function in (min, max)]
-    if sort_key(normal) > 0:
-        return res
-    return reversed(res)
+    locations = [vert.co.copy() for vert in verts]
+    return sorted(locations, key=lambda c: c.length)[:: len(locations) - 1]
 
 
 def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
@@ -559,13 +531,19 @@ def add_posts_along_edge_with_slope(bm, edge, slope, normal, tangent, prop):
     tan_offset = tangent * prop.corner_post_width / 2
     post_offset = tan_offset + (-normal * prop.post_size / 2)
 
-    end, start = find_min_and_max_vert_locations(edge.verts, normal)
+    end, start = min_max_vert_locations(edge.verts)
     for i in range(post_count):
         height = post_height + abs(slope * (i * post_spacing))
         position = start + post_offset - (normal * (i * post_spacing))
         position += Vector((0, 0, height / 2))
         size = (prop.post_size,) * 2 + (height,)
-        create_cube(bm, size, position)
+        post = create_cube_without_faces(bm, size, position, top=True, bottom=True)
+        bmesh.ops.rotate(
+            bm,
+            verts=post["verts"],
+            cent=calc_verts_median(post["verts"]),
+            matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
+        )
 
 
 @map_new_faces(FaceMap.RAILING_RAILS)
@@ -577,7 +555,6 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
     position = start.lerp(end, 0.5) - ((end - start).normalized() * prop.rail_size / 2)
 
     rail = create_cube_without_faces(bm, size, position, right=True)
-
     bmesh.ops.rotate(
         bm,
         verts=rail["verts"],
@@ -585,13 +562,11 @@ def add_rail_with_slope(bm, start, end, slope, normal, prop):
         matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
     )
 
-    axis = "Y" if normal.x else "X"
-    slope *= 1 if normal.y else -1  # -- figure out why???
     bmesh.ops.rotate(
         bm,
         verts=rail["verts"],
         cent=calc_verts_median(rail["verts"]),
-        matrix=Matrix.Rotation(math.atan(slope), 4, axis),
+        matrix=Matrix.Rotation(math.atan(slope), 4, normal.cross(Vector((0, 0, 1)))),
     )
 
 
@@ -609,7 +584,7 @@ def loops_from_edges(edges):
     return list(set(loops))
 
 
-def calc_rail_position_and_size_for_loop(loop, prop, raildata=None):
+def calc_rail_position_and_size_for_loop(loop, prop, raildata):
     """ Calculate proper position and size for a rail along the loop's edge
     """
     edge = loop.edge
@@ -621,11 +596,11 @@ def calc_rail_position_and_size_for_loop(loop, prop, raildata=None):
     convex_offset *= 0 if num_convex == 0 else 1
 
     rail_pos = calc_edge_median(edge) + off + convex_offset
-    rail_len = edge.calc_length() - prop.corner_post_width * num_convex
+    rail_len = edge.calc_length() - raildata.corner_post_size(loop) * num_convex
     if raildata and not prop.remove_colinear:
         is_colinear = (
-            loop in raildata.colinear_loops,
-            loop.link_loop_next in raildata.colinear_loops,
+            loop in raildata.loops_colinear,
+            loop.link_loop_next in raildata.loops_colinear,
         )
         if any(is_colinear):
             rail_len -= prop.corner_post_width / 2
@@ -662,13 +637,56 @@ def array_sloped_rails(bm, min_loc, max_loc, step_size, slope, normal, tangent, 
 
 
 def slope_step_walls(bm, faces, normal, step_size):
-    """ Make wall slope along step edges """
-    axis = "x" if normal.x else "y"
-    func = max if sum(normal) < 0 else min
-
+    """ Make wall slope along step edges
+    """
     for face in faces:
-        pos = func([getattr(calc_edge_median(e), axis) for e in face.edges])
-        e = [e for e in face.edges if getattr(calc_edge_median(e), axis) == pos].pop()
+        loc = min([calc_edge_median(e).xy.length for e in face.edges])
+        e = [e for e in face.edges if calc_edge_median(e).xy.length == loc].pop()
 
         for v in e.verts:
             v.co.z += step_size
+
+
+def add_corner_post_for_last_fill_rail_step(bm, loc, step_size, tan, normal, prop):
+    """ Add a corner posts at the bottom of stairs when fill is rails
+    """
+
+    rail = prop.rail
+    tangent_offset = tan * rail.corner_post_width / 2
+    post_w, post_h = rail.corner_post_width, rail.corner_post_height
+    post_pos = loc + Vector((0, 0, post_h / 2 - step_size))
+    post_pos += tangent_offset + (normal * -post_w / 2)
+    if not prop.landing:
+        post_pos += Vector((0, 0, rail.rail_size / 4))
+        post_h += rail.rail_size / 2
+
+    post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
+    post = post(bm, post_w, post_h, post_pos)
+    bmesh.ops.rotate(
+        bm,
+        verts=post["verts"],
+        cent=calc_verts_median(post["verts"]),
+        matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
+    )
+
+
+def add_corner_post_for_start_fill_rail_step(bm, loc, step_size, tan, normal, prop):
+    """ Add a corner posts at the beginning of stairs when fill is rails
+    """
+
+    rail = prop.rail
+    tangent_offset = tan * rail.corner_post_width / 2
+    post_w, post_h = rail.corner_post_width, rail.corner_post_height
+    post_pos = loc + Vector((0, 0, post_h / 2))
+    post_pos += tangent_offset + (normal * post_w / 2)
+    post_pos += Vector((0, 0, rail.rail_size / 2))
+    post_h += rail.rail_size
+
+    post = map_new_faces(FaceMap.RAILING_POSTS)(add_cube_post)
+    post = post(bm, post_w, post_h, post_pos)
+    bmesh.ops.rotate(
+        bm,
+        verts=post["verts"],
+        cent=calc_verts_median(post["verts"]),
+        matrix=Matrix.Rotation(math.atan2(normal.y, normal.x), 4, "Z"),
+    )

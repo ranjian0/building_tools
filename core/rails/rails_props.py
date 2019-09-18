@@ -67,7 +67,7 @@ class RailProperty(bpy.types.PropertyGroup):
 
     remove_colinear: BoolProperty(
         name="Remove Colinear",
-        default=False,
+        default=True,
         description="Whether to remove extra colinear posts",
     )
 
