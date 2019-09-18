@@ -116,9 +116,10 @@ def create_door_frame_arched(bm, face, prop):
     edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
 
     faces = extrude_door_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
-
-    add_faces_to_map(bm, faces, FaceMap.DOOR)
-    return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
+    if faces:
+        add_faces_to_map(bm, faces, FaceMap.DOOR)
+        return sorted(faces, key=lambda f: f.calc_center_median().z)[0]
+    return min(edge.link_faces, key=lambda f: f.calc_center_median().z)
 
 
 def create_door_fill(bm, face, prop):
@@ -129,6 +130,8 @@ def create_door_fill(bm, face, prop):
         fill_panel(bm, face, prop.panel_fill)
     elif prop.fill_type == "GLASS PANES":
         add_facemap_for_groups(FaceMap.DOOR_PANES)
+        if prop.has_arch():
+            pane_arch_face(bm, face, prop.glass_fill)
         fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.DOOR)
     elif prop.fill_type == "LOUVER":
         add_facemap_for_groups(FaceMap.DOOR_LOUVERS)
@@ -224,3 +227,16 @@ def split_edges_horizontal_offset_top(bm, edges, offset):
 
     res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
     return res.pop()
+
+
+@map_new_faces(FaceMap.DOOR_PANES)
+def pane_arch_face(bm, face, prop):
+    edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
+    arch_face = sorted(edge.link_faces, key=lambda f: f.calc_center_median().z).pop()
+    add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
+    bmesh.ops.inset_individual(
+        bm, faces=[arch_face], thickness=prop.pane_margin * 0.75, use_even_offset=True
+    )
+    bmesh.ops.translate(
+        bm, verts=arch_face.verts, vec=-arch_face.normal * prop.pane_depth
+    )

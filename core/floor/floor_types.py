@@ -69,19 +69,13 @@ def get_slab_and_wall_faces(bm, prop, start_height):
     """
     slabs, walls = [], []
     slab_heights, wall_heights = [], []
+
+    def H(idx):
+        return start_height + (idx * prop.floor_height) + (idx * prop.slab_thickness)
+
     for idx in range(prop.floor_count):
-        slab_heights.append(
-            prop.slab_thickness / 2
-            + (idx * prop.slab_thickness)
-            + (idx * prop.floor_height)
-            + start_height
-        )
-        wall_heights.append(
-            prop.floor_height / 2
-            + (idx * prop.floor_height)
-            + ((idx + 1) * prop.slab_thickness)
-            + start_height
-        )
+        slab_heights.append(H(idx) + prop.slab_thickness / 2)
+        wall_heights.append(H(idx) + prop.floor_height / 2 + prop.slab_thickness)
 
     round_4dp = ft.partial(round, ndigits=4)
     for face in bm.faces:

@@ -10,7 +10,6 @@ from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
-    move_slab_splitface_to_wall,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
 )
@@ -23,7 +22,6 @@ def create_stairs(bm, faces, prop):
     for f in faces:
         f.select = False
         f = create_stair_split(bm, f, prop.size_offset)
-        f = move_slab_splitface_to_wall(bm, f)
 
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
@@ -34,8 +32,8 @@ def create_stairs(bm, faces, prop):
         f = create_landing(bm, f, top_faces, prop)
         create_steps(bm, f, top_faces, prop)
 
-    if prop.railing:
-        create_stairs_railing(bm, init_normal, top_faces, prop)
+        if prop.railing:
+            create_stairs_railing(bm, init_normal, top_faces, prop)
 
 
 def create_landing(bm, f, top_faces, prop):
@@ -125,6 +123,10 @@ def create_stairs_railing(bm, normal, faces, prop):
         edges = edges_from_direction(landing_face, normal, directions)
         create_railing_from_edges(bm, edges, prop.rail)
 
+    else:
+        # -- ensure direction is front if there is no landing
+        prop.stair_direction = "FRONT"
+
     # --create railing for steps
     create_step_railing(bm, normal, faces, prop)
 
@@ -164,7 +166,7 @@ def edges_from_direction(face, normal, direction):
         for loop in e.link_loops:
             if loop in valid_loops:
                 tan = e.calc_tangent(loop)
-                if tan == -normal:
+                if tan.to_tuple(2) == (-normal).to_tuple(2):
                     edges["FRONT"].append(e)
 
                 if round(normal.cross(tan).z) < 0:

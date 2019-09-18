@@ -1,16 +1,23 @@
+DOOR:
+  re-add double door feature, but better and with support for archs
+
+
+BUG:
+    - move_slabface_to_wall prevents splitoffset from working properly
+      (may need to solve this issue the hard way after all)
+
 ROOF:
     - XXX support gable roof for complex shapes
 
 STAIRS:
     - bridge edge loops to fill gaps caused by sloping
 
+    - if landing is provided, perhaps option to slim down the stairs
+      should be there
 
-FLOORS:
-    - add option to add extra roof slab (may be useful)
+      plus, when 'move_slabface_to_wall' is used, and stair direction is
+      not front, stairs intersect with the slab
 
-    - COLUMNS : I keep dismissing this feature and then running into
-                multiple usecases for it e.g support beams for patio roof,
-                plus keeping a uniform look for buildings (slabs and columns)
 
 MATERIAL API:
     - create presets for default materials (FLAT / PBR)

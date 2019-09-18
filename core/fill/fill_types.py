@@ -44,7 +44,7 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     if prop.pane_count_x + prop.pane_count_y == 0:
         return
 
-    userframe = FaceMap.DOOR_FRAMES if user == FillUser.DOOR else FaceMap.WINDOW_FRAMES
+    userframe = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
 
     inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
@@ -53,7 +53,7 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     for f in quads:
         bmesh.ops.translate(bm, verts=f.verts, vec=-f.normal * prop.pane_depth)
 
-    usergroup = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
+    usergroup = FaceMap.DOOR if user == FillUser.DOOR else FaceMap.WINDOW
     add_faces_to_map(bm, quads, usergroup)
 
 

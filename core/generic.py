@@ -132,7 +132,7 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
     """Remove all empty face maps"""
 
     bl_idname = "btools.face_map_clear"
-    bl_label = "Clear face maps"
+    bl_label = "Clear empty face maps"
     bl_options = {"REGISTER", "UNDO"}
 
     @classmethod
