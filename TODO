@@ -1,8 +1,9 @@
 DOOR:
   re-add double door feature, but better and with support for archs
 
-RAILING BUG:
+RAILING BUGS:
   for rails - density option does not affect distance to top rail
+  fix alignment for rails and walls if edges selected are not boundary
 
 BUG:
     - move_slabface_to_wall prevents splitoffset from working properly
