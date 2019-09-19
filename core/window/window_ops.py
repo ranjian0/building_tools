@@ -4,6 +4,7 @@ from .window_props import WindowProperty
 
 
 class BTOOLS_OT_add_window(bpy.types.Operator):
+    """Create window from selected faces"""
 
     bl_idname = "btools.add_window"
     bl_label = "Add Window"

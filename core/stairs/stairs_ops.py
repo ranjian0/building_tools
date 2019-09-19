@@ -4,6 +4,7 @@ from .stairs_props import StairsProperty
 
 
 class BTOOLS_OT_add_stairs(bpy.types.Operator):
+    """Create stairs from selected faces"""
 
     bl_idname = "btools.add_stairs"
     bl_label = "Add Stairs"

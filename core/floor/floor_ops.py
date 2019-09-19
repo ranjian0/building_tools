@@ -4,6 +4,7 @@ from .floor_props import FloorProperty
 
 
 class BTOOLS_OT_add_floors(bpy.types.Operator):
+    """Create floors from the current edit mesh"""
 
     bl_idname = "btools.add_floors"
     bl_label = "Add Floors"

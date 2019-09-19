@@ -4,6 +4,7 @@ from .rails_props import RailProperty
 
 
 class BTOOLS_OT_add_railing(bpy.types.Operator):
+    """Add railing to selected upward facing faces"""
 
     bl_idname = "btools.add_railing"
     bl_label = "Add Railing"

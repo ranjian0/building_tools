@@ -4,6 +4,7 @@ from .door_props import DoorProperty
 
 
 class BTOOLS_OT_add_door(bpy.types.Operator):
+    """Create a door from selected faces"""
 
     bl_idname = "btools.add_door"
     bl_label = "Add Door"
