@@ -8,6 +8,7 @@ BUG:
 
 ROOF:
     - XXX support gable roof for complex shapes
+    - support adding roofs to faces that have boundary geometry e.g for patio
 
 STAIRS:
     - bridge edge loops to fill gaps caused by sloping
