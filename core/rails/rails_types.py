@@ -72,11 +72,10 @@ def create_railing_from_selection(bm, prop):
     else:
         edges = [e for e in bm.edges if e.select]
         rail_faces = upward_faces_from_edges(edges)
-        rail_faces = [f for f in rail_faces if all([e in f.edges for e in edges])]
+        rail_faces = list(filter(
+            lambda f: sum(int(e in f.edges) for e in edges) > 1, rail_faces)
+        )
 
-    if len(rail_faces) > 1:
-        rail_faces = bmesh.ops.dissolve_faces(bm, faces=rail_faces).get("region")
-    select(rail_faces, False)
     create_railing(bm, edges, rail_faces, prop, RailingData(prop))
 
 
