@@ -7,7 +7,6 @@ from mathutils import Vector, Matrix
 
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
-    select,
     FaceMap,
     validate,
     filter_geom,
@@ -106,15 +105,10 @@ def create_railing_from_step_edges(bm, edges, normal, prop):
 def create_railing(bm, edges, lfaces, prop, raildata):
     """ Perform all railing procedures
     """
-    loops = []
-    for e in edges:
-        for v in e.verts:
-            if len(v.link_loops) > 1:
-                loops.extend([l for l in v.link_loops if l.face in lfaces])
-            else:
-                loops.extend([l for l in v.link_loops])
+    vertices = set(v for e in edges for v in e.verts)
+    loops = set(l for v in vertices for l in v.link_loops)
+    loops = list(filter(lambda l: l.face in lfaces and l.edge in edges, loops))
 
-    loops = list(set(loops))
     raildata.loops = loops
     raildata.loops_edges = list(filter(lambda l: l.edge in edges, loops))
 
