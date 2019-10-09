@@ -309,8 +309,7 @@ def array_elements(bm, elem, count, start, stop):
 def upward_faces_from_edges(edges):
     """ Find linked upward facing faces
     """
-    verts = list({v for e in edges for v in e.verts})
-    return list({f for v in verts for f in v.link_faces if f.normal.z})
+    return list({f for e in edges for f in e.link_faces if f.normal.z})
 
 
 def create_edge(bm, start, end):
