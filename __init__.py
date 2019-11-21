@@ -1,6 +1,7 @@
 import bpy
 from .core import register_core, unregister_core
 
+DEBUG = True
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
@@ -107,11 +108,19 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    if DEBUG:
+        from .tests import register_tests
+        register_tests()
+
 
 def unregister():
     unregister_core()
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    if DEBUG:
+        from .tests import unregister_tests
+        unregister_tests()
 
 
 if __name__ == "__main__":
