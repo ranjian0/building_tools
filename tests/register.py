@@ -1,10 +1,12 @@
 import bpy
 from .generic import PANEL_PT_test_tools
+from .test_floors import BTOOLS_OT_test_floors
 from .test_floorplan import BTOOLS_OT_test_floorplan
 
 classes = (
     PANEL_PT_test_tools,
-    BTOOLS_OT_test_floorplan
+    BTOOLS_OT_test_floors,
+    BTOOLS_OT_test_floorplan,
 )
 
 
