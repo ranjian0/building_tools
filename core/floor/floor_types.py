@@ -1,3 +1,4 @@
+import bpy
 import bmesh
 import itertools as it
 import functools as ft
@@ -44,8 +45,9 @@ def create_floors(bm, edges, prop):
     if faces_to_delete:
         bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
 
-    add_faces_to_map(bm, slabs, FaceMap.SLABS)
-    add_faces_to_map(bm, walls, FaceMap.WALLS)
+    if bpy.context.object:
+        add_faces_to_map(bm, slabs, FaceMap.SLABS)
+        add_faces_to_map(bm, walls, FaceMap.WALLS)
 
 
 def extrude_slabs_and_floors(bm, edges, prop):
