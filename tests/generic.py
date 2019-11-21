@@ -1,7 +1,7 @@
 import bpy
 
 
-class PANEL_PT_test_tools(bpy.types.Panel):
+class BTOOLS_PT_test_tools(bpy.types.Panel):
     bl_label = "Test Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"

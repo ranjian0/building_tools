@@ -1,7 +1,7 @@
 import bpy
 from .core import register_core, unregister_core
 
-DEBUG = True
+DEBUG = False
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
@@ -16,7 +16,7 @@ bl_info = {
 }
 
 
-class PANEL_PT_mesh_tools(bpy.types.Panel):
+class BTOOLS_PT_mesh_tools(bpy.types.Panel):
 
     bl_label = "Mesh Tools"
     bl_space_type = "VIEW_3D"
@@ -44,7 +44,7 @@ class PANEL_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_roof")
 
 
-class PANEL_PT_material_tools(bpy.types.Panel):
+class BTOOLS_PT_material_tools(bpy.types.Panel):
 
     bl_label = "Material Tools"
     bl_space_type = "VIEW_3D"
@@ -100,7 +100,7 @@ class PANEL_PT_material_tools(bpy.types.Panel):
             layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 
-classes = (PANEL_PT_mesh_tools, PANEL_PT_material_tools)
+classes = (BTOOLS_PT_mesh_tools, BTOOLS_PT_material_tools)
 
 
 def register():
@@ -108,29 +108,23 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    if DEBUG:
-        from .tests import register_tests
-        register_tests()
-
 
 def unregister():
     unregister_core()
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
-    if DEBUG:
-        from .tests import unregister_tests
-        unregister_tests()
-
 
 if __name__ == "__main__":
     import os
-
     os.system("clear")
 
-    try:
-        unregister()
-    except RuntimeError:
-        pass
-    finally:
-        register()
+    # -- custom unregister for script watcher
+    for tp in dir(bpy.types):
+        if 'BTOOLS_' in tp:
+            bpy.utils.unregister_class(getattr(bpy.types, tp))
+
+    register()
+    if DEBUG:
+        from .tests import register_tests
+        register_tests()
