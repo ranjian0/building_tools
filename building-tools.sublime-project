@@ -2,6 +2,25 @@
 	"folders":
 	[
 		{
+			"file_exclude_patterns":
+			[
+				"tests/test.blend1"
+			],
+			"folder_exclude_patterns":
+			[
+				"core/door/__pycache__",
+				"core/roof/__pycache__",
+				"tests/__pycache__",
+				"core/floorplan/__pycache__",
+				"utils/__pycache__",
+				"core/balcony/__pycache__",
+				"core/stairs/__pycache__",
+				"core/__pycache__",
+				"core/floor/__pycache__",
+				"core/rails/__pycache__",
+				"core/window/__pycache__",
+				"core/fill/__pycache__"
+			],
 			"path": "."
 		}
 	]
