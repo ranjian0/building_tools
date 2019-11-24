@@ -77,7 +77,7 @@ def filter_vertical_edges(edges, normal):
     rnd = ft.partial(round, ndigits=3)
 
     for e in edges:
-        if normal.x:
+        if rnd(normal.x):
             s = set([rnd(v.co.y) for v in e.verts])
         else:
             s = set([rnd(v.co.x) for v in e.verts])
@@ -94,7 +94,7 @@ def filter_horizontal_edges(edges, normal):
     rnd = ft.partial(round, ndigits=3)
 
     for e in edges:
-        if normal.z:
+        if rnd(normal.z):
             s = set([rnd(v.co.y) for v in e.verts])
         else:
             s = set([rnd(v.co.z) for v in e.verts])
@@ -128,7 +128,12 @@ def face_with_verts(bm, verts, default=None):
     """ Find a face in the bmesh with the given verts
     """
     for face in bm.faces:
-        if len(set(list(face.verts) + verts)) == len(verts):
+        equal = map(
+            operator.eq,
+            sorted(verts, key=operator.attrgetter('index')),
+            sorted(face.verts, key=operator.attrgetter('index')),
+        )
+        if len(face.verts) == len(verts) and all(equal):
             return face
     return default
 
