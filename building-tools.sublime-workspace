@@ -4,6 +4,170 @@
 		"selected_items":
 		[
 			[
+				"PAN",
+				"PANELS"
+			],
+			[
+				"BT",
+				"BTOOLS_OT_test_door"
+			],
+			[
+				"ran",
+				"randomize_props"
+			],
+			[
+				"pane_c",
+				"pane_count_x"
+			],
+			[
+				"glas",
+				"glass_fill"
+			],
+			[
+				"rand",
+				"random"
+			],
+			[
+				"bar",
+				"bar_depth"
+			],
+			[
+				"lo",
+				"louver_count"
+			],
+			[
+				"def",
+				"default_window"
+			],
+			[
+				"face",
+				"face_map"
+			],
+			[
+				"op",
+				"operator"
+			],
+			[
+				"eq",
+				"equal"
+			],
+			[
+				"val",
+				"validate"
+			],
+			[
+				"arra",
+				"array_faces"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"ap",
+				"append"
+			],
+			[
+				"create",
+				"create_mesh"
+			],
+			[
+				"po",
+				"position"
+			],
+			[
+				"con",
+				"context"
+			],
+			[
+				"create_wind",
+				"create_window_plane"
+			],
+			[
+				"window",
+				"window_types"
+			],
+			[
+				"calc",
+				"calc_verts_median"
+			],
+			[
+				"fill",
+				"fill_type"
+			],
+			[
+				"bm",
+				"bm_to_obj"
+			],
+			[
+				"bt",
+				"bm_to_obj"
+			],
+			[
+				"WInd",
+				"WindowProperty"
+			],
+			[
+				"in",
+				"install_dir"
+			],
+			[
+				"ins",
+				"install_to_user_dir"
+			],
+			[
+				"uti",
+				"util_install"
+			],
+			[
+				"Pa",
+				"Path"
+			],
+			[
+				"test",
+				"test_col"
+			],
+			[
+				"col",
+				"collection"
+			],
+			[
+				"cre",
+				"create_floors"
+			],
+			[
+				"ra",
+				"random"
+			],
+			[
+				"prop",
+				"props"
+			],
+			[
+				"sel",
+				"select_set"
+			],
+			[
+				"lay",
+				"layer_col"
+			],
+			[
+				"ob",
+				"objects"
+			],
+			[
+				"PANEL_",
+				"PANEL_PT_debug_tools"
+			],
+			[
+				"Flo",
+				"FloorplanProperty"
+			],
+			[
+				"floo",
+				"floorplan_props"
+			],
+			[
 				"coun",
 				"count_convex"
 			],
@@ -54,14 +218,6 @@
 			[
 				"all",
 				"all_loops"
-			],
-			[
-				"val",
-				"valid_loops"
-			],
-			[
-				"face",
-				"face_dict"
 			],
 			[
 				"fac",
@@ -176,10 +332,6 @@
 				"remove_colinear"
 			],
 			[
-				"prop",
-				"property\tNew Property"
-			],
-			[
 				"post",
 				"post_segments"
 			],
@@ -276,10 +428,6 @@
 				"post_h"
 			],
 			[
-				"pos",
-				"post"
-			],
-			[
 				"facemap",
 				"facemap_materials"
 			],
@@ -306,10 +454,6 @@
 			[
 				"facem",
 				"facemap_materials"
-			],
-			[
-				"in",
-				"index"
 			],
 			[
 				"fm",
@@ -370,182 +514,45 @@
 			[
 				"resu",
 				"result_b"
-			],
-			[
-				"sl",
-				"slab_outset"
-			],
-			[
-				"res",
-				"result"
-			],
-			[
-				"other",
-				"other_edge"
-			],
-			[
-				"wi",
-				"width"
-			],
-			[
-				"slab",
-				"slab_normal_offset"
-			],
-			[
-				"dire",
-				"directions"
-			],
-			[
-				"la",
-				"landing_face"
-			],
-			[
-				"bui",
-				"building_has_slab"
-			],
-			[
-				"adj",
-				"slab_adjacent_verts"
-			],
-			[
-				"ini",
-				"initialize_slab_adjacent_verts"
-			],
-			[
-				"mo",
-				"move_slab_splitface_to_wall"
-			],
-			[
-				"new",
-				"new_verts"
-			],
-			[
-				"tra",
-				"target_faces"
-			],
-			[
-				"del",
-				"delete"
-			],
-			[
-				"t",
-				"target_faces"
-			],
-			[
-				"ap",
-				"append"
-			],
-			[
-				"ot",
-				"other_close_vert"
-			],
-			[
-				"so",
-				"sort_axis"
-			],
-			[
-				"ta",
-				"target_edges"
-			],
-			[
-				"fil",
-				"filter_horizontal_edges"
-			],
-			[
-				"roof",
-				"roof_faces"
-			],
-			[
-				"pro",
-				"processed_edges"
-			],
-			[
-				"coline",
-				"colinear_offset"
-			],
-			[
-				"coli",
-				"colinear_offset"
-			],
-			[
-				"ed",
-				"edge_vector"
-			],
-			[
-				"con",
-				"convex_offset"
-			],
-			[
-				"rem",
-				"remove_colinear"
-			],
-			[
-				"col",
-				"colinear_loops"
-			],
-			[
-				"filter_",
-				"filter_horizontal_edges"
-			],
-			[
-				"Flo",
-				"FloatProperty"
-			],
-			[
-				"st",
-				"step_width"
-			],
-			[
-				"create_la",
-				"create_landing"
-			],
-			[
-				"step",
-				"step_width"
-			],
-			[
-				"et",
-				"ext_face"
-			],
-			[
-				"star",
-				"start_loc"
-			],
-			[
-				"P",
-				"POSTS"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "TODO",
+			"file": "tests/test_door.py",
 			"settings":
 			{
-				"buffer_size": 1734,
+				"buffer_size": 4293,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "core/rails/rails_types.py",
+			"file": "tests/test_floorplan.py",
 			"settings":
 			{
-				"buffer_size": 24947,
-				"encoding": "UTF-8",
+				"buffer_size": 2492,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "utils/util_mesh.py",
+			"file": "/media/ranjian0/Backup/Workspace/extern/flutter-examples/dropdown_button/android/app/build.gradle",
 			"settings":
 			{
-				"buffer_size": 11262,
+				"buffer_size": 1521,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "tests/test_railing.py",
+			"settings":
+			{
+				"buffer_size": 0,
 				"line_ending": "Unix"
 			}
 		}
 	],
-	"build_system": "Packages/Python/Python.sublime-build",
+	"build_system": "Start Blender",
 	"build_system_choices":
 	[
 		[
@@ -603,6 +610,70 @@
 		[
 			[
 				[
+					"Reload",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Unittest"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Black"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Black::diff"
+				]
+			],
+			[
+				"Reload",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Start Blender",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Unittest"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Black"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Black::diff"
+				]
+			],
+			[
+				"Start Blender",
+				""
+			]
+		],
+		[
+			[
+				[
 					"risper (Linux)",
 					""
 				],
@@ -632,6 +703,34 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"git up",
+				"Git: Update Project Ignored Files"
+			],
+			[
+				"git",
+				"Git: Update Project Ignored Files"
+			],
+			[
+				"amm",
+				"Git: Amend Commit"
+			],
+			[
+				"reset",
+				"Git: Reset (unstage) Current File"
+			],
+			[
+				"sta",
+				"Git: Stash List"
+			],
+			[
+				"add ",
+				"Git: Add All"
+			],
+			[
+				"stash",
+				"Git: Stash Changes"
+			],
 			[
 				"add",
 				"Git: Add Selected Hunk"
@@ -665,16 +764,8 @@
 				"Git: Pull"
 			],
 			[
-				"amm",
-				"Git: Amend Commit"
-			],
-			[
 				"ad",
 				"Git: Add All"
-			],
-			[
-				"sta",
-				"Git: Stash Apply"
 			],
 			[
 				"cus",
@@ -765,10 +856,6 @@
 				"Git: Blame"
 			],
 			[
-				"reset",
-				"Git: Reset (hard) HEAD"
-			],
-			[
 				"class",
 				"C++ Classhelper - Generate Method Definition"
 			],
@@ -785,20 +872,12 @@
 				"Git: Custom Command"
 			],
 			[
-				"git",
-				"Git: Graph Current File"
-			],
-			[
 				"merg",
 				"Git: Merge Branch"
 			],
 			[
 				"che",
 				"Git: Checkout Current File"
-			],
-			[
-				"stash",
-				"Git: Stash Changes"
 			],
 			[
 				"in",
@@ -994,64 +1073,87 @@
 	"expanded_folders":
 	[
 		"/media/ranjian0/Backup/Workspace/projects/building_tool",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails"
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests"
 	],
 	"file_history":
 	[
+		"/media/ranjian0/Backup/Workspace/extern/flutter-examples/README.md",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/register.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/building-tools.sublime-project",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/generic.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/.gitignore",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/test.blend",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_geometry.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/__init__.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/door/door_types.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/generic.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window_props.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/test_floorplan.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/test_floors.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_mesh.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_material.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor_types.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/fill/fill_props.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/tests/test_window.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_object.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window_types.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/balcony_types.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/rails_types.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/__init__.py",
+		"/home/ranjian0/Desktop/app data/assets/address",
+		"/home/ranjian0/Desktop/app data/AndroidManifest.xml",
+		"/home/ranjian0/Desktop/app data/build-data.properties",
+		"/media/ranjian0/Backup/Documents/sublime_vars.txt",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/install.py",
+		"/media/ranjian0/Backup/Workspace/extern/flutter-examples/using_bottom_nav_bar/lib/main.dart",
+		"/media/ranjian0/Backup/Workspace/extern/flutter-examples/using_firebase_db/lib/main.dart",
+		"/media/ranjian0/Backup/Workspace/extern/flutter-examples/infinite_list/lib/main.dart",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/register.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/__init__.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/../install.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/modules.txt",
+		"/media/ranjian0/Backup/Documents/git sublime commands.txt",
+		"/media/ranjian0/Backup/Documents/gitignore_for_python.txt",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/roof_props.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan_ops.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/__init__.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/__test.py",
+		"/media/ranjian0/Backup/Workspace/projects/building_tool/TODO",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/stairs/stairs_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/balcony_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/door/door_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor_ops.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/rails_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/roof_ops.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window_ops.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/TODO",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/stairs/stairs.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/stairs/stairs_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/rails_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/__init__.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_geometry.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/stairs/stairs_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/rails_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/fill/fill_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/door/door_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_material.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/generic.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/balcony_types.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor_types.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/CHANGELOG",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/rails.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/balcony.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/door/door.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/roof.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floor/floor.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/tracked.diff",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/rails/__init__.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/roof_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/roof/roof_types.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/balcony_props.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/fill/__init__.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan_types.py",
 		"/home/ranjian0/.config/sublime-text-3/Packages/Python/Python.sublime-build",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/fill/fill_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_common.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/door/door_props.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/window/window_props.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/utils/util_object.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/fill/fill.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/floorplan/floorplan_props.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/README.md",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/balcony/__init__.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/register.py",
 		"/media/ranjian0/Backup/Workspace/projects/building_tool/core/__init__.py",
-		"/media/ranjian0/Backup/Workspace/projects/building_tool/.gitignore",
 		"/home/ranjian0/Desktop/test.py",
 		"/home/ranjian0/.config/sublime-text-3/Packages/Python/Python.sublime-syntax",
 		"/media/ranjian0/Backup/Workspace/projects/risper/source/CMakeLists.txt",
@@ -1102,31 +1204,7 @@
 		"/media/ranjian0/Backup/Workspace/scripts/c++/ray-tracer/.main.cpp.swp",
 		"/media/ranjian0/Backup/Workspace/scripts/c++/ray-tracer/ray.h",
 		"/media/ranjian0/Backup/Workspace/scripts/c++/ray-tracer/hitable_list.h",
-		"/home/ranjian0/.config/sublime-text-3/Packages/C++/C++ Single File.sublime-build",
-		"/media/ranjian0/Backup/Workspace/triggered_python-project",
-		"/media/ranjian0/Backup/Workspace/scripts/python/stick_physics.py",
-		"/media/ranjian0/Backup/Workspace/scripts/python/clothsim.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/math.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/utils.py",
-		"/media/ranjian0/Backup/Workspace/scripts/python/pyglet_shapes.py",
-		"/media/ranjian0/Backup/Workspace/scripts/python/generic.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/frame.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/layout.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/widget.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/game.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/widget_label.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/_element.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/_shape.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/container.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/__init__.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/app.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/widget_text.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/gui_element.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/scene.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/__init__.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/gui/gui_shape.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/collection.py",
-		"/media/ranjian0/Backup/Workspace/triggered_python/core/object/map.py"
+		"/home/ranjian0/.config/sublime-text-3/Packages/C++/C++ Single File.sublime-build"
 	],
 	"find":
 	{
@@ -1147,6 +1225,21 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"bar",
+			"_window",
+			"window",
+			"random_window",
+			"window",
+			"operator.getattr",
+			"+",
+			"building",
+			"btools",
+			"PANEL_",
+			"5",
+			"10",
+			"set",
+			"(",
+			"5",
 			"sum(convex_loops)",
 			"all_loops",
 			"location",
@@ -1259,12 +1352,7 @@
 			"opposite_verts",
 			"linked_skeleton_edges",
 			"skeleton_verts",
-			"original_edges",
-			"join_intersecting_and_get_edges",
-			"original_edges",
-			"skeleton_edges",
-			"skeleton_verts",
-			"determine_skeleton_edges_only"
+			"original_edges"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1283,31 +1371,33 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "TODO",
+					"file": "tests/test_door.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1734,
+						"buffer_size": 4293,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								609,
-								609
+								478,
+								478
 							]
 						],
 						"settings":
 						{
-							"SL.13.region_keys":
+							"SL.42.region_keys":
 							[
+								"sublime_linter.protected_regions"
 							],
+							"_anf_new": "",
 							"bracket_highlighter.busy": false,
 							"bracket_highlighter.clone": -1,
 							"bracket_highlighter.clone_locations":
@@ -1327,188 +1417,70 @@
 							},
 							"bracket_highlighter.clone_regions":
 							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
-							],
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
-								"bh_curly_content"
+								"bh_curly_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
 							],
-							"git_gutter_is_enabled": true,
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "core/rails/rails_types.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 24947,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								21122,
-								21122
-							]
-						],
-						"settings":
-						{
-							"SL.14.region_keys":
-							[
-								"sublime_linter.protected_regions"
-							],
-							"SL.16.region_keys":
-							[
-								"sublime_linter.protected_regions"
-							],
-							"SL.74.region_keys":
-							[
-								"sublime_linter.protected_regions"
-							],
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.clone": -1,
-							"bracket_highlighter.clone_locations":
+							"bracket_highlighter.locations":
 							{
 								"close":
 								{
 									"1":
 									[
-										20813,
-										20814
+										477,
+										478
 									]
 								},
 								"icon":
@@ -1523,96 +1495,8 @@
 								{
 									"1":
 									[
-										20797,
-										20798
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.clone_regions":
-							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content"
-							],
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										21122,
-										21123
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"region.yellowish"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										21109,
-										21110
+										467,
+										468
 									]
 								},
 								"unmatched":
@@ -1621,61 +1505,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
-								"bh_curly_content"
+								"bh_curly_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
 							],
 							"git_gutter_is_enabled": true,
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -1683,35 +1567,32 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3009.0,
+						"translation.y": 796.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "utils/util_mesh.py",
-					"semi_transient": false,
+					"buffer": 1,
+					"file": "tests/test_floorplan.py",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 11262,
+						"buffer_size": 2492,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								783,
-								783
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"SL.17.region_keys":
-							[
-							],
-							"SL.22.region_keys":
+							"SL.77.region_keys":
 							[
 							],
 							"bracket_highlighter.busy": false,
@@ -1733,36 +1614,46 @@
 							},
 							"bracket_highlighter.clone_regions":
 							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
@@ -1773,21 +1664,11 @@
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content"
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
 							],
 							"bracket_highlighter.locations":
 							{
@@ -1806,6 +1687,122 @@
 							},
 							"bracket_highlighter.regions":
 							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
+							],
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/media/ranjian0/Backup/Workspace/extern/flutter-examples/dropdown_button/android/app/build.gradle",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1521,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.clone": -1,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
@@ -1821,6 +1818,16 @@
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
@@ -1831,47 +1838,206 @@
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content"
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
 							],
 							"git_gutter_is_enabled": true,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/zzz A File Icon zzz/aliases/Groovy (Gradle).sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "tests/test_railing.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"SL.76.region_keys":
+							[
+							],
+							"_anf_new": "",
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.clone": 76,
+							"bracket_highlighter.clone_locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.clone_regions":
+							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
+							],
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content"
+							],
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -1914,7 +2080,7 @@
 	},
 	"output.exec":
 	{
-		"height": 440.0
+		"height": 173.0
 	},
 	"output.find_results":
 	{
@@ -1922,7 +2088,7 @@
 	},
 	"output.git":
 	{
-		"height": 268.0
+		"height": 80.0
 	},
 	"output.mdpopups":
 	{
@@ -1942,8 +2108,32 @@
 		"selected_items":
 		[
 			[
+				"gen",
+				"core/generic.py"
+			],
+			[
+				"wind",
+				"core/window/window_props.py"
+			],
+			[
+				"uti",
+				"utils/util_mesh.py"
+			],
+			[
 				"win",
-				"core/window/window_ops.py"
+				"core/window/window_types.py"
+			],
+			[
+				"window",
+				"core/window/window_props.py"
+			],
+			[
+				"util",
+				"utils/util_object.py"
+			],
+			[
+				"floo",
+				"core/floor/floor.py"
 			],
 			[
 				"st",
@@ -1966,10 +2156,6 @@
 				"core/floorplan/floorplan_ops.py"
 			],
 			[
-				"floo",
-				"core/floor/floor_ops.py"
-			],
-			[
 				"door",
 				"core/door/door_ops.py"
 			],
@@ -1990,20 +2176,12 @@
 				"utils/util_material.py"
 			],
 			[
-				"window",
-				"core/window/window_types.py"
-			],
-			[
 				"floor",
 				"core/floor/floor_types.py"
 			],
 			[
 				"fl",
 				"core/floor/floor_types.py"
-			],
-			[
-				"uti",
-				"utils/util_mesh.py"
 			],
 			[
 				"ro",
@@ -2038,10 +2216,6 @@
 				"core/door/door_props.py"
 			],
 			[
-				"util",
-				"utils/util_common.py"
-			],
-			[
 				"comm",
 				"utils/util_common.py"
 			],
@@ -2062,10 +2236,6 @@
 				"core/floor/floor_types.py"
 			],
 			[
-				"wind",
-				"core/window/window_types.py"
-			],
-			[
 				"ria",
 				"core/rails/rails_types.py"
 			],
@@ -2080,10 +2250,6 @@
 			[
 				"u",
 				"utils/util_mesh.py"
-			],
-			[
-				"gen",
-				"core/generic.py"
 			],
 			[
 				"ba",
@@ -2482,7 +2648,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 339.0,
+	"side_bar_width": 301.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
