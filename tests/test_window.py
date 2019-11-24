@@ -62,9 +62,7 @@ def random_window(self, context, collection):
 
     # -- exclude all other collections apart from test_col from view layer
     for layer_col in bpy.context.view_layer.layer_collection.children:
-        layer_col.exclude = True
-        if layer_col.name == collection.name:
-            layer_col.exclude = False
+        layer_col.exclude = not (layer_col.name == collection.name)
 
 
 def randomize_props(props):

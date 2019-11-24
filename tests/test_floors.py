@@ -26,6 +26,7 @@ class BTOOLS_OT_test_floors(bpy.types.Operator):
         # -- remove objects if any
         test_col = bpy.context.scene.collection.children.get(self.collection_name)
         if len(test_col.objects):
+            list(map(bpy.data.meshes.remove, [ob.data for ob in test_col.objects]))
             list(map(bpy.data.objects.remove, test_col.objects))
 
         random_floors(self, context, test_col)

@@ -23,16 +23,17 @@ class BTOOLS_OT_test_floorplan(bpy.types.Operator):
         test_col = bpy.context.scene.collection.children.get(self.collection_name)
         if len(test_col.objects):
             list(map(bpy.data.objects.remove, test_col.objects))
+            list(map(bpy.data.meshes.remove, [ob.data for ob in test_col.objects]))
 
-        # -- create various types of floorplans
         random_floorplans(self, context, test_col)
         return {"FINISHED"}
 
 
 def random_floorplans(self, context, collection):
-    objects = []
     fp_types = list(map(op.itemgetter(0), self.props.fp_types))
     positions = [(0, 0, 0), (-20, 20, 0), (20, 20, 0), (20, -20, 0), (-20, -20, 0)]
+
+    objects = []
     for _type, pos in zip(fp_types, positions):
         # -- random attributes
         self.props.type = _type
@@ -59,12 +60,11 @@ def random_floorplans(self, context, collection):
         bpy.context.scene.collection.objects.unlink(obj)
         collection.objects.link(obj)
 
-        # -- exclude all other collections apart from test_col from view layer
-        for layer_col in bpy.context.view_layer.layer_collection.children:
-            layer_col.exclude = True
-            if layer_col.name == collection.name:
-                layer_col.exclude = False
-
         obj.select_set(False)
         objects.append(obj)
+
+    # -- exclude all other collections apart from test_col from view layer
+    for layer_col in bpy.context.view_layer.layer_collection.children:
+        layer_col.exclude = not (layer_col.name == collection.name)
+
     return objects
