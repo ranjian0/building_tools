@@ -1,7 +1,7 @@
 import bpy
 from .core import register_core, unregister_core
 
-DEBUG = False
+DEBUG = True
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
