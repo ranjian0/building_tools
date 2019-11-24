@@ -16,8 +16,8 @@ class BTOOLS_PT_test_tools(bpy.types.Panel):
         col.operator("btools.test_floorplan")
         col.operator("btools.test_floors")
 
-        # row = col.row(align=True)
-        # row.operator("btools.add_window")
+        row = col.row(align=True)
+        row.operator("btools.test_window")
         # row.operator("btools.add_door")
 
         # row = col.row(align=True)
