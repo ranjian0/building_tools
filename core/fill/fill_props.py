@@ -78,7 +78,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         name="Glass Pane Margin",
         min=0.01,
         max=100.0,
-        default=0.05,
+        default=0.1,
         description="Margin of glass pane frames",
     )
 
@@ -166,14 +166,14 @@ class FillBars(bpy.types.PropertyGroup):
     )
 
     bar_width: FloatProperty(
-        name="Bar Width", min=0.01, max=100.0, default=0.05, description="Width of bars"
+        name="Bar Width", min=0.01, max=100.0, default=0.1, description="Width of bars"
     )
 
     bar_depth: FloatProperty(
         name="Bar Depth",
         min=0.01,
         max=100.0,
-        default=0.05,
+        default=0.1,
         step=1,
         description="Depth of bars",
     )
