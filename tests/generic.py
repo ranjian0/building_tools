@@ -20,8 +20,8 @@ class BTOOLS_PT_test_tools(bpy.types.Panel):
         row.operator("btools.test_window")
         row.operator("btools.test_door")
 
-        # row = col.row(align=True)
-        # row.operator("btools.add_railing")
+        row = col.row(align=True)
+        row.operator("btools.test_railing")
         # row.operator("btools.add_balcony")
 
         # col.operator("btools.add_stairs")
