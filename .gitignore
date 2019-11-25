@@ -2,5 +2,5 @@ __pycache__/
 *.pyc
 *.blend1
 *.txt
-.sublime-project
-.sublime-workspace
+*.sublime-project
+*.sublime-workspace
