@@ -35,7 +35,6 @@ class BTOOLS_OT_test_railing(bpy.types.Operator):
         for obj in test_col.objects:
             if 'copy' in obj.name:
                 bpy.data.meshes.remove(obj.data)
-                # bpy.data.objects.remove(obj)
 
         random_railing(self, context, test_col)
         return {"FINISHED"}
@@ -44,7 +43,7 @@ class BTOOLS_OT_test_railing(bpy.types.Operator):
 def random_railing(self, context, collection):
     # -- duplicate data from all objects in the collection
     for obj in collection.objects:
-        # XXX Just in case
+
         if 'copy' in obj.name:
             continue
 
@@ -52,10 +51,12 @@ def random_railing(self, context, collection):
         obj_copy = create_object(obj.name+'_copy', create_mesh(obj.data.name + '_copy'))
         obj_copy.location = obj.location
 
-        self.props.fill = CURRENT_RAIL_TYPE
+        random_properties(self.props)
         create_railing_from_selection(bm, self.props)
         bm_to_obj(bm, obj_copy)
         collection.objects.link(obj_copy)
+
+        obj_copy.show_wire = True
 
     # -- exclude all other collections apart from test_col from view layer
     for layer_col in bpy.context.view_layer.layer_collection.children:
@@ -65,3 +66,12 @@ def random_railing(self, context, collection):
     for obj in collection.objects:
         if 'copy' not in obj.name:
             obj.hide_viewport = True
+
+
+def random_properties(props):
+    props.fill = CURRENT_RAIL_TYPE
+
+    if props.fill == 'POSTS':
+        props.post_density = 0.1
+    elif props.fill == 'RAILS':
+        props.rail_density = 0.1
