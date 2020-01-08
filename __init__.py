@@ -4,7 +4,7 @@ from .core import register_core, unregister_core
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
-    "version": (0, 9, 6),
+    "version": (0, 9, 7),
     "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",

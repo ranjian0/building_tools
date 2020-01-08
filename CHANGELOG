@@ -26,3 +26,4 @@
 # v0.9.4 - implement array for windows and door
 # v0.9.5 - implement arched window and door
 # v0.9.6 - material facemaps
+# v0.9.7 - remove all unstable modules {rails, balcony}
