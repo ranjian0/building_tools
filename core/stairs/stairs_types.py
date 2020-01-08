@@ -1,11 +1,9 @@
 import bmesh
 import operator
-import functools
-from mathutils import Vector
-from bmesh.types import BMVert
-from collections import defaultdict
 
-from ..rails import create_railing_from_edges, create_railing_from_step_edges
+from bmesh.types import BMVert
+
+
 from ...utils import (
     FaceMap,
     filter_geom,
@@ -27,13 +25,9 @@ def create_stairs(bm, faces, prop):
 
         # -- options for railing
         top_faces = []
-        init_normal = f.normal.copy()
 
         f = create_landing(bm, f, top_faces, prop)
         create_steps(bm, f, top_faces, prop)
-
-        if prop.railing:
-            create_stairs_railing(bm, init_normal, top_faces, prop)
 
 
 def create_landing(bm, f, top_faces, prop):
@@ -45,7 +39,7 @@ def create_landing(bm, f, top_faces, prop):
         faces = {f for e in ret_face.edges for f in e.link_faces if f.normal.z > 0}
         top_faces.append(list(faces).pop())
 
-        return get_stair_face_from_direction(bm, ret_face, prop)
+        return ret_face
     return f
 
 
@@ -78,24 +72,6 @@ def extrude_step(bm, face, step_width):
     return ret_face
 
 
-def get_stair_face_from_direction(bm, ret_face, prop):
-    """ adjust ret_face based on stair direction
-    """
-    faces = list({f for e in ret_face.edges for f in e.link_faces})
-    left_normal, right_normal = (
-        ret_face.normal.cross(Vector((0, 0, 1))),
-        ret_face.normal.cross(Vector((0, 0, -1))),
-    )
-
-    def flt(f, normal):
-        return f.normal.to_tuple(4) == normal.to_tuple(4)
-
-    left = next(filter(lambda f: flt(f, left_normal), faces))
-    right = next(filter(lambda f: flt(f, right_normal), faces))
-
-    return {"LEFT": left, "RIGHT": right}.get(prop.stair_direction, ret_face)
-
-
 def subdivide_next_step(bm, ret_face, offset):
     """ cut the next face step height
     """
@@ -111,68 +87,3 @@ def create_stair_split(bm, face, prop):
     """
     size, off = prop.size, prop.offset
     return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
-
-
-def create_stairs_railing(bm, normal, faces, prop):
-    """Create railing for stairs
-    """
-    # -- create railing for landing
-    if prop.landing:
-        landing_face = faces.pop(0)
-        directions = set(["FRONT", "LEFT", "RIGHT"]) - set([prop.stair_direction])
-        edges = edges_from_direction(landing_face, normal, directions)
-        create_railing_from_edges(bm, edges, prop.rail)
-
-    else:
-        # -- ensure direction is front if there is no landing
-        prop.stair_direction = "FRONT"
-
-    # --create railing for steps
-    create_step_railing(bm, normal, faces, prop)
-
-
-def create_step_railing(bm, normal, faces, prop):
-    """Create railing for stair steps
-    """
-
-    # -- update normal based on stair direction
-    if prop.stair_direction == "LEFT":
-        normal = normal.cross(Vector((0, 0, 1)))
-    elif prop.stair_direction == "RIGHT":
-        normal = normal.cross(Vector((0, 0, -1)))
-
-    # -- get all left and right edges
-    left_edges, right_edges = [], []
-    for face in faces:
-        EDGES = functools.partial(edges_from_direction, face, normal)
-        left_edges.extend(EDGES(["LEFT"]))
-        right_edges.extend(EDGES(["RIGHT"]))
-
-    # -- filter edges based on direction
-    valid_edges = {
-        "LEFT": right_edges,
-        "RIGHT": left_edges,
-        "FRONT": left_edges + right_edges,
-    }.get(prop.stair_direction)
-    create_railing_from_step_edges(bm, valid_edges, normal, prop)
-
-
-def edges_from_direction(face, normal, direction):
-    edges = defaultdict(list)
-    edges.fromkeys(["FRONT", "LEFT", "RIGHT"])
-
-    valid_loops = [l for l in face.loops]
-    for e in face.edges:
-        for loop in e.link_loops:
-            if loop in valid_loops:
-                tan = e.calc_tangent(loop)
-                if tan.to_tuple(2) == (-normal).to_tuple(2):
-                    edges["FRONT"].append(e)
-
-                if round(normal.cross(tan).z) < 0:
-                    edges["RIGHT"].append(e)
-
-                if round(normal.cross(tan).z) > 0:
-                    edges["LEFT"].append(e)
-
-    return sum([edges[d] for d in list(direction)], [])
