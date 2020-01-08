@@ -36,10 +36,6 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
         row.operator("btools.add_window")
         row.operator("btools.add_door")
 
-        row = col.row(align=True)
-        row.operator("btools.add_railing")
-        row.operator("btools.add_balcony")
-
         col.operator("btools.add_stairs")
         col.operator("btools.add_roof")
 
