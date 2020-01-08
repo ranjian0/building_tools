@@ -1,7 +1,6 @@
 import bpy
 from .core import register_core, unregister_core
 
-DEBUG = True
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Ichung'wa Karanja (ranjian0)",
@@ -121,6 +120,3 @@ if __name__ == "__main__":
             bpy.utils.unregister_class(getattr(bpy.types, tp))
 
     register()
-    if DEBUG:
-        from .tests import register_tests
-        register_tests()
