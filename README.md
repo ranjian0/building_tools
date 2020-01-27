@@ -30,8 +30,8 @@ and `Building Tools` was born.
   * Download source.zip.
 
 **2. Installing in Blender.**
-  * In blender, go to : User Preferences -> Add-ons -> install addon from file.
-  * Select the downloaded zip file and you're good to go.
+  * In blender, go to : `Edit -> Preferences -> Add-ons -> Install`.
+  * Select the downloaded source.zip file and you're good to go.
 
 ## Features
 List of features ready:
