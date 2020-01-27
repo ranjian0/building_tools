@@ -1,8 +1,8 @@
 
 # BUILDING TOOLS
 
-  ** Note for Users : Some modules {railing, balcony} have been removed from `master` **
-  ** branch into `unstable` branch. They will be re-added once critical bugs have been fixed. **
+  ** Note for Users : Some modules {railing, balcony} have been removed from `master`
+  branch into `unstable` branch. They will be re-added once critical bugs have been fixed. **
 
 ## Purpose:
 
