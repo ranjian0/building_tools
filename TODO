@@ -1,4 +1,9 @@
 REMOVE ALL UNSTABLE FEATURES
+- railing and balcony modules extremely unstable and poorly designed
+- work on more robust implementations in dev branch
+- keep master with stable features only
+
+- roof is also abit unstable esp hip roof and straight skeleton
 
 DOOR:
   re-add double door feature, but better and with support for archs
