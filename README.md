@@ -1,6 +1,9 @@
 
 # BUILDING TOOLS
 
+  ** Note for Users : Some modules {railing, balcony} have been removed from `master` **
+  ** branch into `unstable` branch. They will be re-added once critical bugs have been fixed. **
+
 ## Purpose:
 
 > Provide tools to model building exteriors quickly in blender
