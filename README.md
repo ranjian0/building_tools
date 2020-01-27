@@ -61,12 +61,12 @@ Project inspired by `Ghost Town` addon for `3DS MAX`.
 
 ## Contributing
 
-  * feel free to fork and submit pull requests
+  * Feel free to fork and submit pull requests.
 
-  * incase of bugs, create an issue that describes the problem
-    and attach any relevant info/logs
+  * Incase of bugs, create an issue that describes the problem
+    and attach any relevant info/logs.
 
-  * for feature requests, create an issue and add **Enhancement** label.
+  * For feature requests, create an issue and add **Enhancement** label.
 
 ## Contact
 Created by [@ranjian0](https://github.com/ranjian0) - feel free to contact me!
