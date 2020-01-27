@@ -27,11 +27,11 @@ and `Building Tools` was born.
 **1. Downloading.**
   * Go to the releases tab.
   * Select appropriate release for your blender version (2.79 / 2.80).
-  * Download source.zip.
+  * Download `source.zip`.
 
 **2. Installing in Blender.**
   * In blender, go to : `Edit -> Preferences -> Add-ons -> Install`.
-  * Select the downloaded source.zip file and you're good to go.
+  * Select the downloaded `source.zip` file and you're good to go.
 
 ## Features
 List of features ready:
