@@ -32,6 +32,7 @@ and `Building Tools` was born.
 **2. Installing in Blender.**
   * In blender, go to : `Edit -> Preferences -> Add-ons -> Install`.
   * Select the downloaded `source.zip` file and you're good to go.
+  * :exclamation:**See github issue #20 if you're having trouble installing**
 
 ## Features
 List of features ready:
