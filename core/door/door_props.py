@@ -30,7 +30,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     fill_items = [
         ("NONE", "None", "", 0),
         ("PANELS", "Panels", "", 1),
-        ("GLASS PANES", "Glass Panes", "", 2),
+        ("GLASS_PANES", "Glass_Panes", "", 2),
         ("LOUVER", "Louver", "", 3),
     ]
     fill_type: EnumProperty(
@@ -65,13 +65,8 @@ class DoorProperty(bpy.types.PropertyGroup):
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")
-
-        # -- draw fill types
-        fill_map = {
+        {
             "PANELS": self.panel_fill,
             "LOUVER": self.louver_fill,
-            "GLASS PANES": self.glass_fill,
-        }
-        fill = fill_map.get(self.fill_type)
-        if fill:
-            fill.draw(layout)
+            "GLASS_PANES": self.glass_fill,
+        }.get(self.fill_type).draw(layout)
