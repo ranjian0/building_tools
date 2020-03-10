@@ -7,19 +7,15 @@ from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
-    boundary_edges_from_face_selection,
+    boundary_edges_from_faces,
 )
 
 
-def create_floors(bm, edges, prop):
+def create_floors(bm, faces, prop):
     """Create extrusions of floor geometry from a floorplan
     """
-    start_height = 0.0
-    faces_to_delete = []
-    if edges is None:
-        edges = boundary_edges_from_face_selection(bm)
-        faces_to_delete = [f for f in bm.faces if f.select]
-        start_height = faces_to_delete[-1].calc_center_median().z
+    start_height = faces[-1].calc_center_median().z
+    edges = boundary_edges_from_faces(faces)
 
     extrude_slabs_and_floors(bm, edges, prop)
     slabs, walls = get_slab_and_wall_faces(bm, prop, start_height)
@@ -41,8 +37,6 @@ def create_floors(bm, edges, prop):
     slabs.extend(result_a["faces"] + result_b["faces"])
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    if faces_to_delete:
-        bmesh.ops.delete(bm, geom=faces_to_delete, context="FACES")
 
     add_faces_to_map(bm, slabs, FaceMap.SLABS)
     add_faces_to_map(bm, walls, FaceMap.WALLS)
@@ -51,11 +45,10 @@ def create_floors(bm, edges, prop):
 def extrude_slabs_and_floors(bm, edges, prop):
     """extrude edges alternating between slab and floor heights
     """
-    offsets = it.cycle([prop.slab_thickness, prop.floor_height])
-    for offset in it.islice(offsets, 0, prop.floor_count * 2):
-        if offset == 0:
-            continue
 
+    offsets = [prop.slab_thickness, prop.floor_height] if prop.add_slab else [prop.floor_height]
+    offsets = offsets * prop.floor_count
+    for offset in offsets:
         extrusion = bmesh.ops.extrude_edge_only(bm, edges=edges)
         bmesh.ops.translate(
             bm, vec=(0, 0, offset), verts=filter_geom(extrusion["geom"], BMVert)

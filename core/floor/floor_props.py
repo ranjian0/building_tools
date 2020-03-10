@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import IntProperty, FloatProperty
+from bpy.props import IntProperty, FloatProperty, BoolProperty
 
 
 class FloorProperty(bpy.types.PropertyGroup):
@@ -15,9 +15,15 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Height of each floor",
     )
 
+    add_slab: BoolProperty(
+        name="Add Slab",
+        default=True,
+        description="Add slab between each floor",
+    )
+
     slab_thickness: FloatProperty(
         name="Slab Thickness",
-        min=0.0,
+        min=0.01,
         max=1000.0,
         default=0.2,
         description="Thickness of each slab",
@@ -39,5 +45,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         col.prop(self, "floor_height")
 
         col = box.column(align=True)
-        col.prop(self, "slab_thickness")
-        col.prop(self, "slab_outset")
+        col.prop(self, "add_slab")
+        if self.add_slab == True:
+            col.prop(self, "slab_thickness")
+            col.prop(self, "slab_outset")
