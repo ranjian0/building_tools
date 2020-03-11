@@ -21,12 +21,13 @@ class Floor:
 
         if cls.validate(bm):
             cls.add_floor_facemaps()
-            if any([f for f in bm.faces if f.select]):
-                create_floors(bm, None, prop)
+            selected_faces = [f for f in bm.faces if f.select]
+            if selected_faces:
+                create_floors(bm, selected_faces, prop)
                 select(bm.faces, False)
             else:
-                edges = [e for e in bm.edges if e.is_boundary]
-                create_floors(bm, edges, prop)
+                all_faces = [f for f in bm.faces]
+                create_floors(bm, all_faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
         return {"CANCELLED"}
