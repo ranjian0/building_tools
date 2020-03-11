@@ -14,6 +14,7 @@ from .floorplan import register_floorplan, unregister_floorplan
 register_funcs = (
     register_generic,
     register_railing,
+    register_balcony,
     register_fill,
     register_door,
     register_floor,
@@ -26,6 +27,7 @@ register_funcs = (
 unregister_funcs = (
     unregister_generic,
     unregister_railing,
+    unregister_balcony,
     unregister_fill,
     unregister_door,
     unregister_floor,
