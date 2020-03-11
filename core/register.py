@@ -19,7 +19,6 @@ register_funcs = (
     register_floor,
     register_window,
     register_floorplan,
-    register_balcony,
     register_stairs,
     register_roof,
 )
@@ -32,7 +31,6 @@ unregister_funcs = (
     unregister_floor,
     unregister_window,
     unregister_floorplan,
-    unregister_balcony,
     unregister_stairs,
     unregister_roof,
 )
