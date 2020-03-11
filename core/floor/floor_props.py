@@ -46,6 +46,6 @@ class FloorProperty(bpy.types.PropertyGroup):
 
         col = box.column(align=True)
         col.prop(self, "add_slab")
-        if self.add_slab == True:
+        if self.add_slab:
             col.prop(self, "slab_thickness")
             col.prop(self, "slab_outset")

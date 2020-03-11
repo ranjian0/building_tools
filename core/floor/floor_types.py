@@ -1,13 +1,11 @@
 import bmesh
-import itertools as it
 import functools as ft
-from bmesh.types import BMVert, BMEdge
+from bmesh.types import BMVert, BMFace
 
 from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
-    boundary_edges_from_faces,
 )
 
 
@@ -15,9 +13,8 @@ def create_floors(bm, faces, prop):
     """Create extrusions of floor geometry from a floorplan
     """
     start_height = faces[-1].calc_center_median().z
-    edges = boundary_edges_from_faces(faces)
 
-    extrude_slabs_and_floors(bm, edges, prop)
+    extrude_slabs_and_floors(bm, faces, prop)
     slabs, walls = get_slab_and_wall_faces(bm, prop, start_height)
 
     # XXX CAREFUL NOTE XXX
@@ -33,7 +30,7 @@ def create_floors(bm, faces, prop):
     #
     # XXX END NOTE XXX
 
-    result_b = bmesh.ops.inset_region(bm, faces=slabs, depth=-prop.slab_outset)
+    result_b = bmesh.ops.inset_region(bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True)
     slabs.extend(result_a["faces"] + result_b["faces"])
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -41,21 +38,19 @@ def create_floors(bm, faces, prop):
     add_faces_to_map(bm, slabs, FaceMap.SLABS)
     add_faces_to_map(bm, walls, FaceMap.WALLS)
 
-
-def extrude_slabs_and_floors(bm, edges, prop):
+def extrude_slabs_and_floors(bm, faces, prop):
     """extrude edges alternating between slab and floor heights
     """
 
     offsets = [prop.slab_thickness, prop.floor_height] if prop.add_slab else [prop.floor_height]
     offsets = offsets * prop.floor_count
     for offset in offsets:
-        extrusion = bmesh.ops.extrude_edge_only(bm, edges=edges)
+        extrusion = bmesh.ops.extrude_face_region(bm, geom=faces)
         bmesh.ops.translate(
             bm, vec=(0, 0, offset), verts=filter_geom(extrusion["geom"], BMVert)
         )
-        edges = filter_geom(extrusion["geom"], BMEdge)
-    bmesh.ops.contextual_create(bm, geom=edges)
-
+        bmesh.ops.delete(bm, geom=faces, context="FACES")
+        faces = filter_geom(extrusion["geom"], BMFace)
 
 def get_slab_and_wall_faces(bm, prop, start_height):
     """get faces that form slabs and walls
