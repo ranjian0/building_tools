@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import FloatProperty, PointerProperty, EnumProperty
+from bpy.props import FloatProperty, PointerProperty, EnumProperty, FloatVectorProperty
 
 from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
 from ..fill import FillBars, FillLouver, FillGlassPanes
@@ -51,10 +51,18 @@ class WindowProperty(bpy.types.PropertyGroup):
     louver_fill: PointerProperty(type=FillLouver)
     glass_fill: PointerProperty(type=FillGlassPanes)
 
+    wall_dimensions: FloatVectorProperty(
+        name="Wall dimensions",
+        subtype="XYZ",
+        size=2,
+        description="dimensions of wall",
+    )
+
     def has_arch(self):
         return self.arch.resolution > 0
 
     def draw(self, context, layout):
+        self.size_offset.parent_dimension = self.wall_dimensions
         self.size_offset.draw(context, layout)
         self.array.draw(context, layout)
         self.arch.draw(context, layout)

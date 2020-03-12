@@ -60,3 +60,21 @@ def kwargs_from_props(props):
             # property group within this property
             result.update(kwargs_from_props(prop))
     return result
+
+def resitriced_size(parent_dimension, offset, size_min, size):
+    """ Get size restricted by various factors
+    """
+    limit_x = min(parent_dimension[0] + 2*offset[0], parent_dimension[0] - 2*offset[0])
+    limit_y = min(parent_dimension[1] + 2*offset[1], parent_dimension[1] - 2*offset[1])
+    x = max(min(limit_x, size[0]), size_min[0])
+    y = max(min(limit_y, size[1]), size_min[1])
+    return x, y
+
+def resitriced_offset(parent_dimension, size, offset):
+    """ Get offset restricted by various factors
+    """
+    limit_x = (parent_dimension[0]-size[0])/2
+    limit_y = (parent_dimension[1]-size[1])/2
+    x = max(min(limit_x, offset[0]), -limit_x)
+    y = max(min(limit_y, offset[1]), -limit_y)
+    return x, y

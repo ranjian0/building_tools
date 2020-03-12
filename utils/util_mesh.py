@@ -357,3 +357,11 @@ def split_edge_at_point_from_closest_vert(edge, vert, split_point):
     split_length = (close_vert.co - split_point).length
     split_factor = split_length / edge.calc_length()
     return bmesh.utils.edge_split(edge, close_vert, split_factor)
+
+def get_width_and_height(face):
+    """ Get width and height of a face
+    """
+    normal = face.normal.copy()
+    hors = filter_horizontal_edges(face.edges, normal)
+    vers = filter_vertical_edges(face.edges, normal)
+    return hors[0].calc_length(), vers[0].calc_length()
