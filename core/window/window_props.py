@@ -62,7 +62,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         return self.arch.resolution > 0
 
     def draw(self, context, layout):
-        self.size_offset.parent_dimension = self.wall_dimensions
+        self.size_offset.parent_dimensions = self.wall_dimensions
         self.size_offset.draw(context, layout)
         self.array.draw(context, layout)
         self.arch.draw(context, layout)

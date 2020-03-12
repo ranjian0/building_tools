@@ -365,3 +365,10 @@ def get_width_and_height(face):
     hors = filter_horizontal_edges(face.edges, normal)
     vers = filter_vertical_edges(face.edges, normal)
     return hors[0].calc_length(), vers[0].calc_length()
+
+def get_selected_face_dimensions(context):
+    """ Get dimensions of selected face
+    """
+    bm = bmesh.from_edit_mesh(context.edit_object.data)
+    wall = [f for f in bm.faces if f.select][0]
+    return get_width_and_height(wall)

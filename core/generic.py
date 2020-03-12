@@ -16,7 +16,7 @@ from ..utils import get_edit_mesh, set_material_for_active_facemap, resitriced_s
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
-    parent_dimension: FloatVectorProperty(
+    parent_dimensions: FloatVectorProperty(
         name="Parent dimensions",
         subtype="XYZ",
         size=2,
@@ -24,10 +24,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     )
 
     def get_size(self):
-        return self.get("size", resitriced_size(self.parent_dimension, self.offset, (0.1, 0.1), (1.0, 1.0)))
+        return self.get("size", resitriced_size(self.parent_dimensions, self.offset, (0.1, 0.1), (1.0, 1.0)))
 
     def set_size(self, value):
-        self["size"] = resitriced_size(self.parent_dimension, self.offset, (0.1, 0.1), value)
+        self["size"] = resitriced_size(self.parent_dimensions, self.offset, (0.1, 0.1), value)
 
     size: FloatVectorProperty(
         name="Size",
@@ -42,7 +42,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         return self.get("offset", (0.0, 0.0))
 
     def set_offset(self, value):
-        self["offset"] = resitriced_offset(self.parent_dimension, self.size, value)
+        self["offset"] = resitriced_offset(self.parent_dimensions, self.size, value)
 
     offset: FloatVectorProperty(
         name="Offset",

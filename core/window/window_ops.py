@@ -1,7 +1,7 @@
-import bpy, bmesh
+import bpy
 from .window import Window
 from .window_props import WindowProperty
-from ...utils import get_width_and_height
+from ...utils import get_selected_face_dimensions
 
 
 class BTOOLS_OT_add_window(bpy.types.Operator):
@@ -18,9 +18,7 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        bm = bmesh.from_edit_mesh(context.edit_object.data)
-        wall = [f for f in bm.faces if f.select][0]
-        self.wall_dimensions = get_width_and_height(wall)
+        self.wall_dimensions = get_selected_face_dimensions(context)
         self.props.wall_dimensions = self.wall_dimensions
 
         return Window.build(context, self.props)
