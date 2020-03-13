@@ -84,6 +84,8 @@ def resitriced_offset(parent_dimensions, size, offset):
 
 
 def local_to_global(face, vec):
+    """ Convert vector from local to global space, considering face normal as local z and world z as local y
+    """
     z = face.normal.copy()
     x = face.normal.copy()
     x.rotate(Euler((0.0, 0.0, radians(90)), 'XYZ'))
