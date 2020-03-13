@@ -1,5 +1,6 @@
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Euler
+from math import radians
 
 
 def equal(a, b, eps=0.001):
@@ -61,6 +62,7 @@ def kwargs_from_props(props):
             result.update(kwargs_from_props(prop))
     return result
 
+
 def resitriced_size(parent_dimensions, offset, size_min, size):
     """ Get size restricted by various factors
     """
@@ -70,6 +72,7 @@ def resitriced_size(parent_dimensions, offset, size_min, size):
     y = max(min(limit_y, size[1]), size_min[1])
     return x, y
 
+
 def resitriced_offset(parent_dimensions, size, offset):
     """ Get offset restricted by various factors
     """
@@ -78,3 +81,12 @@ def resitriced_offset(parent_dimensions, size, offset):
     x = max(min(limit_x, offset[0]), -limit_x)
     y = max(min(limit_y, offset[1]), -limit_y)
     return x, y
+
+
+def local_to_global(face, vec):
+    z = face.normal.copy()
+    x = face.normal.copy()
+    x.rotate(Euler((0.0, 0.0, radians(90)), 'XYZ'))
+    y = z.cross(x)
+    global_offset = (x * vec.x) + (y * vec.y) + (z * vec.z)
+    return global_offset

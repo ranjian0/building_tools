@@ -11,8 +11,11 @@ from ...utils import (
     create_cube_without_faces,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
-    get_width_and_height
+    get_width_and_height,
+    local_to_global
 )
+
+from mathutils import Vector
 
 
 def create_window(bm, faces, prop):
@@ -37,10 +40,8 @@ def create_window_split(bm, face, prop):
     wall_w, wall_h = get_width_and_height(face)
     scale_x = prop.size.x/wall_w
     scale_y = prop.size.y/wall_h
-    off_x = 0
-    off_y = prop.offset.x
-    off_z = prop.offset.y
-    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, off_x, off_y, off_z)
+    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)
 
 
 def create_window_array(bm, face, prop):
