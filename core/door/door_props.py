@@ -58,8 +58,11 @@ class DoorProperty(bpy.types.PropertyGroup):
     def has_arch(self):
         return self.arch.resolution > 0
 
-    def draw(self, context, layout):
+    def init(self, wall_dimensions):
+        self.wall_dimensions = wall_dimensions
         self.size_offset.parent_dimensions = self.wall_dimensions
+
+    def draw(self, context, layout):
         self.size_offset.draw(context, layout)
         self.array.draw(context, layout)
         self.arch.draw(context, layout)

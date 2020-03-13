@@ -18,12 +18,8 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        self.wall_dimensions = get_selected_face_dimensions(context)
-        self.props.wall_dimensions = self.wall_dimensions
-
+        self.props.init(get_selected_face_dimensions(context))
         return Window.build(context, self.props)
 
     def draw(self, context):
-        self.props.wall_dimensions = self.wall_dimensions
-
         self.props.draw(context, self.layout)

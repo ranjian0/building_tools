@@ -24,7 +24,8 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     )
 
     def get_size(self):
-        return self.get("size", resitriced_size(self.parent_dimensions, self.offset, (0.1, 0.1), (1.0, 1.0)))
+        default = (1.0, 1.0)
+        return self.get("size", resitriced_size(self.parent_dimensions, self.offset, (0.1, 0.1), default))
 
     def set_size(self, value):
         self["size"] = resitriced_size(self.parent_dimensions, self.offset, (0.1, 0.1), value)
