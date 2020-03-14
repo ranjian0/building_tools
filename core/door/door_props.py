@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import FloatProperty, EnumProperty, PointerProperty, FloatVectorProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty, FloatVectorProperty, BoolProperty
 
 from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
@@ -44,6 +44,12 @@ class DoorProperty(bpy.types.PropertyGroup):
     array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
+    double_door: BoolProperty(
+        name="Double Door",
+        default=False,
+        description="Double door",
+    )
+
     panel_fill: PointerProperty(type=FillPanel)
     glass_fill: PointerProperty(type=FillGlassPanes)
     louver_fill: PointerProperty(type=FillLouver)
@@ -73,6 +79,8 @@ class DoorProperty(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "frame_thickness")
         row.prop(self, "frame_depth")
+        row = col.row(align=True)
+        row.prop(self, "double_door")
 
         row = layout.row()
         row.prop_menu_enum(self, "fill_type")
