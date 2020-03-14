@@ -18,7 +18,7 @@ def create_balcony(bm, faces, prop):
     """
     for f in faces:
         size, off = prop.size_offset.size, prop.size_offset.offset
-        f = inset_face_with_scale_offset(bm, f, size.y, size.x, off.x, off.y, off.z)
+        f = inset_face_with_scale_offset(bm, f, size.y, size.x, off.x, off.y)
 
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
         ret = bmesh.ops.extrude_face_region(bm, geom=[f])

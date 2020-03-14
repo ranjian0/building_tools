@@ -86,4 +86,4 @@ def create_stair_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     size, off = prop.size, prop.offset
-    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
+    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y)
