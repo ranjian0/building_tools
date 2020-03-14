@@ -36,6 +36,8 @@ def create_balcony_railing(bm, edges, prop, normal):
 # @map_new_faces(FaceMap.RAILING_POSTS)
 def make_corner_posts(bm, loops, prop, edges, normal):
     # add_facemap_for_groups(FaceMap.RAILING_POSTS)
+
+    wall_edge = [l.edge for l in loops if l.edge not in edges].pop()
     for loop in loops:
         v = loop.vert
         e = loop.edge
@@ -51,8 +53,9 @@ def make_corner_posts(bm, loops, prop, edges, normal):
         # -- by {SLAB_OUTSET} to make it flush with the walls
         active_obj = bpy.context.active_object
         slab_outset = active_obj.tracked_properties.slab_outset
-        if e not in edges:
-            pos += normal * slab_outset
+        slab_rel = math.sin(math.pi / 4) * slab_outset
+        if v in wall_edge.verts:
+            pos += normal * slab_rel
 
         post = add_cube_post(bm, width, height, pos)
         align_geometry_to_edge(bm, post, e)
