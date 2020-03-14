@@ -229,6 +229,17 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
     return new_verts
 
 
+def boundary_edges_from_face_selection(bm):
+    """ Find all edges that bound the current selected faces
+    """
+    selected_faces = [f for f in bm.faces if f.select]
+    all_edges = list({e for f in selected_faces for e in f.edges})
+    edge_is_boundary = (
+        lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
+    )
+    return [e for e in all_edges if edge_is_boundary(e)]
+
+
 def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
     """ Subdivide the given edge and offset vertices to form an arc
     """
