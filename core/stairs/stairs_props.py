@@ -20,7 +20,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Step Width",
         min=0.01,
         max=100.0,
-        default=0.5,
+        default=0.2,
         description="Width of each step",
     )
 
@@ -28,7 +28,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Landing Width",
         min=0.01,
         max=100.0,
-        default=1.0,
+        default=0.2,
         description="Width of each stairs landing",
     )
 
@@ -38,13 +38,9 @@ class StairsProperty(bpy.types.PropertyGroup):
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
-    def set_defaults(self):
-        """ Helper function to make convinient property adjustments """
-        if self.redo:
-            return
-
-        self.size_offset.size = (0.5, 1.0)
-        self.redo = True
+    def init(self, wall_dimensions):
+        self['wall_dimensions'] = wall_dimensions
+        self.size_offset.init((self['wall_dimensions'][0], self['wall_dimensions'][1]), default_size=(1.0, 0.2), default_offset=(0.0, 0.0))
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
@@ -53,7 +49,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         col.prop(self, "step_count")
         col.prop(self, "step_width")
 
-        layout.prop(self, "landing", toggle=True)
+        col.prop(self, "landing")
         if self.landing:
             box = layout.box()
             col = box.column()
