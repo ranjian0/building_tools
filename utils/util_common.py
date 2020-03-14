@@ -63,23 +63,23 @@ def kwargs_from_props(props):
     return result
 
 
-def resitriced_size(parent_dimensions, offset, size_min, size):
+def restricted_size(parent_dimensions, offset, size_min, size):
     """ Get size restricted by various factors
     """
     limit_x = min(parent_dimensions[0] + 2*offset[0], parent_dimensions[0] - 2*offset[0])
     limit_y = min(parent_dimensions[1] + 2*offset[1], parent_dimensions[1] - 2*offset[1])
-    x = max(min(limit_x, size[0]), size_min[0])
-    y = max(min(limit_y, size[1]), size_min[1])
+    x = clamp(size[0], size_min[0], limit_x)
+    y = clamp(size[1], size_min[1], limit_x)
     return x, y
 
 
-def resitriced_offset(parent_dimensions, size, offset):
+def restricted_offset(parent_dimensions, size, offset):
     """ Get offset restricted by various factors
     """
     limit_x = (parent_dimensions[0]-size[0])/2
     limit_y = (parent_dimensions[1]-size[1])/2
-    x = max(min(limit_x, offset[0]), -limit_x)
-    y = max(min(limit_y, offset[1]), -limit_y)
+    x = clamp(offset[0], -limit_x, limit_x)
+    y = clamp(offset[1], -limit_y, limit_y)
     return x, y
 
 

@@ -16,7 +16,6 @@ from ...utils import (
     add_facemap_for_groups,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
-    get_width_and_height,
     local_to_global
 )
 
@@ -42,7 +41,7 @@ def create_door(bm, faces, prop):
 def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
-    wall_w, wall_h = get_width_and_height(face)
+    wall_w, wall_h = calc_face_dimensions(face)
     scale_x = prop.size.x/wall_w
     scale_y = prop.size.y/wall_h
     offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
