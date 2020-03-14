@@ -16,7 +16,10 @@ from ...utils import (
     add_facemap_for_groups,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
+    local_to_global
 )
+
+from mathutils import Vector
 
 
 def create_door(bm, faces, prop):
@@ -38,9 +41,11 @@ def create_door(bm, faces, prop):
 def create_door_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
-    size, off = prop.size, prop.offset
-    size_y = min(size.y, 0.9999)
-    return inset_face_with_scale_offset(bm, face, size_y, size.x, off.x, off.y, off.z)
+    wall_w, wall_h = calc_face_dimensions(face)
+    scale_x = prop.size.x / wall_w
+    scale_y = prop.size.y / wall_h
+    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y)
 
 
 def create_door_array(bm, face, prop):
@@ -128,7 +133,7 @@ def create_door_fill(bm, face, prop):
     if prop.fill_type == "PANELS":
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, prop.panel_fill)
-    elif prop.fill_type == "GLASS PANES":
+    elif prop.fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.DOOR_PANES)
         if prop.has_arch():
             pane_arch_face(bm, face, prop.glass_fill)

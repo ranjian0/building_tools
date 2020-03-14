@@ -229,17 +229,6 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
     return new_verts
 
 
-def boundary_edges_from_face_selection(bm):
-    """ Find all edges that bound the current selected faces
-    """
-    selected_faces = [f for f in bm.faces if f.select]
-    all_edges = list({e for f in selected_faces for e in f.edges})
-    edge_is_boundary = (
-        lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
-    )
-    return [e for e in all_edges if edge_is_boundary(e)]
-
-
 def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
     """ Subdivide the given edge and offset vertices to form an arc
     """
@@ -368,3 +357,11 @@ def split_edge_at_point_from_closest_vert(edge, vert, split_point):
     split_length = (close_vert.co - split_point).length
     split_factor = split_length / edge.calc_length()
     return bmesh.utils.edge_split(edge, close_vert, split_factor)
+
+
+def get_selected_face_dimensions(context):
+    """ Get dimensions of selected face
+    """
+    bm = bmesh.from_edit_mesh(context.edit_object.data)
+    wall = [f for f in bm.faces if f.select][0]
+    return calc_face_dimensions(wall)
