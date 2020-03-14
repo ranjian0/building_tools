@@ -1,4 +1,5 @@
 import bmesh
+from mathutils import Vector
 from bmesh.types import BMVert, BMFace
 
 from .balcony_rails import (
@@ -7,8 +8,10 @@ from .balcony_rails import (
 from ...utils import (
     FaceMap,
     filter_geom,
+    local_to_global,
     calc_edge_median,
     add_faces_to_map,
+    calc_face_dimensions,
     inset_face_with_scale_offset,
 )
 
@@ -17,8 +20,7 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
-        size, off = prop.size_offset.size, prop.size_offset.offset
-        f = inset_face_with_scale_offset(bm, f, size.y, size.x, off.x, off.y)
+        f = create_balcony_split(bm, f, prop.size_offset)
 
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
         ret = bmesh.ops.extrude_face_region(bm, geom=[f])
@@ -78,3 +80,13 @@ def map_balcony_faces(bm, geom):
         for face in e.link_faces
     }
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
+
+
+def create_balcony_split(bm, face, prop):
+    """Use properties from SplitOffset to subdivide face into regular quads
+    """
+    wall_w, wall_h = calc_face_dimensions(face)
+    scale_x = prop.size.x/wall_w
+    scale_y = prop.size.y/wall_h
+    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)

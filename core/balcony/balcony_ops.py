@@ -1,6 +1,7 @@
 import bpy
 from .balcony import Balcony
 from .balcony_props import BalconyProperty
+from ...utils import get_selected_face_dimensions
 
 
 class BTOOLS_OT_add_balcony(bpy.types.Operator):
@@ -17,7 +18,7 @@ class BTOOLS_OT_add_balcony(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        self.props.set_defaults()
+        self.props.init(get_selected_face_dimensions(context))
         return Balcony.build(context, self.props)
 
     def draw(self, context):
