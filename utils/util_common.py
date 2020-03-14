@@ -1,5 +1,6 @@
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Euler
+from math import radians
 
 
 def equal(a, b, eps=0.001):
@@ -60,3 +61,34 @@ def kwargs_from_props(props):
             # property group within this property
             result.update(kwargs_from_props(prop))
     return result
+
+
+def restricted_size(parent_dimensions, offset, size_min, size):
+    """ Get size restricted by various factors
+    """
+    limit_x = min(parent_dimensions[0] + 2*offset[0], parent_dimensions[0] - 2*offset[0])
+    limit_y = min(parent_dimensions[1] + 2*offset[1], parent_dimensions[1] - 2*offset[1])
+    x = clamp(size[0], size_min[0], limit_x)
+    y = clamp(size[1], size_min[1], limit_x)
+    return x, y
+
+
+def restricted_offset(parent_dimensions, size, offset):
+    """ Get offset restricted by various factors
+    """
+    limit_x = (parent_dimensions[0]-size[0])/2
+    limit_y = (parent_dimensions[1]-size[1])/2
+    x = clamp(offset[0], -limit_x, limit_x)
+    y = clamp(offset[1], -limit_y, limit_y)
+    return x, y
+
+
+def local_to_global(face, vec):
+    """ Convert vector from local to global space, considering face normal as local z and world z as local y
+    """
+    z = face.normal.copy()
+    x = face.normal.copy()
+    x.rotate(Euler((0.0, 0.0, radians(90)), 'XYZ'))
+    y = z.cross(x)
+    global_offset = (x * vec.x) + (y * vec.y) + (z * vec.z)
+    return global_offset

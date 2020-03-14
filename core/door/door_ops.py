@@ -1,6 +1,7 @@
 import bpy
 from .door import Door
 from .door_props import DoorProperty
+from ...utils import get_selected_face_dimensions
 
 
 class BTOOLS_OT_add_door(bpy.types.Operator):
@@ -17,6 +18,7 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
+        self.props.init(get_selected_face_dimensions(context))
         return Door.build(self.props)
 
     def draw(self, context):
