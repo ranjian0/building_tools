@@ -16,19 +16,11 @@ from ..utils import get_edit_mesh, set_material_for_active_facemap, restricted_o
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
-    parent_dimensions: FloatVectorProperty(
-        name="Parent dimensions",
-        subtype="XYZ",
-        size=2,
-        description="dimensions of parent component",
-    )
-
     def get_size(self):
-        default = (1.0, 1.0)
-        return self.get("size", restricted_size(self.parent_dimensions, self.offset, (0.1, 0.1), default))
+        return self.get("size", restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']))
 
     def set_size(self, value):
-        self["size"] = restricted_size(self.parent_dimensions, self.offset, (0.1, 0.1), value)
+        self["size"] = restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), value)
 
     size: FloatVectorProperty(
         name="Size",
@@ -40,10 +32,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     )
 
     def get_offset(self):
-        return self.get("offset", (0.0, 0.0))
+        return self.get("offset", self['default_offset'])
 
     def set_offset(self, value):
-        self["offset"] = restricted_offset(self.parent_dimensions, self.size, value)
+        self["offset"] = restricted_offset(self['parent_dimensions'], self.size, value)
 
     offset: FloatVectorProperty(
         name="Offset",
@@ -55,6 +47,11 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     )
 
     show_props: BoolProperty(default=False)
+
+    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0)):
+        self['parent_dimensions'] = parent_dimensions
+        self['default_size'] = default_size
+        self['default_offset'] = default_offset
 
     def draw(self, context, layout):
         layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Size & Offset", emboss=False)
