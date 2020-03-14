@@ -69,7 +69,7 @@ def restricted_size(parent_dimensions, offset, size_min, size):
     limit_x = min(parent_dimensions[0] + 2*offset[0], parent_dimensions[0] - 2*offset[0])
     limit_y = min(parent_dimensions[1] + 2*offset[1], parent_dimensions[1] - 2*offset[1])
     x = clamp(size[0], size_min[0], limit_x)
-    y = clamp(size[1], size_min[1], limit_x)
+    y = clamp(size[1], size_min[1], limit_y)
     return x, y
 
 
