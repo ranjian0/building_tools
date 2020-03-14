@@ -60,7 +60,9 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self.wall_dimensions = wall_dimensions
-        self.size_offset.parent_dimensions = (self.wall_dimensions.x/self.array.count, self.wall_dimensions.y)
+        self.size_offset.parent_dimensions = (
+            self.wall_dimensions.x / self.array.count, self.wall_dimensions.y
+        )
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)

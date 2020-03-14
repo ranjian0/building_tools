@@ -45,7 +45,7 @@ def create_door_split(bm, face, prop):
     scale_x = prop.size.x/wall_w
     scale_y = prop.size.y/wall_h
     offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
-    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y)
 
 
 def create_door_array(bm, face, prop):
