@@ -38,7 +38,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         ("NONE", "None", "", 0),
         ("BAR", "Bar", "", 1),
         ("LOUVER", "Louver", "", 2),
-        ("GLASS PANES", "Glass Panes", "", 3),
+        ("GLASS_PANES", "Glass Panes", "", 3),
     ]
     fill_type: EnumProperty(
         name="Fill Type",
@@ -84,7 +84,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         fill_map = {
             "BAR": self.bar_fill,
             "LOUVER": self.louver_fill,
-            "GLASS PANES": self.glass_fill,
+            "GLASS_PANES": self.glass_fill,
         }
         fill = fill_map.get(self.fill_type)
         if fill:

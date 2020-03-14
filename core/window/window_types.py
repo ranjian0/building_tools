@@ -111,7 +111,7 @@ def create_window_fill(bm, face, prop):
     """Create extra elements on face
     """
 
-    if prop.fill_type == "GLASS PANES":
+    if prop.fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.WINDOW_PANES)
         if prop.has_arch():
             pane_arch_face(bm, face, prop.glass_fill)

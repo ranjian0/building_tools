@@ -133,7 +133,7 @@ def create_door_fill(bm, face, prop):
     if prop.fill_type == "PANELS":
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, prop.panel_fill)
-    elif prop.fill_type == "GLASS PANES":
+    elif prop.fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.DOOR_PANES)
         if prop.has_arch():
             pane_arch_face(bm, face, prop.glass_fill)
