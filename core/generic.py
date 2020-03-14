@@ -10,42 +10,60 @@ from bpy.props import (
     FloatVectorProperty,
 )
 
-from ..utils import get_edit_mesh, set_material_for_active_facemap
+from ..utils import get_edit_mesh, set_material_for_active_facemap, restricted_offset, restricted_size
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
-    size: FloatVectorProperty(
-        name="Size",
-        min=0.01,
-        max=1.0,
+    parent_dimensions: FloatVectorProperty(
+        name="Parent dimensions",
         subtype="XYZ",
         size=2,
-        default=(0.7, 0.7),
+        description="dimensions of parent component",
+    )
+
+    def get_size(self):
+        default = (1.0, 1.0)
+        return self.get("size", restricted_size(self.parent_dimensions, self.offset, (0.1, 0.1), default))
+
+    def set_size(self, value):
+        self["size"] = restricted_size(self.parent_dimensions, self.offset, (0.1, 0.1), value)
+
+    size: FloatVectorProperty(
+        name="Size",
+        get=get_size,
+        set=set_size,
+        subtype="XYZ",
+        size=2,
         description="Size of geometry",
     )
 
+    def get_offset(self):
+        return self.get("offset", (0.0, 0.0))
+
+    def set_offset(self, value):
+        self["offset"] = restricted_offset(self.parent_dimensions, self.size, value)
+
     offset: FloatVectorProperty(
         name="Offset",
-        min=-1000.0,
-        max=1000.0,
+        get=get_offset,
+        set=set_offset,
         subtype="TRANSLATION",
-        size=3,
-        default=(0.0, 0.0, 0.0),
+        size=2,
         description="How much to offset geometry",
     )
 
     show_props: BoolProperty(default=False)
 
     def draw(self, context, layout):
-        layout.prop(self, "show_props", text="Size & Offset", toggle=True)
+        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Size & Offset", emboss=False)
 
         if self.show_props:
             box = layout.box()
             row = box.row(align=False)
             col = row.column(align=True)
-            col.prop(self, "size", slider=True)
+            col.prop(self, "size")
 
             col = row.column(align=True)
             col.prop(self, "offset")
@@ -61,7 +79,7 @@ class ArrayProperty(bpy.types.PropertyGroup):
     show_props: BoolProperty(default=False)
 
     def draw(self, context, layout):
-        layout.prop(self, "show_props", text="Array Elements", toggle=True)
+        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Array Elements", emboss=False)
 
         if self.show_props:
             box = layout.box()
@@ -106,7 +124,7 @@ class ArchProperty(bpy.types.PropertyGroup):
     show_props: BoolProperty(default=False)
 
     def draw(self, context, layout):
-        layout.prop(self, "show_props", text="Arched", toggle=True)
+        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Arched", emboss=False)
 
         if self.show_props:
             box = layout.box()

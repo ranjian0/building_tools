@@ -357,3 +357,10 @@ def split_edge_at_point_from_closest_vert(edge, vert, split_point):
     split_length = (close_vert.co - split_point).length
     split_factor = split_length / edge.calc_length()
     return bmesh.utils.edge_split(edge, close_vert, split_factor)
+
+def get_selected_face_dimensions(context):
+    """ Get dimensions of selected face
+    """
+    bm = bmesh.from_edit_mesh(context.edit_object.data)
+    wall = [f for f in bm.faces if f.select][0]
+    return calc_face_dimensions(wall)

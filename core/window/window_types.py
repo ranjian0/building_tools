@@ -11,7 +11,11 @@ from ...utils import (
     create_cube_without_faces,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
+    calc_face_dimensions,
+    local_to_global
 )
+
+from mathutils import Vector
 
 
 def create_window(bm, faces, prop):
@@ -33,8 +37,11 @@ def create_window(bm, faces, prop):
 def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
-    size, off = prop.size, prop.offset
-    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
+    wall_w, wall_h = calc_face_dimensions(face)
+    scale_x = prop.size.x/wall_w
+    scale_y = prop.size.y/wall_h
+    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)
 
 
 def create_window_array(bm, face, prop):
