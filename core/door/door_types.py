@@ -1,4 +1,5 @@
 import bmesh
+from mathutils import Vector
 from bmesh.types import BMEdge
 
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
@@ -8,6 +9,7 @@ from ...utils import (
     arc_edge,
     filter_geom,
     map_new_faces,
+    local_to_global,
     face_with_verts,
     add_faces_to_map,
     calc_edge_median,
@@ -16,10 +18,7 @@ from ...utils import (
     add_facemap_for_groups,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
-    local_to_global
 )
-
-from mathutils import Vector
 
 
 def create_door(bm, faces, prop):

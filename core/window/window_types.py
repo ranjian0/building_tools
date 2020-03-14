@@ -1,4 +1,6 @@
 import bmesh
+from mathutils import Vector
+
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ...utils import (
     FaceMap,
@@ -14,8 +16,6 @@ from ...utils import (
     calc_face_dimensions,
     local_to_global
 )
-
-from mathutils import Vector
 
 
 def create_window(bm, faces, prop):

@@ -22,10 +22,14 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
     def get_size(self):
-        return self.get("size", restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']))
+        return self.get("size", restricted_size(
+            self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']
+        ))
 
     def set_size(self, value):
-        self["size"] = restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), value)
+        self["size"] = restricted_size(
+            self['parent_dimensions'], self.offset, (0.1, 0.1), value
+        )
 
     size: FloatVectorProperty(
         name="Size",

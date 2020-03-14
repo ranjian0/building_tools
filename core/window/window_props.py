@@ -56,7 +56,10 @@ class WindowProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.array.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
+        self.size_offset.init(
+            (self['wall_dimensions'][0] / self.array.count, self['wall_dimensions'][1]),
+            default_size=(1.0, 1.0), default_offset=(0.0, 0.0)
+        )
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
