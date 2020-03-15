@@ -1,3 +1,4 @@
+import math
 import bmesh
 from bmesh.types import BMVert
 from mathutils import Vector, Matrix
@@ -18,7 +19,7 @@ from ...utils import (
 def create_rectangular_floorplan(bm, prop):
     """Create plane in provided bmesh
     """
-    plane(bm, prop.width, prop.length)
+    plane(bm, prop.width / 2, prop.length / 2)
 
 
 def create_circular_floorplan(bm, prop):
@@ -41,7 +42,7 @@ def create_composite_floorplan(bm, prop):
         .____.
 
     """
-    plane(bm, prop.width, prop.length)
+    plane(bm, prop.width / 2, prop.length / 2)
     median_reference = list(bm.faces).pop().calc_center_median()
 
     edges = sort_edges_clockwise(bm.edges)
@@ -69,7 +70,7 @@ def create_hshaped_floorplan(bm, prop):
     .___.      .___.
 
     """
-    plane(bm, prop.width, prop.length)
+    plane(bm, prop.width / 2, prop.length / 2)
     face = list(bm.faces).pop()
     normal = face.normal
     median_reference = face.calc_center_median()
@@ -80,20 +81,23 @@ def create_hshaped_floorplan(bm, prop):
     extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     extrusion_widths = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
     for idx, edge in enumerate(extreme_edges):
+        length, width = extrusion_lengths[idx], extrusion_widths[idx]
 
-        if extrusion_lengths[idx] > 0.0:
+        if length > 0.0:
             res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
             verts = filter_geom(res["geom"], BMVert)
             v = (calc_edge_median(edge) - median_reference).normalized()
             bmesh.ops.translate(
-                bm, verts=verts, vec=Vector((0, v.y, 0)) * extrusion_lengths[idx]
+                bm, verts=verts, vec=Vector((0, math.copysign(1.0, v.y), 0)) * length
             )
 
             filter_function = min if v.x > 0 else max
             mv1 = filter_function(list(edge.verts), key=lambda v: v.co.x)
             mv2 = filter_function(verts, key=lambda v: v.co.x)
             bmesh.ops.translate(
-                bm, verts=[mv1, mv2], vec=Vector((-v.x, 0, 0)) * extrusion_widths[idx]
+                bm, verts=[mv1, mv2],
+                # -- subtract 1.0 from the width to offset the default width
+                vec=Vector((-math.copysign(1.0, v.x), 0, 0)) * (width - 1.0)
             )
 
 
@@ -101,8 +105,8 @@ def create_random_floorplan(bm, prop):
     """Create randomly generated building floorplan
     """
     random.seed(prop.seed)
-    scale_x = Matrix.Scale(prop.width, 4, (1, 0, 0))
-    scale_y = Matrix.Scale(prop.length, 4, (0, 1, 0))
+    scale_x = Matrix.Scale(prop.width / 2, 4, (1, 0, 0))
+    scale_y = Matrix.Scale(prop.length / 2, 4, (0, 1, 0))
     bmesh.ops.create_grid(
         bm, x_segments=1, y_segments=1, size=1, matrix=scale_x @ scale_y
     )
