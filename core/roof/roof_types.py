@@ -39,8 +39,11 @@ def create_flat_roof(bm, faces, prop):
     bmesh.ops.translate(
         bm, vec=(0, 0, prop.thickness), verts=filter_geom(ret["geom"], BMVert)
     )
+    top_face = filter_geom(ret["geom"], BMFace)
+    if len(top_face) > 1:
+        top_face = bmesh.ops.dissolve_faces(
+            bm, faces=top_face, use_verts=True).get("region").pop()
 
-    top_face = filter_geom(ret["geom"], BMFace).pop()
     link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
 
     bmesh.ops.inset_region(
@@ -59,10 +62,10 @@ def create_gable_roof(bm, faces, prop):
     if not is_rectangular(faces):
         return
 
-    axis = "x" if prop.orient == "HORIZONTAL" else "y"
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
 
+    axis = "x" if prop.orient == "HORIZONTAL" else "y"
     edges = extrude_up_and_delete_faces(bm, faces, prop.height)
     merge_verts_along_axis(bm, set(v for e in edges for v in e.verts), axis)
     roof_faces = list({f for e in edges for f in e.link_faces})
