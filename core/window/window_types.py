@@ -2,8 +2,10 @@ import bmesh
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ...utils import (
     FaceMap,
+    is_ngon,
     arc_edge,
     filter_geom,
+    popup_message,
     map_new_faces,
     add_faces_to_map,
     calc_edge_median,
@@ -22,8 +24,11 @@ def create_window(bm, faces, prop):
     """Generate a window
     """
     for face in faces:
-        array_faces = create_window_array(bm, face, prop.array)
+        if is_ngon(face):
+            popup_message("Window creation not supported for n-gon", "Ngon Error")
+            return False
 
+        array_faces = create_window_array(bm, face, prop.array)
         for aface in array_faces:
             face = create_window_split(bm, aface, prop.size_offset)
             if not face:
@@ -31,6 +36,7 @@ def create_window(bm, faces, prop):
 
             face = create_window_frame(bm, face, prop)
             create_window_fill(bm, face, prop)
+    return True
 
 
 @map_new_faces(FaceMap.WALLS)

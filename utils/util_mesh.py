@@ -56,6 +56,10 @@ def edge_vector(edge):
     return (v2.co - v1.co).normalized()
 
 
+def is_ngon(face):
+    return len(face.verts) > 4
+
+
 def sort_edges_clockwise(edges):
     """ sort edges clockwise based on angle from their median center
     """

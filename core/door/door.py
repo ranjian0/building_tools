@@ -13,9 +13,9 @@ class Door:
 
         if cls.validate(faces):
             cls.add_door_facemaps()
-            create_door(bm, faces, props)
-            bmesh.update_edit_mesh(me, True)
-            return {"FINISHED"}
+            if create_door(bm, faces, props):
+                bmesh.update_edit_mesh(me, True)
+                return {"FINISHED"}
         return {"CANCELLED"}
 
     @classmethod

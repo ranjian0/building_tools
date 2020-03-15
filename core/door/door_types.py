@@ -3,10 +3,12 @@ from bmesh.types import BMEdge
 
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
 from ...utils import (
+    is_ngon,
     FaceMap,
     validate,
     arc_edge,
     filter_geom,
+    popup_message,
     map_new_faces,
     face_with_verts,
     add_faces_to_map,
@@ -16,7 +18,7 @@ from ...utils import (
     add_facemap_for_groups,
     inset_face_with_scale_offset,
     subdivide_face_edges_vertical,
-    local_to_global
+    local_to_global,
 )
 
 from mathutils import Vector
@@ -26,8 +28,11 @@ def create_door(bm, faces, prop):
     """Create door from face selection
     """
     for face in faces:
-        array_faces = create_door_array(bm, face, prop.array)
+        if is_ngon(face):
+            popup_message("Door creation not supported for n-gons!", "Ngon Error")
+            return False
 
+        array_faces = create_door_array(bm, face, prop.array)
         for aface in array_faces:
             face = create_door_split(bm, aface, prop.size_offset)
             if not face:
@@ -35,6 +40,7 @@ def create_door(bm, faces, prop):
 
             face = create_door_frame(bm, face, prop)
             create_door_fill(bm, face, prop)
+    return True
 
 
 @map_new_faces(FaceMap.WALLS)

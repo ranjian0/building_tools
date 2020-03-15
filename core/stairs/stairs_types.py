@@ -6,7 +6,9 @@ from bmesh.types import BMVert
 
 from ...utils import (
     FaceMap,
+    is_ngon,
     filter_geom,
+    popup_message,
     add_faces_to_map,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
@@ -23,8 +25,11 @@ def create_stairs(bm, faces, prop):
 
     for f in faces:
         f.select = False
-        f = create_stair_split(bm, f, prop.size_offset)
+        if is_ngon(f):
+            popup_message("Stair creation not supported for n-gons!", "Ngon Error")
+            return False
 
+        f = create_stair_split(bm, f, prop.size_offset)
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
         # -- options for railing
@@ -32,6 +37,7 @@ def create_stairs(bm, faces, prop):
 
         f = create_landing(bm, f, top_faces, prop)
         create_steps(bm, f, top_faces, prop)
+        return True
 
 
 def create_landing(bm, f, top_faces, prop):
