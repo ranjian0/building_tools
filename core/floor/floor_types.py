@@ -30,13 +30,15 @@ def create_floors(bm, faces, prop):
     #
     # XXX END NOTE XXX
 
-    result_b = bmesh.ops.inset_region(bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True)
+    result_b = bmesh.ops.inset_region(
+        bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True)
     slabs.extend(result_a["faces"] + result_b["faces"])
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     add_faces_to_map(bm, slabs, FaceMap.SLABS)
     add_faces_to_map(bm, walls, FaceMap.WALLS)
+
 
 def extrude_slabs_and_floors(bm, faces, prop):
     """extrude edges alternating between slab and floor heights
@@ -51,6 +53,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
         )
         bmesh.ops.delete(bm, geom=faces, context="FACES")
         faces = filter_geom(extrusion["geom"], BMFace)
+
 
 def get_slab_and_wall_faces(bm, prop, start_height):
     """get faces that form slabs and walls
