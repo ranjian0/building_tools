@@ -33,6 +33,13 @@ def args_from_props(props, names):
     return tuple(getattr(props, name) for name in names)
 
 
+def popup_message(message, title="Error", icon='ERROR'):
+    def oops(self, context):
+        self.layout.label(text=message)
+
+    bpy.context.window_manager.popup_menu(oops, title=title, icon=icon)
+
+
 def kwargs_from_props(props):
     """ Converts all properties in a props{bpy.types.PropertyGroup} into dict
     """

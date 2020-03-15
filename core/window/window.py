@@ -12,9 +12,9 @@ class Window:
 
         if cls.validate(faces):
             cls.add_window_facemaps()
-            create_window(bm, faces, prop)
-            bmesh.update_edit_mesh(me, True)
-            return {"FINISHED"}
+            if create_window(bm, faces, prop):
+                bmesh.update_edit_mesh(me, True)
+                return {"FINISHED"}
         return {"CANCELLED"}
 
     @classmethod

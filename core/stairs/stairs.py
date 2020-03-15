@@ -13,9 +13,9 @@ class Stairs:
 
         if cls.validate(faces):
             cls.add_stairs_facemaps()
-            create_stairs(bm, faces, prop)
-            bmesh.update_edit_mesh(me, True)
-            return {"FINISHED"}
+            if create_stairs(bm, faces, prop):
+                bmesh.update_edit_mesh(me, True)
+                return {"FINISHED"}
         return {"CANCELLED"}
 
     @classmethod
