@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
+from ...utils import clamp
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):
@@ -27,7 +28,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Width",
         min=0.01,
         max=100.0,
-        default=2,
+        default=4,
         description="Base Width of floorplan",
     )
 
@@ -35,7 +36,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Length",
         min=0.01,
         max=100.0,
-        default=2,
+        default=4,
         description="Base Length of floorplan",
     )
 
@@ -51,12 +52,38 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Number of segments in the circle",
     )
 
+    def get_segment_width(self, propname):
+        return self.get(propname, 1.0)
+
+    def set_segment_width(self, value, propname):
+        """
+        Clamp the segment width to less than default_width + base width
+        ONLY for H-Shaped floorplan
+        """
+        default_width = 1.0
+        maximum_width = default_width + self.width
+
+        # -- calculate offsets of adjacent segments
+        adjacent_prop = {
+            "tw1" : "tw2",
+            "tw2" : "tw1",
+            "tw3" : "tw4",
+            "tw4" : "tw3",
+        }.get(propname)
+        maximum_width += (default_width - self.get(adjacent_prop, 1.0))
+
+        if self.type == "H-SHAPED":
+            self[propname] = clamp(value, 0.0, maximum_width)
+        else:
+            self[propname] = value
+
     tw1: FloatProperty(
         name="Tail Width 1",
         min=0.0,
         max=100.0,
-        default=1,
         description="Width of floorplan segment",
+        get=lambda self : self.get_segment_width("tw1"),
+        set=lambda self, value : self.set_segment_width(value, "tw1"),
     )
 
     tl1: FloatProperty(
@@ -71,8 +98,9 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 2",
         min=0.0,
         max=100.0,
-        default=1,
         description="Width of floorplan segment",
+        get=lambda self : self.get_segment_width("tw2"),
+        set=lambda self, value : self.set_segment_width(value, "tw2"),
     )
 
     tl2: FloatProperty(
@@ -87,8 +115,9 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 3",
         min=0.0,
         max=100.0,
-        default=1,
         description="Width of floorplan segment",
+        get=lambda self : self.get_segment_width("tw3"),
+        set=lambda self, value : self.set_segment_width(value, "tw3"),
     )
 
     tl3: FloatProperty(
@@ -103,8 +132,9 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 4",
         min=0.0,
         max=100.0,
-        default=1,
         description="Width of floorplan segment",
+        get=lambda self : self.get_segment_width("tw4"),
+        set=lambda self, value : self.set_segment_width(value, "tw4"),
     )
 
     tl4: FloatProperty(
