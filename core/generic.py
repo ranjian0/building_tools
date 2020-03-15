@@ -10,7 +10,13 @@ from bpy.props import (
     FloatVectorProperty,
 )
 
-from ..utils import get_edit_mesh, set_material_for_active_facemap, restricted_offset, restricted_size
+from ..utils import (
+    clamp,
+    get_edit_mesh,
+    restricted_size,
+    restricted_offset,
+    set_material_for_active_facemap,
+)
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -20,7 +26,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         return self.get("size", restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']))
 
     def set_size(self, value):
-        self["size"] = restricted_size(self['parent_dimensions'], self.offset, (0.1, 0.1), value)
+        value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
+        self["size"] = restricted_size(
+            self['parent_dimensions'], self.offset, (0.1, 0.1), value
+        )
 
     size: FloatVectorProperty(
         name="Size",
