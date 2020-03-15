@@ -11,6 +11,7 @@ from bpy.props import (
 )
 
 from ..utils import (
+    clamp,
     get_edit_mesh,
     restricted_size,
     restricted_offset,
@@ -27,6 +28,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         ))
 
     def set_size(self, value):
+        value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
         self["size"] = restricted_size(
             self['parent_dimensions'], self.offset, (0.1, 0.1), value
         )
