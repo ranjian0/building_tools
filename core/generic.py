@@ -81,7 +81,7 @@ class ArrayProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used to array elements """
 
     count: IntProperty(
-        name="Count", min=1, max=1000, default=1, description="Number of elements"
+        name="Count", min=1, max=64, default=1, description="Number of elements"
     )
 
     show_props: BoolProperty(default=False)
@@ -100,7 +100,7 @@ class ArchProperty(bpy.types.PropertyGroup):
     resolution: IntProperty(
         name="Arc Resolution",
         min=0,
-        max=1000,
+        max=128,
         default=0,
         description="Number of segements for the arc",
     )
@@ -116,7 +116,7 @@ class ArchProperty(bpy.types.PropertyGroup):
     height: FloatProperty(
         name="Arc Height",
         min=0.01,
-        max=100.0,
+        max=10.0,
         default=0.5,
         description="Radius of the arc",
     )

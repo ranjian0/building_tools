@@ -5,6 +5,22 @@ REMOVE ALL UNSTABLE FEATURES
 
 - roof is also abit unstable esp hip roof and straight skeleton
 
+SLANTED FACES:
+  Window tool should allow  for slanted faces
+
+NGON VALIDATION AND SOLVE
+  It may be useful to try and provide solution for simple ngon cases.
+
+  For instance, if ngon has two top edges, create a new horizontal edge
+  and slide it to the top. This can be repeated as nessesary for remaining
+  sides until a quad is formed.
+
+  If the ngon for instance has all sides with multiple edges, skip and throw
+  warning.
+
+REMOVE ALL DEAD CODE / UNREACHABLE
+  - part of refactoring
+
 DOOR:
   re-add double door feature, but better and with support for archs
 
