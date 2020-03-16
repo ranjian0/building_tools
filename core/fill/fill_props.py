@@ -61,7 +61,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
     pane_count_x: IntProperty(
         name="Horizontal glass panes",
         min=0,
-        max=100,
+        max=10,
         default=1,
         description="Number of horizontal glass panes",
     )
@@ -69,7 +69,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
     pane_count_y: IntProperty(
         name="Vertical glass panes",
         min=0,
-        max=100,
+        max=10,
         default=1,
         description="Number of vertical glass panes",
     )
@@ -77,17 +77,17 @@ class FillGlassPanes(bpy.types.PropertyGroup):
     pane_margin: FloatProperty(
         name="Glass Pane Margin",
         min=0.01,
-        max=100.0,
+        max=1.0,
         default=0.1,
         description="Margin of glass pane frames",
     )
 
     pane_depth: FloatProperty(
         name="Glass Pane Depth",
-        min=0.01,
-        max=100.0,
+        min=0.0,
+        max=0.1,
         default=0.01,
-        step=1,
+        step=0.1,
         description="Depth of glass panes",
     )
 
@@ -98,8 +98,8 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "pane_count_x")
         row.prop(self, "pane_count_y")
-        col.prop(self, "pane_margin")
-        col.prop(self, "pane_depth")
+        col.prop(self, "pane_margin", slider=True)
+        col.prop(self, "pane_depth", slider=True)
 
 
 class FillLouver(bpy.types.PropertyGroup):
