@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import FloatProperty, EnumProperty, PointerProperty, FloatVectorProperty, BoolProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty
 
 from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
@@ -54,19 +54,12 @@ class DoorProperty(bpy.types.PropertyGroup):
     glass_fill: PointerProperty(type=FillGlassPanes)
     louver_fill: PointerProperty(type=FillLouver)
 
-    wall_dimensions: FloatVectorProperty(
-        name="Wall dimensions",
-        subtype="XYZ",
-        size=2,
-        description="dimensions of wall",
-    )
-
     def has_arch(self):
         return self.arch.resolution > 0
 
     def init(self, wall_dimensions):
-        self.wall_dimensions = wall_dimensions
-        self.size_offset.parent_dimensions = (self.wall_dimensions.x/self.array.count, self.wall_dimensions.y)
+        self['wall_dimensions'] = wall_dimensions
+        self.size_offset.init((self['wall_dimensions'][0]/self.array.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)

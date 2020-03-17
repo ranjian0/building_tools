@@ -10,7 +10,11 @@ from ...utils import (
     add_faces_to_map,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
+    local_to_global,
+    calc_face_dimensions,
 )
+
+from mathutils import Vector
 
 
 def create_stairs(bm, faces, prop):
@@ -85,5 +89,8 @@ def subdivide_next_step(bm, ret_face, offset):
 def create_stair_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
-    size, off = prop.size, prop.offset
-    return inset_face_with_scale_offset(bm, face, size.y, size.x, off.x, off.y, off.z)
+    wall_w, wall_h = calc_face_dimensions(face)
+    scale_x = prop.size.x/wall_w
+    scale_y = prop.size.y/wall_h
+    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
+    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)
