@@ -59,7 +59,7 @@ def create_door_array(bm, face, prop):
     if prop.count <= 1:
         return [face]
     res = subdivide_face_edges_vertical(bm, face, prop.count - 1)
-    inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
+    inner_edges = filter_geom(res["geom_inner"], BMEdge)
     return list({f for e in inner_edges for f in e.link_faces})
 
 
@@ -135,13 +135,34 @@ def create_door_frame_arched(bm, face, prop):
 def create_door_fill(bm, face, prop):
     """Add decorative elements on door face
     """
+    if prop.has_arch():
+        fill_arch(bm, face, prop)
+    if prop.double_door:
+        res = subdivide_face_edges_vertical(bm, face, 1)
+        inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
+        faces = list({f for e in inner_edges for f in e.link_faces})
+        for f in faces:
+            fill_door_face(bm, f, prop)
+    else:
+        fill_door_face(bm, face, prop)
+
+
+def fill_arch(bm, face, prop):
+    """ Fill arch
+    """
+    if prop.fill_type == "GLASS_PANES":
+        add_facemap_for_groups(FaceMap.DOOR_PANES)
+        pane_arch_face(bm, face, prop.glass_fill)
+
+
+def fill_door_face(bm, face, prop):
+    """ Fill individual door face
+    """
     if prop.fill_type == "PANELS":
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, prop.panel_fill)
     elif prop.fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.DOOR_PANES)
-        if prop.has_arch():
-            pane_arch_face(bm, face, prop.glass_fill)
         fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.DOOR)
     elif prop.fill_type == "LOUVER":
         add_facemap_for_groups(FaceMap.DOOR_LOUVERS)
