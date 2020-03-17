@@ -45,6 +45,7 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
         return
 
     userframe = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
+    bmesh.ops.inset_individual(bm, faces=[face], thickness=0.0001) # to isolate the working quad and not leave adjacent face as n-gon
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
 
     inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
