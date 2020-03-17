@@ -17,48 +17,48 @@ def create_balcony_railing(bm, edges, prop, normal):
         f for e in edges for f in e.link_faces if f.normal.z
     }.pop()
     balcony_verts = {v for e in edges for v in e.verts}
-    balcony_loops = {l for v in balcony_verts for l in v.link_loops}
 
-    # -- use all loops for making corner posts
-    balcony_loops = list(
-        l for l in balcony_loops if l.face == balcony_face
-    )
-    make_corner_posts(bm, balcony_loops, prop, edges, normal)
+    def loop_is_valid(l):
+        return l.edge in edges and l.face == balcony_face
+    loops = list({l for v in balcony_verts for l in v.link_loops if loop_is_valid(l)})
 
-    # -- remove back loop for creating railing
-    balcony_loops = list(
-        l for l in balcony_loops if l.edge in edges
-    )
-    make_fill(bm, balcony_loops, prop)
+    make_corner_posts(bm, loops, prop, normal)
+    make_fill(bm, loops, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
 # @map_new_faces(FaceMap.RAILING_POSTS)
-def make_corner_posts(bm, loops, prop, edges, normal):
+def make_corner_posts(bm, loops, prop, normal):
     # add_facemap_for_groups(FaceMap.RAILING_POSTS)
+    active_obj = bpy.context.active_object
+    slab_outset = active_obj.tracked_properties.slab_outset
 
-    wall_edge = [l.edge for l in loops if l.edge not in edges].pop()
-    for loop in loops:
-        v = loop.vert
+    def loop_is_last(l):
         e = loop.edge
+        return e.calc_tangent(loop).cross(normal).z < 0
 
+    def loop_is_first(l):
+        e = loop.edge
+        return e.calc_tangent(loop).cross(normal).z > 0
+
+    def post_at_loop(loop):
         vec = loop.calc_tangent()
         width, height = prop.corner_post_width, prop.corner_post_height
-
         off = vec * math.sqrt(2 * ((width / 2) ** 2))
-        pos = v.co + off + Vector((0, 0, height / 2))
-
-        # EDGE CASE
-        # -- if this loop.vert belongs to the back edge, we may need to move it back
-        # -- by {SLAB_OUTSET} to make it flush with the walls
-        active_obj = bpy.context.active_object
-        slab_outset = active_obj.tracked_properties.slab_outset
-        slab_rel = math.sin(math.pi / 4) * slab_outset
-        if v in wall_edge.verts:
-            pos += normal * slab_rel
-
+        if loop_is_first(loop) or loop not in loops:
+            # -- pust first and last loops adjacent to walls
+            off += normal * slab_outset
+        pos = loop.vert.co + off + Vector((0, 0, height / 2))
         post = add_cube_post(bm, width, height, pos)
-        align_geometry_to_edge(bm, post, e)
+        align_geometry_to_edge(bm, post, loop.edge)
+
+    last_loop = None
+    for loop in loops:
+        if loop_is_last(loop):
+            last_loop = loop
+        post_at_loop(loop)
+    if last_loop:
+        post_at_loop(last_loop.link_loop_next)
 
 
 def make_fill(bm, loops, prop):
