@@ -70,13 +70,14 @@ def create_multidoor_frame(bm, face, prop):
     """
     normal = face.normal.copy()
 
-    door_faces, frame_faces = make_multidoor_insets(bm, face, prop.size_offset.size, prop.frame_thickness, prop.door_count)
+    door_faces, frame_faces = make_multidoor_insets(bm, face, prop.size_offset.size, prop.frame_thickness, prop.components)
     arch_face = None
 
     if prop.add_arch:
-        if prop.door_count == 1:
+        door_count = get_door_count(prop.components)
+        if door_count == 1:
             frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
-        top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=prop.door_count+1) for e in f.edges}, n=prop.door_count+1)
+        top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=door_count+1) for e in f.edges}, n=door_count+1)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
         arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
@@ -91,19 +92,25 @@ def create_multidoor_frame(bm, face, prop):
     return door_faces, arch_face
 
 
-def make_multidoor_insets(bm, face, size, frame_thickness, door_count):
+def make_multidoor_insets(bm, face, size, frame_thickness, components):
     if frame_thickness > 0:
+        door_count = get_door_count(components)
         door_width = (size.x - frame_thickness * (door_count + 1)) / door_count
         _, face_height = calc_face_dimensions(face)
         door_height = face_height - frame_thickness
         # vertical frame
         h_widths = [frame_thickness, door_width] * door_count + [frame_thickness]
         h_faces = subdivide_face_horizontally(bm, face, h_widths)
-        # horizontal frame
+        # horizontal frames
         v_widths = [door_height, frame_thickness]
         v_faces = [f for h_face in h_faces[1::2] for f in subdivide_face_vertically(bm, h_face, v_widths)]
         return v_faces[::2], h_faces[::2] + v_faces[1::2]
     else:
+        door_count = get_door_count(components)
         door_width = size.x / door_count
         widths = [door_width] * door_count
         return subdivide_face_horizontally(bm, face, widths), []
+
+
+def get_door_count(components):
+    return len(components)

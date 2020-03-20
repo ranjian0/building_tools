@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty, StringProperty
 
 from ..generic import ArchProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
@@ -27,10 +27,6 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         name="Door Depth", min=0.0, max=0.5, default=0.05, description="Depth of door"
     )
 
-    door_count: IntProperty(
-        name="Door Count", min=1, max=100, default=1, description="Number of doors"
-    )
-
     count: IntProperty(
         name="Count",
         min=1,
@@ -45,6 +41,11 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         description="Add arch over door/window",
     )
 
+    components: StringProperty(
+        name="Components",
+        default="dd",
+        description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows"
+    )
 
     fill_items = [
         ("NONE", "None", "", 0),
@@ -52,6 +53,7 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         ("GLASS_PANES", "Glass_Panes", "", 2),
         ("LOUVER", "Louver", "", 3),
     ]
+
     fill_type: EnumProperty(
         name="Fill Type",
         items=fill_items,
@@ -82,8 +84,8 @@ class MultidoorProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        row = col.row(align=True)
-        row.prop(self, "door_count")
+        col.prop(self, "components")
+        col = box.column(align=True)
         row = col.row(align=True)
         row.prop(self, "door_depth")
         row = col.row(align=True)
