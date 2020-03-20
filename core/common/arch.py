@@ -8,6 +8,7 @@ from ...utils import (
     FaceMap,
     local_xyz,
     arc_edge,
+    get_bottom_faces,
 )
 
 
@@ -38,9 +39,11 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
     arch_frame_faces = bmesh.ops.bridge_loops(bm, edges=arc_edges)["faces"]
     arch_face = min(lower_arc[arch_prop.resolution//2].link_faces, key=lambda f: f.calc_center_median().z)
     
-    if len(verts) == 4:
+    if len(verts) == 4: # corner case
         verts = sort_verts([v for e in top_edges for v in e.verts], xyz[0])
-        bmesh.ops.connect_verts(bm, verts=[verts[1],verts[-2]])['edges'].pop(),
+        new_edge = bmesh.ops.connect_verts(bm, verts=[verts[1],verts[-2]])['edges'].pop()
+        new_face = get_bottom_faces(new_edge.link_faces).pop()
+        arch_frame_faces.append(new_face)
     
     return arch_face, arch_frame_faces
 

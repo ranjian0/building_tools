@@ -18,6 +18,7 @@ from ...utils import (
     map_new_faces,
     add_faces_to_map,
     calc_face_dimensions,
+    get_top_faces,
     get_bottom_faces,
     get_top_edges,
     subdivide_face_horizontally,
@@ -73,6 +74,8 @@ def create_multidoor_frame(bm, face, prop):
     arch_face = None
 
     if prop.has_arch():
+        if prop.door_count == 1:
+            frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=prop.door_count+1) for e in f.edges}, n=prop.door_count+1)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces

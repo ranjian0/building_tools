@@ -28,7 +28,7 @@ class MultidoorProperty(bpy.types.PropertyGroup):
     )
 
     door_count: IntProperty(
-        name="Door Count", min=2, max=100, default=2, description="Number of doors"
+        name="Door Count", min=1, max=100, default=1, description="Number of doors"
     )
 
     fill_items = [
