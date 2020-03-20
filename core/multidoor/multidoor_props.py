@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty
 
-from ..generic import ArchProperty, ArrayProperty, SizeOffsetProperty
+from ..generic import ArchProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 
 
@@ -31,6 +31,21 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         name="Door Count", min=1, max=100, default=1, description="Number of doors"
     )
 
+    count: IntProperty(
+        name="Count",
+        min=1,
+        max=100,
+        default=1,
+        description="Number of elements"
+    )
+
+    add_arch: BoolProperty(
+        name="Add Arch",
+        default=False,
+        description="Add arch over door/window",
+    )
+
+
     fill_items = [
         ("NONE", "None", "", 0),
         ("PANELS", "Panels", "", 1),
@@ -45,7 +60,6 @@ class MultidoorProperty(bpy.types.PropertyGroup):
     )
 
     arch: PointerProperty(type=ArchProperty)
-    array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     double_door: BoolProperty(
@@ -58,32 +72,39 @@ class MultidoorProperty(bpy.types.PropertyGroup):
     glass_fill: PointerProperty(type=FillGlassPanes)
     louver_fill: PointerProperty(type=FillLouver)
 
-    def has_arch(self):
-        return self.arch.resolution > 0
-
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.array.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
+        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
 
     def draw(self, context, layout):
-        self.size_offset.draw(context, layout)
-        self.array.draw(context, layout)
-        self.arch.draw(context, layout)
+        box = layout.box()
+        self.size_offset.draw(context, box)
 
-        
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "door_count")
-        col = box.column(align=True)
-        col.prop(self, "door_depth")
+        row = col.row(align=True)
+        row.prop(self, "door_count")
+        row = col.row(align=True)
+        row.prop(self, "door_depth")
         row = col.row(align=True)
         row.prop(self, "frame_thickness")
         row.prop(self, "frame_depth")
-        row = col.row(align=True)
-        row.prop(self, "double_door")
 
-        row = layout.row()
-        row.prop_menu_enum(self, "fill_type")
+        col = box.column(align=True)
+        col.prop(self, "count")
+
+        col = box.column(align=True)
+        col.prop(self, "double_door")
+
+        box = layout.box()
+        col = box.column(align=True)
+        col.prop(self, "add_arch")
+        if self.add_arch:
+            self.arch.draw(context, box)
+
+        box = layout.box()
+        col = box.column(align=True)
+        col.prop_menu_enum(self, "fill_type")
 
         # -- draw fill types
         fill_map = {
@@ -93,4 +114,4 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         }
         fill = fill_map.get(self.fill_type)
         if fill:
-            fill.draw(layout)
+            fill.draw(box)

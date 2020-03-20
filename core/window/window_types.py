@@ -35,7 +35,7 @@ def create_window(bm, faces, prop):
 
         face.select = False
 
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.array.count)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
             face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
             window, arch = create_window_frame(bm, face, prop)
@@ -69,12 +69,12 @@ def create_window_frame(bm, face, prop):
     window_face, frame_faces = make_window_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
     arch_face = None
 
-    if prop.has_arch():
+    if prop.add_arch:
         frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=3)[1:] for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
-        arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
+        arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
 
     window_face = add_window_depth(bm, window_face, prop.window_depth, normal)
 

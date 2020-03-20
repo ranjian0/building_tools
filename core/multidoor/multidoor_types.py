@@ -38,7 +38,7 @@ def create_multidoor(bm, faces, prop):
     
         face.select = False
 
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.array.count)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
             face = create_multidoor_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
             doors, arch = create_multidoor_frame(bm, face, prop)
@@ -73,13 +73,13 @@ def create_multidoor_frame(bm, face, prop):
     door_faces, frame_faces = make_multidoor_insets(bm, face, prop.size_offset.size, prop.frame_thickness, prop.door_count)
     arch_face = None
 
-    if prop.has_arch():
+    if prop.add_arch:
         if prop.door_count == 1:
             frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=prop.door_count+1) for e in f.edges}, n=prop.door_count+1)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
-        arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
+        arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
 
     door_faces = [add_door_depth(bm, door, prop.door_depth, normal) for door in door_faces]
 
