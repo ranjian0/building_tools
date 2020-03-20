@@ -22,6 +22,7 @@ from ...utils import (
     get_top_edges,
     subdivide_face_horizontally,
     subdivide_face_vertically,
+    local_xyz,
 )
 
 
@@ -73,7 +74,7 @@ def create_multidoor_frame(bm, face, prop):
 
     if prop.has_arch():
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
-        arch_face, arch_frame_faces = create_arch(bm, face, top_edges, frame_faces, prop.arch, prop.frame_thickness)
+        arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
         arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
 

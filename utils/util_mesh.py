@@ -273,18 +273,17 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
     return new_verts
 
 
-def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
+def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     """ Subdivide the given edge and offset vertices to form an arc
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)
-    normal = edge_vector(edge).cross(Vector((0, 0, 1)))
 
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
-    verts = list(
-        {v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}
-    )
-    verts.sort(key=lambda v: v.co.x if normal.y else v.co.y)
+    verts = sort_verts(
+        list({v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}),
+        xyz[0]
+    ) 
     theta = math.pi / (len(verts) - 1)
 
     def arc_sine(verts):
@@ -294,11 +293,8 @@ def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
             angle = math.pi - (theta * idx)
+            v.co = median + xyz[0] * math.cos(angle) * length/2 
             v.co.z += math.sin(angle) * height
-            if normal.y:
-                v.co.x = median.x + math.cos(angle) * length / 2
-            else:
-                v.co.y = median.y + math.cos(angle) * length / 2
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
     return ret

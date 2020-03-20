@@ -19,17 +19,17 @@ def fill_arch(bm, face, prop):
         pane_arch_face(bm, face, prop.glass_fill)
 
 
-def create_arch(bm, face, top_edges, frame_faces, arch_prop, frame_thickness):
+def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
     """ Create arch using top edges of extreme frames
     """
-    verts = sort_verts([v for e in top_edges for v in e.verts], local_xyz(face)[1])
+    verts = sort_verts([v for e in top_edges for v in e.verts], xyz[1])
     arc_edges = [
         bmesh.ops.connect_verts(bm, verts=[verts[0],verts[3]])['edges'].pop(),
         bmesh.ops.connect_verts(bm, verts=[verts[1],verts[2]])['edges'].pop(),
     ]
 
-    upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, arch_prop.offset, arch_prop.function)["geom_split"], BMEdge)
-    lower_arc = filter_geom(arc_edge(bm, arc_edges[1], arch_prop.resolution, arch_prop.height-frame_thickness, arch_prop.offset, arch_prop.function)["geom_split"], BMEdge)
+    upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, arch_prop.offset, xyz, arch_prop.function)["geom_split"], BMEdge)
+    lower_arc = filter_geom(arc_edge(bm, arc_edges[1], arch_prop.resolution, arch_prop.height-frame_thickness, arch_prop.offset, xyz, arch_prop.function)["geom_split"], BMEdge)
     arc_edges = [
         *upper_arc,
         *lower_arc,
