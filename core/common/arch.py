@@ -22,10 +22,10 @@ def fill_arch(bm, face, prop):
 def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
     """ Create arch using top edges of extreme frames
     """
-    verts = sort_verts([v for e in top_edges for v in e.verts], xyz[1])
+    verts = sort_verts([v for e in top_edges for v in e.verts], xyz[0])
     arc_edges = [
-        bmesh.ops.connect_verts(bm, verts=[verts[0],verts[3]])['edges'].pop(),
-        bmesh.ops.connect_verts(bm, verts=[verts[1],verts[2]])['edges'].pop(),
+        bmesh.ops.connect_verts(bm, verts=[verts[0],verts[-1]])['edges'].pop(),
+        bmesh.ops.connect_verts(bm, verts=[verts[1],verts[-2]])['edges'].pop(),
     ]
 
     upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, arch_prop.offset, xyz, arch_prop.function)["geom_split"], BMEdge)
@@ -37,6 +37,11 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
 
     arch_frame_faces = bmesh.ops.bridge_loops(bm, edges=arc_edges)["faces"]
     arch_face = min(lower_arc[arch_prop.resolution//2].link_faces, key=lambda f: f.calc_center_median().z)
+    
+    if len(verts) == 4:
+        verts = sort_verts([v for e in top_edges for v in e.verts], xyz[0])
+        bmesh.ops.connect_verts(bm, verts=[verts[1],verts[-2]])['edges'].pop(),
+    
     return arch_face, arch_frame_faces
 
 

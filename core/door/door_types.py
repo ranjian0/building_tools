@@ -22,6 +22,7 @@ from ...utils import (
     subdivide_face_horizontally,
     subdivide_face_vertically,
     get_top_edges,
+    get_top_faces,
     get_bottom_faces,
     local_xyz,
 )
@@ -72,6 +73,7 @@ def create_door_frame(bm, face, prop):
     arch_face = None
 
     if prop.has_arch():
+        frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
