@@ -50,7 +50,7 @@ def pane_arch_face(bm, face, prop):
     )
 
 
-def arch_add_depth(bm, arch_face, depth, normal):
+def add_arch_depth(bm, arch_face, depth, normal):
     """ Add depth to arch face
     """
     if depth != 0:

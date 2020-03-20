@@ -1,23 +1,26 @@
 import bmesh
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
+from ..common.frame import (
+    add_frame_depth,
+)
+from ..common.arch import (
+    fill_arch,
+    create_arch,
+    add_arch_depth,
+)
 from ...utils import (
     FaceMap,
     is_ngon,
-    arc_edge,
-    filter_geom,
     popup_message,
     map_new_faces,
     add_faces_to_map,
-    calc_edge_median,
     add_facemap_for_groups,
-    create_cube_without_faces,
-    inset_face_with_scale_offset,
-    subdivide_face_edges_vertical,
     calc_face_dimensions,
-    local_to_global
+    subdivide_face_horizontally,
+    subdivide_face_vertically,
+    get_top_edges,
+    get_bottom_faces,
 )
-
-from mathutils import Vector
 
 
 def create_window(bm, faces, prop):
@@ -28,153 +31,93 @@ def create_window(bm, faces, prop):
             popup_message("Window creation not supported for n-gon", "Ngon Error")
             return False
 
-        array_faces = create_window_array(bm, face, prop.array)
-        for aface in array_faces:
-            face = create_window_split(bm, aface, prop.size_offset)
-            if not face:
-                continue
+        face.select = False
 
-            face = create_window_frame(bm, face, prop)
-            create_window_fill(bm, face, prop)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.array.count)
+        for aface in array_faces:
+            face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            window, arch = create_window_frame(bm, face, prop)
+            fill_window_face(bm, window, prop)
+            fill_arch(bm, arch, prop)
     return True
 
 
 @map_new_faces(FaceMap.WALLS)
-def create_window_split(bm, face, prop):
+def create_window_split(bm, face, size, offset):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     wall_w, wall_h = calc_face_dimensions(face)
-    scale_x = prop.size.x / wall_w
-    scale_y = prop.size.y / wall_h
-    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
-    return inset_face_with_scale_offset(
-        bm, face, scale_y, scale_x, offset.x, offset.y, offset.z
-    )
+    # horizontal split
+    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_faces = subdivide_face_horizontally(bm, face, h_widths)
+    # vertical split
+    v_width = [wall_h/2 - offset.y - size.y/2, size.y, wall_h/2 + offset.y - size.y/2]
+    v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
-
-def create_window_array(bm, face, prop):
-    """Use ArrayProperty to subdivide face vertically
-    """
-    if prop.count <= 1:
-        return [face]
-    res = subdivide_face_edges_vertical(bm, face, prop.count - 1)
-    inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
-    return list({f for e in inner_edges for f in e.link_faces})
+    return v_faces[1]
 
 
 @map_new_faces(FaceMap.WINDOW_FRAMES, skip=FaceMap.WINDOW)
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
+
+    normal = face.normal.copy()
+
+    window_face, frame_faces = make_window_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
+    arch_face = None
+
     if prop.has_arch():
-        return create_window_frame_arched(bm, face, prop)
+        top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=3)[1:] for e in f.edges}, n=2)
+        arch_face, arch_frame_faces = create_arch(bm, face, top_edges, frame_faces, prop.arch, prop.frame_thickness)
+        frame_faces += arch_frame_faces
+        arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
 
-    faces = None
-    normal = face.normal.copy()
-    if prop.frame_thickness > 0.0:
-        res = bmesh.ops.inset_individual(
-            bm, faces=[face], thickness=prop.frame_thickness, use_even_offset=True
-        )
-        faces = res.get("faces")
+    window_face = add_window_depth(bm, window_face, prop.window_depth, normal)
 
-    if prop.window_depth > 0.0:
-        face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
-        bmesh.ops.translate(bm, verts=face.verts, vec=-normal * prop.window_depth)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    if frame_faces:
+        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
-    if faces and prop.frame_depth > 0.0:
-        geom = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
-        verts = filter_geom(geom, bmesh.types.BMVert)
-        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
-
-    add_faces_to_map(bm, [face], FaceMap.WINDOW)
-    return face
+    add_faces_to_map(bm, [window_face], FaceMap.WINDOW)
+    return window_face, arch_face
 
 
-def create_window_frame_arched(bm, face, prop):
-    """ Arch the top edge of face then extrude and make window frame
+def add_window_depth(bm, window, depth, normal):
+    if depth > 0.0:
+        window = bmesh.ops.extrude_discrete_faces(bm, faces=[window]).get("faces").pop()
+        bmesh.ops.translate(bm, verts=window.verts, vec=-normal * depth)
+        return window
+    else:
+        return window
+
+
+def make_window_inset(bm, face, size, frame_thickness):
+    """ Make two horizontal cuts and two vertical cuts
     """
-    arch = prop.arch
-    top = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
-    arc_edge(bm, top, arch.resolution, arch.height, arch.offset, arch.function)
-
-    frame_faces = []
-    normal = face.normal.copy()
-    if prop.frame_thickness > 0.0:
-        res = bmesh.ops.inset_individual(
-            bm, faces=[face], thickness=prop.frame_thickness, use_even_offset=True
-        )
-        frame_faces = res.get("faces")
-
-    verts = sorted(face.verts, key=lambda v: v.co.z)
-    edge = bmesh.ops.connect_verts(bm, verts=verts[2:4]).get("edges").pop()
-
-    fcs = extrude_window_and_frame_depth(bm, edge.link_faces, frame_faces, normal, prop)
-    if fcs:
-        add_faces_to_map(bm, fcs, FaceMap.WINDOW)
-        return sorted(fcs, key=lambda f: f.calc_center_median().z)[0]
-    return min(edge.link_faces, key=lambda f: f.calc_center_median().z)
+    if frame_thickness > 0:
+        window_width = size.x - frame_thickness * 2
+        window_height = size.y - frame_thickness * 2
+        # horizontal cuts
+        h_widths = [frame_thickness, window_width, frame_thickness]
+        h_faces = subdivide_face_horizontally(bm, face, h_widths)
+        # vertical cuts
+        v_widths = [frame_thickness, window_height, frame_thickness]
+        v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
+        return v_faces[1], h_faces[::2] + v_faces[::2]
+    else:
+        return face, []
 
 
-def create_window_fill(bm, face, prop):
+def fill_window_face(bm, face, prop):
     """Create extra elements on face
     """
-
     if prop.fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.WINDOW_PANES)
-        if prop.has_arch():
-            pane_arch_face(bm, face, prop.glass_fill)
         fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.WINDOW)
     elif prop.fill_type == "BAR":
         add_facemap_for_groups(FaceMap.WINDOW_BARS)
         fill_bar(bm, face, prop.bar_fill)
-        if prop.has_arch():
-            add_extra_arch_bar(bm, face, prop.bar_fill)
     elif prop.fill_type == "LOUVER":
         add_facemap_for_groups(FaceMap.WINDOW_LOUVERS)
         fill_louver(bm, face, prop.louver_fill, user=FillUser.WINDOW)
-
-
-def extrude_window_and_frame_depth(bm, window_faces, frame_faces, normal, prop):
-    faces = None
-    if prop.window_depth > 0.0:
-        res = bmesh.ops.extrude_face_region(bm, geom=window_faces).get("geom")
-        bmesh.ops.delete(bm, geom=window_faces, context="FACES")
-        faces = filter_geom(res, bmesh.types.BMFace)
-        verts = list({v for f in faces for v in f.verts})
-        bmesh.ops.translate(bm, verts=verts, vec=-normal * prop.window_depth)
-
-    if frame_faces and prop.frame_depth > 0.0:
-        geom = bmesh.ops.extrude_face_region(bm, geom=frame_faces).get("geom")
-        verts = filter_geom(geom, bmesh.types.BMVert)
-        bmesh.ops.translate(bm, verts=verts, vec=normal * prop.frame_depth)
-
-    return faces
-
-
-@map_new_faces(FaceMap.WINDOW_BARS)
-def add_extra_arch_bar(bm, face, prop):
-    top_edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
-    bar_pos = calc_edge_median(top_edge) + (face.normal * prop.bar_depth / 4)
-    if face.normal.y:
-        bar_size = (top_edge.calc_length(), prop.bar_depth / 2, prop.bar_width)
-        back_face = "back" if face.normal.y > 0 else "front"
-        face_flags = {"left": True, "right": True, back_face: True}
-    else:
-        bar_size = (prop.bar_depth / 2, top_edge.calc_length(), prop.bar_width)
-        back_face = "right" if face.normal.x > 0 else "left"
-        face_flags = {"front": True, "back": True, back_face: True}
-
-    create_cube_without_faces(bm, bar_size, bar_pos, **face_flags)
-
-
-@map_new_faces(FaceMap.WINDOW_PANES)
-def pane_arch_face(bm, face, prop):
-    edge = sorted(face.edges, key=lambda ed: calc_edge_median(ed).z).pop()
-    arch_face = sorted(edge.link_faces, key=lambda f: f.calc_center_median().z).pop()
-    add_faces_to_map(bm, [arch_face], FaceMap.WINDOW)
-    bmesh.ops.inset_individual(
-        bm, faces=[arch_face], thickness=prop.pane_margin * 0.75, use_even_offset=True
-    )
-    bmesh.ops.translate(
-        bm, verts=arch_face.verts, vec=-arch_face.normal * prop.pane_depth
-    )

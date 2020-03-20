@@ -1,11 +1,11 @@
 import bmesh
 from ..common.frame import (
-    frame_add_depth,
+    add_frame_depth,
 )
 from ..common.arch import (
     fill_arch,
     create_arch,
-    arch_add_depth,
+    add_arch_depth,
 )
 from ..door.door_types import (
     add_door_depth,
@@ -75,13 +75,13 @@ def create_multidoor_frame(bm, face, prop):
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, face, top_edges, frame_faces, prop.arch, prop.frame_thickness)
         frame_faces += arch_frame_faces
-        arch_face = arch_add_depth(bm, arch_face, prop.arch.offset, normal)
+        arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
 
     door_faces = [add_door_depth(bm, door, prop.door_depth, normal) for door in door_faces]
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if frame_faces:
-        frame_add_depth(bm, frame_faces, prop.frame_depth, normal)
+        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
     add_faces_to_map(bm, door_faces, FaceMap.DOOR)
     return door_faces, arch_face

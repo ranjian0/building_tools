@@ -2,12 +2,12 @@ import bmesh
 from bmesh.types import BMEdge
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
 from ..common.frame import (
-    frame_add_depth,
+    add_frame_depth,
 )
 from ..common.arch import (
     fill_arch,
     create_arch,
-    arch_add_depth,
+    add_arch_depth,
 )
 from ...utils import (
     is_ngon,
@@ -74,13 +74,13 @@ def create_door_frame(bm, face, prop):
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, face, top_edges, frame_faces, prop.arch, prop.frame_thickness)
         frame_faces += arch_frame_faces
-        arch_face = arch_add_depth(bm, arch_face, prop.arch.offset, normal)
+        arch_face = add_arch_depth(bm, arch_face, prop.arch.offset, normal)
 
     door_face = add_door_depth(bm, door_face, prop.door_depth, normal)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     if frame_faces:
-        frame_add_depth(bm, frame_faces, prop.frame_depth, normal)
+        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
     add_faces_to_map(bm, [door_face], FaceMap.DOOR)
     return door_face, arch_face
@@ -127,13 +127,13 @@ def make_door_inset(bm, face, size, frame_thickness):
     """ Make one horizontal cut and two vertical cuts on face
     """
     if frame_thickness > 0:
-        door_width = (size.x - frame_thickness * 2)
+        door_width = size.x - frame_thickness * 2
         _, face_height = calc_face_dimensions(face)
         door_height = face_height - frame_thickness
-        # vertical frame
+        # horizontal cuts
         h_widths = [frame_thickness, door_width, frame_thickness]
         h_faces = subdivide_face_horizontally(bm, face, h_widths)
-        # horizontal frame
+        # vertical cuts
         v_widths = [door_height, frame_thickness]
         v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
         return v_faces[0], h_faces[::2] + [v_faces[1]]

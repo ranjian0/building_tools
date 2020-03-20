@@ -4,7 +4,7 @@ from ...utils import (
 )
 
 
-def frame_add_depth(bm, frame_faces, depth, normal):
+def add_frame_depth(bm, frame_faces, depth, normal):
     """ Add depth to frame
     """
     if depth > 0.0:
