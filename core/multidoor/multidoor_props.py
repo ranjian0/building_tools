@@ -23,8 +23,8 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         description="Depth of door Frame",
     )
 
-    door_depth: FloatProperty(
-        name="Door Depth", min=0.0, max=0.5, default=0.05, description="Depth of door"
+    dw_depth: FloatProperty(
+        name="Door/Window Depth", min=0.0, max=0.5, default=0.05, description="Depth of door/window"
     )
 
     count: IntProperty(
@@ -43,7 +43,7 @@ class MultidoorProperty(bpy.types.PropertyGroup):
 
     components: StringProperty(
         name="Components",
-        default="dd",
+        default="dw",
         description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows"
     )
 
@@ -87,7 +87,7 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         col.prop(self, "components")
         col = box.column(align=True)
         row = col.row(align=True)
-        row.prop(self, "door_depth")
+        row.prop(self, "dw_depth")
         row = col.row(align=True)
         row.prop(self, "frame_thickness")
         row.prop(self, "frame_depth")

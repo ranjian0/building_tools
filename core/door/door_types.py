@@ -43,7 +43,8 @@ def create_door(bm, faces, prop):
             face = create_door_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
             door, arch = create_door_frame(bm, face, prop)
             create_door_fill(bm, door, prop)
-            fill_arch(bm, arch, prop)
+            if prop.add_arch:
+                fill_arch(bm, arch, prop)
     return True
 
 

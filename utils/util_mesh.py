@@ -406,7 +406,7 @@ def get_selected_face_dimensions(context):
 
 
 def get_top_edges(edges, n=1):
-    return sort_edges(edges, Vector((0, 0, 1)))[-n:]
+    return sort_edges(edges, Vector((0, 0, -1)))[:n]
 
 
 def get_bottom_edges(edges, n=1):
@@ -414,17 +414,20 @@ def get_bottom_edges(edges, n=1):
 
 
 def get_top_faces(faces, n=1):
-    return sort_faces(faces, Vector((0, 0, 1)))[-n:]
+    return sort_faces(faces, Vector((0, 0, -1)))[:n]
 
 
 def get_bottom_faces(faces, n=1):
     return sort_faces(faces, Vector((0, 0, 1)))[:n]
 
+
 def sort_faces(faces, direction):
     return sorted(faces, key=lambda f: direction.dot(f.calc_center_median()))
 
+
 def sort_edges(edges, direction):
     return sorted(edges, key=lambda e: direction.dot(calc_edge_median(e)))
+
 
 def sort_verts(verts, direction):
     return sorted(verts, key=lambda v: direction.dot(v.co))

@@ -40,7 +40,8 @@ def create_window(bm, faces, prop):
             face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
             window, arch = create_window_frame(bm, face, prop)
             fill_window_face(bm, window, prop)
-            fill_arch(bm, arch, prop)
+            if prop.add_arch:
+                fill_arch(bm, arch, prop)
     return True
 
 

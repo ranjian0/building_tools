@@ -66,4 +66,3 @@ def add_arch_depth(bm, arch_face, depth, normal):
         verts = [v for v in arch_face.verts]
         bmesh.ops.translate(bm, verts=verts, vec=-normal * depth)
         return arch_face
-
