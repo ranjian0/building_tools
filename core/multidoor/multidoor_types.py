@@ -64,7 +64,7 @@ def create_multidoor_split(bm, face, size, offset):
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 - offset.y + size.y/2, wall_h/2 + offset.y - size.y/2]
+    v_width = [wall_h/2 + offset.y + size.y/2, wall_h/2 - offset.y - size.y/2]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[0]
