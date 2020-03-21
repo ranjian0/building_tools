@@ -10,7 +10,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         name="Frame Thickness",
         min=0.0,
         max=1.0,
-        default=0.15,
+        default=0.1,
         description="Thickness of window Frame",
     )
 
