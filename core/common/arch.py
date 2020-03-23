@@ -36,6 +36,9 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
         *lower_arc,
     ]
 
+    arc_face = min(upper_arc[arch_prop.resolution//2].link_faces, key=lambda f: f.calc_center_median().z)
+    bmesh.ops.delete(bm, geom=[arc_face], context="FACES")
+
     arch_frame_faces = bmesh.ops.bridge_loops(bm, edges=arc_edges)["faces"]
     arch_face = min(lower_arc[arch_prop.resolution//2].link_faces, key=lambda f: f.calc_center_median().z)
     
@@ -61,8 +64,7 @@ def pane_arch_face(bm, face, prop):
 def add_arch_depth(bm, arch_face, depth, normal):
     """ Add depth to arch face
     """
-    if depth != 0:
+    if depth > 0.0:
         arch_face = bmesh.ops.extrude_discrete_faces(bm, faces=[arch_face]).get("faces").pop()
-        verts = [v for v in arch_face.verts]
-        bmesh.ops.translate(bm, verts=verts, vec=-normal * depth)
+        bmesh.ops.translate(bm, verts=arch_face.verts, vec=-normal * depth)
         return arch_face
