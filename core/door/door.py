@@ -20,7 +20,7 @@ class Door:
 
     @classmethod
     def add_door_facemaps(cls):
-        groups = FaceMap.DOOR, FaceMap.DOOR_FRAMES
+        groups = FaceMap.DOOR, FaceMap.FRAME
         add_facemap_for_groups(groups)
 
     @classmethod

@@ -22,6 +22,7 @@ from ...utils import (
     get_top_faces,
     get_bottom_faces,
     local_xyz,
+    extrude_face_region,
 )
 
 
@@ -60,7 +61,6 @@ def create_window_split(bm, face, size, offset):
     return v_faces[1]
 
 
-@map_new_faces(FaceMap.WINDOW_FRAMES, skip=FaceMap.WINDOW)
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
@@ -70,30 +70,42 @@ def create_window_frame(bm, face, prop):
     window_face, frame_faces = make_window_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
     arch_face = None
 
+    # create arch
     if prop.add_arch:
         frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=3)[1:] for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
-        arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
-
-    window_face = add_window_depth(bm, window_face, prop.window_depth, normal)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if frame_faces:
-        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
+    # add depths
+    if frame_faces:
+        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+        frame_faces = frame_front_faces + frame_side_faces
+
+    if prop.add_arch:
+        arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
+        frame_faces += new_frame_faces
+
+    window_face, new_frame_faces = add_window_depth(bm, window_face, prop.window_depth, normal)
+    frame_faces += new_frame_faces
+
+    # add face maps
     add_faces_to_map(bm, [window_face], FaceMap.WINDOW)
+    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    if prop.add_arch:
+        add_faces_to_map(bm, [arch_face], FaceMap.WINDOW)
+
     return window_face, arch_face
 
 
 def add_window_depth(bm, window, depth, normal):
     if depth > 0.0:
-        window = bmesh.ops.extrude_discrete_faces(bm, faces=[window]).get("faces").pop()
-        bmesh.ops.translate(bm, verts=window.verts, vec=-normal * depth)
-        return window
+        window_faces, frame_faces = extrude_face_region(bm, [window], -depth, normal)
+        return window_faces[0], frame_faces
     else:
-        return window
+        return window, []
 
 
 def make_window_inset(bm, face, size, frame_thickness):

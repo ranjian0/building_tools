@@ -19,7 +19,7 @@ class Window:
 
     @classmethod
     def add_window_facemaps(cls):
-        groups = FaceMap.WINDOW, FaceMap.WINDOW_FRAMES
+        groups = FaceMap.WINDOW, FaceMap.FRAME
         add_facemap_for_groups(groups)
 
     @classmethod

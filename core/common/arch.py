@@ -9,6 +9,7 @@ from ...utils import (
     local_xyz,
     arc_edge,
     get_bottom_faces,
+    extrude_face_region,
 )
 
 
@@ -65,6 +66,7 @@ def add_arch_depth(bm, arch_face, depth, normal):
     """ Add depth to arch face
     """
     if depth > 0.0:
-        arch_face = bmesh.ops.extrude_discrete_faces(bm, faces=[arch_face]).get("faces").pop()
-        bmesh.ops.translate(bm, verts=arch_face.verts, vec=-normal * depth)
-        return arch_face
+        arch_faces, frame_faces = extrude_face_region(bm, [arch_face], -depth, normal)
+        return arch_faces[0], frame_faces
+    else:
+        return arch_face, []

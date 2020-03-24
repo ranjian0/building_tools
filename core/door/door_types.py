@@ -25,6 +25,7 @@ from ...utils import (
     get_top_faces,
     get_bottom_faces,
     local_xyz,
+    extrude_face_region,
 )
 
 
@@ -64,7 +65,6 @@ def create_door_split(bm, face, size, offset):
     return v_faces[0]
 
 
-@map_new_faces(FaceMap.DOOR_FRAMES, skip=FaceMap.DOOR)
 def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
@@ -73,30 +73,42 @@ def create_door_frame(bm, face, prop):
     door_face, frame_faces = make_door_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
     arch_face = None
 
+    # create arch
     if prop.add_arch:
         frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
-        arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
-
-    door_face = add_door_depth(bm, door_face, prop.door_depth, normal)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if frame_faces:
-        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
+    # add depths
+    if frame_faces:
+        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+        frame_faces = frame_front_faces + frame_side_faces
+    
+    if prop.add_arch:
+        arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
+        frame_faces += new_frame_faces
+
+    door_face, new_frame_faces = add_door_depth(bm, door_face, prop.door_depth, normal)
+    frame_faces += new_frame_faces
+
+    # add face maps
     add_faces_to_map(bm, [door_face], FaceMap.DOOR)
+    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    if prop.add_arch:
+        add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
+
     return door_face, arch_face
 
 
 def add_door_depth(bm, door, depth, normal):
     if depth > 0.0:
-        door = bmesh.ops.extrude_discrete_faces(bm, faces=[door]).get("faces").pop()
-        bmesh.ops.translate(bm, verts=door.verts, vec=-normal * depth)
-        return door
+        door_faces, frame_faces = extrude_face_region(bm, [door], -depth, normal)
+        return door_faces[0], frame_faces
     else:
-        return door
+        return door, []
 
 
 

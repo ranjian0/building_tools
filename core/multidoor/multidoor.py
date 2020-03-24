@@ -20,7 +20,7 @@ class Multidoor:
 
     @classmethod
     def add_multidoor_facemaps(cls):
-        groups = FaceMap.DOOR, FaceMap.DOOR_FRAMES
+        groups = FaceMap.DOOR, FaceMap.WINDOW, FaceMap.FRAME
         add_facemap_for_groups(groups)
 
     @classmethod

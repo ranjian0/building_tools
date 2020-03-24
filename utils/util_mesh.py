@@ -4,7 +4,7 @@ import bmesh
 import operator
 import functools as ft
 from mathutils import Matrix, Vector
-from bmesh.types import BMVert, BMEdge
+from bmesh.types import BMVert, BMEdge, BMFace
 from .util_common import local_xyz
 
 
@@ -312,6 +312,20 @@ def extrude_face_and_delete_bottom(bm, face, extrude_depth):
     hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
     bmesh.ops.delete(bm, geom=[hidden], context="FACES")
     return f
+
+
+def extrude_face_region(bm, faces, depth, normal):
+    """extrude a face and delete redundant faces
+    """
+    geom = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
+    verts = filter_geom(geom, BMVert)
+    bmesh.ops.translate(bm, verts=verts, vec=normal * depth)
+
+    bmesh.ops.delete(bm, geom=faces, context="FACES")  # remove redundant faces
+
+    extruded_faces = filter_geom(geom, BMFace)
+    surrounding_faces = list({f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces})
+    return extruded_faces, surrounding_faces
 
 
 def move_slab_splitface_to_wall(bm, face):

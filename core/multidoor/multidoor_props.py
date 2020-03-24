@@ -90,8 +90,8 @@ class MultidoorProperty(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "dw_depth")
         row = col.row(align=True)
-        row.prop(self, "frame_thickness")
         row.prop(self, "frame_depth")
+        row.prop(self, "frame_thickness")
 
         col = box.column(align=True)
         col.prop(self, "count")

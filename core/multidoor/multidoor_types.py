@@ -70,7 +70,6 @@ def create_multidoor_split(bm, face, size, offset):
     return v_faces[0]
 
 
-@map_new_faces(FaceMap.DOOR_FRAMES, skip=FaceMap.DOOR)
 def create_multidoor_frame(bm, face, prop):
     """ Extrude and inset face to make multidoor frame
     """
@@ -80,6 +79,7 @@ def create_multidoor_frame(bm, face, prop):
     door_faces, window_faces, frame_faces = make_multidoor_insets(bm, face, prop.size_offset.size, prop.frame_thickness, dws)
     arch_face = None
 
+    # create arch
     if prop.add_arch:
         dw_count = count(dws)
         top_edges = get_top_edges({e for f in get_top_faces(frame_faces, n=2*dw_count+1)[-dw_count-1:] for e in f.edges}, n=dw_count+1)
@@ -87,17 +87,52 @@ def create_multidoor_frame(bm, face, prop):
             frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
         arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
         frame_faces += arch_frame_faces
-        arch_face = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
-
-    door_faces = [add_door_depth(bm, door, prop.dw_depth, normal) for door in door_faces]
-    window_faces = [add_window_depth(bm, window, prop.dw_depth, normal) for window in window_faces]
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    if frame_faces:
-        add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
 
+    # add depths
+    if frame_faces:
+        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+        frame_faces = frame_front_faces + frame_side_faces
+
+    if prop.add_arch:
+        arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
+        frame_faces += new_frame_faces
+
+    door_faces, new_frame_faces = add_multi_door_depth(bm, door_faces, prop.dw_depth, normal)
+    frame_faces += new_frame_faces
+    window_faces, new_frame_faces = add_multi_window_depth(bm, window_faces, prop.dw_depth, normal)
+    frame_faces += new_frame_faces
+
+    # add face maps
     add_faces_to_map(bm, door_faces, FaceMap.DOOR)
+    add_faces_to_map(bm, window_faces, FaceMap.WINDOW)
+    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    if prop.add_arch:
+        add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
+
     return door_faces, window_faces, arch_face
+
+
+def add_multi_door_depth(bm, door_faces, depth, normal):
+    new_door_faces = []
+    new_frame_faces = []
+    for door in door_faces:
+        df, ff = add_door_depth(bm, door, depth, normal)
+        new_door_faces.append(df)
+        new_frame_faces += ff
+    return new_door_faces, new_frame_faces
+
+
+def add_multi_window_depth(bm, window_faces, depth, normal):
+    new_window_faces = []
+    new_frame_faces = []
+    for window in window_faces:
+        wf, ff = add_door_depth(bm, window, depth, normal)
+        new_window_faces.append(wf)
+        new_frame_faces += ff
+    return new_window_faces, new_frame_faces
+
 
 
 def make_multidoor_insets(bm, face, size, frame_thickness, dws):
