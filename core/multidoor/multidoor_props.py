@@ -84,7 +84,8 @@ class MultidoorProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop(self, "components")
+        col.label(text="Components")
+        col.prop(self, "components", text="")
         col = box.column(align=True)
         row = col.row(align=True)
         row.prop(self, "dw_depth")
