@@ -1,9 +1,9 @@
 import bmesh
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
-from ..common.frame import (
+from ..frame import (
     add_frame_depth,
 )
-from ..common.arch import (
+from ..arch import (
     fill_arch,
     create_arch,
     add_arch_depth,

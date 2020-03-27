@@ -1,10 +1,10 @@
 import bmesh
 from bmesh.types import BMEdge
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
-from ..common.frame import (
+from ..frame import (
     add_frame_depth,
 )
-from ..common.arch import (
+from ..arch import (
     fill_arch,
     create_arch,
     add_arch_depth,

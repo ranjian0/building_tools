@@ -1,8 +1,8 @@
 import bmesh
-from ..common.frame import (
+from ..frame import (
     add_frame_depth,
 )
-from ..common.arch import (
+from ..arch import (
     fill_arch,
     create_arch,
     add_arch_depth,

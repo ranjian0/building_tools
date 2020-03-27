@@ -1,6 +1,6 @@
 import bmesh
 from bmesh.types import BMEdge
-from ...utils import (
+from ..utils import (
     add_facemap_for_groups,
     sort_verts,
     filter_geom,
