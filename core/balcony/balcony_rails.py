@@ -12,6 +12,61 @@ from ...util_rail import (
 )
 
 
+class RailLoop:
+    def __init__(self, **kwargs):
+        self.normal = kwargs.get("normal", Vector())
+        self.tangent = kwargs.get("tangent", Vector())
+        self.angle = kwargs.get("angle", 0.0)
+
+        self.vert = kwargs.get("vert")
+        self.edge = kwargs.get("edge")
+        self.face = kwargs.get("face")
+
+        self.next = None
+        self.prev = None
+        self.edge_tangent = Vector()
+
+    def __repr__(self):
+        return "RailLoop<loc={}, tangent={}>".format(self.location, self.tangent)
+
+    def _get_loc(self):
+        return self.vert.co
+    location = property(_get_loc)
+
+    @staticmethod
+    def process(loops):
+        # -- create rail loops from bm loops
+        rl_loops = []
+        loop_idx = []
+        for loop in loops:
+            rl = RailLoop.from_bmloop(loop)
+            loop_idx.append(loop.vert.index)
+            rl_loops.append(rl)
+
+        # -- set next and previous loops
+        for rl, loop in zip(rl_loops, loops):
+            loop_n = loop.link_loop_next
+            loop_p = loop.link_loop_prev
+
+            rl_loop_n = [l for l in rl_loops if l.vert == loop_n.vert].pop()
+            rl.next = rl_loop_n
+            rl_loop_p = [l for l in rl_loops if l.vert == loop_p.vert].pop()
+            rl.prev = rl_loop_p
+
+            rl.edge_tangent = loop.edge.calc_tangent(loop)
+
+        return rl_loops
+
+    @staticmethod
+    def from_bmloop(loop):
+        return RailLoop(
+            normal=loop.calc_normal(),
+            tangent=loop.calc_tangent(),
+            angle=loop.calc_angle(),
+            vert=loop.vert, edge=loop.edge, face=loop.face
+        )
+
+
 def create_balcony_railing(bm, edges, prop, normal):
     balcony_face = {
         f for e in edges for f in e.link_faces if f.normal.z
@@ -21,6 +76,14 @@ def create_balcony_railing(bm, edges, prop, normal):
     def loop_is_valid(l):
         return l.edge in edges and l.face == balcony_face
     loops = list({l for v in balcony_verts for l in v.link_loops if loop_is_valid(l)})
+
+    rail_loops = RailLoop.process(balcony_face.loops)
+    from pprint import pprint
+    # pprint(rail_loops)
+    for loop in rail_loops:
+        print(loop, " : ", loop.edge_tangent.cross(normal))
+        print(loop, " : ", loop.edge_tangent.cross(Vector((0, 0, 1))))
+        print()
 
     make_corner_posts(bm, loops, prop, normal)
     make_fill(bm, loops, prop)
