@@ -30,21 +30,21 @@ from ...utils import (
 )
 
 
-def create_multidoor(bm, faces, prop):
-    """ Create multidoor from face selection
+def create_multigroup(bm, faces, prop):
+    """ Create multigroup from face selection
     """
 
     for face in faces:
         if is_ngon(face):
-            popup_message("Multidoor creation not supported for n-gons!", "Ngon Error")
+            popup_message("Multigroup creation not supported for n-gons!", "Ngon Error")
             return False
     
         face.select = False
 
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
-            face = create_multidoor_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
-            doors, windows, arch = create_multidoor_frame(bm, face, prop)
+            face = create_multigroup_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            doors, windows, arch = create_multigroup_frame(bm, face, prop)
             for door in doors:
                 create_door_fill(bm, door, prop)
             for window in windows:
@@ -55,7 +55,7 @@ def create_multidoor(bm, faces, prop):
 
 
 @map_new_faces(FaceMap.WALLS)
-def create_multidoor_split(bm, face, size, offset):
+def create_multigroup_split(bm, face, size, offset):
     """ Use properties from SizeOffset to subdivide face into regular quads
     """
 
@@ -70,13 +70,13 @@ def create_multidoor_split(bm, face, size, offset):
     return v_faces[0]
 
 
-def create_multidoor_frame(bm, face, prop):
-    """ Extrude and inset face to make multidoor frame
+def create_multigroup_frame(bm, face, prop):
+    """ Extrude and inset face to make multigroup frame
     """
     normal = face.normal.copy()
 
     dws = parse_components(prop.components)
-    door_faces, window_faces, frame_faces = make_multidoor_insets(bm, face, prop.size_offset.size, prop.frame_thickness, dws)
+    door_faces, window_faces, frame_faces = make_multigroup_insets(bm, face, prop.size_offset.size, prop.frame_thickness, dws)
     arch_face = None
 
     # create arch
@@ -135,7 +135,7 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 
 
 
-def make_multidoor_insets(bm, face, size, frame_thickness, dws):
+def make_multigroup_insets(bm, face, size, frame_thickness, dws):
     if frame_thickness > 0:
         dw_count = count(dws)
         dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count

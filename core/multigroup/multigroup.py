@@ -1,10 +1,10 @@
 import bmesh
 
-from .multidoor_types import create_multidoor
+from .multigroup_types import create_multigroup
 from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups
 
 
-class Multidoor:
+class Multigroup:
     @classmethod
     def build(cls, props):
         me = get_edit_mesh()
@@ -12,14 +12,14 @@ class Multidoor:
         faces = [face for face in bm.faces if face.select]
 
         if cls.validate(faces):
-            cls.add_multidoor_facemaps()
-            if create_multidoor(bm, faces, props):
+            cls.add_multigroup_facemaps()
+            if create_multigroup(bm, faces, props):
                 bmesh.update_edit_mesh(me, True)
                 return {"FINISHED"}
         return {"CANCELLED"}
 
     @classmethod
-    def add_multidoor_facemaps(cls):
+    def add_multigroup_facemaps(cls):
         groups = FaceMap.DOOR, FaceMap.WINDOW, FaceMap.FRAME
         add_facemap_for_groups(groups)
 

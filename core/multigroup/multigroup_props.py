@@ -5,7 +5,7 @@ from ..generic import ArchProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 
 
-class MultidoorProperty(bpy.types.PropertyGroup):
+class MultigroupProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,

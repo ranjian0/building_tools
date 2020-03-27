@@ -6,7 +6,7 @@ from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
 from .generic import register_generic, unregister_generic
 from .floorplan import register_floorplan, unregister_floorplan
-from .multidoor import register_multidoor, unregister_multidoor
+from .multigroup import register_multigroup, unregister_multigroup
 
 
 # -- ORDER MATTERS --
@@ -19,7 +19,7 @@ register_funcs = (
     register_floorplan,
     register_stairs,
     register_roof,
-    register_multidoor,
+    register_multigroup,
 )
 
 unregister_funcs = (
@@ -31,7 +31,7 @@ unregister_funcs = (
     unregister_floorplan,
     unregister_stairs,
     unregister_roof,
-    unregister_multidoor,
+    unregister_multigroup,
 )
 
 
