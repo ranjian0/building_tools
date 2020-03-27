@@ -9,7 +9,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,
-        max=2.99,
+        max=1.0,
         default=0.1,
         description="Thickness of door Frame",
     )
@@ -17,14 +17,18 @@ class DoorProperty(bpy.types.PropertyGroup):
     frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
-        max=100.0,
+        max=1.0,
         default=0.0,
         step=1,
         description="Depth of door Frame",
     )
 
     door_depth: FloatProperty(
-        name="Door Depth", min=0.0, max=0.5, default=0.05, description="Depth of door"
+        name="Door Depth",
+        min=0.0,
+        max=1.0,
+        default=0.05,
+        description="Depth of door",
     )
 
     count: IntProperty(
@@ -32,7 +36,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         min=1,
         max=100,
         default=1,
-        description="Number of elements"
+        description="Number of elements",
     )
 
     add_arch: BoolProperty(

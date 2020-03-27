@@ -9,7 +9,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,
-        max=2.99,
+        max=1.0,
         default=0.1,
         description="Thickness of door/window Frame",
     )
@@ -17,14 +17,18 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
-        max=100.0,
+        max=1.0,
         default=0.0,
         step=1,
         description="Depth of door/window Frame",
     )
 
     dw_depth: FloatProperty(
-        name="Door/Window Depth", min=0.0, max=0.5, default=0.05, description="Depth of door/window"
+        name="Door/Window Depth",
+        min=0.0,
+        max=1.0,
+        default=0.05,
+        description="Depth of door/window",
     )
 
     count: IntProperty(
@@ -32,7 +36,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         min=1,
         max=100,
         default=1,
-        description="Number of elements"
+        description="Number of elements",
     )
 
     add_arch: BoolProperty(
@@ -44,7 +48,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     components: StringProperty(
         name="Components",
         default="dw",
-        description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows"
+        description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows",
     )
 
     fill_items = [

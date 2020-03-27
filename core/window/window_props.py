@@ -17,7 +17,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     frame_depth: FloatProperty(
         name="Frame Depth",
         min=0.0,
-        max=0.5,
+        max=1.0,
         default=0.0,
         description="Depth of window Frame",
     )
@@ -25,7 +25,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     window_depth: FloatProperty(
         name="Window Depth",
         min=0.0,
-        max=0.5,
+        max=1.0,
         default=0.05,
         description="Depth of window",
     )
@@ -35,7 +35,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         min=1,
         max=100,
         default=1,
-        description="Number of elements"
+        description="Number of elements",
     )
 
     add_arch: BoolProperty(
