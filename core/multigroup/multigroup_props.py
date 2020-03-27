@@ -11,7 +11,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=2.99,
         default=0.1,
-        description="Thickness of door Frame",
+        description="Thickness of door/window Frame",
     )
 
     frame_depth: FloatProperty(
@@ -20,7 +20,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         max=100.0,
         default=0.0,
         step=1,
-        description="Depth of door Frame",
+        description="Depth of door/window Frame",
     )
 
     dw_depth: FloatProperty(
@@ -58,7 +58,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         name="Fill Type",
         items=fill_items,
         default="NONE",
-        description="Type of fill for door",
+        description="Type of fill for door/window",
     )
 
     arch: PointerProperty(type=ArchProperty)

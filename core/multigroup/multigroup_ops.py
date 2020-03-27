@@ -5,7 +5,7 @@ from ...utils import get_selected_face_dimensions
 
 
 class BTOOLS_OT_add_multigroup(bpy.types.Operator):
-    """Create a multigroup from selected faces"""
+    """Create multiple door/window group from selected faces"""
 
     bl_idname = "btools.add_multigroup"
     bl_label = "Add Multigroup"
