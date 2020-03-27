@@ -20,7 +20,7 @@ class FillUser(Enum):
     WINDOW = auto()
 
 
-@map_new_faces(FaceMap.DOOR_FRAMES, skip=FaceMap.DOOR_PANELS)
+@map_new_faces(FaceMap.FRAME, skip=FaceMap.DOOR_PANELS)
 def fill_panel(bm, face, prop):
     """Create panels on face
     """
@@ -94,7 +94,7 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     """
     normal = face.normal.copy()
     if prop.louver_margin:
-        uframe = [FaceMap.WINDOW_FRAMES, FaceMap.DOOR_FRAMES][user == FillUser.DOOR]
+        uframe = [FaceMap.FARME][user == FillUser.DOOR]
         inset = map_new_faces(uframe)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 

@@ -91,8 +91,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         description="Depth of glass panes",
     )
 
-    def draw(self, layout):
-        box = layout.box()
+    def draw(self, box):
 
         col = box.column(align=True)
         row = col.row(align=True)
@@ -138,8 +137,8 @@ class FillLouver(bpy.types.PropertyGroup):
         description="Distance between louvers",
     )
 
-    def draw(self, layout):
-        box = layout.box()
+    def draw(self, box):
+
         box.prop(self, "louver_margin")
 
         col = box.column(align=True)
@@ -178,8 +177,7 @@ class FillBars(bpy.types.PropertyGroup):
         description="Depth of bars",
     )
 
-    def draw(self, layout):
-        box = layout.box()
+    def draw(self, box):
 
         col = box.column(align=True)
         row = col.row(align=True)

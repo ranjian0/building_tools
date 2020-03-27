@@ -4,7 +4,8 @@ import bmesh
 import operator
 import functools as ft
 from mathutils import Matrix, Vector
-from bmesh.types import BMVert
+from bmesh.types import BMVert, BMEdge, BMFace
+from .util_common import local_xyz
 
 
 def get_edit_mesh():
@@ -156,6 +157,45 @@ def subdivide_face_edges_horizontal(bm, face, cuts=4):
     return bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
 
 
+def subdivide_face_horizontally(bm, face, widths):
+    """ Subdivide the face horizontally, widths from left to right (face x axis)
+    """
+    if len(widths) < 2:
+        return [face]
+    edges = filter_horizontal_edges(face.edges, face.normal)
+    direction, _, _ = local_xyz(face)
+    inner_edges = subdivide_edges(bm, edges, direction, widths)
+    return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
+
+
+def subdivide_face_vertically(bm, face, widths):
+    """ Subdivide the face vertically, widths from bottom to top (face y axis)
+    """
+    if len(widths) < 2:
+        return [face]
+    edges = filter_vertical_edges(face.edges, face.normal)
+    _, direction, _ = local_xyz(face)
+    inner_edges = subdivide_edges(bm, edges, direction, widths)
+    return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
+
+
+def subdivide_edges(bm, edges, direction, widths):
+    """ Subdivide edges in a direction, widths in the direction
+    """
+    cuts = len(widths) - 1
+    res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=cuts)
+    inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
+    distance = sum(widths)/len(widths)
+    final_position = 0.0
+    # TODO: sort in direction before iterating
+    for i, edge in enumerate(inner_edges):
+        original_position = (i+1) * distance
+        final_position += widths[i]
+        diff = final_position - original_position
+        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*direction)
+    return inner_edges
+
+
 def inset_face_with_scale_offset(bm, face, scale_y, scale_x, offx=0, offy=0, offz=0):
     """ Inset a face using right angled cuts, then offset and scale inner face
     """
@@ -233,34 +273,28 @@ def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
     return new_verts
 
 
-def arc_edge(bm, edge, resolution, height, offset, function="SPHERE"):
+def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     """ Subdivide the given edge and offset vertices to form an arc
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)
-    normal = edge_vector(edge).cross(Vector((0, 0, 1)))
 
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
-    verts = list(
-        {v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}
-    )
-    verts.sort(key=lambda v: v.co.x if normal.y else v.co.y)
+    verts = sort_verts(
+        list({v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}),
+        xyz[0]
+    ) 
     theta = math.pi / (len(verts) - 1)
 
     def arc_sine(verts):
         for idx, v in enumerate(verts):
-            v.co.z -= offset
             v.co.z += math.sin(theta * idx) * height
 
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
             angle = math.pi - (theta * idx)
-            v.co.z -= offset
+            v.co = median + xyz[0] * math.cos(angle) * length/2 
             v.co.z += math.sin(angle) * height
-            if normal.y:
-                v.co.x = median.x + math.cos(angle) * length / 2
-            else:
-                v.co.y = median.y + math.cos(angle) * length / 2
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
     return ret
@@ -278,6 +312,20 @@ def extrude_face_and_delete_bottom(bm, face, extrude_depth):
     hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
     bmesh.ops.delete(bm, geom=[hidden], context="FACES")
     return f
+
+
+def extrude_face_region(bm, faces, depth, normal):
+    """extrude a face and delete redundant faces
+    """
+    geom = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
+    verts = filter_geom(geom, BMVert)
+    bmesh.ops.translate(bm, verts=verts, vec=normal * depth)
+
+    bmesh.ops.delete(bm, geom=faces, context="FACES")  # remove redundant faces
+
+    extruded_faces = filter_geom(geom, BMFace)
+    surrounding_faces = list({f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces})
+    return extruded_faces, surrounding_faces
 
 
 def move_slab_splitface_to_wall(bm, face):
@@ -362,9 +410,38 @@ def split_edge_at_point_from_closest_vert(edge, vert, split_point):
     split_factor = split_length / edge.calc_length()
     return bmesh.utils.edge_split(edge, close_vert, split_factor)
 
+
 def get_selected_face_dimensions(context):
     """ Get dimensions of selected face
     """
     bm = bmesh.from_edit_mesh(context.edit_object.data)
     wall = [f for f in bm.faces if f.select][0]
     return calc_face_dimensions(wall)
+
+
+def get_top_edges(edges, n=1):
+    return sort_edges(edges, Vector((0, 0, -1)))[:n]
+
+
+def get_bottom_edges(edges, n=1):
+    return sort_edges(edges, Vector((0, 0, 1)))[:n]
+
+
+def get_top_faces(faces, n=1):
+    return sort_faces(faces, Vector((0, 0, -1)))[:n]
+
+
+def get_bottom_faces(faces, n=1):
+    return sort_faces(faces, Vector((0, 0, 1)))[:n]
+
+
+def sort_faces(faces, direction):
+    return sorted(faces, key=lambda f: direction.dot(f.calc_center_median()))
+
+
+def sort_edges(edges, direction):
+    return sorted(edges, key=lambda e: direction.dot(calc_edge_median(e)))
+
+
+def sort_verts(verts, direction):
+    return sorted(verts, key=lambda v: direction.dot(v.co))
