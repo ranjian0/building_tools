@@ -94,7 +94,7 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     """
     normal = face.normal.copy()
     if prop.louver_margin:
-        uframe = [FaceMap.FARME][user == FillUser.DOOR]
+        uframe = [FaceMap.FRAME][user == FillUser.DOOR]
         inset = map_new_faces(uframe)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 
