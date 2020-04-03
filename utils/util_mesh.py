@@ -283,7 +283,7 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     verts = sort_verts(
         list({v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}),
         xyz[0]
-    ) 
+    )
     theta = math.pi / (len(verts) - 1)
 
     def arc_sine(verts):
@@ -293,7 +293,7 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
             angle = math.pi - (theta * idx)
-            v.co = median + xyz[0] * math.cos(angle) * length/2 
+            v.co = median + xyz[0] * math.cos(angle) * length/2
             v.co.z += math.sin(angle) * height
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)

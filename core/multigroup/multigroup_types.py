@@ -12,7 +12,6 @@ from ..door.door_types import (
     create_door_fill,
 )
 from ..window.window_types import (
-    add_window_depth,
     fill_window_face,
 )
 from ...utils import (
@@ -38,7 +37,7 @@ def create_multigroup(bm, faces, prop):
         if is_ngon(face):
             popup_message("Multigroup creation not supported for n-gons!", "Ngon Error")
             return False
-    
+
         face.select = False
 
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
@@ -134,7 +133,6 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
     return new_window_faces, new_frame_faces
 
 
-
 def make_multigroup_insets(bm, face, size, frame_thickness, dws):
     if frame_thickness > 0:
         dw_count = count(dws)
@@ -183,7 +181,7 @@ def make_window_insets(bm, face, count, window_height, window_width, frame_thick
     # split vertically for window
     face_height = calc_face_dimensions(face)[1]
     face = subdivide_face_vertically(bm, face, [face_height - (window_height+2*frame_thickness), window_height+2*frame_thickness])[1]
-    
+
     # vertical frame
     if first and last:
         h_widths = [frame_thickness, window_width] * count + [frame_thickness]
@@ -206,6 +204,7 @@ def make_window_insets(bm, face, count, window_height, window_width, frame_thick
 
     return v_faces[1::3], v_frames + v_faces[::3] + v_faces[2::3]
 
+
 def make_door_insets(bm, face, count, door_height, door_width, frame_thickness, first=False, last=False):
     # vertical frame
     h_widths = [frame_thickness, door_width] * count + [frame_thickness]
@@ -214,6 +213,7 @@ def make_door_insets(bm, face, count, door_height, door_width, frame_thickness, 
     v_widths = [door_height, frame_thickness]
     v_faces = [f for h_face in h_faces[1::2] for f in subdivide_face_vertically(bm, h_face, v_widths)]
     return v_faces[::2], h_faces[::2] + v_faces[1::2]
+
 
 def count(dws):
     return sum(dw["count"] for dw in dws)
