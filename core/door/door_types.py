@@ -1,5 +1,4 @@
 import bmesh
-from bmesh.types import BMEdge
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
 from ..frame import (
     add_frame_depth,
@@ -86,7 +85,7 @@ def create_door_frame(bm, face, prop):
     if frame_faces:
         frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
         frame_faces = frame_front_faces + frame_side_faces
-    
+
     if prop.add_arch:
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
         frame_faces += new_frame_faces
@@ -109,7 +108,6 @@ def add_door_depth(bm, door, depth, normal):
         return door_faces[0], frame_faces
     else:
         return door, []
-
 
 
 def create_door_fill(bm, face, prop):
@@ -155,4 +153,3 @@ def make_door_inset(bm, face, size, frame_thickness):
         return v_faces[0], h_faces[::2] + [v_faces[1]]
     else:
         return face, []
-
