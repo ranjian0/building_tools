@@ -415,8 +415,10 @@ def get_selected_face_dimensions(context):
     """ Get dimensions of selected face
     """
     bm = bmesh.from_edit_mesh(context.edit_object.data)
-    wall = [f for f in bm.faces if f.select][0]
-    return calc_face_dimensions(wall)
+    wall = [f for f in bm.faces if f.select]
+    if wall:
+        return calc_face_dimensions(wall[0])
+    return 1, 1
 
 
 def get_top_edges(edges, n=1):
