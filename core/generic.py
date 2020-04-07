@@ -64,34 +64,14 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         self['default_size'] = default_size
         self['default_offset'] = default_offset
 
-    def draw(self, context, layout):
-        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Size & Offset", emboss=False)
+    def draw(self, context, box):
 
-        if self.show_props:
-            box = layout.box()
-            row = box.row(align=False)
-            col = row.column(align=True)
-            col.prop(self, "size")
+        row = box.row(align=False)
+        col = row.column(align=True)
+        col.prop(self, "size")
 
-            col = row.column(align=True)
-            col.prop(self, "offset")
-
-
-class ArrayProperty(bpy.types.PropertyGroup):
-    """ Convinience PropertyGroup used to array elements """
-
-    count: IntProperty(
-        name="Count", min=1, max=64, default=1, description="Number of elements"
-    )
-
-    show_props: BoolProperty(default=False)
-
-    def draw(self, context, layout):
-        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Array Elements", emboss=False)
-
-        if self.show_props:
-            box = layout.box()
-            box.prop(self, "count")
+        col = row.column(align=True)
+        col.prop(self, "offset")
 
 
 class ArchProperty(bpy.types.PropertyGroup):
@@ -99,17 +79,17 @@ class ArchProperty(bpy.types.PropertyGroup):
 
     resolution: IntProperty(
         name="Arc Resolution",
-        min=0,
+        min=1,
         max=128,
-        default=0,
+        default=6,
         description="Number of segements for the arc",
     )
 
-    offset: FloatProperty(
-        name="Arc Offset",
+    depth: FloatProperty(
+        name="Arc Depth",
         min=0.01,
         max=1.0,
-        default=0.5,
+        default=0.05,
         description="How far arc is from top",
     )
 
@@ -117,7 +97,7 @@ class ArchProperty(bpy.types.PropertyGroup):
         name="Arc Height",
         min=0.01,
         max=10.0,
-        default=0.5,
+        default=0.4,
         description="Radius of the arc",
     )
 
@@ -129,19 +109,14 @@ class ArchProperty(bpy.types.PropertyGroup):
         description="Type of offset for arch",
     )
 
-    show_props: BoolProperty(default=False)
+    def draw(self, context, box):
 
-    def draw(self, context, layout):
-        layout.prop(self, "show_props", icon="TRIA_DOWN" if self.show_props else "TRIA_RIGHT", text="Arched", emboss=False)
-
-        if self.show_props:
-            box = layout.box()
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.prop(self, "function", expand=True)
-            col.prop(self, "resolution")
-            col.prop(self, "offset")
-            col.prop(self, "height")
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, "function", expand=True)
+        col.prop(self, "resolution")
+        col.prop(self, "depth")
+        col.prop(self, "height")
 
 
 class BTOOLS_UL_fmaps(bpy.types.UIList):
@@ -213,7 +188,6 @@ class FaceMapMaterial(bpy.types.PropertyGroup):
 
 classes = (
     ArchProperty,
-    ArrayProperty,
     FaceMapMaterial,
     TrackedProperty,
     BTOOLS_UL_fmaps,

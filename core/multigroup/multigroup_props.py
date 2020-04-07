@@ -1,17 +1,17 @@
 import bpy
-from bpy.props import FloatProperty, PointerProperty, EnumProperty, IntProperty, BoolProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty, StringProperty
 
 from ..generic import ArchProperty, SizeOffsetProperty
-from ..fill import FillBars, FillLouver, FillGlassPanes
+from ..fill import FillPanel, FillLouver, FillGlassPanes
 
 
-class WindowProperty(bpy.types.PropertyGroup):
+class MultigroupProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.0,
         max=1.0,
         default=0.1,
-        description="Thickness of window Frame",
+        description="Thickness of door/window Frame",
     )
 
     frame_depth: FloatProperty(
@@ -19,15 +19,16 @@ class WindowProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.0,
-        description="Depth of window Frame",
+        step=1,
+        description="Depth of door/window Frame",
     )
 
-    window_depth: FloatProperty(
-        name="Window Depth",
+    dw_depth: FloatProperty(
+        name="Door/Window Depth",
         min=0.0,
         max=1.0,
         default=0.05,
-        description="Depth of window",
+        description="Depth of door/window",
     )
 
     count: IntProperty(
@@ -44,29 +45,42 @@ class WindowProperty(bpy.types.PropertyGroup):
         description="Add arch over door/window",
     )
 
-    arch: PointerProperty(type=ArchProperty)
-    size_offset: PointerProperty(type=SizeOffsetProperty)
+    components: StringProperty(
+        name="Components",
+        default="dw",
+        description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows",
+    )
 
     fill_items = [
         ("NONE", "None", "", 0),
-        ("BAR", "Bar", "", 1),
-        ("LOUVER", "Louver", "", 2),
-        ("GLASS_PANES", "Glass_Panes", "", 3),
+        ("PANELS", "Panels", "", 1),
+        ("GLASS_PANES", "Glass_Panes", "", 2),
+        ("LOUVER", "Louver", "", 3),
     ]
+
     fill_type: EnumProperty(
         name="Fill Type",
         items=fill_items,
         default="NONE",
-        description="Type of fill for window",
+        description="Type of fill for door/window",
     )
 
-    bar_fill: PointerProperty(type=FillBars)
-    louver_fill: PointerProperty(type=FillLouver)
+    arch: PointerProperty(type=ArchProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
+
+    double_door: BoolProperty(
+        name="Double Door",
+        default=False,
+        description="Double door",
+    )
+
+    panel_fill: PointerProperty(type=FillPanel)
     glass_fill: PointerProperty(type=FillGlassPanes)
+    louver_fill: PointerProperty(type=FillLouver)
 
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
+        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(2.0, 1.0), default_offset=(0.0, 0.0))
 
     def draw(self, context, layout):
         box = layout.box()
@@ -74,14 +88,20 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
+        col.label(text="Components")
+        col.prop(self, "components", text="")
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, "dw_depth")
         row = col.row(align=True)
         row.prop(self, "frame_depth")
         row.prop(self, "frame_thickness")
-        row = col.row(align=True)
-        row.prop(self, "window_depth")
 
         col = box.column(align=True)
         col.prop(self, "count")
+
+        col = box.column(align=True)
+        col.prop(self, "double_door")
 
         box = layout.box()
         col = box.column(align=True)
@@ -95,9 +115,10 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         # -- draw fill types
         fill_map = {
-            "BAR": self.bar_fill,
+            "PANELS": self.panel_fill,
             "LOUVER": self.louver_fill,
             "GLASS_PANES": self.glass_fill,
-        }.get(self.fill_type)
+        }
+        fill = fill_map.get(self.fill_type)
         if fill:
             fill.draw(box)

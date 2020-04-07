@@ -93,9 +93,15 @@ def restricted_offset(parent_dimensions, size, offset):
 def local_to_global(face, vec):
     """ Convert vector from local to global space, considering face normal as local z and world z as local y
     """
+    x, y, z = local_xyz(face)
+    global_offset = (x * vec.x) + (y * vec.y) + (z * vec.z)
+    return global_offset
+
+def local_xyz(face):
+    """ Get local xyz directions
+    """
     z = face.normal.copy()
     x = face.normal.copy()
     x.rotate(Euler((0.0, 0.0, radians(90)), 'XYZ'))
     y = z.cross(x)
-    global_offset = (x * vec.x) + (y * vec.y) + (z * vec.z)
-    return global_offset
+    return x, y, z

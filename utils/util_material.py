@@ -17,16 +17,16 @@ class FaceMap(AutoIndex):
     SLABS = auto()
     WALLS = auto()
 
+    FRAME = auto()
+
     WINDOW = auto()
     WINDOW_BARS = auto()
     WINDOW_PANES = auto()
-    WINDOW_FRAMES = auto()
     WINDOW_LOUVERS = auto()
 
     DOOR = auto
     DOOR_PANES = auto()
     DOOR_PANELS = auto()
-    DOOR_FRAMES = auto()
     DOOR_LOUVERS = auto()
 
     STAIRS = auto()

@@ -8,6 +8,7 @@ from .railing import register_railing, unregister_railing
 from .balcony import register_balcony, unregister_balcony
 from .generic import register_generic, unregister_generic
 from .floorplan import register_floorplan, unregister_floorplan
+from .multigroup import register_multigroup, unregister_multigroup
 
 
 # -- ORDER MATTERS --
@@ -22,6 +23,7 @@ register_funcs = (
     register_floorplan,
     register_stairs,
     register_roof,
+    register_multigroup,
 )
 
 unregister_funcs = (
@@ -35,6 +37,7 @@ unregister_funcs = (
     unregister_floorplan,
     unregister_stairs,
     unregister_roof,
+    unregister_multigroup,
 )
 
 
