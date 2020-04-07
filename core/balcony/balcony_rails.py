@@ -3,7 +3,7 @@ import math
 import bmesh
 
 from mathutils import Vector
-from ...util_rail import (
+from ...utils import (
     add_cube_post,
     align_geometry_to_edge,
     add_posts_between_loops,
