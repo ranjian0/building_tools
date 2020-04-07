@@ -13,6 +13,7 @@ from .util_mesh import (
     edge_tangent,
     calc_edge_median,
     calc_verts_median,
+    boundary_edges_from_face_selection,
 )
 
 from .util_material import (
