@@ -43,6 +43,8 @@ def create_flat_roof(bm, faces, prop):
     if len(top_face) > 1:
         top_face = bmesh.ops.dissolve_faces(
             bm, faces=top_face, use_verts=True).get("region").pop()
+    else:
+        top_face = top_face.pop()
 
     link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
 
