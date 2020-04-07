@@ -98,6 +98,7 @@ class WindowProperty(bpy.types.PropertyGroup):
             "BAR": self.bar_fill,
             "LOUVER": self.louver_fill,
             "GLASS_PANES": self.glass_fill,
-        }.get(self.fill_type)
+        }
+        fill = fill_map.get(self.fill_type)
         if fill:
             fill.draw(box)

@@ -6,19 +6,24 @@ import functools
 from mathutils import Vector, Matrix
 
 from bmesh.types import BMVert, BMEdge, BMFace
-from .utils import (
-    FaceMap,
+from .util_mesh import (
     validate,
     filter_geom,
     edge_vector,
     edge_tangent,
-    map_new_faces,
-    create_cylinder,
     calc_edge_median,
     calc_verts_median,
+)
+
+from .util_material import (
+    FaceMap,
+    map_new_faces,
     add_facemap_for_groups,
+)
+
+from .util_geometry import (
     create_cube_without_faces,
-    boundary_edges_from_face_selection,
+    create_cylinder,
 )
 
 

@@ -38,6 +38,7 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
         col.operator("btools.add_multigroup")
 
         col = layout.column(align=True)
+        col.operator("btools.add_balcony")
         col.operator("btools.add_stairs")
         col.operator("btools.add_roof")
 
