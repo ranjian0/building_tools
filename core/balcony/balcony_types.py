@@ -6,7 +6,6 @@ from ...utils import (
     FaceMap,
     filter_geom,
     local_to_global,
-    calc_edge_median,
     add_faces_to_map,
     calc_face_dimensions,
     inset_face_with_scale_offset,
@@ -42,32 +41,9 @@ def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
     edges = list(
         {e for v in top_verts for e in v.link_edges if e not in list(face.edges)}
     )
-    sort_edges_from_normal_direction(edges, balcony_normal)
 
-    left, right = edges
-    front = bm.edges.get(top_verts)
-    r_edges = choose_edges_from_direction(prop.open_side, front, left, right)
-    create_balcony_railing(bm, r_edges, prop.rail, balcony_normal)
-
-
-def sort_edges_from_normal_direction(edges, normal):
-    """sort edges based on normal direction
-    """
-    if normal.y:
-        edges.sort(key=lambda e: calc_edge_median(e).x, reverse=normal.y < 0)
-    elif normal.x:
-        edges.sort(key=lambda e: calc_edge_median(e).y, reverse=normal.x > 0)
-
-
-def choose_edges_from_direction(direction, front, left, right):
-    """filter out the edge specified by direction
-    """
-    return {
-        "LEFT": [front, right],
-        "FRONT": [left, right],
-        "RIGHT": [front, left],
-        "NONE": [left, right, front],
-    }.get(direction)
+    edges.append(bm.edges.get(top_verts))
+    create_balcony_railing(bm, edges, prop, balcony_normal)
 
 
 def map_balcony_faces(bm, geom):

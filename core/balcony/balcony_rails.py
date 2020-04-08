@@ -4,6 +4,8 @@ import bmesh
 
 from mathutils import Vector
 from ...utils import (
+    edge_vector,
+    edge_tangent,
     add_cube_post,
     align_geometry_to_edge,
     add_posts_between_loops,
@@ -12,116 +14,46 @@ from ...utils import (
 )
 
 
-class RailLoop:
-    def __init__(self, **kwargs):
-        self.normal = kwargs.get("normal", Vector())
-        self.tangent = kwargs.get("tangent", Vector())
-        self.angle = kwargs.get("angle", 0.0)
-
-        self.vert = kwargs.get("vert")
-        self.edge = kwargs.get("edge")
-        self.face = kwargs.get("face")
-
-        self.next = None
-        self.prev = None
-        self.edge_tangent = Vector()
-
-    def __repr__(self):
-        return "RailLoop<loc={}, tangent={}>".format(self.location, self.tangent)
-
-    def _get_loc(self):
-        return self.vert.co
-    location = property(_get_loc)
-
-    @staticmethod
-    def process(loops):
-        # -- create rail loops from bm loops
-        rl_loops = []
-        loop_idx = []
-        for loop in loops:
-            rl = RailLoop.from_bmloop(loop)
-            loop_idx.append(loop.vert.index)
-            rl_loops.append(rl)
-
-        # -- set next and previous loops
-        for rl, loop in zip(rl_loops, loops):
-            loop_n = loop.link_loop_next
-            loop_p = loop.link_loop_prev
-
-            rl_loop_n = [l for l in rl_loops if l.vert == loop_n.vert].pop()
-            rl.next = rl_loop_n
-            rl_loop_p = [l for l in rl_loops if l.vert == loop_p.vert].pop()
-            rl.prev = rl_loop_p
-
-            rl.edge_tangent = loop.edge.calc_tangent(loop)
-
-        return rl_loops
-
-    @staticmethod
-    def from_bmloop(loop):
-        return RailLoop(
-            normal=loop.calc_normal(),
-            tangent=loop.calc_tangent(),
-            angle=loop.calc_angle(),
-            vert=loop.vert, edge=loop.edge, face=loop.face
-        )
-
-
 def create_balcony_railing(bm, edges, prop, normal):
-    balcony_face = {
-        f for e in edges for f in e.link_faces if f.normal.z
-    }.pop()
-    balcony_verts = {v for e in edges for v in e.verts}
-
-    def loop_is_valid(l):
-        return l.edge in edges and l.face == balcony_face
-    loops = list({l for v in balcony_verts for l in v.link_loops if loop_is_valid(l)})
-
-    rail_loops = RailLoop.process(balcony_face.loops)
-    from pprint import pprint
-    # pprint(rail_loops)
-    for loop in rail_loops:
-        print(loop, " : ", loop.edge_tangent.cross(normal))
-        print(loop, " : ", loop.edge_tangent.cross(Vector((0, 0, 1))))
-        print()
-
-    make_corner_posts(bm, loops, prop, normal)
-    make_fill(bm, loops, prop)
+    make_corner_posts(bm, edges, normal, prop)
+    # make_fill(bm, loops, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
 # @map_new_faces(FaceMap.RAILING_POSTS)
-def make_corner_posts(bm, loops, prop, normal):
+def make_corner_posts(bm, edges, normal, prop):
     # add_facemap_for_groups(FaceMap.RAILING_POSTS)
+    rail = prop.rail
+
+    front_edge = [e for e in edges if edge_tangent(e).to_tuple(3) == normal.to_tuple(3)].pop()
+    other_edges = list(set(edges) - set([front_edge]))
+    left, right = sorted(other_edges, key=lambda e : -cross_edge_tangents(e, front_edge).z)
+
+    # -- flag to push posts adjacent to walls
     active_obj = bpy.context.active_object
     slab_outset = active_obj.tracked_properties.slab_outset
 
-    def loop_is_last(l):
-        e = loop.edge
-        return e.calc_tangent(loop).cross(normal).z < 0
+    width, height = rail.corner_post_width, rail.corner_post_height
+    diag_width = math.sqrt(2 * ((width / 2) ** 2))
+    for e in edges:
+        if e == front_edge:
+            continue
 
-    def loop_is_first(l):
-        e = loop.edge
-        return e.calc_tangent(loop).cross(normal).z > 0
+        for v in e.verts:
+            # -- skip some posts if left/right sides are open
+            if vert_is_open(v, front_edge, left, right, prop):
+                continue
 
-    def post_at_loop(loop):
-        vec = loop.calc_tangent()
-        width, height = prop.corner_post_width, prop.corner_post_height
-        off = vec * math.sqrt(2 * ((width / 2) ** 2))
-        if loop_is_first(loop) or loop not in loops:
-            # -- pust first and last loops adjacent to walls
-            off += normal * slab_outset
-        pos = loop.vert.co + off + Vector((0, 0, height / 2))
-        post = add_cube_post(bm, width, height, pos)
-        align_geometry_to_edge(bm, post, loop.edge)
+            vtan = [l.calc_tangent() for l in v.link_loops if l.face.normal.z].pop()
+            offset = vtan * diag_width
 
-    last_loop = None
-    for loop in loops:
-        if loop_is_last(loop):
-            last_loop = loop
-        post_at_loop(loop)
-    if last_loop:
-        post_at_loop(last_loop.link_loop_next)
+            location = v.co + Vector((0, 0, height / 2)) + offset
+            if v not in front_edge.verts:
+                # -- make stating posts flush with walls
+                location += normal * slab_outset
+
+            post = add_cube_post(bm, width, height, location)
+            align_geometry_to_edge(bm, post, e)
 
 
 def make_fill(bm, loops, prop):
@@ -162,3 +94,19 @@ def create_fill_rails(bm, loops, prop):
 # @map_new_faces(FaceMap.RAILING_WALLS)
 def create_fill_walls(bm, loops, prop):
     pass
+
+
+def cross_edge_tangents(edge_a, edge_b):
+    return edge_tangent(edge_a).cross(edge_tangent(edge_b))
+
+
+def vert_is_open(v, front, left, right, prop):
+    """ Determine if this is the vert in an open edge that should not have a post
+    """
+    if prop.open_side == "LEFT":
+        if v in left.verts and v not in front.verts:
+            return True
+    elif prop.open_side == "RIGHT":
+        if v in right.verts and v not in front.verts:
+            return True
+    return False
