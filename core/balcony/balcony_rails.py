@@ -4,7 +4,6 @@ import bmesh
 
 from mathutils import Vector
 from ...utils import (
-    edge_vector,
     edge_tangent,
     add_cube_post,
     align_geometry_to_edge,
