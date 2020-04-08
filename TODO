@@ -1,3 +1,7 @@
+Issues
+ - array with large initial size has undefined behaviour
+ - multigroup array with louver fill has undefined geometry
+
 REMOVE ALL UNSTABLE FEATURES
 - railing and balcony modules extremely unstable and poorly designed
 - work on more robust implementations in dev branch
@@ -20,9 +24,6 @@ NGON VALIDATION AND SOLVE
 
 REMOVE ALL DEAD CODE / UNREACHABLE
   - part of refactoring
-
-DOOR:
-  re-add double door feature, but better and with support for archs
 
 RAILING BUGS:
   for rails - density option does not affect distance to top rail

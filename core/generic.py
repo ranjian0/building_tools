@@ -19,6 +19,34 @@ from ..utils import (
 )
 
 
+def get_count(self):
+    """ Return count value with a default of 1
+    """
+    return self.get('count', 1)
+
+
+def set_count(self, value):
+    """ Set count value ensuring that element fit nicely in parent
+    """
+    # -- Make each element in array fit into the parent
+    parent_width = self['wall_dimensions'][0]
+    if self.size_offset.size.x > parent_width / value:
+        self.size_offset.size.x = parent_width / value
+
+    # -- set count
+    self['count'] = value
+
+
+CountProperty = IntProperty(
+    name="Count",
+    min=1,
+    max=100,
+    set=set_count,
+    get=get_count,
+    description="Number of elements",
+)
+
+
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 

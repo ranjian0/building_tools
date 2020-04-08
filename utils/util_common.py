@@ -97,6 +97,7 @@ def local_to_global(face, vec):
     global_offset = (x * vec.x) + (y * vec.y) + (z * vec.z)
     return global_offset
 
+
 def local_xyz(face):
     """ Get local xyz directions
     """

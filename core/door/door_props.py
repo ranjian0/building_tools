@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty
 
-from ..generic import ArchProperty, SizeOffsetProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes
+from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
 
 
 class DoorProperty(bpy.types.PropertyGroup):
@@ -31,14 +31,6 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Depth of door",
     )
 
-    count: IntProperty(
-        name="Count",
-        min=1,
-        max=100,
-        default=1,
-        description="Number of elements",
-    )
-
     add_arch: BoolProperty(
         name="Add Arch",
         default=False,
@@ -59,6 +51,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Type of fill for door",
     )
 
+    count: CountProperty
     arch: PointerProperty(type=ArchProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
