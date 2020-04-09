@@ -66,7 +66,7 @@ def make_corner_posts(bm, edges):
 
 def make_fill(bm, edges):
     if context.prop.rail.fill == "POSTS":
-        # add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_posts(bm, edges)
     elif context.prop.rail.fill == "RAILS":
         # add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
@@ -76,7 +76,7 @@ def make_fill(bm, edges):
         create_fill_walls(bm, edges)
 
 
-# @map_new_faces(FaceMap.RAILING_RAILS)
+@map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
 def create_fill_posts(bm, edges):
     skip = {context.front: "FRONT", context.left: "LEFT", context.right: "RIGHT"}
     for edge in edges:
@@ -91,17 +91,17 @@ def create_fill_posts(bm, edges):
         rail_pos += Vector((0, 0, context.prop.rail.corner_post_height - context.prop.rail.rail_fill.size / 2))
 
         rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
-        rail = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
+        rail = rail(bm, rail_size, rail_pos, left=True, right=True)
         align_geometry_to_edge(bm, rail, edge)
 
 
-# @map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
-def create_fill_rails(bm, loops, prop):
+# @map_new_faces(FaceMap.RAILING_RAILS)
+def create_fill_rails(bm, edges):
     pass
 
 
 # @map_new_faces(FaceMap.RAILING_WALLS)
-def create_fill_walls(bm, loops, prop):
+def create_fill_walls(bm, edges):
     pass
 
 
