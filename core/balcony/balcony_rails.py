@@ -95,9 +95,25 @@ def create_fill_posts(bm, edges):
         align_geometry_to_edge(bm, rail, edge)
 
 
-# @map_new_faces(FaceMap.RAILING_RAILS)
+@map_new_faces(FaceMap.RAILING_RAILS)
 def create_fill_rails(bm, edges):
-    pass
+    rail = context.prop.rail
+    rail_fill = rail.rail_fill
+    skip = {context.front: "FRONT", context.left: "LEFT", context.right: "RIGHT"}
+    for edge in edges:
+        if context.prop.open_side == skip.get(edge):
+            continue
+
+        rail_pos, rail_size = calc_rail_position_and_size_for_edge(edge)
+
+        start = rail_pos
+        stop = rail_pos + Vector((0, 0, rail.corner_post_height - rail_fill.size))
+
+        rail_geom = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
+        align_geometry_to_edge(bm, rail_geom, edge)
+
+        rail_count = int((rail.corner_post_height / rail_fill.size) * rail_fill.density)
+        array_elements(bm, rail_geom, rail_count, start, stop)
 
 
 # @map_new_faces(FaceMap.RAILING_WALLS)
