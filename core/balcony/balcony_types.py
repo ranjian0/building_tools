@@ -18,6 +18,7 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
+        normal = f.normal.copy()
         f = create_balcony_split(bm, f, prop.size_offset)
 
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
@@ -25,11 +26,11 @@ def create_balcony(bm, faces, prop):
 
         map_balcony_faces(bm, ret)
         bmesh.ops.translate(
-            bm, verts=filter_geom(ret["geom"], BMVert), vec=-f.normal * prop.width
+            bm, verts=filter_geom(ret["geom"], BMVert), vec=normal * prop.width
         )
 
         if prop.has_railing:
-            add_railing_to_balcony_edges(bm, ret["geom"], f.normal, prop)
+            add_railing_to_balcony_edges(bm, ret["geom"], normal, prop)
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 
 

@@ -24,7 +24,7 @@ def make_corner_posts(bm, edges, normal, prop):
     # add_facemap_for_groups(FaceMap.RAILING_POSTS)
     rail = prop.rail
 
-    front_edge = [e for e in edges if edge_tangent(e).to_tuple(3) == normal.to_tuple(3)].pop()
+    front_edge = [e for e in edges if edge_tangent(e).to_tuple(3) == (-normal).to_tuple(3)].pop()
     other_edges = list(set(edges) - set([front_edge]))
     left, right = sorted(other_edges, key=lambda e : -cross_edge_tangents(e, front_edge).z)
 
@@ -49,7 +49,7 @@ def make_corner_posts(bm, edges, normal, prop):
             location = v.co + Vector((0, 0, height / 2)) + offset
             if v not in front_edge.verts:
                 # -- make stating posts flush with walls
-                location += normal * slab_outset
+                location += -normal * slab_outset
 
             post = add_cube_post(bm, width, height, location)
             align_geometry_to_edge(bm, post, e)
