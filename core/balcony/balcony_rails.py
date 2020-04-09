@@ -9,6 +9,7 @@ from ...utils import (
     map_new_faces,
     add_cube_post,
     array_elements,
+    calc_edge_median,
     add_facemap_for_groups,
     align_geometry_to_edge,
     create_cube_without_faces,
@@ -20,6 +21,7 @@ RailContext = namedtuple("_RailContext", "normal prop front left right slab_outs
 
 
 def create_balcony_railing(bm, edges, prop, normal):
+    # -- setup global context
     global context
     active_obj = bpy.context.active_object
     context = RailContext(
@@ -85,12 +87,12 @@ def create_fill_posts(bm, edges):
         add_posts_between_edge(bm, edge)
 
         # -- add top rail
-        # rail_pos, rail_size = calc_rail_position_and_size_for_loop(loop, prop)
-        # rail_pos += Vector((0, 0, prop.corner_post_height - prop.rail_fill.size / 2))
+        rail_pos, rail_size = calc_rail_position_and_size_for_edge(edge)
+        rail_pos += Vector((0, 0, context.prop.rail.corner_post_height - context.prop.rail.rail_fill.size / 2))
 
-        # rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
-        # rail = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
-        # align_geometry_to_edge(bm, rail, edge)
+        rail = map_new_faces(FaceMap.RAILING_RAILS)(create_cube_without_faces)
+        rail = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
+        align_geometry_to_edge(bm, rail, edge)
 
 
 # @map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
@@ -139,11 +141,25 @@ def add_posts_between_edge(bm, edge):
 
     offset = height_v + (edge_tangent(edge) * rail.corner_post_width/2)
     start, stop = v1.co + offset, v2.co + offset
+
+    add_outset = (v1 not in context.front.verts) or (v2 not in context.front.verts)
     if v1 not in context.front.verts:
         start += -context.normal * context.slab_outset
     if v2 not in context.front.verts:
         stop += -context.normal * context.slab_outset
 
-    length = edge.calc_length()
+    length = edge.calc_length() + [0, context.slab_outset][add_outset]
     post_count = round((length / rail.post_fill.size) * rail.post_fill.density)
     array_elements(bm, post, post_count, start, stop)
+
+
+def calc_rail_position_and_size_for_edge(edge):
+    v1, v2 = edge.verts
+    add_outset = (v1 not in context.front.verts) or (v2 not in context.front.verts)
+    rail_len = edge.calc_length() + [0, context.slab_outset][add_outset]
+    rail_len -= context.prop.rail.corner_post_width * 2
+    rail_size = (rail_len, 2 * context.prop.rail.rail_fill.size, context.prop.rail.rail_fill.size)
+
+    off = edge_tangent(edge).normalized() * (context.prop.rail.corner_post_width / 2)
+    rail_pos = calc_edge_median(edge) + off + [Vector(), -context.normal * context.slab_outset/2][add_outset]
+    return rail_pos, rail_size
