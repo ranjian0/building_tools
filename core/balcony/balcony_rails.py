@@ -4,8 +4,11 @@ import bmesh
 
 from mathutils import Vector
 from ...utils import (
+    FaceMap,
     edge_tangent,
+    map_new_faces,
     add_cube_post,
+    add_facemap_for_groups,
     align_geometry_to_edge,
     add_posts_between_loops,
     create_cube_without_faces,
@@ -19,11 +22,11 @@ def create_balcony_railing(bm, edges, prop, normal):
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
-# @map_new_faces(FaceMap.RAILING_POSTS)
+@map_new_faces(FaceMap.RAILING_POSTS)
 def make_corner_posts(bm, edges, normal, prop):
-    # add_facemap_for_groups(FaceMap.RAILING_POSTS)
-    rail = prop.rail
+    add_facemap_for_groups(FaceMap.RAILING_POSTS)
 
+    rail = prop.rail
     front_edge = [e for e in edges if edge_tangent(e).to_tuple(3) == (-normal).to_tuple(3)].pop()
     other_edges = list(set(edges) - set([front_edge]))
     left, right = sorted(other_edges, key=lambda e : -cross_edge_tangents(e, front_edge).z)
