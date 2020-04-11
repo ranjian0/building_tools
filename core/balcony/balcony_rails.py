@@ -69,7 +69,7 @@ def make_fill(bm, edges):
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_posts(bm, edges)
     elif context.prop.rail.fill == "RAILS":
-        # add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_rails(bm, edges)
     elif context.prop.rail.fill == "WALL":
         # add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
@@ -105,15 +105,13 @@ def create_fill_rails(bm, edges):
             continue
 
         rail_pos, rail_size = calc_rail_position_and_size_for_edge(edge)
+        start, stop = rail_pos, rail_pos + Vector((0, 0, rail.corner_post_height - rail_fill.size/2))
 
-        start = rail_pos
-        stop = rail_pos + Vector((0, 0, rail.corner_post_height - rail_fill.size))
-
-        rail_geom = create_cube_without_faces(bm, rail_size, rail_pos, left=True, right=True)
+        rail_geom = create_cube_without_faces(bm, rail_size, left=True, right=True)
         align_geometry_to_edge(bm, rail_geom, edge)
 
         rail_count = int((rail.corner_post_height / rail_fill.size) * rail_fill.density)
-        array_elements(bm, rail_geom, rail_count, start, stop)
+        array_elements(bm, rail_geom, rail_count, start, stop, fill_last=True)
 
 
 # @map_new_faces(FaceMap.RAILING_WALLS)
@@ -174,7 +172,7 @@ def calc_rail_position_and_size_for_edge(edge):
     add_outset = (v1 not in context.front.verts) or (v2 not in context.front.verts)
     rail_len = edge.calc_length() + [0, context.slab_outset][add_outset]
     rail_len -= context.prop.rail.corner_post_width * 2
-    rail_size = (rail_len, 2 * context.prop.rail.rail_fill.size, context.prop.rail.rail_fill.size)
+    rail_size = (rail_len, context.prop.rail.corner_post_width, context.prop.rail.rail_fill.size)
 
     off = edge_tangent(edge).normalized() * (context.prop.rail.corner_post_width / 2)
     rail_pos = calc_edge_median(edge) + off + [Vector(), -context.normal * context.slab_outset/2][add_outset]

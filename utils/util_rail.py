@@ -290,11 +290,11 @@ def is_parallel(loop):
     return math.isclose(loop.calc_angle(), math.pi, rel_tol=1e-04)
 
 
-def array_elements(bm, elem, count, start, stop):
+def array_elements(bm, elem, count, start, stop, fill_last=False):
     """ Duplicate elements count-1 times between start and stop
     """
     step = (stop - start) / (count + 1)
-    for i in range(count):
+    for i in range(count + 1 if fill_last else count):
         if i == 0:
             bmesh.ops.translate(bm, verts=elem["verts"], vec=start + step)
         else:
