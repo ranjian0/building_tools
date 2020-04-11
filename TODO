@@ -1,6 +1,3 @@
-Issues
- - array with large initial size has undefined behaviour
- - multigroup array with louver fill has undefined geometry
 
 REMOVE ALL UNSTABLE FEATURES
 - railing and balcony modules extremely unstable and poorly designed
@@ -25,18 +22,6 @@ NGON VALIDATION AND SOLVE
 REMOVE ALL DEAD CODE / UNREACHABLE
   - part of refactoring
 
-RAILING BUGS:
-  for rails - density option does not affect distance to top rail
-  fix alignment for rails and walls if edges selected are not boundary
-  undefined behavior if user selected edges that are between two upward faces
-
-RAILING OPTIONS:
-  expand the height of corner posts to floor height without affecting
-  fill types
-
-BUG:
-    - move_slabface_to_wall prevents splitoffset from working properly
-      (may need to solve this issue the hard way after all)
 
 ROOF:
     - XXX support gable roof for complex shapes
