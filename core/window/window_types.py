@@ -1,5 +1,4 @@
 import bmesh
-from mathutils import Vector
 
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ..frame import (
@@ -13,6 +12,7 @@ from ..arch import (
 from ...utils import (
     FaceMap,
     is_ngon,
+    validate,
     popup_message,
     map_new_faces,
     add_faces_to_map,
@@ -95,7 +95,7 @@ def create_window_frame(bm, face, prop):
 
     # add face maps
     add_faces_to_map(bm, [window_face], FaceMap.WINDOW)
-    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
     if prop.add_arch:
         add_faces_to_map(bm, [arch_face], FaceMap.WINDOW)
 
