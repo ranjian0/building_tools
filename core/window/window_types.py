@@ -45,6 +45,7 @@ def create_window(bm, faces, prop):
             fill_window_face(bm, window, prop)
             if prop.add_arch:
                 fill_arch(bm, arch, prop)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return True
 
 

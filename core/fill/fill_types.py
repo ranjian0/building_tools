@@ -169,7 +169,6 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
             key=lambda e: calc_edge_median(e).z,
         )
         bmesh.ops.translate(bm, vec=-face.normal * extrude_depth, verts=top_edge.verts)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
 
 
 def subdivide_face_into_vertical_segments(bm, face, segments):
