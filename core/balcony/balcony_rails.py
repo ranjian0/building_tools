@@ -5,6 +5,7 @@ from collections import namedtuple
 from mathutils import Vector
 from ...utils import (
     FaceMap,
+    create_wall,
     edge_tangent,
     map_new_faces,
     add_cube_post,
@@ -72,7 +73,7 @@ def make_fill(bm, edges):
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_rails(bm, edges)
     elif context.prop.rail.fill == "WALL":
-        # add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
+        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
         create_fill_walls(bm, edges)
 
 
@@ -114,9 +115,30 @@ def create_fill_rails(bm, edges):
         array_elements(bm, rail_geom, rail_count, start, stop, fill_last=True)
 
 
-# @map_new_faces(FaceMap.RAILING_WALLS)
+@map_new_faces(FaceMap.RAILING_WALLS)
 def create_fill_walls(bm, edges):
-    pass
+    rail = context.prop.rail
+    wall_fill = rail.wall_fill
+    skip = {context.front: "FRONT", context.left: "LEFT", context.right: "RIGHT"}
+    for edge in edges:
+        if context.prop.open_side == skip.get(edge):
+            continue
+
+        v1, v2 = edge.verts
+        start, stop = [v.co.copy() for v in edge.verts]
+        start += (calc_edge_median(edge) - start).normalized() * rail.corner_post_width
+        if v1 not in context.front.verts:
+            start += -context.normal * context.slab_outset
+
+        stop += (calc_edge_median(edge) - stop).normalized() * rail.corner_post_width
+        if v2 not in context.front.verts:
+            stop += -context.normal * context.slab_outset
+
+        wall_pos, wall_size = calc_rail_position_and_size_for_edge(edge)
+        wall = create_wall(
+            bm, start, stop, rail.corner_post_height, wall_fill.width, edge_tangent(edge)
+        )
+        wall(delete_faces=["bottom", "left", "right"])
 
 
 def cross_edge_tangents(edge_a, edge_b):
@@ -154,7 +176,7 @@ def add_posts_between_edge(bm, edge):
     align_geometry_to_edge(bm, post, edge)
 
     offset = height_v + (edge_tangent(edge) * rail.corner_post_width/2)
-    start, stop = v1.co + offset, v2.co + offset
+    start, stop = v1.co.copy() + offset, v2.co.copy() + offset
 
     add_outset = (v1 not in context.front.verts) or (v2 not in context.front.verts)
     if v1 not in context.front.verts:
