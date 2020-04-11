@@ -180,8 +180,11 @@ def clubbed_width(width, frame_thickness, type, count, first=False, last=False):
 def make_window_insets(bm, face, count, window_height, window_width, frame_thickness, first=False, last=False):
     # split vertically for window
     face_height = calc_face_dimensions(face)[1]
-    face = subdivide_face_vertically(bm, face, [face_height - (window_height+2*frame_thickness), window_height+2*frame_thickness])[1]
+    res = subdivide_face_vertically(bm, face, [face_height - (window_height+2*frame_thickness), window_height+2*frame_thickness])
+    if not res:
+        return [], []
 
+    face = res[1]
     # vertical frame
     if first and last:
         h_widths = [frame_thickness, window_width] * count + [frame_thickness]
