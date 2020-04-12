@@ -1,7 +1,8 @@
-REMOVE ALL UNSTABLE FEATURES
-- railing and balcony modules extremely unstable and poorly designed
-- work on more robust implementations in dev branch
-- keep master with stable features only
+
+BALCONY NITPICK FEATURES
+ - have rounded/circular balconies
+ - more robust implementation of corner balcony (current open implementation
+   may not be abvious to users)
 
 - roof is also abit unstable esp hip roof and straight skeleton
 
@@ -61,3 +62,22 @@ UI:
 
 #???
     - Circular floorplan doesn't have any real use ??? Remove!
+
+
+FEATURE - LAYOUT
+````````````````
+After version 1.0 release of building tools, begin work on layout tools for
+creating city/town layouts:
+
+Features should include:
+    - road/street networks
+        (randomy generated CIRCULAR/SQUARE) [l-systems] etc
+        with user input (probably a modal operator to add segments and intersections)
+
+    - plot subdivisions
+       after road/street network is created, middle regions make up plots
+       with optional pavements and decorational artifacts like street light/ power lines
+       etc
+
+       buildings can then be added on the plots using the building tools.
+
