@@ -61,7 +61,7 @@ def create_steps(bm, f, top_faces, prop):
     step_size = fheight / (prop.step_count + 1)
     start_loc = max(f.verts, key=get_z).co.z
     for i in range(prop.step_count):
-        idx = i + 1 if prop.landing else i
+        idx = i + 1
         offset = start_loc - (step_size * idx)
         ret_face = subdivide_next_step(bm, ext_face, offset)
 
