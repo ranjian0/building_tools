@@ -6,6 +6,7 @@ from bpy.props import (
     PointerProperty,
 )
 
+from ..railing.railing_props import RailProperty
 from ..generic import SizeOffsetProperty
 
 
@@ -36,6 +37,12 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Has Landing", default=True, description="Whether to stairs have a landing"
     )
 
+    has_railing: BoolProperty(
+        name="Add Railing", default=True, description="Whether the stairs have railing"
+    )
+
+    rail: PointerProperty(type=RailProperty)
+
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def init(self, wall_dimensions):
@@ -57,3 +64,9 @@ class StairsProperty(bpy.types.PropertyGroup):
             box = layout.box()
             col = box.column()
             col.prop(self, "landing_width")
+
+        layout.prop(self, "has_railing")
+        if self.has_railing:
+            box = layout.box()
+            # box.prop_menu_enum(self, "open_side", text="Open")
+            self.rail.draw(context, box)

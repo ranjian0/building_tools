@@ -129,21 +129,3 @@ class RailProperty(bpy.types.PropertyGroup):
         col = layout.column(align=True)
         col.prop(self, "corner_post_width")
         col.prop(self, "corner_post_height")
-
-
-classes = (
-    PostFillProperty,
-    RailFillProperty,
-    WallFillProperty,
-    RailProperty,
-)
-
-
-def register_railing():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_railing():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)

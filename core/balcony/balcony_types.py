@@ -13,7 +13,7 @@ from ...utils import (
     sort_edges,
 )
 
-from .balcony_rails import create_balcony_railing
+from ..railing.railing import create_balcony_railing
 
 
 def create_balcony(bm, faces, prop):
@@ -56,7 +56,7 @@ def add_railing_to_balcony(bm, top, balcony_normal, prop):
     edges = sort_edges(dup_top.edges, balcony_normal)[1:]
     railing_geom = bmesh.ops.extrude_edge_only(bm, edges=edges)["geom"]
     bmesh.ops.translate(
-        bm, verts=filter_geom(railing_geom, BMVert), vec=(0.,0.,prop.rail.corner_post_height)
+        bm, verts=filter_geom(railing_geom, BMVert), vec=(0., 0., prop.rail.corner_post_height)
     )
 
     bmesh.ops.delete(bm, geom=[dup_top], context="FACES")

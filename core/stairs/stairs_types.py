@@ -1,9 +1,9 @@
 import bmesh
 import operator
+import math
 
-from mathutils import Vector
-from bmesh.types import BMVert
-
+from mathutils import Vector, Quaternion, Euler
+from bmesh.types import BMVert, BMFace, BMEdge
 
 from ...utils import (
     FaceMap,
@@ -15,8 +15,11 @@ from ...utils import (
     subdivide_face_edges_horizontal,
     local_to_global,
     calc_face_dimensions,
+    sort_faces,
+    sort_verts,
 )
 
+from ..railing.railing import create_balcony_railing
 
 def create_stairs(bm, faces, prop):
     """Extrude steps from selected faces
@@ -31,8 +34,11 @@ def create_stairs(bm, faces, prop):
         f = create_stair_split(bm, f, prop.size_offset)
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
-        # -- options for railing
+        normal = f.normal
         top_faces = create_steps(bm, f, prop)
+
+        if prop.has_railing:
+            add_railing_to_stairs(bm, top_faces, normal, prop)
 
         return True
 
@@ -64,6 +70,8 @@ def create_steps(bm, face, prop):
         faces = {f for e in face.edges for f in e.link_faces if f.normal.z > 0}
         top_faces.append(list(faces).pop())
 
+    return top_faces
+
 
 def extrude_step(bm, face, step_width):
     """ Extrude a stair step
@@ -92,3 +100,37 @@ def create_stair_split(bm, face, prop):
     scale_y = prop.size.y/wall_h
     off = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
     return inset_face_with_scale_offset(bm, face, scale_y, scale_x, off.x, off.y, off.z)
+
+
+def add_railing_to_stairs(bm, top_faces, normal, prop):
+    step = sort_faces(top_faces, normal)
+    first_step = step[0]
+    last_step = step[-1]
+
+    # create railing initial edges
+    v1, v2 = railing_verts(bm, first_step, normal, prop.rail.offset)
+    v3, v4 = railing_verts(bm, last_step, normal, prop.rail.offset)
+    e1 = bmesh.ops.contextual_create(bm, geom=(v1, v3))["edges"][0]
+    e2 = bmesh.ops.contextual_create(bm, geom=[v2, v4])["edges"][0]
+
+    # extrude edges
+    ret = bmesh.ops.extrude_edge_only(bm, edges=[e1, e2])
+    top_edges = filter_geom(ret["geom"], BMEdge)
+    top_verts = [v for e in top_edges for v in e.verts]
+    bmesh.ops.translate(bm, verts=top_verts, vec=Vector((0., 0., 1.))*prop.rail.corner_post_height)
+    railing_faces = filter_geom(ret["geom"], BMFace)
+
+    create_balcony_railing(bm, railing_faces, prop.rail, normal)
+
+
+def railing_verts(bm, face, normal, offset):
+    tangent = normal.copy()
+    tangent.rotate(Quaternion(Vector((0., 0., 1.)), math.pi/2).to_euler())
+    verts = sort_verts(face.verts, tangent)
+    co1 = (verts[0].co + verts[1].co)/2
+    co2 = (verts[2].co + verts[3].co)/2
+    v1 = bmesh.ops.create_vert(bm, co=co1)["vert"][0]
+    v2 = bmesh.ops.create_vert(bm, co=co2)["vert"][0]
+    bmesh.ops.translate(bm, verts=[v1], vec=tangent*offset)
+    bmesh.ops.translate(bm, verts=[v2], vec=-tangent*offset)
+    return v1, v2
