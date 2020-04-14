@@ -46,7 +46,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         row = layout.row()
         row.prop(self, "width")
 
-        layout.prop(self, "has_railing", toggle=True)
+        layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
             box.prop_menu_enum(self, "open_side", text="Open")

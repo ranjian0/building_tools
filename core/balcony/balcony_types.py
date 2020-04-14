@@ -9,6 +9,8 @@ from ...utils import (
     add_faces_to_map,
     calc_face_dimensions,
     inset_face_with_scale_offset,
+    get_top_faces,
+    sort_edges,
 )
 
 from .balcony_rails import create_balcony_railing
@@ -20,40 +22,55 @@ def create_balcony(bm, faces, prop):
     for f in faces:
         normal = f.normal.copy()
         f = create_balcony_split(bm, f, prop.size_offset)
-
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
-        ret = bmesh.ops.extrude_face_region(bm, geom=[f])
 
-        map_balcony_faces(bm, ret)
-        bmesh.ops.translate(
-            bm, verts=filter_geom(ret["geom"], BMVert), vec=normal * prop.width
-        )
+        front, top = extrude_balcony(bm, f, prop.width, normal)
 
         if prop.has_railing:
-            add_railing_to_balcony_edges(bm, ret["geom"], normal, prop)
+            add_railing_to_balcony(bm, top, normal, prop)
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 
 
-def add_railing_to_balcony_edges(bm, balcony_geom, balcony_normal, prop):
+def extrude_balcony(bm, face, depth, normal):
+    front = filter_geom(bmesh.ops.extrude_face_region(bm, geom=[face])["geom"], BMFace)[0]
+    map_balcony_faces(bm, front)
+    bmesh.ops.translate(
+        bm, verts=front.verts, vec=normal * depth
+    )
+    
+    top = get_top_faces(f for e in front.edges for f in e.link_faces)[0]
+    return front, top
+
+
+def add_railing_to_balcony(bm, top, balcony_normal, prop):
     """Add railing to the balcony
     """
-    face = filter_geom(balcony_geom, BMFace).pop()
-    top_verts = sorted(face.verts, key=lambda v: v.co.z)[2:]
-    edges = list(
-        {e for v in top_verts for e in v.link_edges if e not in list(face.edges)}
+    ret = bmesh.ops.duplicate(bm, geom=[top])
+    dup_top = filter_geom(ret["geom"], BMFace)[0]
+
+    ret = bmesh.ops.inset_individual(
+        bm, faces=[dup_top], thickness=prop.rail.offset, use_even_offset=True
+    )
+    bmesh.ops.delete(bm, geom=ret["faces"], context="FACES")
+
+    edges = sort_edges(dup_top.edges, balcony_normal)[1:]
+    railing_geom = bmesh.ops.extrude_edge_only(bm, edges=edges)["geom"]
+    bmesh.ops.translate(
+        bm, verts=filter_geom(railing_geom, BMVert), vec=(0.,0.,prop.rail.corner_post_height)
     )
 
-    edges.append(bm.edges.get(top_verts))
-    create_balcony_railing(bm, edges, prop, balcony_normal)
+    bmesh.ops.delete(bm, geom=[dup_top], context="FACES")
+
+    railing_faces = filter_geom(railing_geom, BMFace)
+    create_balcony_railing(bm, railing_faces, prop.rail, balcony_normal)
 
 
-def map_balcony_faces(bm, geom):
+def map_balcony_faces(bm, face):
     """ Add balcony faces to their facemap """
     new_faces = {
-        face
-        for f in filter_geom(geom["geom"], BMFace)
-        for e in f.edges
-        for face in e.link_faces
+        f
+        for e in face.edges
+        for f in e.link_faces
     }
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
 

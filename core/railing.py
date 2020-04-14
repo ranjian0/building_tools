@@ -101,11 +101,20 @@ class RailProperty(bpy.types.PropertyGroup):
         description="Whether the railing has corner posts",
     )
 
+    offset: FloatProperty(
+        name="Offset",
+        default=0.05,
+        description="Railings offset",
+    )
+
     post_fill: PointerProperty(type=PostFillProperty)
     rail_fill: PointerProperty(type=RailFillProperty)
     wall_fill: PointerProperty(type=WallFillProperty)
 
     def draw(self, context, layout):
+
+        row = layout.row()
+        row.prop(self, "offset", text="Railing Offset")
 
         row = layout.row()
         row.prop(self, "fill", text="")
