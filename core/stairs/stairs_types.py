@@ -32,43 +32,36 @@ def create_stairs(bm, faces, prop):
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
         # -- options for railing
-        top_faces = []
+        top_faces = create_steps(bm, f, prop)
 
-        f = create_landing(bm, f, top_faces, prop)
-        create_steps(bm, f, top_faces, prop)
         return True
 
 
-def create_landing(bm, f, top_faces, prop):
-    """ Create stair landing """
+def create_steps(bm, face, prop):
+    """ Create stair steps with landing"""
+    
+    top_faces = []
+
+    # create landing
     if prop.landing:
-        ret_face = extrude_step(bm, f, prop.landing_width)
+        face = extrude_step(bm, face, prop.landing_width)
+        top_faces.append(list({f for e in face.edges for f in e.link_faces if f.normal.z > 0}).pop())
 
-        # -- keep reference to top faces for railing
-        faces = {f for e in ret_face.edges for f in e.link_faces if f.normal.z > 0}
-        top_faces.append(list(faces).pop())
-
-        return ret_face
-    return f
-
-
-def create_steps(bm, f, top_faces, prop):
-    """ Create stair steps """
-    ext_face = f
+    # create other steps
     get_z = operator.attrgetter("co.z")
-    fheight = max(f.verts, key=get_z).co.z - min(f.verts, key=get_z).co.z
+    fheight = max(face.verts, key=get_z).co.z - min(face.verts, key=get_z).co.z
 
     step_size = fheight / (prop.step_count + 1)
-    start_loc = max(f.verts, key=get_z).co.z
+    start_loc = max(face.verts, key=get_z).co.z
     for i in range(prop.step_count):
         idx = i + 1
         offset = start_loc - (step_size * idx)
-        ret_face = subdivide_next_step(bm, ext_face, offset)
+        ret_face = subdivide_next_step(bm, face, offset)
 
-        ext_face = extrude_step(bm, ret_face, prop.step_width)
+        face = extrude_step(bm, ret_face, prop.step_width)
 
         # -- keep reference to top faces for railing
-        faces = {f for e in ext_face.edges for f in e.link_faces if f.normal.z > 0}
+        faces = {f for e in face.edges for f in e.link_faces if f.normal.z > 0}
         top_faces.append(list(faces).pop())
 
 
