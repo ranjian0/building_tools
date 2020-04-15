@@ -29,7 +29,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Landing Width",
         min=0.01,
         max=100.0,
-        default=0.2,
+        default=1.0,
         description="Width of each stairs landing",
     )
 

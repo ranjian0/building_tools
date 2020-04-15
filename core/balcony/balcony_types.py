@@ -13,7 +13,7 @@ from ...utils import (
     sort_edges,
 )
 
-from ..railing.railing import create_balcony_railing
+from ..railing.railing import create_railing
 
 
 def create_balcony(bm, faces, prop):
@@ -62,7 +62,7 @@ def add_railing_to_balcony(bm, top, balcony_normal, prop):
     bmesh.ops.delete(bm, geom=[dup_top], context="FACES")
 
     railing_faces = filter_geom(railing_geom, BMFace)
-    create_balcony_railing(bm, railing_faces, prop.rail, balcony_normal)
+    create_railing(bm, railing_faces, prop.rail, balcony_normal)
 
 
 def map_balcony_faces(bm, face):

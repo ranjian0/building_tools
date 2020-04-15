@@ -14,7 +14,7 @@ from ...utils import (
 )
 
 
-def create_balcony_railing(bm, faces, prop, normal):
+def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
     make_corner_posts(bm, vertical_edges, prop)
     for f in faces:
