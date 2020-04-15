@@ -58,7 +58,8 @@ def make_fill(bm, face, prop):
 
 @map_new_faces(FaceMap.RAILING_RAILS)
 def create_fill_posts(bm, face, prop):
-    sorted_edges = sort_edges(face.edges, Vector((0., 0., -1.)))
+    vertical_edges = filter_vertical_edges(face.edges, face.normal)
+    sorted_edges = sort_edges([e for e in face.edges if e not in vertical_edges], Vector((0., 0., -1.)))
 
     # create posts
     top_edge = sorted_edges[0]
