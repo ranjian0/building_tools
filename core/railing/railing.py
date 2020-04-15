@@ -44,6 +44,7 @@ def make_fill(bm, face, prop):
     up = edge_vector(top_dup_edge)
     up.rotate(Quaternion(horizon, math.pi/2).to_euler())
     edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
+    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     if prop.fill == "POSTS":
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
