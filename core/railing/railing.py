@@ -1,6 +1,6 @@
 import math
 import bmesh
-from bmesh.types import BMFace, BMEdge
+from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Euler, Quaternion
 from ...utils import (
     FaceMap,
@@ -74,7 +74,7 @@ def create_fill_posts(bm, face, prop):
         up = face.normal
         edge_to_cylinder(bm, dup_edge, prop.post_fill.size/2, up)
 
-    # delete duplicated faces
+    # delete reference faces
     dup_faces = list({f for e in inner_edges for f in e.link_faces})
     bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
 
@@ -93,14 +93,25 @@ def create_fill_rails(bm, face, prop):
         up = face.normal
         edge_to_cylinder(bm, dup_edge, prop.rail_fill.size/2, up)
 
-    # delete duplicated faces
+    # delete reference faces
     dup_faces = list({f for e in inner_edges for f in e.link_faces})
     bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
 
 
 @map_new_faces(FaceMap.RAILING_WALLS)
 def create_fill_walls(bm, face, prop):
-    pass
+    # create walls
+    ret = bmesh.ops.duplicate(bm, geom=[face])
+    dup_face = filter_geom(ret["geom"], BMFace)[0]
+    bmesh.ops.translate(bm, verts=dup_face.verts, vec=-face.normal*prop.wall_fill.width/2)
+    ret = bmesh.ops.extrude_edge_only(bm, edges=dup_face.edges)
+    verts = filter_geom(ret["geom"], BMVert)
+    bmesh.ops.translate(bm, verts=verts, vec=face.normal*prop.wall_fill.width)
+    bmesh.ops.contextual_create(bm, geom=verts)
+
+    # delete reference faces
+    bmesh.ops.delete(bm, geom=[face], context="FACES")
+
 
 def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     edge_vec = edge_vector(edge)
