@@ -46,7 +46,10 @@ def create_fill_posts(bm, face, prop):
     # create railing top
     ret = bmesh.ops.duplicate(bm, geom=[top_edge])
     top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, Vector((0., 0., 1.)))
+    horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
+    up = edge_vector(top_dup_edge)
+    up.rotate(Quaternion(horizon, math.pi/2).to_euler())
+    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
 
     # create posts
     bottom_edge = sorted_edges[-1]
