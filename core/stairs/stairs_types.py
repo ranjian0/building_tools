@@ -13,6 +13,7 @@ from ...utils import (
     add_faces_to_map,
     inset_face_with_scale_offset,
     subdivide_face_edges_horizontal,
+    subdivide_face_vertically,
     local_to_global,
     calc_face_dimensions,
     sort_faces,
@@ -53,17 +54,10 @@ def create_steps(bm, face, prop):
         face = extrude_step(bm, face, prop.landing_width)
         top_faces.append(list({f for e in face.edges for f in e.link_faces if f.normal.z > 0}).pop())
 
-    # create other steps
-    get_z = operator.attrgetter("co.z")
-    fheight = max(face.verts, key=get_z).co.z - min(face.verts, key=get_z).co.z
-
-    step_size = fheight / (prop.step_count + 1)
-    start_loc = max(face.verts, key=get_z).co.z
+    # create steps
+    step_height = prop.size_offset.size.y/(prop.step_count + 1)
     for i in range(prop.step_count):
-        idx = i + 1
-        offset = start_loc - (step_size * idx)
-        ret_face = subdivide_next_step(bm, face, offset)
-
+        ret_face = subdivide_next_step(bm, face, prop.step_count-i, step_height)
         face = extrude_step(bm, ret_face, prop.step_width)
 
         # -- keep reference to top faces for railing
@@ -82,14 +76,10 @@ def extrude_step(bm, face, step_width):
     return ret_face
 
 
-def subdivide_next_step(bm, ret_face, offset):
+def subdivide_next_step(bm, ret_face, remaining, step_height):
     """ cut the next face step height
     """
-    res = subdivide_face_edges_horizontal(bm, ret_face, cuts=1)
-    verts = filter_geom(res["geom_inner"], BMVert)
-    for v in verts:
-        v.co.z = offset
-    return min(verts.pop().link_faces, key=lambda f: f.calc_center_median().z)
+    return subdivide_face_vertically(bm, ret_face, widths=[remaining*step_height, step_height])[0]
 
 
 def create_stair_split(bm, face, prop):

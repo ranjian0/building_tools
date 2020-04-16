@@ -187,8 +187,7 @@ def subdivide_edges(bm, edges, direction, widths):
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
     distance = sum(widths)/len(widths)
     final_position = 0.0
-    # TODO: sort in direction before iterating
-    for i, edge in enumerate(inner_edges):
+    for i, edge in enumerate(sort_edges(inner_edges, direction)):
         original_position = (i+1) * distance
         final_position += widths[i]
         diff = final_position - original_position
