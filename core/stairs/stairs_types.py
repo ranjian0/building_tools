@@ -11,10 +11,8 @@ from ...utils import (
     filter_geom,
     popup_message,
     add_faces_to_map,
-    inset_face_with_scale_offset,
-    subdivide_face_edges_horizontal,
     subdivide_face_vertically,
-    local_to_global,
+    subdivide_face_horizontally,
     calc_face_dimensions,
     sort_faces,
     sort_verts,
@@ -32,7 +30,7 @@ def create_stairs(bm, faces, prop):
             popup_message("Stair creation not supported for n-gons!", "Ngon Error")
             return False
 
-        f = create_stair_split(bm, f, prop.size_offset)
+        f = create_stair_split(bm, f, prop.size_offset.size, prop.size_offset.offset)
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
         normal = f.normal
@@ -82,14 +80,18 @@ def subdivide_next_step(bm, ret_face, remaining, step_height):
     return subdivide_face_vertically(bm, ret_face, widths=[remaining*step_height, step_height])[0]
 
 
-def create_stair_split(bm, face, prop):
+def create_stair_split(bm, face, size, offset):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     wall_w, wall_h = calc_face_dimensions(face)
-    scale_x = prop.size.x/wall_w
-    scale_y = prop.size.y/wall_h
-    off = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
-    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, off.x, off.y, off.z)
+    # horizontal split
+    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_faces = subdivide_face_horizontally(bm, face, h_widths)
+    # vertical split
+    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
+    v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
+
+    return v_faces[1]
 
 
 def add_railing_to_stairs(bm, top_faces, normal, prop):

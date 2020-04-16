@@ -5,10 +5,10 @@ from bmesh.types import BMVert, BMFace
 from ...utils import (
     FaceMap,
     filter_geom,
-    local_to_global,
     add_faces_to_map,
     calc_face_dimensions,
-    inset_face_with_scale_offset,
+    subdivide_face_horizontally,
+    subdivide_face_vertically,
     get_top_faces,
     sort_edges,
 )
@@ -20,8 +20,10 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
+        f.select = False
+
         normal = f.normal.copy()
-        f = create_balcony_split(bm, f, prop.size_offset)
+        f = create_balcony_split(bm, f, prop.size_offset.size, prop.size_offset.offset)
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
 
         front, top = extrude_balcony(bm, f, prop.width, normal)
@@ -75,11 +77,15 @@ def map_balcony_faces(bm, face):
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
 
 
-def create_balcony_split(bm, face, prop):
+def create_balcony_split(bm, face, size, offset):
     """Use properties from SplitOffset to subdivide face into regular quads
     """
     wall_w, wall_h = calc_face_dimensions(face)
-    scale_x = prop.size.x/wall_w
-    scale_y = prop.size.y/wall_h
-    offset = local_to_global(face, Vector((prop.offset.x, prop.offset.y, 0.0)))
-    return inset_face_with_scale_offset(bm, face, scale_y, scale_x, offset.x, offset.y, offset.z)
+    # horizontal split
+    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_faces = subdivide_face_horizontally(bm, face, h_widths)
+    # vertical split
+    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
+    v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
+
+    return v_faces[1]
