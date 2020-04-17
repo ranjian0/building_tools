@@ -22,10 +22,10 @@ def create_balcony(bm, faces, prop):
         f.select = False
 
         normal = f.normal.copy()
-        f = create_balcony_split(bm, f, prop.size_offset.size, prop.size_offset.offset)
+        f = create_balcony_split(bm, f, prop)
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
 
-        front, top = extrude_balcony(bm, f, prop.width, normal)
+        front, top = extrude_balcony(bm, f, prop.size_offset.size.y, normal)
 
         if prop.has_railing:
             add_railing_to_balcony(bm, top, normal, prop)
@@ -76,11 +76,12 @@ def map_balcony_faces(bm, face):
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
 
 
-def create_balcony_split(bm, face, size, offset):
+def create_balcony_split(bm, face, prop):
     """Use properties from SizeOffset to create face
     """
     xyz = local_xyz(face)
-    f = create_face(bm, size, offset, xyz)
+    size = Vector((prop.size_offset.size.x, prop.slab_height))
+    f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds()
     )
