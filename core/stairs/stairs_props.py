@@ -13,12 +13,12 @@ from ..generic import SizeOffsetProperty
 class StairsProperty(bpy.types.PropertyGroup):
     redo: BoolProperty()
 
-    depth: FloatProperty(
-        name="Stairs depth",
+    depth_offset: FloatProperty(
+        name="Depth Offset",
         min=0.0,
         max=100.0,
         default=0.0,
-        description="Depth of Stairs",
+        description="Depth offset of stairs",
     )
 
     step_count: IntProperty(
@@ -73,7 +73,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         self.size_offset.draw(context, layout)
 
         col = layout.column(align=True)
-        col.prop(self, "depth")
+        col.prop(self, "depth_offset")
 
         col = layout.column(align=True)
         col.prop(self, "step_count")

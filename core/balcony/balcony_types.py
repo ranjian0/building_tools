@@ -83,6 +83,6 @@ def create_balcony_split(bm, face, prop):
     size = Vector((prop.size_offset.size.x, prop.slab_height))
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
-        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth
+        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
     )
     return f

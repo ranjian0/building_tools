@@ -86,7 +86,7 @@ def create_stairs_split(bm, face, prop):
     size = Vector((prop.size_offset.size.x, (prop.step_count+1)*prop.step_height))
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
-        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth
+        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
     )
     return f
 
