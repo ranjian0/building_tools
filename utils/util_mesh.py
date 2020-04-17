@@ -143,20 +143,6 @@ def face_with_verts(bm, verts, default=None):
     return default
 
 
-def subdivide_face_edges_vertical(bm, face, cuts=4):
-    """ Subdivide the vertical edges of a face
-    """
-    e = filter_horizontal_edges(face.edges, face.normal)
-    return bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-
-
-def subdivide_face_edges_horizontal(bm, face, cuts=4):
-    """ Subdivide the horizontal edges of a face
-    """
-    e = filter_vertical_edges(face.edges, face.normal)
-    return bmesh.ops.subdivide_edges(bm, edges=e, cuts=cuts)
-
-
 def subdivide_face_horizontally(bm, face, widths):
     """ Subdivide the face horizontally, widths from left to right (face x axis)
     """
@@ -187,101 +173,12 @@ def subdivide_edges(bm, edges, direction, widths):
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
     distance = sum(widths)/len(widths)
     final_position = 0.0
-    # TODO: sort in direction before iterating
-    for i, edge in enumerate(inner_edges):
+    for i, edge in enumerate(sort_edges(inner_edges, direction)):
         original_position = (i+1) * distance
         final_position += widths[i]
         diff = final_position - original_position
         bmesh.ops.translate(bm, verts=edge.verts, vec=diff*direction)
     return inner_edges
-
-
-def inset_face_with_scale_offset(bm, face, scale_y, scale_x, offx=0, offy=0, offz=0):
-    """ Inset a face using right angled cuts, then offset and scale inner face
-    """
-    cuts = 2
-    scale = cuts + 1
-    scale_y *= scale
-    scale_x *= scale
-
-    do_vertical = scale_y < scale
-    do_horizontal = scale_x < scale
-
-    if not do_horizontal and not do_vertical:
-        return face
-
-    face.select = False
-    verts = subdivide_flagged_edges(
-        bm, face, do_horizontal, do_vertical, scale_x, scale_y
-    )
-    offset_flagged_verts(bm, verts, do_horizontal, do_vertical, offx, offy, offz)
-    return face_with_verts(bm, verts)
-
-
-def subdivide_flagged_edges(bm, face, cut_horizontal, cut_vertical, scale_x, scale_y):
-    """ Subdivide the edges of a face that are flagged
-    """
-    normal = face.normal
-    median = face.calc_center_median()
-    if cut_horizontal:
-        horizontal = filter_horizontal_edges(face.edges, normal)
-        verts = subdivide_edges_and_scale_inner(
-            bm, horizontal, (scale_x, scale_x, 1), median
-        )
-
-    if cut_vertical:
-        bmesh.ops.remove_doubles(bm, verts=list(bm.verts))
-        face = face_with_verts(bm, verts) if cut_horizontal else face
-        vertical = filter_vertical_edges(face.edges, normal)
-        verts = subdivide_edges_and_scale_inner(bm, vertical, (1, 1, scale_y), median)
-    return verts
-
-
-def offset_flagged_verts(bm, verts, horizontal, vertical, offx, offy, offz):
-    """ Move the flagged vertices
-    """
-    if horizontal and vertical:
-        link_edges = [e for v in verts for e in v.link_edges]
-        all_verts = list({v for e in link_edges for v in e.verts})
-        bmesh.ops.translate(bm, verts=all_verts, vec=(offx, offy, 0))
-    elif horizontal and not vertical:
-        bmesh.ops.translate(bm, verts=verts, vec=(offx, offy, 0))
-    bmesh.ops.translate(bm, verts=verts, vec=(0, 0, offz))
-
-
-def subdivide_edges_and_scale_inner(bm, edges, scale, scale_center):
-    """ subdivide the edges twice and scale the middle section
-    """
-    sp_res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=2)
-    verts = filter_geom(sp_res["geom_inner"], BMVert)
-    bmesh.ops.scale(bm, vec=scale, verts=verts, space=Matrix.Translation(-scale_center))
-    return verts
-
-
-def edge_split_offset(bm, edges, verts, offset, connect_verts=False):
-    """ Split the edges, offset amount from verts
-    """
-    new_verts = []
-    for idx, e in enumerate(edges):
-        vert = verts[idx]
-        _, v = bmesh.utils.edge_split(e, vert, offset / e.calc_length())
-        new_verts.append(v)
-
-    if connect_verts:
-        res = bmesh.ops.connect_verts(bm, verts=new_verts).get("edges")
-        return res
-    return new_verts
-
-
-def boundary_edges_from_face_selection(bm):
-    """ Find all edges that bound the current selected faces
-    """
-    selected_faces = [f for f in bm.faces if f.select]
-    all_edges = list({e for f in selected_faces for e in f.edges})
-    edge_is_boundary = (
-        lambda e: len({f for f in e.link_faces if f in selected_faces}) == 1
-    )
-    return [e for e in all_edges if edge_is_boundary(e)]
 
 
 def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
@@ -311,7 +208,7 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     return ret
 
 
-def extrude_face_and_delete_bottom(bm, face, extrude_depth):
+def extrude_face(bm, face, extrude_depth):
     """extrude a face and delete bottom face from new geometry
     """
     f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
@@ -337,89 +234,6 @@ def extrude_face_region(bm, faces, depth, normal):
     extruded_faces = filter_geom(geom, BMFace)
     surrounding_faces = list({f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces})
     return extruded_faces, surrounding_faces
-
-
-def move_slab_splitface_to_wall(bm, face):
-    """ Align a face that was split from a slab to building wall
-    """
-    if not face_belongs_to_slab(bm, face):
-        return face
-
-    slab_outset = bpy.context.object.tracked_properties.slab_outset
-    target_edges = filter_horizontal_edges(face.edges, face.normal.copy())
-    sort_axis = "x" if face.normal.x else "y"
-
-    new_verts = []
-    target_faces = [face]
-    for edge in target_edges:
-        other_face = (set(edge.link_faces) - {face}).pop()
-        func = min if getattr(face.normal, sort_axis) > 0 else max
-        other_edge = func(
-            other_face.edges, key=lambda e: getattr(calc_edge_median(e), sort_axis)
-        )
-
-        verts, faces = cut_edge_based_on_other_edge(
-            bm, edge, other_edge, (-face.normal * slab_outset)
-        )
-        new_verts.extend(verts)
-        target_faces.extend(faces)
-
-    bmesh.ops.delete(bm, geom=target_faces, context="FACES_ONLY")
-    bmesh.ops.delete(bm, geom=target_edges, context="EDGES")
-    ret = bmesh.ops.contextual_create(bm, geom=new_verts)
-    return ret.get("faces").pop()
-
-
-def face_belongs_to_slab(bm, face):
-    """ Check if face belongs to generate slab faces that dont face upwards
-    """
-
-    if face.normal.z:
-        return False
-
-    slab_outset = bpy.context.object.tracked_properties.slab_outset
-    if slab_outset <= 0.00001:
-        return False
-
-    slab_facemap = bpy.context.object.face_maps.get("slabs")
-    if not slab_facemap:
-        return False
-
-    active_face_map = bm.faces.layers.face_map.active
-    if face[active_face_map] != slab_facemap.index:
-        return False
-
-    return True
-
-
-def cut_edge_based_on_other_edge(bm, edge, other_edge, cut_direction):
-    """ Project cuts onto other_edge based on edge.verts and cut_direction
-    """
-    new_edges = []
-    new_verts = []
-    target_faces = []
-    for v in edge.verts:
-        split_point = v.co + cut_direction
-        e, new_vert = split_edge_at_point_from_closest_vert(other_edge, v, split_point)
-        e = bmesh.ops.connect_vert_pair(bm, verts=[v, new_vert]).get("edges").pop()
-        new_edges.append(e)
-        new_verts.append(new_vert)
-
-    target_faces.append(
-        (set(new_edges[0].link_faces) & set(new_edges[1].link_faces)).pop()
-    )
-
-    return new_verts, target_faces
-
-
-def split_edge_at_point_from_closest_vert(edge, vert, split_point):
-    """ Split the edge 'edge' from one of its vertices that is closest to
-        'vert' at the split_point
-    """
-    close_vert = min(edge.verts, key=lambda ov: (ov.co - vert.co).length)
-    split_length = (close_vert.co - split_point).length
-    split_factor = split_length / edge.calc_length()
-    return bmesh.utils.edge_split(edge, close_vert, split_factor)
 
 
 def get_selected_face_dimensions(context):
