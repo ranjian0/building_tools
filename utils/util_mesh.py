@@ -246,6 +246,19 @@ def get_selected_face_dimensions(context):
     return 1, 1
 
 
+def create_face(bm, size, offset, xyz):
+    """ Create a face in xy plane of xyz space
+    """
+    offset = offset.x * xyz[0] + offset.y * xyz[1]
+
+    v1 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
+    v2 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
+    v3 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
+    v4 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
+
+    return bmesh.ops.contextual_create(bm, geom=[v1,v2,v3,v4])["faces"][0]
+
+
 def get_top_edges(edges, n=1):
     return sort_edges(edges, Vector((0, 0, -1)))[:n]
 

@@ -6,11 +6,10 @@ from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
-    calc_face_dimensions,
-    subdivide_face_horizontally,
-    subdivide_face_vertically,
     get_top_faces,
     sort_edges,
+    local_xyz,
+    create_face,
 )
 
 from ..railing.railing import create_railing
@@ -78,14 +77,11 @@ def map_balcony_faces(bm, face):
 
 
 def create_balcony_split(bm, face, size, offset):
-    """Use properties from SplitOffset to subdivide face into regular quads
+    """Use properties from SizeOffset to create face
     """
-    wall_w, wall_h = calc_face_dimensions(face)
-    # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
-    h_faces = subdivide_face_horizontally(bm, face, h_widths)
-    # vertical split
-    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
-    v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
-
-    return v_faces[1]
+    xyz = local_xyz(face)
+    f = create_face(bm, size, offset, xyz)
+    bmesh.ops.translate(
+        bm, verts=f.verts, vec=face.calc_center_bounds()
+    )
+    return f

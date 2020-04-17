@@ -49,7 +49,8 @@ class StairsProperty(bpy.types.PropertyGroup):
         self['wall_dimensions'] = wall_dimensions
         self.size_offset.init(
             (self['wall_dimensions'][0], self['wall_dimensions'][1]),
-            default_size=(1.0, 0.2), default_offset=(0.0, 0.0)
+            default_size=(1.0, 0.2), default_offset=(0.0, 0.0),
+            restricted=False,
         )
 
     def draw(self, context, layout):

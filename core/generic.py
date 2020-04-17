@@ -51,15 +51,21 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
     def get_size(self):
-        return self.get("size", restricted_size(
-            self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']
-        ))
+        if self['restricted']:
+            return self.get("size", restricted_size(
+                self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']
+            ))
+        else:
+            return self.get("size", self['default_size'])
 
     def set_size(self, value):
-        value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
-        self["size"] = restricted_size(
-            self['parent_dimensions'], self.offset, (0.1, 0.1), value
-        )
+        if self['restricted']:
+            value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
+            self["size"] = restricted_size(
+                self['parent_dimensions'], self.offset, (0.1, 0.1), value
+            )
+        else:
+            self["size"] = value
 
     size: FloatVectorProperty(
         name="Size",
@@ -74,7 +80,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         return self.get("offset", self['default_offset'])
 
     def set_offset(self, value):
-        self["offset"] = restricted_offset(self['parent_dimensions'], self.size, value)
+        self["offset"] = restricted_offset(self['parent_dimensions'], self.size, value) if self['restricted'] else value
 
     offset: FloatVectorProperty(
         name="Offset",
@@ -87,10 +93,11 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     show_props: BoolProperty(default=False)
 
-    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0)):
+    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=True):
         self['parent_dimensions'] = parent_dimensions
         self['default_size'] = default_size
         self['default_offset'] = default_offset
+        self['restricted'] = restricted
 
     def draw(self, context, box):
 
