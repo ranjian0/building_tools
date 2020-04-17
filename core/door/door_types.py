@@ -17,7 +17,6 @@ from ...utils import (
     add_faces_to_map,
     calc_face_dimensions,
     add_facemap_for_groups,
-    subdivide_face_edges_vertical,
     subdivide_face_horizontally,
     subdivide_face_vertically,
     get_top_edges,
@@ -114,9 +113,7 @@ def create_door_fill(bm, face, prop):
     """Add decorative elements on door face
     """
     if prop.double_door:
-        res = subdivide_face_edges_vertical(bm, face, 1)
-        inner_edges = filter_geom(res["geom_inner"], bmesh.types.BMEdge)
-        faces = list({f for e in inner_edges for f in e.link_faces})
+        faces = subdivide_face_horizontally(bm, face, widths=[1, 1])
         for f in faces:
             fill_door_face(bm, f, prop)
     else:

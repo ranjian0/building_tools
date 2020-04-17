@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import BoolProperty, EnumProperty, FloatProperty, PointerProperty
 
-from ..railing import RailProperty
+from ..railing.railing_props import RailProperty
 from ..generic import SizeOffsetProperty
 
 
@@ -33,7 +33,9 @@ class BalconyProperty(bpy.types.PropertyGroup):
     has_railing: BoolProperty(
         name="Add Railing", default=True, description="Whether the balcony has railing"
     )
+
     rail: PointerProperty(type=RailProperty)
+
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def init(self, wall_dimensions):
@@ -46,7 +48,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         row = layout.row()
         row.prop(self, "width")
 
-        layout.prop(self, "has_railing", toggle=True)
+        layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
             box.prop_menu_enum(self, "open_side", text="Open")
