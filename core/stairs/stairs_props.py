@@ -25,6 +25,14 @@ class StairsProperty(bpy.types.PropertyGroup):
         description="Width of each step",
     )
 
+    step_height: FloatProperty(
+        name="Step Height",
+        min=0.01,
+        max=100.0,
+        default=0.12,
+        description="Height of each step",
+    )
+
     landing_width: FloatProperty(
         name="Landing Width",
         min=0.01,
@@ -48,8 +56,8 @@ class StairsProperty(bpy.types.PropertyGroup):
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
         self.size_offset.init(
-            (self['wall_dimensions'][0], self['wall_dimensions'][1]),
-            default_size=(1.0, 0.2), default_offset=(0.0, 0.0),
+            (self['wall_dimensions'][0], 0.0),
+            default_size=(1.0, 0.0), default_offset=(0.0, 0.0),
             restricted=False,
         )
 
@@ -58,6 +66,7 @@ class StairsProperty(bpy.types.PropertyGroup):
 
         col = layout.column(align=True)
         col.prop(self, "step_count")
+        col.prop(self, "step_height")
         col.prop(self, "step_width")
 
         col.prop(self, "landing")

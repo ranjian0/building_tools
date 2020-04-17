@@ -77,7 +77,7 @@ def map_balcony_faces(bm, face):
 
 
 def create_balcony_split(bm, face, prop):
-    """Use properties from SizeOffset to create face
+    """Use properties to create face
     """
     xyz = local_xyz(face)
     size = Vector((prop.size_offset.size.x, prop.slab_height))

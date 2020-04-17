@@ -30,7 +30,7 @@ def create_stairs(bm, faces, prop):
             popup_message("Stair creation not supported for n-gons!", "Ngon Error")
             return False
 
-        f = create_stairs_split(bm, f, prop.size_offset.size, prop.size_offset.offset)
+        f = create_stairs_split(bm, f, prop)
         add_faces_to_map(bm, [f], FaceMap.STAIRS)
 
         normal = f.normal
@@ -53,9 +53,8 @@ def create_steps(bm, face, prop):
         top_faces.append(list({f for e in face.edges for f in e.link_faces if f.normal.z > 0}).pop())
 
     # create steps
-    step_height = prop.size_offset.size.y/(prop.step_count + 1)
     for i in range(prop.step_count):
-        ret_face = subdivide_next_step(bm, face, prop.step_count-i, step_height)
+        ret_face = subdivide_next_step(bm, face, prop.step_count-i, prop.step_height)
         face = extrude_step(bm, ret_face, prop.step_width)
 
         # -- keep reference to top faces for railing
@@ -80,11 +79,12 @@ def subdivide_next_step(bm, ret_face, remaining, step_height):
     return subdivide_face_vertically(bm, ret_face, widths=[remaining*step_height, step_height])[0]
 
 
-def create_stairs_split(bm, face, size, offset):
-    """Use properties from SizeOffset to create face
+def create_stairs_split(bm, face, prop):
+    """Use properties to create face
     """
     xyz = local_xyz(face)
-    f = create_face(bm, size, offset, xyz)
+    size = Vector((prop.size_offset.size.x, (prop.step_count+1)*prop.step_height))
+    f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds()
     )
