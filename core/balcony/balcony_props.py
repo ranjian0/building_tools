@@ -16,6 +16,14 @@ class BalconyProperty(bpy.types.PropertyGroup):
         description="Height of balcony slab",
     )
 
+    depth: FloatProperty(
+        name="Balcony depth",
+        min=0.0,
+        max=100.0,
+        default=0.0,
+        description="Depth of balcony",
+    )
+
     open_items = [
         ("NONE", "None", "", 0),
         ("FRONT", "Front", "", 1),
@@ -45,8 +53,11 @@ class BalconyProperty(bpy.types.PropertyGroup):
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
 
-        row = layout.row()
-        row.prop(self, "slab_height")
+        col = layout.column(align=True)
+        col.prop(self, "depth")
+
+        col = layout.column(align=True)
+        col.prop(self, "slab_height")
 
         layout.prop(self, "has_railing")
         if self.has_railing:
