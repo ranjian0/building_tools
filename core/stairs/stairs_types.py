@@ -7,7 +7,7 @@ from bmesh.types import BMVert, BMFace, BMEdge
 
 from ...utils import (
     FaceMap,
-    is_ngon,
+    valid_ngon,
     filter_geom,
     popup_message,
     add_faces_to_map,
@@ -26,8 +26,8 @@ def create_stairs(bm, faces, prop):
 
     for f in faces:
         f.select = False
-        if is_ngon(f):
-            popup_message("Stair creation not supported for n-gons!", "Ngon Error")
+        if not valid_ngon(f):
+            popup_message("Stairs creation not supported for non-rectangular n-gon!", "Ngon Error")
             return False
 
         f = create_stairs_split(bm, f, prop)

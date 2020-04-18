@@ -11,7 +11,7 @@ from ..arch import (
 )
 from ...utils import (
     FaceMap,
-    is_ngon,
+    valid_ngon,
     validate,
     popup_message,
     map_new_faces,
@@ -32,8 +32,8 @@ def create_window(bm, faces, prop):
     """Generate a window
     """
     for face in faces:
-        if is_ngon(face):
-            popup_message("Window creation not supported for n-gon", "Ngon Error")
+        if not valid_ngon(face):
+            popup_message("Window creation not supported for non-rectangular n-gon", "Ngon Error")
             return False
 
         face.select = False

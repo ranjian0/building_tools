@@ -10,6 +10,8 @@ from ...utils import (
     sort_edges,
     local_xyz,
     create_face,
+    valid_ngon,
+    popup_message,
 )
 
 from ..railing.railing import create_railing
@@ -19,6 +21,10 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
+        if not valid_ngon(f):
+            popup_message("Balcony creation not supported for non-rectangular n-gon!", "Ngon Error")
+            return False
+
         f.select = False
 
         normal = f.normal.copy()

@@ -57,9 +57,20 @@ def edge_vector(edge):
     return (v2.co - v1.co).normalized()
 
 
-def is_ngon(face):
-    return len(face.verts) > 4
+def valid_ngon(face):
+    """ faces with rectanuglar shape and undivided horizontal edges are valid
+    """
+    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
+    return len(horizontal_edges) == 2 and is_rectangle(face)
 
+
+def is_rectangle(face):
+    """ check if face is rectangulars
+    """
+    angles = [math.pi - l.calc_angle() for l in face.loops]
+    right_angles = len([a for a in angles if math.pi/2-0.001<a<math.pi/2+0.001])
+    straight_angles = len([a for a in angles if -0.001<a<0.001])
+    return right_angles == 4 and straight_angles == len(angles) - 4
 
 def sort_edges_clockwise(edges):
     """ sort edges clockwise based on angle from their median center
@@ -124,9 +135,11 @@ def calc_verts_median(verts):
 def calc_face_dimensions(face):
     """ Determine the width and height of face
     """
-    vertical = filter_vertical_edges(face.edges, face.normal).pop()
-    horizontal = filter_horizontal_edges(face.edges, face.normal).pop()
-    return horizontal.calc_length(), vertical.calc_length()
+    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
+    vertical_edges = filter_vertical_edges(face.edges, face.normal)
+    width = sum(e.calc_length() for e in horizontal_edges)/2
+    height = sum(e.calc_length() for e in vertical_edges)/2
+    return width, height
 
 
 def face_with_verts(bm, verts, default=None):
