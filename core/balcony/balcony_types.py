@@ -1,5 +1,6 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
+from mathutils import Vector
 
 from ...utils import (
     FaceMap,
