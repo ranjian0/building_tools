@@ -1,7 +1,7 @@
 import math
 import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
-from mathutils import Vector, Euler, Quaternion
+from mathutils import Vector, Quaternion
 from ...utils import (
     FaceMap,
     map_new_faces,
@@ -90,8 +90,6 @@ def create_fill_posts(bm, face, prop):
 
 @map_new_faces(FaceMap.RAILING_RAILS)
 def create_fill_rails(bm, face, prop):
-    sorted_edges = sort_edges(face.edges, Vector((0., 0., -1.)))
-
     # create rails
     rail_size = min(prop.rail_fill.size, prop.corner_post_width)
 
@@ -130,7 +128,7 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     edge_vec = edge_vector(edge)
     theta = (n-2)*math.pi/n
     length = 2 * radius * math.tan(theta/2)
-    
+
     dir = up.copy()
     dir.rotate(Quaternion(edge_vec, -math.pi+theta/2).to_euler())
     bmesh.ops.translate(bm, verts=edge.verts, vec=dir*radius/math.sin(theta/2))
@@ -142,7 +140,7 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
         bmesh.ops.translate(bm, verts=edge.verts, vec=dir*length)
         dir.rotate(Quaternion(edge_vec, math.radians(360/n)).to_euler())
         all_verts += edge.verts
-    
+
     bmesh.ops.remove_doubles(bm, verts=all_verts, dist=0.001)
 
     if fill:  # fill holes
