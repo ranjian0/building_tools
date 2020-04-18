@@ -1,6 +1,4 @@
-import bmesh
 from ..utils import (
-    filter_geom,
     extrude_face_region,
 )
 

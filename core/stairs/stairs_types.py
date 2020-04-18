@@ -1,9 +1,8 @@
-import bmesh
-import operator
 import math
+import bmesh
 
-from mathutils import Vector, Quaternion, Euler
-from bmesh.types import BMVert, BMFace, BMEdge
+from mathutils import Vector, Quaternion
+from bmesh.types import BMFace, BMEdge
 
 from ...utils import (
     FaceMap,
@@ -19,6 +18,7 @@ from ...utils import (
 )
 
 from ..railing.railing import create_railing
+
 
 def create_stairs(bm, faces, prop):
     """Extrude steps from selected faces
@@ -44,7 +44,7 @@ def create_stairs(bm, faces, prop):
 
 def create_steps(bm, face, prop):
     """ Create stair steps with landing"""
-    
+
     top_faces = []
 
     # create landing

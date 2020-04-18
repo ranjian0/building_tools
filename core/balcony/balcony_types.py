@@ -1,5 +1,4 @@
 import bmesh
-from mathutils import Vector
 from bmesh.types import BMVert, BMFace
 
 from ...utils import (
@@ -39,7 +38,7 @@ def extrude_balcony(bm, face, depth, normal):
     bmesh.ops.translate(
         bm, verts=front.verts, vec=normal * depth
     )
-    
+
     top = get_top_faces(f for e in front.edges for f in e.link_faces)[0]
     return front, top
 
