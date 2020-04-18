@@ -22,7 +22,7 @@ def create_railing(bm, faces, prop, normal):
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
 
 
-@map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
+@map_new_faces(FaceMap.RAILING_POSTS)
 def make_corner_posts(bm, edges, prop):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
