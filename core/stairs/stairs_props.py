@@ -76,9 +76,11 @@ class StairsProperty(bpy.types.PropertyGroup):
         col.prop(self, "depth_offset")
 
         col = layout.column(align=True)
-        col.prop(self, "step_count")
-        col.prop(self, "step_height")
-        col.prop(self, "step_width")
+        row = col.row(align=True)
+        row.prop(self, "step_count")
+        row = col.row(align=True)
+        row.prop(self, "step_height")
+        row.prop(self, "step_width")
 
         col = layout.column()
         col.prop(self, "landing")
