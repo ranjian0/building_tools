@@ -16,6 +16,7 @@ from ...utils import (
     subdivide_face_vertically,
     subdivide_edges,
     sort_faces,
+    sort_edges,
     sort_verts,
     filter_parallel_edges,
     vec_equal,
@@ -57,6 +58,8 @@ def create_steps(bm, face, prop):
         return create_filled_steps(bm, face, step_widths, prop.step_height)
     elif prop.bottom == "BLOCKED":
         return create_blocked_steps(bm, face, step_widths, prop.step_height)
+    elif prop.bottom == "SLOPE":
+        return create_slope_steps(bm, face, step_widths, prop.step_height)
 
 
 def create_filled_steps(bm, face, step_widths, step_height):
@@ -73,7 +76,7 @@ def create_filled_steps(bm, face, step_widths, step_height):
             top_faces.append([f for f in surrounding_faces if vec_equal(f.normal, Vector((0.,0.,1.)))][0])
         else:
             bottom_face = list({f for e in front_face.edges for f in e.link_faces if vec_equal(f.normal, Vector((0.,0.,-1.)))})[0]
-            top_face, front_face = extrude_step(bm, bottom_face, normal, step_height, step_width)
+            top_face, front_face, _ = extrude_step(bm, bottom_face, normal, step_height, step_width)
             top_faces.append(top_face)
 
     return top_faces
@@ -99,8 +102,39 @@ def create_blocked_steps(bm, face, step_widths, step_height):
             inner_edges = subdivide_edges(bm, edges, normal, widths=widths)
             bottom_face = sort_faces(list({f for e in inner_edges for f in e.link_faces}), normal)[1]
 
-            top_face, front_face = extrude_step(bm, bottom_face, normal, step_height, step_width)
+            top_face, front_face, _ = extrude_step(bm, bottom_face, normal, step_height, step_width)
             top_faces.append(top_face)
+
+    return top_faces
+
+
+def create_slope_steps(bm, face, step_widths, step_height):
+    """ Create slope steps with landing"""
+
+    normal = face.normal.copy()
+    top_faces = []
+
+    # create steps
+    front_face = face
+    for i,step_width in enumerate(step_widths):
+        if i==0:
+            front_face, surrounding_faces = extrude_face(bm, front_face, step_width)
+            top_faces.append([f for f in surrounding_faces if vec_equal(f.normal, Vector((0.,0.,1.)))][0])
+        else:
+            bottom_face = list({f for e in front_face.edges for f in e.link_faces if vec_equal(f.normal, Vector((0.,0.,-1.)))})[0]
+
+            e1 = sort_edges(bottom_face.edges, normal)[0]
+            edges = filter_parallel_edges(bottom_face.edges, normal)
+            widths = [edges[0].calc_length() -step_height, step_height]
+            inner_edges = subdivide_edges(bm, edges, normal, widths=widths)
+            bottom_face = sort_faces(list({f for e in inner_edges for f in e.link_faces}), normal)[1]
+            e2 = sort_edges(bottom_face.edges, normal)[0]
+
+            top_face, front_face, _ = extrude_step(bm, bottom_face, normal, step_height, step_width)
+            top_faces.append(top_face)
+
+            bmesh.ops.translate(bm, verts=e2.verts, vec=-2*normal*step_width/2)
+            bmesh.ops.remove_doubles(bm, verts=list(e1.verts)+list(e2.verts), dist=0.001)
 
     return top_faces
 
@@ -119,8 +153,9 @@ def extrude_step(bm, face, normal, step_height, step_width):
     flat_edges = list({e for f in surrounding_faces for e in f.edges if e.calc_face_angle() < 0.001 and e.calc_face_angle() > -0.001 })
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)
     top_face = list({f for e in front_face.edges for f in e.link_faces if vec_equal(f.normal, Vector((0.,0.,1.)))})[0]
+    bottom_face = list({f for e in front_face.edges for f in e.link_faces if vec_equal(f.normal, Vector((0.,0.,-1.)))})[0]
 
-    return top_face, front_face
+    return top_face, front_face, bottom_face
 
 
 def subdivide_next_step(bm, ret_face, remaining, step_height):

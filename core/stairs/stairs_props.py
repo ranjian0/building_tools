@@ -58,7 +58,6 @@ class StairsProperty(bpy.types.PropertyGroup):
         ("FILLED", "Filled", "", 0),
         ("SLOPE", "Slope", "", 2),
         ("BLOCKED", "Blocked", "", 1),
-        ("SEPARATED", "Separated", "", 3),
     ]
 
     bottom: EnumProperty(
