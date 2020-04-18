@@ -72,6 +72,21 @@ def is_rectangle(face):
     straight_angles = len([a for a in angles if -0.001<a<0.001])
     return right_angles == 4 and straight_angles == len(angles) - 4
 
+
+def vec_equal(a, b):
+    angle = a.angle(b)
+    return angle < 0.001 and angle > -0.001
+
+
+def vec_opposite(a, b):
+    angle = a.angle(b)
+    return angle < math.pi + 0.001 and angle > math.pi - 0.001
+
+
+def is_parallel(a, b):
+    return vec_equal(a,b) or vec_opposite(a,b)
+
+
 def sort_edges_clockwise(edges):
     """ sort edges clockwise based on angle from their median center
     """
@@ -118,6 +133,12 @@ def filter_horizontal_edges(edges, normal):
         if len(s) == 1:
             res.append(e)
     return res
+
+
+def filter_parallel_edges(edges, dir):
+    """ Determine edges that are parallel to a vector
+    """
+    return [e for e in edges if is_parallel(edge_vector(e), dir)]
 
 
 def calc_edge_median(edge):
@@ -181,16 +202,17 @@ def subdivide_face_vertically(bm, face, widths):
 def subdivide_edges(bm, edges, direction, widths):
     """ Subdivide edges in a direction, widths in the direction
     """
+    dir = direction.copy()
     cuts = len(widths) - 1
     res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=cuts)
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
     distance = sum(widths)/len(widths)
     final_position = 0.0
-    for i, edge in enumerate(sort_edges(inner_edges, direction)):
+    for i, edge in enumerate(sort_edges(inner_edges, dir)):
         original_position = (i+1) * distance
         final_position += widths[i]
         diff = final_position - original_position
-        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*direction)
+        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*dir)
     return inner_edges
 
 
@@ -222,17 +244,12 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
 
 
 def extrude_face(bm, face, extrude_depth):
-    """extrude a face and delete bottom face from new geometry
+    """extrude a face
     """
-    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
-    bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
-    bottom_edge = min(
-        filter_horizontal_edges(face.edges, face.normal),
-        key=lambda e: calc_edge_median(e).z,
-    )
-    hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
-    bmesh.ops.delete(bm, geom=[hidden], context="FACES")
-    return f
+    extruded_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[0]
+    bmesh.ops.translate(bm, verts=extruded_face.verts, vec=extruded_face.normal * extrude_depth)
+    surrounding_faces = list({f for edge in extruded_face.edges for f in edge.link_faces if f not in [extruded_face]})
+    return extruded_face, surrounding_faces
 
 
 def extrude_face_region(bm, faces, depth, normal):

@@ -4,6 +4,7 @@ from bpy.props import (
     BoolProperty,
     FloatProperty,
     PointerProperty,
+    EnumProperty,
 )
 
 from ..railing.railing_props import RailProperty
@@ -53,6 +54,20 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Has Landing", default=True, description="Whether to stairs have a landing"
     )
 
+    bottom_types = [
+        ("FILLED", "Filled", "", 0),
+        ("SLOPE", "Slope", "", 2),
+        ("BLOCKED", "Blocked", "", 1),
+        ("SEPARATED", "Separated", "", 3),
+    ]
+
+    bottom: EnumProperty(
+        name="Bottom Type",
+        items=bottom_types,
+        default="FILLED",
+        description="Bottom type of stairs",
+    )
+
     has_railing: BoolProperty(
         name="Add Railing", default=True, description="Whether the stairs have railing"
     )
@@ -88,9 +103,11 @@ class StairsProperty(bpy.types.PropertyGroup):
             box = layout.box()
             col = box.column()
             col.prop(self, "landing_width")
+        
+        col = layout.column()
+        col.prop_menu_enum(self, "bottom", text="Bottom")
 
         layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
-            # box.prop_menu_enum(self, "open_side", text="Open")
             self.rail.draw(context, box)
