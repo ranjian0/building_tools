@@ -22,7 +22,7 @@ def create_railing(bm, faces, prop, normal):
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
 
 
-@map_new_faces(FaceMap.RAILING_POSTS)
+@map_new_faces(FaceMap.RAILING_POSTS, skip=FaceMap.RAILING_RAILS)
 def make_corner_posts(bm, edges, prop):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
@@ -53,7 +53,7 @@ def make_fill(bm, face, prop):
         create_fill_walls(bm, dup_face, prop)
 
 
-@map_new_faces(FaceMap.RAILING_POSTS)
+@map_new_faces(FaceMap.RAILING_RAILS)
 def create_railing_top(bm, top_edge, prop):
     ret = bmesh.ops.duplicate(bm, geom=[top_edge])
     top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
