@@ -21,7 +21,7 @@ def create_railing(bm, faces, prop, normal):
         make_fill(bm, f, prop)
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
 
-
+@map_new_faces(FaceMap.RAILING_POSTS)
 def make_corner_posts(bm, edges, prop):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
@@ -38,14 +38,9 @@ def make_fill(bm, face, prop):
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top
-    ret = bmesh.ops.duplicate(bm, geom=[top_edge])
-    top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-    horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
-    up = edge_vector(top_dup_edge)
-    up.rotate(Quaternion(horizon, math.pi/2).to_euler())
-    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
-    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
+    create_railing_top(bm, top_edge, prop)
 
+    # create fill
     if prop.fill == "POSTS":
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_posts(bm, dup_face, prop)
@@ -56,8 +51,18 @@ def make_fill(bm, face, prop):
         add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
         create_fill_walls(bm, dup_face, prop)
 
+@map_new_faces(FaceMap.RAILING_POSTS)
+def create_railing_top(bm, top_edge, prop):
+    ret = bmesh.ops.duplicate(bm, geom=[top_edge])
+    top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
+    horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
+    up = edge_vector(top_dup_edge)
+    up.rotate(Quaternion(horizon, math.pi/2).to_euler())
+    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
+    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
-@map_new_faces(FaceMap.RAILING_RAILS)
+
+@map_new_faces(FaceMap.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
     sorted_edges = sort_edges([e for e in face.edges if e not in vertical_edges], Vector((0., 0., -1.)))
