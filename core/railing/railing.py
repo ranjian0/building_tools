@@ -16,6 +16,7 @@ from ...utils import (
 
 def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
+    add_facemap_for_groups(FaceMap.RAILING_POSTS)
     make_corner_posts(bm, vertical_edges, prop)
     for f in faces:
         make_fill(bm, f, prop)
@@ -39,17 +40,16 @@ def make_fill(bm, face, prop):
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top
+    add_facemap_for_groups(FaceMap.RAILING_RAILS)
     create_railing_top(bm, top_edge, prop)
 
     # create fill
     if prop.fill == "POSTS":
-        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_posts(bm, dup_face, prop)
     elif prop.fill == "RAILS":
-        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_RAILS))
         create_fill_rails(bm, dup_face, prop)
     elif prop.fill == "WALL":
-        add_facemap_for_groups((FaceMap.RAILING_POSTS, FaceMap.RAILING_WALLS))
+        add_facemap_for_groups(FaceMap.RAILING_WALLS)
         create_fill_walls(bm, dup_face, prop)
 
 
