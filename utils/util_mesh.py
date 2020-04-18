@@ -57,8 +57,34 @@ def edge_vector(edge):
     return (v2.co - v1.co).normalized()
 
 
-def is_ngon(face):
-    return len(face.verts) > 4
+def valid_ngon(face):
+    """ faces with rectanuglar shape and undivided horizontal edges are valid
+    """
+    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
+    return len(horizontal_edges) == 2 and is_rectangle(face)
+
+
+def is_rectangle(face):
+    """ check if face is rectangular
+    """
+    angles = [math.pi - l.calc_angle() for l in face.loops]
+    right_angles = len([a for a in angles if math.pi/2-0.001<a<math.pi/2+0.001])
+    straight_angles = len([a for a in angles if -0.001<a<0.001])
+    return right_angles == 4 and straight_angles == len(angles) - 4
+
+
+def vec_equal(a, b):
+    angle = a.angle(b)
+    return angle < 0.001 and angle > -0.001
+
+
+def vec_opposite(a, b):
+    angle = a.angle(b)
+    return angle < math.pi + 0.001 and angle > math.pi - 0.001
+
+
+def is_parallel(a, b):
+    return vec_equal(a,b) or vec_opposite(a,b)
 
 
 def sort_edges_clockwise(edges):
@@ -109,6 +135,12 @@ def filter_horizontal_edges(edges, normal):
     return res
 
 
+def filter_parallel_edges(edges, dir):
+    """ Determine edges that are parallel to a vector
+    """
+    return [e for e in edges if is_parallel(edge_vector(e), dir)]
+
+
 def calc_edge_median(edge):
     """ Calculate the center position of edge
     """
@@ -124,9 +156,11 @@ def calc_verts_median(verts):
 def calc_face_dimensions(face):
     """ Determine the width and height of face
     """
-    vertical = filter_vertical_edges(face.edges, face.normal).pop()
-    horizontal = filter_horizontal_edges(face.edges, face.normal).pop()
-    return horizontal.calc_length(), vertical.calc_length()
+    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
+    vertical_edges = filter_vertical_edges(face.edges, face.normal)
+    width = sum(e.calc_length() for e in horizontal_edges)/2
+    height = sum(e.calc_length() for e in vertical_edges)/2
+    return width, height
 
 
 def face_with_verts(bm, verts, default=None):
@@ -168,16 +202,17 @@ def subdivide_face_vertically(bm, face, widths):
 def subdivide_edges(bm, edges, direction, widths):
     """ Subdivide edges in a direction, widths in the direction
     """
+    dir = direction.copy()
     cuts = len(widths) - 1
     res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=cuts)
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
     distance = sum(widths)/len(widths)
     final_position = 0.0
-    for i, edge in enumerate(sort_edges(inner_edges, direction)):
+    for i, edge in enumerate(sort_edges(inner_edges, dir)):
         original_position = (i+1) * distance
         final_position += widths[i]
         diff = final_position - original_position
-        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*direction)
+        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*dir)
     return inner_edges
 
 
@@ -209,17 +244,12 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
 
 
 def extrude_face(bm, face, extrude_depth):
-    """extrude a face and delete bottom face from new geometry
+    """extrude a face
     """
-    f = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces").pop()
-    bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * extrude_depth)
-    bottom_edge = min(
-        filter_horizontal_edges(face.edges, face.normal),
-        key=lambda e: calc_edge_median(e).z,
-    )
-    hidden = min(bottom_edge.link_faces, key=lambda f: f.calc_center_median().z)
-    bmesh.ops.delete(bm, geom=[hidden], context="FACES")
-    return f
+    extruded_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[0]
+    bmesh.ops.translate(bm, verts=extruded_face.verts, vec=extruded_face.normal * extrude_depth)
+    surrounding_faces = list({f for edge in extruded_face.edges for f in edge.link_faces if f not in [extruded_face]})
+    return extruded_face, surrounding_faces
 
 
 def extrude_face_region(bm, faces, depth, normal):
@@ -244,6 +274,19 @@ def get_selected_face_dimensions(context):
     if wall:
         return calc_face_dimensions(wall[0])
     return 1, 1
+
+
+def create_face(bm, size, offset, xyz):
+    """ Create a face in xy plane of xyz space
+    """
+    offset = offset.x * xyz[0] + offset.y * xyz[1]
+
+    v1 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
+    v2 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
+    v3 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
+    v4 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
+
+    return bmesh.ops.contextual_create(bm, geom=[v1,v2,v3,v4])["faces"][0]
 
 
 def get_top_edges(edges, n=1):

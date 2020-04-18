@@ -9,7 +9,7 @@ from ..arch import (
     add_arch_depth,
 )
 from ...utils import (
-    is_ngon,
+    valid_ngon,
     FaceMap,
     filter_geom,
     popup_message,
@@ -31,8 +31,8 @@ def create_door(bm, faces, prop):
     """Create door from face selection
     """
     for face in faces:
-        if is_ngon(face):
-            popup_message("Door creation not supported for n-gons!", "Ngon Error")
+        if not valid_ngon(face):
+            popup_message("Door creation not supported non-rectangular n-gon!", "Ngon Error")
             return False
 
         face.select = False

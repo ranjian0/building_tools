@@ -8,26 +8,20 @@ from ..generic import SizeOffsetProperty
 class BalconyProperty(bpy.types.PropertyGroup):
     redo: BoolProperty()
 
-    width: FloatProperty(
-        name="Balcony Width",
+    slab_height: FloatProperty(
+        name="Slab Height",
         min=0.01,
         max=100.0,
-        default=1.2,
-        description="Width of balcony",
+        default=0.2,
+        description="Height of balcony slab",
     )
 
-    open_items = [
-        ("NONE", "None", "", 0),
-        ("FRONT", "Front", "", 1),
-        ("LEFT", "Left", "", 2),
-        ("RIGHT", "Right", "", 3),
-    ]
-
-    open_side: EnumProperty(
-        name="Open Side",
-        items=open_items,
-        default="NONE",
-        description="Sides of the balcony with no railing",
+    depth_offset: FloatProperty(
+        name="Depth Offset",
+        min=0.0,
+        max=100.0,
+        default=0.0,
+        description="Depth offset of balcony",
     )
 
     has_railing: BoolProperty(
@@ -40,16 +34,18 @@ class BalconyProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0], self['wall_dimensions'][1]), default_size=(1.0, 0.2), default_offset=(0.0, 0.0))
+        self.size_offset.init((self['wall_dimensions'][0], self['wall_dimensions'][1]), default_size=(1.6, 1.0), default_offset=(0.0, 0.0), restricted=False)
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
 
-        row = layout.row()
-        row.prop(self, "width")
+        col = layout.column(align=True)
+        col.prop(self, "depth_offset")
+
+        col = layout.column(align=True)
+        col.prop(self, "slab_height")
 
         layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
-            box.prop_menu_enum(self, "open_side", text="Open")
             self.rail.draw(context, box)

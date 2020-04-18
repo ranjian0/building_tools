@@ -6,7 +6,7 @@ from bpy.props import (
 
 class PostFillProperty(bpy.types.PropertyGroup):
     size: FloatProperty(
-        name="Post Size",
+        name="Size",
         min=0.01,
         max=100.0,
         default=0.05,
@@ -14,7 +14,7 @@ class PostFillProperty(bpy.types.PropertyGroup):
     )
 
     density: FloatProperty(
-        name="Post Density",
+        name="Density",
         min=0.0,
         max=1.0,
         default=0.3,
@@ -22,9 +22,9 @@ class PostFillProperty(bpy.types.PropertyGroup):
     )
 
     def draw(self, context, layout):
-        col = layout.column(align=True)
-        col.prop(self, "density")
-        col.prop(self, "size")
+        row = layout.row(align=True)
+        row.prop(self, "density")
+        row.prop(self, "size")
 
 
 class RailFillProperty(bpy.types.PropertyGroup):
@@ -45,9 +45,9 @@ class RailFillProperty(bpy.types.PropertyGroup):
     )
 
     def draw(self, context, layout):
-        col = layout.column(align=True)
-        col.prop(self, "density")
-        col.prop(self, "size")
+        row = layout.row(align=True)
+        row.prop(self, "density")
+        row.prop(self, "size")
 
 
 class WallFillProperty(bpy.types.PropertyGroup):
@@ -60,8 +60,8 @@ class WallFillProperty(bpy.types.PropertyGroup):
     )
 
     def draw(self, context, layout):
-        col = layout.column(align=True)
-        col.prop(self, "width")
+        row = layout.row(align=True)
+        row.prop(self, "width")
 
 
 class RailProperty(bpy.types.PropertyGroup):
@@ -80,7 +80,7 @@ class RailProperty(bpy.types.PropertyGroup):
     )
 
     corner_post_width: FloatProperty(
-        name="Corner Post Width",
+        name="Width",
         min=0.01,
         max=100.0,
         default=0.1,
@@ -88,7 +88,7 @@ class RailProperty(bpy.types.PropertyGroup):
     )
 
     corner_post_height: FloatProperty(
-        name="Corner Post Height",
+        name="Height",
         min=0.01,
         max=100.0,
         default=0.7,
@@ -126,6 +126,6 @@ class RailProperty(bpy.types.PropertyGroup):
         }.get(self.fill).draw(context, layout)
 
         layout.label(text="Corner Posts")
-        col = layout.column(align=True)
-        col.prop(self, "corner_post_width")
-        col.prop(self, "corner_post_height")
+        row = layout.row(align=True)
+        row.prop(self, "corner_post_width")
+        row.prop(self, "corner_post_height")

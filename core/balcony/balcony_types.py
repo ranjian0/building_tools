@@ -1,15 +1,17 @@
 import bmesh
 from bmesh.types import BMVert, BMFace
+from mathutils import Vector
 
 from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
-    calc_face_dimensions,
-    subdivide_face_horizontally,
-    subdivide_face_vertically,
     get_top_faces,
     sort_edges,
+    local_xyz,
+    create_face,
+    valid_ngon,
+    popup_message,
 )
 
 from ..railing.railing import create_railing
@@ -19,13 +21,17 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
+        if not valid_ngon(f):
+            popup_message("Balcony creation not supported for non-rectangular n-gon!", "Ngon Error")
+            return False
+
         f.select = False
 
         normal = f.normal.copy()
-        f = create_balcony_split(bm, f, prop.size_offset.size, prop.size_offset.offset)
+        f = create_balcony_split(bm, f, prop)
         add_faces_to_map(bm, [f], FaceMap.BALCONY)
 
-        front, top = extrude_balcony(bm, f, prop.width, normal)
+        front, top = extrude_balcony(bm, f, prop.size_offset.size.y, normal)
 
         if prop.has_railing:
             add_railing_to_balcony(bm, top, normal, prop)
@@ -76,15 +82,13 @@ def map_balcony_faces(bm, face):
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
 
 
-def create_balcony_split(bm, face, size, offset):
-    """Use properties from SplitOffset to subdivide face into regular quads
+def create_balcony_split(bm, face, prop):
+    """Use properties to create face
     """
-    wall_w, wall_h = calc_face_dimensions(face)
-    # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
-    h_faces = subdivide_face_horizontally(bm, face, h_widths)
-    # vertical split
-    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
-    v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
-
-    return v_faces[1]
+    xyz = local_xyz(face)
+    size = Vector((prop.size_offset.size.x, prop.slab_height))
+    f = create_face(bm, size, prop.size_offset.offset, xyz)
+    bmesh.ops.translate(
+        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
+    )
+    return f

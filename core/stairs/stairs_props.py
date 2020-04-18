@@ -4,6 +4,7 @@ from bpy.props import (
     BoolProperty,
     FloatProperty,
     PointerProperty,
+    EnumProperty,
 )
 
 from ..railing.railing_props import RailProperty
@@ -12,6 +13,14 @@ from ..generic import SizeOffsetProperty
 
 class StairsProperty(bpy.types.PropertyGroup):
     redo: BoolProperty()
+
+    depth_offset: FloatProperty(
+        name="Depth Offset",
+        min=0.0,
+        max=100.0,
+        default=0.0,
+        description="Depth offset of stairs",
+    )
 
     step_count: IntProperty(
         name="Step Count", min=1, max=100, default=3, description="Number of steps"
@@ -25,6 +34,14 @@ class StairsProperty(bpy.types.PropertyGroup):
         description="Width of each step",
     )
 
+    step_height: FloatProperty(
+        name="Step Height",
+        min=0.01,
+        max=100.0,
+        default=0.12,
+        description="Height of each step",
+    )
+
     landing_width: FloatProperty(
         name="Landing Width",
         min=0.01,
@@ -34,7 +51,20 @@ class StairsProperty(bpy.types.PropertyGroup):
     )
 
     landing: BoolProperty(
-        name="Has Landing", default=True, description="Whether to stairs have a landing"
+        name="Has Landing", default=True, description="Whether the stairs have a landing"
+    )
+
+    bottom_types = [
+        ("FILLED", "Filled", "", 0),
+        ("SLOPE", "Slope", "", 2),
+        ("BLOCKED", "Blocked", "", 1),
+    ]
+
+    bottom: EnumProperty(
+        name="Bottom Type",
+        items=bottom_types,
+        default="FILLED",
+        description="Bottom type of stairs",
     )
 
     has_railing: BoolProperty(
@@ -48,25 +78,35 @@ class StairsProperty(bpy.types.PropertyGroup):
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
         self.size_offset.init(
-            (self['wall_dimensions'][0], self['wall_dimensions'][1]),
-            default_size=(1.0, 0.2), default_offset=(0.0, 0.0)
+            (self['wall_dimensions'][0], 0.0),
+            default_size=(1.0, 0.0), default_offset=(0.0, 0.0),
+            restricted=False,
         )
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
 
         col = layout.column(align=True)
-        col.prop(self, "step_count")
-        col.prop(self, "step_width")
+        col.prop(self, "depth_offset")
 
+        col = layout.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, "step_count")
+        row = col.row(align=True)
+        row.prop(self, "step_height")
+        row.prop(self, "step_width")
+
+        col = layout.column()
         col.prop(self, "landing")
         if self.landing:
             box = layout.box()
             col = box.column()
             col.prop(self, "landing_width")
+        
+        col = layout.column()
+        col.prop_menu_enum(self, "bottom", text="Bottom Type")
 
         layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
-            # box.prop_menu_enum(self, "open_side", text="Open")
             self.rail.draw(context, box)

@@ -15,7 +15,7 @@ from ..window.window_types import (
     fill_window_face,
 )
 from ...utils import (
-    is_ngon,
+    valid_ngon,
     FaceMap,
     popup_message,
     map_new_faces,
@@ -34,8 +34,8 @@ def create_multigroup(bm, faces, prop):
     """
 
     for face in faces:
-        if is_ngon(face):
-            popup_message("Multigroup creation not supported for n-gons!", "Ngon Error")
+        if not valid_ngon(face):
+            popup_message("Multigroup creation not supported for non-rectangular n-gon!", "Ngon Error")
             return False
 
         face.select = False
