@@ -51,7 +51,7 @@ class StairsProperty(bpy.types.PropertyGroup):
     )
 
     landing: BoolProperty(
-        name="Has Landing", default=True, description="Whether to stairs have a landing"
+        name="Has Landing", default=True, description="Whether the stairs have a landing"
     )
 
     bottom_types = [
@@ -104,7 +104,7 @@ class StairsProperty(bpy.types.PropertyGroup):
             col.prop(self, "landing_width")
         
         col = layout.column()
-        col.prop_menu_enum(self, "bottom", text="Bottom")
+        col.prop_menu_enum(self, "bottom", text="Bottom Type")
 
         layout.prop(self, "has_railing")
         if self.has_railing:

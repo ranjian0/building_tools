@@ -65,7 +65,7 @@ def valid_ngon(face):
 
 
 def is_rectangle(face):
-    """ check if face is rectangulars
+    """ check if face is rectangular
     """
     angles = [math.pi - l.calc_angle() for l in face.loops]
     right_angles = len([a for a in angles if math.pi/2-0.001<a<math.pi/2+0.001])
