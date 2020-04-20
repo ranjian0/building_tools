@@ -17,26 +17,27 @@ from ...utils import (
 def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
     add_facemap_for_groups(FaceMap.RAILING_POSTS)
-    make_corner_posts(bm, vertical_edges, prop)
+    make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
     for f in faces:
         make_fill(bm, f, prop)
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
-def make_corner_posts(bm, edges, prop):
+def make_corner_posts(bm, edges, prop, up):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
         dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        edge_to_cylinder(bm, dup_edge, prop.corner_post_width/2, Vector((1., 0., 0.)), fill=True)
+        edge_to_cylinder(bm, dup_edge, prop.corner_post_width/2, up, fill=True)
 
 
 def make_fill(bm, face, prop):
     # duplicate original face and resize
     ret = bmesh.ops.duplicate(bm, geom=[face])
     dup_face = filter_geom(ret["geom"], BMFace)[0]
-    sorted_edges = sort_edges(dup_face.edges, Vector((0., 0., -1.)))
-    top_edge = sorted_edges[0]
+    vertical = filter_vertical_edges(dup_face.edges, dup_face.normal)
+    non_vertical = [e for e in dup_face.edges if e not in vertical]
+    top_edge = sort_edges(non_vertical, Vector((0.,0.,-1.)))[0]
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top
@@ -74,7 +75,9 @@ def create_fill_posts(bm, face, prop):
 
     top_edge = sorted_edges[0]
     bottom_edge = sorted_edges[-1]
-    n_posts = math.floor(top_edge.calc_length()*prop.post_fill.density/post_size)
+    top_edge_vector = top_edge.verts[0].co - top_edge.verts[1].co
+    top_edge_vector.z = 0
+    n_posts = round(top_edge_vector.length*prop.post_fill.density/post_size)
     dir = edge_vector(top_edge)
     inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
     for edge in inner_edges:
