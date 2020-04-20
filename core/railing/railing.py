@@ -17,18 +17,18 @@ from ...utils import (
 def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
     add_facemap_for_groups(FaceMap.RAILING_POSTS)
-    make_corner_posts(bm, vertical_edges, prop)
+    make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
     for f in faces:
         make_fill(bm, f, prop)
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
-def make_corner_posts(bm, edges, prop):
+def make_corner_posts(bm, edges, prop, up):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
         dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        edge_to_cylinder(bm, dup_edge, prop.corner_post_width/2, Vector((1., 0., 0.)), fill=True)
+        edge_to_cylinder(bm, dup_edge, prop.corner_post_width/2, up, fill=True)
 
 
 def make_fill(bm, face, prop):
