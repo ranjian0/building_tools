@@ -13,12 +13,7 @@ from ...utils import (
 def create_floors(bm, faces, prop):
     """Create extrusions of floor geometry from a floorplan
     """
-    start_height = faces[-1].calc_center_median().z
-
     slabs, walls = extrude_slabs_and_floors(bm, faces, prop)
-    slab_sides = bmesh.ops.inset_region(
-        bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True)["faces"]
-    slabs += slab_sides
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
@@ -33,6 +28,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
     walls = []
     normal = faces[0].normal.copy()
 
+    # extrude vertically
     if prop.add_slab:
         offsets = [prop.slab_thickness, prop.floor_height] * prop.floor_count
         for i, offset in enumerate(offsets):
@@ -46,5 +42,9 @@ def extrude_slabs_and_floors(bm, faces, prop):
         for offset in offsets:
             faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
             walls += surrounding_faces
+
+    # extrude slabs horizontally
+    slabs = bmesh.ops.inset_region(
+        bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True)["faces"]
 
     return slabs, walls
