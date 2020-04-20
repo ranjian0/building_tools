@@ -74,7 +74,9 @@ def create_fill_posts(bm, face, prop):
 
     top_edge = sorted_edges[0]
     bottom_edge = sorted_edges[-1]
-    n_posts = math.floor(top_edge.calc_length()*prop.post_fill.density/post_size)
+    top_edge_vector = top_edge.verts[0].co - top_edge.verts[1].co
+    top_edge_vector.z = 0
+    n_posts = round(top_edge_vector.length*prop.post_fill.density/post_size)
     dir = edge_vector(top_edge)
     inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
     for edge in inner_edges:
