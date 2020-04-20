@@ -6,6 +6,7 @@ from ...utils import (
     FaceMap,
     filter_geom,
     add_faces_to_map,
+    extrude_face_region,
 )
 
 
@@ -14,25 +15,10 @@ def create_floors(bm, faces, prop):
     """
     start_height = faces[-1].calc_center_median().z
 
-    extrude_slabs_and_floors(bm, faces, prop)
-    slabs, walls = get_slab_and_wall_faces(bm, prop, start_height)
-
-    # XXX CAREFUL NOTE XXX
-    #   (this solves alot of issues across the whole addon)
-    #   This first inset is a very decisive and it's distance is not arbitrary either
-    #   0.00011 is just a tad above the default distance for blender's remove_doubles,
-    #
-    #   This insets acts as a boundary region between slabs and floors and hence it's
-    #   a buffer to separate geometry created on walls from geometry created on slabs
-    #   especially usefull due to how 'inset_face_with_scale_offset' and
-    #   'move_slab_splitface_to_wall' work.
-    result_a = bmesh.ops.inset_region(bm, faces=slabs, depth=-0.00011)
-    #
-    # XXX END NOTE XXX
-
-    result_b = bmesh.ops.inset_region(
-        bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True)
-    slabs.extend(result_a["faces"] + result_b["faces"])
+    slabs, walls = extrude_slabs_and_floors(bm, faces, prop)
+    slab_sides = bmesh.ops.inset_region(
+        bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True)["faces"]
+    slabs += slab_sides
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
@@ -43,36 +29,22 @@ def create_floors(bm, faces, prop):
 def extrude_slabs_and_floors(bm, faces, prop):
     """extrude edges alternating between slab and floor heights
     """
+    slabs = []
+    walls = []
+    normal = faces[0].normal.copy()
 
-    offsets = [prop.slab_thickness, prop.floor_height] if prop.add_slab else [prop.floor_height]
-    offsets = offsets * prop.floor_count
-    for offset in offsets:
-        extrusion = bmesh.ops.extrude_face_region(bm, geom=faces)
-        bmesh.ops.translate(
-            bm, vec=(0, 0, offset), verts=filter_geom(extrusion["geom"], BMVert)
-        )
-        bmesh.ops.delete(bm, geom=faces, context="FACES")
-        faces = filter_geom(extrusion["geom"], BMFace)
+    if prop.add_slab:
+        offsets = [prop.slab_thickness, prop.floor_height] * prop.floor_count
+        for i, offset in enumerate(offsets):
+            faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
+            if i%2:
+                walls += surrounding_faces
+            else:
+                slabs += surrounding_faces
+    else:
+        offsets = [prop.floor_height] * prop.floor_count
+        for offset in offsets:
+            faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
+            walls += surrounding_faces
 
-
-def get_slab_and_wall_faces(bm, prop, start_height):
-    """get faces that form slabs and walls
-    """
-    slabs, walls = [], []
-    slab_heights, wall_heights = [], []
-
-    def H(idx):
-        return start_height + (idx * prop.floor_height) + (idx * prop.slab_thickness)
-
-    for idx in range(prop.floor_count):
-        slab_heights.append(H(idx) + prop.slab_thickness / 2)
-        wall_heights.append(H(idx) + prop.floor_height / 2 + prop.slab_thickness)
-
-    round_4dp = ft.partial(round, ndigits=4)
-    for face in bm.faces:
-        face_location_z = round_4dp(face.calc_center_median().z)
-        if face_location_z in map(round_4dp, slab_heights):
-            slabs.append(face)
-        elif face_location_z in map(round_4dp, wall_heights):
-            walls.append(face)
     return slabs, walls
