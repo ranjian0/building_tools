@@ -6,7 +6,7 @@ from math import radians
 def equal(a, b, eps=0.001):
     """ Check if a and b are approximately equal with a margin of eps
     """
-    return a == b or (abs(a - b) <= max(abs(a), abs(b)) * eps)
+    return a == b or (abs(a - b) <= eps)
 
 
 def clamp(value, minimum, maximum):
