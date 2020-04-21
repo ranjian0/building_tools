@@ -71,11 +71,6 @@ def add_faces_to_map(bm, faces, group, skip=None):
 
         see map_new_faces for the option *skip*
     """
-
-    # XXX - Only necessary because tests run in wrong context
-    if not bpy.context.object:
-        return
-
     face_map = bm.faces.layers.face_map.active
     group_index = face_map_index_from_name(group.name.lower())
 
