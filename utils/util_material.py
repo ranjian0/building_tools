@@ -94,11 +94,6 @@ def add_facemap_for_groups(groups):
         in the active object
     """
     obj = bpy.context.object
-
-    # XXX - Only necessary because tests run in wrong context
-    if not obj:
-        return
-
     groups = groups if isinstance(groups, (list, tuple)) else [groups]
 
     for group in groups:
