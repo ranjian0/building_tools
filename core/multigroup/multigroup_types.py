@@ -141,20 +141,20 @@ def make_multigroup_insets(bm, face, size, frame_thickness, dws):
         window_height = size.y - 2 * frame_thickness
 
         # adjacent doors/windows clubbed
-        clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i==0, i==len(dws)-1) for i,dw in enumerate(dws)]
+        clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
         clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
 
         doors = []
         windows = []
         frames = []
 
-        for i,(dw,f) in enumerate(zip(dws, clubbed_faces)):
+        for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
             if dw['type'] == 'door':
-                ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i==0, i==len(dws)-1)
+                ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
                 doors.extend(ds)
                 frames.extend(fs)
             elif dw['type'] == 'window':
-                ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i==0, i==len(dws)-1)
+                ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
                 windows.extend(ws)
                 frames.extend(fs)
         return doors, windows, frames

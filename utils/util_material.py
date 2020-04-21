@@ -59,9 +59,7 @@ def map_new_faces(group, skip=None):
             new_faces = set(bm.faces) - faces
             add_faces_to_map(bm, list(new_faces), group, skip)
             return result
-
         return wrapper
-
     return outer
 
 

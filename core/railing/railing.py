@@ -37,7 +37,7 @@ def make_fill(bm, face, prop):
     dup_face = filter_geom(ret["geom"], BMFace)[0]
     vertical = filter_vertical_edges(dup_face.edges, dup_face.normal)
     non_vertical = [e for e in dup_face.edges if e not in vertical]
-    top_edge = sort_edges(non_vertical, Vector((0.,0.,-1.)))[0]
+    top_edge = sort_edges(non_vertical, Vector((0., 0., -1.)))[0]
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top

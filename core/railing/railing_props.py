@@ -7,8 +7,10 @@ from bpy.props import (
 def get_density(self):
     return self.get("density", self.get("initial_density", 0.2))
 
+
 def set_density(self, value):
     self["density"] = value
+
 
 class PostFillProperty(bpy.types.PropertyGroup):
     size: FloatProperty(

@@ -68,8 +68,8 @@ def is_rectangle(face):
     """ check if face is rectangular
     """
     angles = [math.pi - l.calc_angle() for l in face.loops]
-    right_angles = len([a for a in angles if math.pi/2-0.001<a<math.pi/2+0.001])
-    straight_angles = len([a for a in angles if -0.001<a<0.001])
+    right_angles = len([a for a in angles if math.pi/2-0.001 < a < math.pi/2+0.001])
+    straight_angles = len([a for a in angles if -0.001 < a < 0.001])
     return right_angles == 4 and straight_angles == len(angles) - 4
 
 
@@ -84,7 +84,7 @@ def vec_opposite(a, b):
 
 
 def is_parallel(a, b):
-    return vec_equal(a,b) or vec_opposite(a,b)
+    return vec_equal(a, b) or vec_opposite(a, b)
 
 
 def sort_edges_clockwise(edges):
@@ -286,7 +286,7 @@ def create_face(bm, size, offset, xyz):
     v3 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
     v4 = bmesh.ops.create_vert(bm, co=offset-size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
 
-    return bmesh.ops.contextual_create(bm, geom=[v1,v2,v3,v4])["faces"][0]
+    return bmesh.ops.contextual_create(bm, geom=[v1, v2, v3, v4])["faces"][0]
 
 
 def get_top_edges(edges, n=1):
