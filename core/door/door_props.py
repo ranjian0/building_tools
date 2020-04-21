@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty, IntProperty
+from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty
 
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
@@ -95,7 +95,8 @@ class DoorProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        col.prop_menu_enum(self, "fill_type")
+        prop_name = "Fill Type" if self.fill_type == "NONE" else self.fill_type.title().replace('_', ' ')
+        col.prop_menu_enum(self, "fill_type", text=prop_name)
 
         # -- draw fill types
         fill_map = {

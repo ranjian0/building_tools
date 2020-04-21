@@ -132,7 +132,7 @@ class RailProperty(bpy.types.PropertyGroup):
         row.prop(self, "offset", text="Railing Offset")
 
         row = layout.row()
-        row.prop(self, "fill", text="")
+        row.prop_menu_enum(self, "fill", text=self.fill.title())
 
         {
             "POSTS" : self.post_fill,
