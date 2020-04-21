@@ -39,13 +39,12 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of entire roof",
     )
 
-    o_types = [("HORIZONTAL", "Horizontal", "", 0), ("VERTICAL", "Vertical", "", 1)]
-    orient: EnumProperty(
-        description="Orientation of gable", items=o_types, default="HORIZONTAL"
-    )
-
     roof_hangs: BoolProperty(
         name="Roof Hangs", default=True, description="Whether to add roof hangs"
+    )
+
+    flip_direction: BoolProperty(
+        name="Flip Direction", default=False, description="Whether to change direction of roof axis"
     )
 
     def draw(self, context, layout):
@@ -59,7 +58,7 @@ class RoofProperty(bpy.types.PropertyGroup):
 
         elif self.type == "GABLE":
             row = box.row(align=True)
-            row.prop(self, "orient", expand=True)
+            row.prop(self, "flip_direction", toggle=True)
 
             col = box.column(align=True)
             col.prop(self, "thickness")

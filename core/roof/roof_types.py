@@ -1,5 +1,4 @@
 import bmesh
-import operator
 import mathutils
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
@@ -8,6 +7,7 @@ from ...utils import (
     select,
     FaceMap,
     validate,
+    edge_vector,
     skeletonize,
     filter_geom,
     map_new_faces,
@@ -67,9 +67,14 @@ def create_gable_roof(bm, faces, prop):
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
 
-    axis = "x" if prop.orient == "HORIZONTAL" else "y"
     edges = extrude_up_and_delete_faces(bm, faces, prop.height)
-    merge_verts_along_axis(bm, set(v for e in edges for v in e.verts), axis)
+    sedges = sorted(edges, key=lambda e: e.calc_length())
+    normal_edge = sedges[0]
+    if prop.flip_direction:
+        normal_edge = sedges[-1]
+
+    merge_normal = edge_vector(normal_edge).cross(Vector((0, 0, 1)))
+    merge_edges_along_normal(bm, edges, merge_normal)
     roof_faces = list({f for e in edges for f in e.link_faces})
     bmesh.ops.dissolve_degenerate(bm, dist=0.01, edges=edges)
 
@@ -85,7 +90,7 @@ def create_gable_roof(bm, faces, prop):
         bmesh.ops.delete(bm, geom=roof_faces, context="FACES")
 
         hang_edges = create_roof_hangs(bm, boundary_edges, prop.outset)
-        fill_roof_faces_from_hang(bm, hang_edges, prop.thickness, axis)
+        fill_roof_faces_from_hang(bm, hang_edges, prop.thickness)
 
 
 def create_hip_roof(bm, faces, prop):
@@ -121,23 +126,19 @@ def create_hip_roof(bm, faces, prop):
 def is_rectangular(faces):
     """ Determine if faces form a rectangular area
     """
-    # TODO - using area to determine this can fail, better
-    # have checks to determine if verts are only horizontally
-    # and vertically aligned.
-
-    face_area = sum([f.calc_area() for f in faces])
+    # -- use equal diagonal to check for rectangularness
 
     verts = [v for f in faces for v in f.verts]
+
     verts = sorted(verts, key=lambda v: (v.co.x, v.co.y))
+    _min_x, _max_x = verts[0], verts[-1]
 
-    _min, _max = verts[0], verts[-1]
-    width = abs(_min.co.x - _max.co.x)
-    length = abs(_min.co.y - _max.co.y)
-    area = width * length
+    verts = sorted(verts, key=lambda v: (v.co.y, v.co.x))
+    _min_y, _max_y = verts[0], verts[-1]
 
-    if round(face_area, 4) == round(area, 4):
-        return True
-    return False
+    diag_a = round((_min_x.co - _max_x.co).length, 4)
+    diag_b = round((_min_y.co - _max_y.co).length, 4)
+    return diag_a == diag_b
 
 
 def sort_verts_by_loops(face):
@@ -185,15 +186,23 @@ def extrude_up_and_delete_faces(bm, faces, extrude_depth):
     return edges
 
 
-def merge_verts_along_axis(bm, verts, axis):
-    """ Merge verts that lie along given axis
+def merge_edges_along_normal(bm, edges, normal):
+    """ Merge verts so that they lie along the midpoint perpendicular to a normal
     """
-    key_func = operator.attrgetter("co." + axis)
-    _max = max(verts, key=key_func)
-    _min = min(verts, key=key_func)
-    mid = getattr((_max.co + _min.co) / 2, axis)
-    for v in verts:
-        setattr(v.co, axis, mid)
+    def vabs(vec):
+        return tuple(map(abs, vec.to_tuple(3)))
+
+    for edge in edges:
+        if vabs(edge_vector(edge)) == vabs(normal):
+            cen = calc_edge_median(edge)
+            for v in edge.verts:
+                v.co = cen
+    # key_func = operator.attrgetter("co." + axis)
+    # _max = max(verts, key=key_func)
+    # _min = min(verts, key=key_func)
+    # mid = getattr((_max.co + _min.co) / 2, axis)
+    # for v in verts:
+    #     setattr(v.co, axis, mid)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 
@@ -216,7 +225,7 @@ def create_roof_hangs(bm, edges, size):
     return hang_edges
 
 
-def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
+def fill_roof_faces_from_hang(bm, edges, roof_thickness):
     """ Use edges formed for hang to form complete roof
     """
     # -- extrude edges upwards
@@ -227,14 +236,8 @@ def fill_roof_faces_from_hang(bm, edges, roof_thickness, axis):
 
     min_z = min([v.co.z for e in edges for v in e.verts])
     valid_edges = list(filter(lambda e: calc_edge_median(e).z != min_z, edges))
-    edge_loc = set([getattr(calc_edge_median(e), axis) for e in valid_edges])
-
-    # -- fill faces
-    for loc in edge_loc:
-        edges = [e for e in valid_edges if getattr(calc_edge_median(e), axis) == loc]
-        ret = bmesh.ops.contextual_create(bm, geom=edges)
-        add_faces_to_map(bm, ret["faces"], FaceMap.ROOF)
-
+    ret = bmesh.ops.bridge_loops(bm, edges=valid_edges, use_pairs=True)
+    add_faces_to_map(bm, ret["faces"], FaceMap.ROOF)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
 
