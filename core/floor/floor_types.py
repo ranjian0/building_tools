@@ -31,14 +31,14 @@ def extrude_slabs_and_floors(bm, faces, prop):
     walls = []
     normal = faces[0].normal.copy()
 
-    faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True)["region"]
+    faces = bmesh.ops.dissolve_faces(bm, faces=faces)["region"]
 
     # extrude vertically
     if prop.add_slab:
         offsets = [prop.slab_thickness, prop.floor_height] * prop.floor_count
         for i, offset in enumerate(offsets):
             if i==0:
-                orig_locs = [f.calc_center_median() for f in faces]
+                orig_locs = [f.calc_center_bounds() for f in faces]
                 flat_faces = get_flat_faces(faces, {})
                 flat_faces, surrounding_faces = extrude_face_region(bm, flat_faces, offset, normal)
                 dissolve_flat_edges(bm, surrounding_faces)
@@ -86,6 +86,6 @@ def get_flat_faces(faces, visited):
 def closest_faces(faces, locations):
     def get_face(faces, location):
         for f in faces:
-            if equal((f.calc_center_median()-location).length, 0):
+            if equal((f.calc_center_bounds()-location).length, 0):
                 return f
     return [get_face(faces,l) for l in locations]
