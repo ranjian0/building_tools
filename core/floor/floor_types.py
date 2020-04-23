@@ -10,9 +10,7 @@ from ...utils import (
     equal,
     filter_vertical_edges,
 )
-from mathutils import (
-    Vector,
-)
+from mathutils import Vector
 
 
 def create_floors(bm, faces, prop):
