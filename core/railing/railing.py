@@ -42,8 +42,8 @@ def make_fill(bm, face, prop):
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top
-    # add_facemap_for_groups(FaceMap.RAILING_RAILS)
-    # create_railing_top(bm, top_edge, prop)
+    add_facemap_for_groups(FaceMap.RAILING_RAILS)
+    create_railing_top(bm, top_edge, prop)
 
     # create fill
     if prop.fill == "POSTS":
