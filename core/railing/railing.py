@@ -3,14 +3,15 @@ import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Quaternion
 from ...utils import (
+    clamp,
     FaceMap,
-    map_new_faces,
-    add_facemap_for_groups,
-    filter_vertical_edges,
-    filter_geom,
-    edge_vector,
     sort_edges,
+    edge_vector,
+    filter_geom,
+    map_new_faces,
     subdivide_edges,
+    filter_vertical_edges,
+    add_facemap_for_groups,
 )
 
 
@@ -41,8 +42,8 @@ def make_fill(bm, face, prop):
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
     # create railing top
-    add_facemap_for_groups(FaceMap.RAILING_RAILS)
-    create_railing_top(bm, top_edge, prop)
+    # add_facemap_for_groups(FaceMap.RAILING_RAILS)
+    # create_railing_top(bm, top_edge, prop)
 
     # create fill
     if prop.fill == "POSTS":
@@ -113,7 +114,7 @@ def create_fill_rails(bm, face, prop):
 @map_new_faces(FaceMap.RAILING_WALLS)
 def create_fill_walls(bm, face, prop):
     # create walls
-    wall_size = min(prop.wall_fill.width, prop.corner_post_width)
+    wall_size = clamp(prop.wall_fill.width, 0.001, prop.corner_post_width)
 
     ret = bmesh.ops.duplicate(bm, geom=[face])
     dup_face = filter_geom(ret["geom"], BMFace)[0]
@@ -123,8 +124,8 @@ def create_fill_walls(bm, face, prop):
     bmesh.ops.translate(bm, verts=verts, vec=face.normal*wall_size)
     bmesh.ops.contextual_create(bm, geom=verts)
 
-    # delete reference faces
-    bmesh.ops.delete(bm, geom=[face], context="FACES")
+    # delete reference faces and hidden faces
+    bmesh.ops.delete(bm, geom=[face] + filter_geom(ret['geom'], BMFace), context="FACES")
 
 
 def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
