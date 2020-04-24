@@ -1,6 +1,6 @@
 import bmesh
 import mathutils
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from bmesh.types import BMVert, BMEdge, BMFace
 from ...utils import (
     equal,
@@ -13,6 +13,7 @@ from ...utils import (
     map_new_faces,
     calc_edge_median,
     add_faces_to_map,
+    calc_verts_median,
     add_facemap_for_groups,
 )
 
@@ -209,12 +210,13 @@ def merge_edges_along_normal(bm, edges, normal):
 
 @map_new_faces(FaceMap.ROOF_HANGS)
 def create_roof_hangs(bm, edges, size):
-    """Extrude edges outwards and slope the downward to form proper
-    hangs
+    """Extrude edges outwards and slope the downward to form proper hangs
     """
     ret = bmesh.ops.extrude_edge_only(bm, edges=edges)
     verts = filter_geom(ret["geom"], BMVert)
-    bmesh.ops.scale(bm, verts=verts, vec=(1 + size, 1 + size, 1))
+    bmesh.ops.scale(bm, verts=verts, vec=(1 + size, 1 + size, 1),
+                    space=Matrix.Translation(-calc_verts_median(verts)))
+
     hang_edges = list(
         {e for v in verts for e in v.link_edges if all([v in verts for v in e.verts])}
     )
