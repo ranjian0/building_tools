@@ -197,12 +197,6 @@ def merge_edges_along_normal(bm, edges, normal):
             cen = calc_edge_median(edge)
             for v in edge.verts:
                 v.co = cen
-    # key_func = operator.attrgetter("co." + axis)
-    # _max = max(verts, key=key_func)
-    # _min = min(verts, key=key_func)
-    # mid = getattr((_max.co + _min.co) / 2, axis)
-    # for v in verts:
-    #     setattr(v.co, axis, mid)
     bmesh.ops.remove_doubles(bm, verts=bm.verts)
 
 

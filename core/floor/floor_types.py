@@ -1,6 +1,5 @@
 import bmesh
-import functools as ft
-from bmesh.types import BMVert, BMFace
+from bmesh.types import BMFace
 
 from ...utils import (
     FaceMap,
