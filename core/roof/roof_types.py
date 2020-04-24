@@ -69,11 +69,18 @@ def create_gable_roof(bm, faces, prop):
 
     edges = extrude_up_and_delete_faces(bm, faces, prop.height)
     sedges = sorted(edges, key=lambda e: e.calc_length())
-    normal_edge = sedges[0]
+    normal_edge = edge_vector(sedges[0])
     if prop.flip_direction:
-        normal_edge = sedges[-1]
+        normal_edge = edge_vector(sedges[-1])
 
-    merge_normal = edge_vector(normal_edge).cross(Vector((0, 0, 1)))
+    # -- cleanup any lone edges
+    if len(edges) > 4:
+        sverts = list({v for e in sedges for v in e.verts})
+        lone_edges = [e for v in sverts for e in v.link_edges if e not in sedges and equal(e.calc_face_angle(), 0)]
+        bmesh.ops.dissolve_edges(bm, edges=lone_edges, use_verts=True)
+        edges = validate(edges)
+
+    merge_normal = normal_edge.cross(Vector((0, 0, 1)))
     merge_edges_along_normal(bm, edges, merge_normal)
     roof_faces = list({f for e in edges for f in e.link_faces})
     bmesh.ops.dissolve_degenerate(bm, dist=0.01, edges=edges)

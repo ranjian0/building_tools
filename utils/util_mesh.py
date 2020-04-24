@@ -58,7 +58,7 @@ def edge_vector(edge):
 
 
 def valid_ngon(face):
-    """ faces with rectanuglar shape and undivided horizontal edges are valid
+    """ faces with rectangular shape and undivided horizontal edges are valid
     """
     horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
     return len(horizontal_edges) == 2 and is_rectangle(face)

@@ -1,6 +1,6 @@
 import bpy
-from mathutils import Vector, Euler
 from math import radians
+from mathutils import Vector, Euler
 
 
 def equal(a, b, eps=0.001):
