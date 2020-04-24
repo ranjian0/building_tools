@@ -144,7 +144,7 @@ def filter_parallel_edges(edges, dir):
 def calc_edge_median(edge):
     """ Calculate the center position of edge
     """
-    return ft.reduce(operator.add, [v.co for v in edge.verts]) / len(edge.verts)
+    return calc_verts_median(edge.verts)
 
 
 def calc_verts_median(verts):
