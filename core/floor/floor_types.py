@@ -9,6 +9,7 @@ from ...utils import (
     equal,
     filter_vertical_edges,
 )
+from mathutils import Vector
 
 
 def create_floors(bm, faces, prop):
@@ -29,16 +30,21 @@ def extrude_slabs_and_floors(bm, faces, prop):
     walls = []
     normal = faces[0].normal.copy()
 
-    faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True)["region"]
+    faces = bmesh.ops.dissolve_faces(bm, faces=faces)["region"]
 
     # extrude vertically
     if prop.add_slab:
         offsets = [prop.slab_thickness, prop.floor_height] * prop.floor_count
         for i, offset in enumerate(offsets):
-            faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
             if i==0:
+                orig_locs = [f.calc_center_bounds() for f in faces]
+                flat_faces = get_flat_faces(faces, {})
+                flat_faces, surrounding_faces = extrude_face_region(bm, flat_faces, offset, normal)
                 dissolve_flat_edges(bm, surrounding_faces)
-                surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=faces, use_faces=True)["geom"], BMFace)
+                surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)["geom"], BMFace)
+                faces = closest_faces(flat_faces, [l+Vector((0.,0.,offset)) for l in orig_locs])
+            else:
+                faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
             if i%2:
                 walls += surrounding_faces
             else:
@@ -63,3 +69,22 @@ def extrude_slabs_and_floors(bm, faces, prop):
 def dissolve_flat_edges(bm, faces):
     flat_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal) if len(e.link_faces)>1 and equal(e.calc_face_angle(),0)})
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)
+
+
+def get_flat_faces(faces, visited):
+    flat_edges = list({e for f in faces for e in f.edges if len(e.link_faces)>1 and equal(e.calc_face_angle(),0)})
+    flat_faces = []
+    for e in flat_edges:
+        for f in e.link_faces:
+            if not visited.get(f, False):
+                visited[f] = True
+                flat_faces += get_flat_faces([f], visited)
+    return list(set(faces + flat_faces))
+
+
+def closest_faces(faces, locations):
+    def get_face(faces, location):
+        for f in faces:
+            if equal((f.calc_center_bounds()-location).length, 0):
+                return f
+    return [get_face(faces,l) for l in locations]
