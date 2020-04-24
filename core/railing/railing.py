@@ -1,7 +1,7 @@
 import math
 import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
-from mathutils import Vector, Quaternion
+from mathutils import Vector, Matrix, Quaternion
 from ...utils import (
     clamp,
     FaceMap,
@@ -10,6 +10,7 @@ from ...utils import (
     filter_geom,
     map_new_faces,
     subdivide_edges,
+    calc_edge_median,
     filter_vertical_edges,
     add_facemap_for_groups,
 )
@@ -62,6 +63,10 @@ def create_railing_top(bm, top_edge, prop):
     horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
     up = edge_vector(top_dup_edge)
     up.rotate(Quaternion(horizon, math.pi/2).to_euler())
+
+    if not edge_vector(top_dup_edge).z:
+        scale_railing_edge(bm, top_dup_edge, prop.corner_post_width)
+
     edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
@@ -104,6 +109,8 @@ def create_fill_rails(bm, face, prop):
         ret = bmesh.ops.duplicate(bm, geom=[edge])
         dup_edge = filter_geom(ret["geom"], BMEdge)[0]
         up = face.normal
+        if not edge_vector(dup_edge).z:
+            scale_railing_edge(bm, dup_edge, prop.corner_post_width)
         edge_to_cylinder(bm, dup_edge, rail_size/2, up)
 
     # delete reference faces
@@ -154,3 +161,12 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
         bottom_edges = sorted_edges[:n]
         bmesh.ops.holes_fill(bm, edges=top_edges)
         bmesh.ops.holes_fill(bm, edges=bottom_edges)
+
+
+def scale_railing_edge(bm, edge, amount):
+    edge_len = edge.calc_length()
+    edge_scale = (edge_len - amount) / edge_len
+    bmesh.ops.scale(bm,
+                    verts=edge.verts,
+                    vec=edge_vector(edge) * edge_scale,
+                    space=Matrix.Translation(-calc_edge_median(edge)))
