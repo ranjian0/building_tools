@@ -51,7 +51,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
                 slabs += surrounding_faces
 
         # extrude slabs horizontally
-        slabs = bmesh.ops.inset_region(
+        slabs += bmesh.ops.inset_region(
             bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True)["faces"]
 
     else:
