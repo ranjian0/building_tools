@@ -10,6 +10,7 @@ from ...utils import (
     edge_vector,
     skeletonize,
     filter_geom,
+    popup_message,
     map_new_faces,
     calc_edge_median,
     add_faces_to_map,
@@ -62,11 +63,12 @@ def create_flat_roof(bm, faces, prop):
 def create_gable_roof(bm, faces, prop):
     """Create a gable roof
     """
-    if not is_rectangular(faces):
-        return
-
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
+
+    if not is_rectangular(faces[0]):
+        popup_message("Gable Roof can only be created on rectangular faces", "Context Error")
+        return
 
     edges = extrude_up_and_delete_faces(bm, faces, prop.height)
     sedges = sorted(edges, key=lambda e: e.calc_length())
@@ -131,13 +133,24 @@ def create_hip_roof(bm, faces, prop):
     create_hiproof_faces(bm, original_edges, skeleton_edges)
 
 
-def is_rectangular(faces):
-    """ Determine if faces form a rectangular area
+def is_rectangular(face):
+    """ Determine if faces form a rectangular polygon
+    Current strategies may fail, when that happens, consider strategies from
+    https://www.quora.com/How-do-you-know-if-a-polygon-is-regular
     """
-    # -- use equal diagonal to check for rectangularness
+    verts = list(face.verts)
+    loops = list({loop for v in face.verts for loop in v.link_loops if loop.face == face})
 
-    verts = [v for f in faces for v in f.verts]
+    # -- strategy A (only 4 right angled verts, others colinear)
+    # no problem if the face is an ngon
+    angles = [l.calc_angle() for l in loops]
+    right_angles = [a for a in angles if round(a, 2) == 1.57]
+    other_angles = [a for a in angles if a not in right_angles and round(a, 2) == 3.14]
+    strat_b = len(right_angles) == 4 and (len(right_angles) + len(other_angles)) == len(angles)
+    if not strat_b:
+        return False
 
+    # -- strategy B (equal diagonals)
     verts = sorted(verts, key=lambda v: (v.co.x, v.co.y))
     _min_x, _max_x = verts[0], verts[-1]
 
@@ -146,7 +159,15 @@ def is_rectangular(faces):
 
     diag_a = round((_min_x.co - _max_x.co).length, 4)
     diag_b = round((_min_y.co - _max_y.co).length, 4)
-    return diag_a == diag_b
+    if not diag_a == diag_b:
+        return False
+
+    # -- strategy C (face area ~= numerical area)
+    a, b = abs(_max_x.co.x - _min_x.co.x), abs(_max_y.co.y - _min_y.co.y)
+    num_area = a * b
+    if not equal(face.calc_area(), num_area):
+        return False
+    return True
 
 
 def sort_verts_by_loops(face):
@@ -366,7 +387,7 @@ def dissolve_lone_verts(bm, face, original_edges):
     loops = {loop for v in face.verts for loop in v.link_loops if loop.face == face}
 
     def is_parallel(loop):
-        return round(loop.calc_angle(), 3) == 3.142
+        return round(loop.calc_angle(), 2) == 3.14
 
     parallel_verts = [loop.vert for loop in loops if is_parallel(loop)]
     lone_edges = [

@@ -445,8 +445,9 @@ def normalize_contour(contour):
     ]
 
 
+# -- Event Type (etype) is 1
 class SplitEvent(
-    namedtuple("SplitEvent", "distance, intersection_point, vertex, opposite_edge")
+    namedtuple("SplitEvent", "distance intersection_point etype vertex opposite_edge")
 ):
     __slots__ = ()
 
@@ -456,8 +457,9 @@ class SplitEvent(
         )
 
 
+# -- Event Type (etype) is 0
 class EdgeEvent(
-    namedtuple("EdgeEvent", "distance intersection_point vertex_a vertex_b")
+    namedtuple("EdgeEvent", "distance intersection_point etype vertex_a vertex_b")
 ):
     __slots__ = ()
 
@@ -559,7 +561,7 @@ class LAVertex:
                         continue
 
                     events.append(
-                        SplitEvent(Line2(edge.edge).distance(b), b, self, edge.edge)
+                        SplitEvent(Line2(edge.edge).distance(b), b, 0, self, edge.edge)
                     )
 
         i_prev = self.bisector.intersect(self.prev.bisector)
@@ -568,13 +570,13 @@ class LAVertex:
         if i_prev is not None:
             events.append(
                 EdgeEvent(
-                    Line2(self.edge_left).distance(i_prev), i_prev, self.prev, self
+                    Line2(self.edge_left).distance(i_prev), i_prev, 1, self.prev, self
                 )
             )
         if i_next is not None:
             events.append(
                 EdgeEvent(
-                    Line2(self.edge_right).distance(i_next), i_next, self, self.next
+                    Line2(self.edge_right).distance(i_next), i_next, 1, self, self.next
                 )
             )
 
