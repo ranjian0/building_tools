@@ -44,7 +44,7 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
 
     if len(verts) == 4: # corner case
         verts = sort_verts([v for e in top_edges for v in e.verts], xyz[0])
-        new_edge = bmesh.ops.connect_verts(bm, verts=[verts[1],verts[-2]])['edges'].pop()
+        new_edge = bmesh.ops.connect_verts(bm, verts=[verts[1], verts[-2]])['edges'].pop()
         new_face = get_bottom_faces(new_edge.link_faces).pop()
         arch_frame_faces.append(new_face)
 

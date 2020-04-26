@@ -38,16 +38,16 @@ def extrude_slabs_and_floors(bm, faces, prop):
     if prop.add_slab:
         offsets = [prop.slab_thickness, prop.floor_height] * prop.floor_count
         for i, offset in enumerate(offsets):
-            if i==0:
+            if i == 0:
                 orig_locs = [f.calc_center_bounds() for f in faces]
                 flat_faces = get_flat_faces(faces, {})
                 flat_faces, surrounding_faces = extrude_face_region(bm, flat_faces, offset, normal)
                 dissolve_flat_edges(bm, surrounding_faces)
                 surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)["geom"], BMFace)
-                faces = closest_faces(flat_faces, [l+Vector((0.,0.,offset)) for l in orig_locs])
+                faces = closest_faces(flat_faces, [l+Vector((0., 0., offset)) for l in orig_locs])
             else:
                 faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
-            if i%2:
+            if i % 2:
                 walls += surrounding_faces
             else:
                 slabs += surrounding_faces
@@ -60,7 +60,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
         offsets = [prop.floor_height] * prop.floor_count
         for i, offset in enumerate(offsets):
             faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
-            if i==0:
+            if i == 0:
                 dissolve_flat_edges(bm, surrounding_faces)
                 surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=faces, use_faces=True)["geom"], BMFace)
             walls += surrounding_faces
@@ -69,12 +69,12 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
 
 def dissolve_flat_edges(bm, faces):
-    flat_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal) if len(e.link_faces)>1 and equal(e.calc_face_angle(),0)})
+    flat_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal) if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)})
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)
 
 
 def get_flat_faces(faces, visited):
-    flat_edges = list({e for f in faces for e in f.edges if len(e.link_faces)>1 and equal(e.calc_face_angle(),0)})
+    flat_edges = list({e for f in faces for e in f.edges if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)})
     flat_faces = []
     for e in flat_edges:
         for f in e.link_faces:

@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import BoolProperty, EnumProperty, FloatProperty, PointerProperty
+from bpy.props import BoolProperty, FloatProperty, PointerProperty
 
 from ..railing.railing_props import RailProperty
 from ..generic import SizeOffsetProperty

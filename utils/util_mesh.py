@@ -275,7 +275,7 @@ def closest_faces(faces, locations):
         for f in faces:
             if equal((f.calc_center_bounds()-location).length, 0):
                 return f
-    return [get_face(faces,l) for l in locations]
+    return [get_face(faces, l) for l in locations]
 
 
 def get_selected_face_dimensions(context):
