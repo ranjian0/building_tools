@@ -8,7 +8,7 @@ from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
 class DoorProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
-        min=0.0,
+        min=0.01,
         max=1.0,
         default=0.1,
         description="Thickness of door Frame",

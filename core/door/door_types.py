@@ -81,9 +81,8 @@ def create_door_frame(bm, face, prop):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
-    if frame_faces:
-        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
-        frame_faces = frame_front_faces + frame_side_faces
+    frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+    frame_faces = frame_front_faces + frame_side_faces
 
     if prop.add_arch:
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
@@ -137,16 +136,13 @@ def fill_door_face(bm, face, prop):
 def make_door_inset(bm, face, size, frame_thickness):
     """ Make one horizontal cut and two vertical cuts on face
     """
-    if frame_thickness > 0:
-        door_width = size.x - frame_thickness * 2
-        _, face_height = calc_face_dimensions(face)
-        door_height = face_height - frame_thickness
-        # horizontal cuts
-        h_widths = [frame_thickness, door_width, frame_thickness]
-        h_faces = subdivide_face_horizontally(bm, face, h_widths)
-        # vertical cuts
-        v_widths = [door_height, frame_thickness]
-        v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
-        return v_faces[0], h_faces[::2] + [v_faces[1]]
-    else:
-        return face, []
+    door_width = size.x - frame_thickness * 2
+    _, face_height = calc_face_dimensions(face)
+    door_height = face_height - frame_thickness
+    # horizontal cuts
+    h_widths = [frame_thickness, door_width, frame_thickness]
+    h_faces = subdivide_face_horizontally(bm, face, h_widths)
+    # vertical cuts
+    v_widths = [door_height, frame_thickness]
+    v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
+    return v_faces[0], h_faces[::2] + [v_faces[1]]

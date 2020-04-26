@@ -83,9 +83,8 @@ def create_window_frame(bm, face, prop):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
-    if frame_faces:
-        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
-        frame_faces = frame_front_faces + frame_side_faces
+    frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+    frame_faces = frame_front_faces + frame_side_faces
 
     if prop.add_arch:
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
@@ -114,18 +113,15 @@ def add_window_depth(bm, window, depth, normal):
 def make_window_inset(bm, face, size, frame_thickness):
     """ Make two horizontal cuts and two vertical cuts
     """
-    if frame_thickness > 0:
-        window_width = size.x - frame_thickness * 2
-        window_height = size.y - frame_thickness * 2
-        # horizontal cuts
-        h_widths = [frame_thickness, window_width, frame_thickness]
-        h_faces = subdivide_face_horizontally(bm, face, h_widths)
-        # vertical cuts
-        v_widths = [frame_thickness, window_height, frame_thickness]
-        v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
-        return v_faces[1], h_faces[::2] + v_faces[::2]
-    else:
-        return face, []
+    window_width = size.x - frame_thickness * 2
+    window_height = size.y - frame_thickness * 2
+    # horizontal cuts
+    h_widths = [frame_thickness, window_width, frame_thickness]
+    h_faces = subdivide_face_horizontally(bm, face, h_widths)
+    # vertical cuts
+    v_widths = [frame_thickness, window_height, frame_thickness]
+    v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
+    return v_faces[1], h_faces[::2] + v_faces[::2]
 
 
 def fill_window_face(bm, face, prop):

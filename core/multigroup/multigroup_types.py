@@ -90,9 +90,8 @@ def create_multigroup_frame(bm, face, prop):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
-    if frame_faces:
-        frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
-        frame_faces = frame_front_faces + frame_side_faces
+    frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
+    frame_faces = frame_front_faces + frame_side_faces
 
     if prop.add_arch:
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
@@ -134,35 +133,29 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 
 
 def make_multigroup_insets(bm, face, size, frame_thickness, dws):
-    if frame_thickness > 0:
-        dw_count = count(dws)
-        dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
-        door_height = calc_face_dimensions(face)[1] - frame_thickness
-        window_height = size.y - 2 * frame_thickness
+    dw_count = count(dws)
+    dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
+    door_height = calc_face_dimensions(face)[1] - frame_thickness
+    window_height = size.y - 2 * frame_thickness
 
-        # adjacent doors/windows clubbed
-        clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
-        clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
+    # adjacent doors/windows clubbed
+    clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
+    clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
 
-        doors = []
-        windows = []
-        frames = []
+    doors = []
+    windows = []
+    frames = []
 
-        for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
-            if dw['type'] == 'door':
-                ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
-                doors.extend(ds)
-                frames.extend(fs)
-            elif dw['type'] == 'window':
-                ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
-                windows.extend(ws)
-                frames.extend(fs)
-        return doors, windows, frames
-    else:
-        dw_count = count(components)
-        dw_width = size.x / dw_count
-        widths = [dw_width] * dw_count
-        return subdivide_face_horizontally(bm, face, widths), [], []
+    for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
+        if dw['type'] == 'door':
+            ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            doors.extend(ds)
+            frames.extend(fs)
+        elif dw['type'] == 'window':
+            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            windows.extend(ws)
+            frames.extend(fs)
+    return doors, windows, frames
 
 
 def clubbed_width(width, frame_thickness, type, count, first=False, last=False):
