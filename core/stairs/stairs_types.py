@@ -211,6 +211,7 @@ def add_railing_to_stairs(bm, top_faces, normal, prop):
 def railing_verts(bm, verts, normal, offset, depth):
     tangent = normal.copy()
     tangent.rotate(Quaternion(Vector((0., 0., 1.)), math.pi/2).to_euler())
+    verts = sort_verts(verts, tangent)
     co1 = verts[0].co + depth * normal
     co2 = verts[1].co + depth * normal
     v1 = bmesh.ops.create_vert(bm, co=co1)["vert"][0]
