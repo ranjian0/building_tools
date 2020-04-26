@@ -111,6 +111,11 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
 class ArchProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup to create arched features """
+    def get_height(self):
+        return self.get("height", min(self['parent_height'], self["default_height"]))
+
+    def set_height(self, value):
+        self["height"] = clamp(value, 0.1, self["parent_height"] - 0.0001)
 
     resolution: IntProperty(
         name="Arc Resolution",
@@ -130,9 +135,8 @@ class ArchProperty(bpy.types.PropertyGroup):
 
     height: FloatProperty(
         name="Arc Height",
-        min=0.01,
-        max=10.0,
-        default=0.4,
+        get=get_height,
+        set=set_height,
         description="Radius of the arc",
     )
 
@@ -143,6 +147,10 @@ class ArchProperty(bpy.types.PropertyGroup):
         default="SPHERE",
         description="Type of offset for arch",
     )
+
+    def init(self, parent_height):
+        self['parent_height'] = parent_height
+        self['default_height'] = 0.4
 
     def draw(self, context, box):
 
