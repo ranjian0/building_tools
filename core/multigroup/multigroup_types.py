@@ -26,6 +26,7 @@ from ...utils import (
     subdivide_face_horizontally,
     subdivide_face_vertically,
     local_xyz,
+    extrude_face_region,
 )
 
 
@@ -90,8 +91,23 @@ def create_multigroup_frame(bm, face, prop):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
-    frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
-    frame_faces = frame_front_faces + frame_side_faces
+    if prop.add_arch:
+        # frame depth
+        n_doors = len(door_faces)
+        n_windows = len(window_faces)
+        all_faces = door_faces + window_faces + [arch_face] + frame_faces
+        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
+        door_faces, window_faces, arch_face, frame_faces = all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows], all_faces[n_doors+n_windows+1:] + surrounding_faces
+        # arch depth
+        arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
+        frame_faces += new_frame_faces
+    else:
+        # frame depth
+        n_doors = len(door_faces)
+        n_windows = len(window_faces)
+        all_faces = door_faces + window_faces + frame_faces
+        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
+        door_faces, window_faces, frame_faces = all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows:] + surrounding_faces
 
     if prop.add_arch:
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)

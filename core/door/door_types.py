@@ -81,12 +81,19 @@ def create_door_frame(bm, face, prop):
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
-    frame_front_faces, frame_side_faces = add_frame_depth(bm, frame_faces, prop.frame_depth, normal)
-    frame_faces = frame_front_faces + frame_side_faces
-
     if prop.add_arch:
+        # frame depth
+        all_faces = [door_face] + [arch_face] + frame_faces
+        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
+        door_face, arch_face, frame_faces = all_faces[0], all_faces[1], all_faces[2:] + surrounding_faces
+        # arch depth
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
         frame_faces += new_frame_faces
+    else:
+        # frame depth
+        all_faces = [door_face] + frame_faces
+        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, prop.frame_depth, normal)
+        door_face, frame_faces = all_faces[0], all_faces[1:] + surrounding_faces
 
     door_face, new_frame_faces = add_door_depth(bm, door_face, prop.door_depth, normal)
     frame_faces += new_frame_faces

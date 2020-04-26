@@ -16,7 +16,7 @@ class WindowProperty(bpy.types.PropertyGroup):
 
     frame_depth: FloatProperty(
         name="Frame Depth",
-        min=0.0,
+        min=-1.0,
         max=1.0,
         default=0.0,
         description="Depth of window Frame",

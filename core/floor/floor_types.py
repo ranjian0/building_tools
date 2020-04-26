@@ -8,6 +8,7 @@ from ...utils import (
     extrude_face_region,
     equal,
     filter_vertical_edges,
+    closest_faces,
 )
 from mathutils import Vector
 
@@ -80,11 +81,3 @@ def get_flat_faces(faces, visited):
                 visited[f] = True
                 flat_faces += get_flat_faces([f], visited)
     return list(set(faces + flat_faces))
-
-
-def closest_faces(faces, locations):
-    def get_face(faces, location):
-        for f in faces:
-            if equal((f.calc_center_bounds()-location).length, 0):
-                return f
-    return [get_face(faces,l) for l in locations]

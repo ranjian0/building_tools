@@ -5,7 +5,7 @@ import operator
 import functools as ft
 from mathutils import Vector
 from bmesh.types import BMVert, BMEdge, BMFace
-from .util_common import local_xyz
+from .util_common import local_xyz, equal
 
 
 def get_edit_mesh():
@@ -255,6 +255,7 @@ def extrude_face(bm, face, extrude_depth):
 def extrude_face_region(bm, faces, depth, normal):
     """extrude a face and delete redundant faces
     """
+    initial_locations = [f.calc_center_bounds() for f in faces]
     geom = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
     verts = filter_geom(geom, BMVert)
     bmesh.ops.translate(bm, verts=verts, vec=normal * depth)
@@ -262,8 +263,19 @@ def extrude_face_region(bm, faces, depth, normal):
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # remove redundant faces
 
     extruded_faces = filter_geom(geom, BMFace)
+    # order extruded faces as per initially passed
+    final_locations = [loc+depth*normal for loc in initial_locations]
+    extruded_faces = closest_faces(extruded_faces, final_locations)
     surrounding_faces = list({f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces})
     return extruded_faces, surrounding_faces
+
+
+def closest_faces(faces, locations):
+    def get_face(faces, location):
+        for f in faces:
+            if equal((f.calc_center_bounds()-location).length, 0):
+                return f
+    return [get_face(faces,l) for l in locations]
 
 
 def get_selected_face_dimensions(context):
