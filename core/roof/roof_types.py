@@ -366,7 +366,7 @@ def dissolve_lone_verts(bm, face, original_edges):
     loops = {loop for v in face.verts for loop in v.link_loops if loop.face == face}
 
     def is_parallel(loop):
-        return round(loop.calc_angle(), 3) == 3.142
+        return round(loop.calc_angle(), 2) == 3.14
 
     parallel_verts = [loop.vert for loop in loops if is_parallel(loop)]
     lone_edges = [
