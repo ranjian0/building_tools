@@ -2,13 +2,13 @@ import bmesh
 from bmesh.types import BMFace
 
 from ...utils import (
+    equal,
     FaceMap,
     filter_geom,
+    closest_faces,
     add_faces_to_map,
     extrude_face_region,
-    equal,
     filter_vertical_edges,
-    closest_faces,
 )
 from mathutils import Vector
 
@@ -16,12 +16,13 @@ from mathutils import Vector
 def create_floors(bm, faces, prop):
     """Create extrusions of floor geometry from a floorplan
     """
-    slabs, walls = extrude_slabs_and_floors(bm, faces, prop)
+    slabs, walls, roof = extrude_slabs_and_floors(bm, faces, prop)
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
     add_faces_to_map(bm, slabs, FaceMap.SLABS)
     add_faces_to_map(bm, walls, FaceMap.WALLS)
+    add_faces_to_map(bm, roof, FaceMap.ROOF)
 
 
 def extrude_slabs_and_floors(bm, faces, prop):
@@ -64,7 +65,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
                 surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=faces, use_faces=True)["geom"], BMFace)
             walls += surrounding_faces
 
-    return slabs, walls
+    return slabs, walls, faces
 
 
 def dissolve_flat_edges(bm, faces):
