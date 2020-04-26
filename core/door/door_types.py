@@ -92,7 +92,7 @@ def create_door_frame(bm, face, prop):
     else:
         # frame depth
         all_faces = [door_face] + frame_faces
-        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, prop.frame_depth, normal)
+        all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
         door_face, frame_faces = all_faces[0], all_faces[1:] + surrounding_faces
 
     door_face, new_frame_faces = add_door_depth(bm, door_face, prop.door_depth, normal)

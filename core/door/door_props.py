@@ -18,7 +18,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         name="Frame Depth",
         min=-1.0,
         max=1.0,
-        default=0.0,
+        default=0.05,
         step=1,
         description="Depth of door Frame",
     )
