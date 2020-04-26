@@ -85,7 +85,7 @@ def create_window_frame(bm, face, prop):
     # add depths
     if prop.add_arch:
         if prop.frame_depth != 0.0:  # frame depth
-            all_faces = [window_face] + [arch_face] + frame_faces
+            all_faces = [window_face, arch_face] + frame_faces
             all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
             window_face, arch_face, frame_faces = all_faces[0], all_faces[1], all_faces[2:] + surrounding_faces
         # arch depth
