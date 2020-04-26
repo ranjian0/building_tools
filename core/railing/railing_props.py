@@ -125,7 +125,10 @@ class RailProperty(bpy.types.PropertyGroup):
 
     def init(self, stair_step_width=None, step_count=None):
         if stair_step_width and self.fill == "POSTS":
-            initial_density = (self.post_fill.size * (step_count-1))/(stair_step_width*step_count)
+            if step_count > 1:
+                initial_density = (self.post_fill.size * (step_count-1))/(stair_step_width*step_count)
+            else:
+                initial_density = (self.post_fill.size - 0.001)/(2*stair_step_width)  # just enough to have 0 post on stairs
             self.post_fill.init(initial_density=initial_density)
 
     def draw(self, context, layout):
