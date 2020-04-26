@@ -183,7 +183,7 @@ def add_railing_to_stairs(bm, top_faces, normal, prop):
 
     # create railing initial edges
     if prop.landing:
-        v1, v2 = railing_verts(bm, sort_verts(first_step.verts, normal)[:2], normal, prop.rail.offset, prop.step_width/2)
+        v1, v2 = railing_verts(bm, sort_verts(first_step.verts, normal)[:2], normal, prop.rail.offset, prop.rail.corner_post_width/2)
         v3, v4 = railing_verts(bm, sort_verts(first_step.verts, normal)[-2:], normal, prop.rail.offset, -prop.step_width/2)
         v5, v6 = railing_verts(bm, sort_verts(last_step.verts, normal)[:2], normal, prop.rail.offset, prop.step_width/2)
         e1 = bmesh.ops.contextual_create(bm, geom=(v1, v3))["edges"][0]
