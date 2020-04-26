@@ -85,16 +85,19 @@ def create_fill_posts(bm, face, prop):
     top_edge_vector.z = 0
     n_posts = round(top_edge_vector.length*prop.post_fill.density/post_size)
     dir = edge_vector(top_edge)
-    inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
-    for edge in inner_edges:
-        ret = bmesh.ops.duplicate(bm, geom=[edge])
-        dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        up = face.normal
-        edge_to_cylinder(bm, dup_edge, post_size/2, up)
-
-    # delete reference faces
-    dup_faces = list({f for e in inner_edges for f in e.link_faces})
-    bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+    if n_posts != 0:
+        inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
+        for edge in inner_edges:
+            ret = bmesh.ops.duplicate(bm, geom=[edge])
+            dup_edge = filter_geom(ret["geom"], BMEdge)[0]
+            up = face.normal
+            edge_to_cylinder(bm, dup_edge, post_size/2, up)
+        # delete reference faces
+        dup_faces = list({f for e in inner_edges for f in e.link_faces})
+        bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+    else:
+        # delete reference faces
+        bmesh.ops.delete(bm, geom=[face], context="FACES")
 
 
 @map_new_faces(FaceMap.RAILING_RAILS)
@@ -104,18 +107,21 @@ def create_fill_rails(bm, face, prop):
 
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
     n_rails = math.floor(vertical_edges[0].calc_length()*prop.rail_fill.density/rail_size)
-    inner_edges = subdivide_edges(bm, vertical_edges, Vector((0., 0., 1.)), widths=[1.]*(n_rails+1))
-    for edge in inner_edges:
-        ret = bmesh.ops.duplicate(bm, geom=[edge])
-        dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        up = face.normal
-        if not edge_vector(dup_edge).z:
-            scale_railing_edge(bm, dup_edge, prop.corner_post_width)
-        edge_to_cylinder(bm, dup_edge, rail_size/2, up)
-
-    # delete reference faces
-    dup_faces = list({f for e in inner_edges for f in e.link_faces})
-    bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+    if n_rails != 0:
+        inner_edges = subdivide_edges(bm, vertical_edges, Vector((0., 0., 1.)), widths=[1.]*(n_rails+1))
+        for edge in inner_edges:
+            ret = bmesh.ops.duplicate(bm, geom=[edge])
+            dup_edge = filter_geom(ret["geom"], BMEdge)[0]
+            up = face.normal
+            if not edge_vector(dup_edge).z:
+                scale_railing_edge(bm, dup_edge, prop.corner_post_width)
+            edge_to_cylinder(bm, dup_edge, rail_size/2, up)
+        # delete reference faces
+        dup_faces = list({f for e in inner_edges for f in e.link_faces})
+        bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+    else:
+        # delete reference faces
+        bmesh.ops.delete(bm, geom=[face], context="FACES")
 
 
 @map_new_faces(FaceMap.RAILING_WALLS)
