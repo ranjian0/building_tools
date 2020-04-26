@@ -37,6 +37,10 @@ def set_count(self, value):
     self['count'] = value
 
 
+def clamp_count(face_width, frame_width, prop):
+    prop.count = clamp(prop.count, 1, int(face_width / frame_width) - 1)
+
+
 CountProperty = IntProperty(
     name="Count",
     min=1,

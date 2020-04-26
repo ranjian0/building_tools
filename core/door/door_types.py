@@ -1,29 +1,28 @@
 import bmesh
+from ..generic import clamp_count
+from ..frame import add_frame_depth
 from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
-from ..frame import (
-    add_frame_depth,
-)
+
 from ..arch import (
     fill_arch,
     create_arch,
     add_arch_depth,
 )
 from ...utils import (
-    valid_ngon,
     FaceMap,
-    filter_geom,
+    local_xyz,
+    valid_ngon,
     popup_message,
     map_new_faces,
-    add_faces_to_map,
-    calc_face_dimensions,
-    add_facemap_for_groups,
-    subdivide_face_horizontally,
-    subdivide_face_vertically,
     get_top_edges,
     get_top_faces,
     get_bottom_faces,
-    local_xyz,
+    add_faces_to_map,
     extrude_face_region,
+    calc_face_dimensions,
+    add_facemap_for_groups,
+    subdivide_face_vertically,
+    subdivide_face_horizontally,
 )
 
 
@@ -36,7 +35,7 @@ def create_door(bm, faces, prop):
             return False
 
         face.select = False
-
+        clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
             face = create_door_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)

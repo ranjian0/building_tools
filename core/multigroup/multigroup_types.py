@@ -1,7 +1,7 @@
 import bmesh
-from ..frame import (
-    add_frame_depth,
-)
+from ..frame import add_frame_depth
+from ..window.window_types import fill_window_face
+
 from ..arch import (
     fill_arch,
     create_arch,
@@ -11,22 +11,18 @@ from ..door.door_types import (
     add_door_depth,
     create_door_fill,
 )
-from ..window.window_types import (
-    fill_window_face,
-)
 from ...utils import (
-    valid_ngon,
     FaceMap,
+    local_xyz,
+    valid_ngon,
+    get_top_faces,
+    get_top_edges,
     popup_message,
     map_new_faces,
     add_faces_to_map,
     calc_face_dimensions,
-    get_top_faces,
-    get_top_edges,
     subdivide_face_horizontally,
     subdivide_face_vertically,
-    local_xyz,
-    extrude_face_region,
 )
 
 
