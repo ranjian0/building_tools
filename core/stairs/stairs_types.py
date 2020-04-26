@@ -173,6 +173,8 @@ def create_stairs_split(bm, face, prop):
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
     )
+    if not vec_equal(f.normal, face.normal):
+        bmesh.ops.reverse_faces(bm, faces=[f])
     return f
 
 
