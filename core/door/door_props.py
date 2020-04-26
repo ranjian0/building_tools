@@ -8,7 +8,7 @@ from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
 class DoorProperty(bpy.types.PropertyGroup):
     frame_thickness: FloatProperty(
         name="Frame Thickness",
-        min=0.0,
+        min=0.01,
         max=1.0,
         default=0.1,
         description="Thickness of door Frame",
@@ -16,7 +16,7 @@ class DoorProperty(bpy.types.PropertyGroup):
 
     frame_depth: FloatProperty(
         name="Frame Depth",
-        min=0.0,
+        min=-1.0,
         max=1.0,
         default=0.0,
         step=1,
@@ -68,6 +68,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
         self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
+        self.arch.init(wall_dimensions[1]/2 - self.size_offset.offset.y - self.size_offset.size.y/2)
 
     def draw(self, context, layout):
         box = layout.box()
