@@ -33,6 +33,12 @@ def set_count(self, value):
     if self.size_offset.size.x > parent_width / value:
         self.size_offset.size.x = parent_width / value
 
+    # -- keep horizontal offset within bounds of parent face
+    element_width = parent_width / value
+    item_width = self.size_offset.size.x
+    max_offset = (element_width / 2) - (item_width / 2)
+    self.size_offset.offset.x = clamp(self.size_offset.offset.x, -max_offset, max_offset)
+
     # -- set count
     self['count'] = value
 
