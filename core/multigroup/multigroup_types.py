@@ -109,10 +109,6 @@ def create_multigroup_frame(bm, face, prop):
         all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -prop.frame_depth, normal)
         door_faces, window_faces, frame_faces = all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows:] + surrounding_faces
 
-    if prop.add_arch:
-        arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
-        frame_faces += new_frame_faces
-
     door_faces, new_frame_faces = add_multi_door_depth(bm, door_faces, prop.dw_depth, normal)
     frame_faces += new_frame_faces
     window_faces, new_frame_faces = add_multi_window_depth(bm, window_faces, prop.dw_depth, normal)
