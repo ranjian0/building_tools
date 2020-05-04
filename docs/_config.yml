@@ -6,5 +6,5 @@ description: [Tools to model building exteriors quickly in blender!]
 show_downloads: true
 
 github:
-    zip_url: https://github.com/ranjian0/building_tool/archive/v0_9_7_rc2.zip
-    tar_url: https://github.com/ranjian0/building_tool/archive/v0_9_7_rc2.tar.gz
+    zip_url: https://github.com/ranjian0/building_tool/archive/v1.0.0-alpha.2.zip
+    tar_url: https://github.com/ranjian0/building_tool/archive/v1.0.0-alpha.2.tar.gz
