@@ -29,3 +29,4 @@
 # v0.9.7 - remove all unstable modules {rails, balcony}
 # v0.9.8 - new balcony, stairs and railing
 # v0.9.9 - add feature multigroup
+# v1.0.0 - all stable core features
