@@ -1,9 +1,11 @@
 theme: jekyll-theme-cayman
 
 title: [Building Tools]
-description: [Tools to model building exteriors quickly in blender!]
+description: [1.0-alpha released!]
 
 show_downloads: true
 
 github:
     zip_url: https://github.com/ranjian0/building_tool/archive/master.zip
+
+google_analytics: UA-154906120-2
