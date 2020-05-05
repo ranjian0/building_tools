@@ -25,4 +25,4 @@
 
 ## Authors
 
-Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://github.com/ranjian0). Feel free to contact.
+Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://github.com/luckykadam). Feel free to contact.
