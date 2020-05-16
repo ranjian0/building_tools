@@ -29,18 +29,19 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
         # ``````````````
         col = layout.column(align=True)
         col.operator("btools.add_floorplan")
-        col.operator("btools.add_floors")
+        row = col.row(align=True)
+        row.operator("btools.add_floors")
+        row.operator("btools.add_roof")
+
+        col = layout.column(align=True)
+        col.operator("btools.add_balcony")
+        col.operator("btools.add_stairs")
 
         col = layout.column(align=True)
         row = col.row(align=True)
         row.operator("btools.add_window")
         row.operator("btools.add_door")
         col.operator("btools.add_multigroup")
-
-        col = layout.column(align=True)
-        col.operator("btools.add_balcony")
-        col.operator("btools.add_stairs")
-        col.operator("btools.add_roof")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):
