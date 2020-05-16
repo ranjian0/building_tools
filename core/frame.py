@@ -13,8 +13,8 @@ def add_frame_depth(bm, door_faces, window_faces, arch_faces, frame_faces, depth
         all_faces = door_faces + window_faces + arch_faces + frame_faces
         all_faces, surrounding_faces = extrude_face_region(bm, all_faces, -depth, normal)
         if depth < 0.0:
-            return all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows: n_doors+n_windows+n_arch], all_faces[n_doors+n_windows+n_arch+1:] + surrounding_faces
+            return all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows: n_doors+n_windows+n_arch], all_faces[n_doors+n_windows+n_arch:] + surrounding_faces
         else:
-            return all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows: n_doors+n_windows+n_arch], all_faces[n_doors+n_windows+n_arch+1:]
+            return all_faces[:n_doors], all_faces[n_doors:n_doors+n_windows], all_faces[n_doors+n_windows: n_doors+n_windows+n_arch], all_faces[n_doors+n_windows+n_arch:]
     else:
         return door_faces, window_faces, arch_faces, frame_faces
