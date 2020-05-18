@@ -44,7 +44,7 @@ def create_stairs(bm, faces, prop):
         if prop.has_railing:
             add_railing_to_stairs(bm, top_faces, normal, prop)
 
-        return True
+    return True
 
 
 def create_steps(bm, face, prop):
