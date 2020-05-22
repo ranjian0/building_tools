@@ -19,7 +19,7 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
 
     def execute(self, context):
         self.props.init(get_selected_face_dimensions(context))
-        return Door.build(self.props)
+        return Door.build(context, self.props)
 
     def draw(self, context):
         self.props.draw(context, self.layout)

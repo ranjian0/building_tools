@@ -1,12 +1,13 @@
 import bmesh
 
 from .door_types import create_door
-from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups
+from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups, verify_facemaps_for_object
 
 
 class Door:
     @classmethod
-    def build(cls, props):
+    def build(cls, context, props):
+        verify_facemaps_for_object(context.object)
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
         faces = [face for face in bm.faces if face.select]
