@@ -19,7 +19,7 @@ class BTOOLS_OT_add_multigroup(bpy.types.Operator):
 
     def execute(self, context):
         self.props.init(get_selected_face_dimensions(context))
-        return Multigroup.build(self.props)
+        return Multigroup.build(context, self.props)
 
     def draw(self, context):
         self.props.draw(context, self.layout)
