@@ -25,9 +25,7 @@ and `Building Tools` was born.
 
 ## Preview
 
-<iframe id="ytplayer" type="text/html" width="640" height="360"
-  src="https://www.youtube.com/embed/HLaWeToDmms"
-  frameborder="0"></iframe>
+[![Preview video](http://img.youtube.com/vi/HLaWeToDmms/0.jpg)](http://www.youtube.com/watch?v=HLaWeToDmms)
 
 ## Installation
 
