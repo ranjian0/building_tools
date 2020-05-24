@@ -8,19 +8,19 @@
 
 ## Features
 
-1. Floorplans
-2. Floors (slabs and walls)
-3. Doors
-4. Windows
-5. Multigroup (door-window combinations)
-6. Roof
-7. Stairs
-8. Balcony
+* Floorplans
+* Floors (slabs and walls)
+* Doors
+* Windows
+* Multigroup (door-window combinations)
+* Roof
+* Stairs
+* Balcony
 
 ## Usage
 
 <iframe id="ytplayer" type="text/html" width="640" height="360"
-  src="https://www.youtube.com/embed/oMwa6priW3k"
+  src="https://www.youtube.com/embed/HLaWeToDmms"
   frameborder="0"></iframe>
 
 ## Authors

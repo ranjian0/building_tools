@@ -1,19 +1,22 @@
-# Building Tools
-> Tools to model building exteriors quickly in blender!
+# [Building Tools](https://ranjian0.github.io/building_tool/)
+
+> ⚡️ Crazy fast way to model buildings in Blender!
+
+Artists should redirect to: https://ranjian0.github.io/building_tool/
 
 ## Table of contents
-* [General info](#general-info)
+
+* [Background](#background)
 * [Preview](#preview)
-* [Setup](#setup)
+* [Installation](#installation)
 * [Features](#features)
 * [Status](#status)
 * [Inspiration](#inspiration)
 * [Contributing](#contributing)
-* [Contact](#contact)
+* [Authors](#authors)
 
+## Background
 
-
-## General info
 This addon started out as a collection of scripts used to create 3d models for games.
 
 After a couple of months of development, I noticed that most of the scripts were geared
@@ -21,43 +24,37 @@ towards creating buildings and environments. I decided to create a proper addon 
 and `Building Tools` was born.
 
 ## Preview
-[![Watch Short Preview](http://img.youtube.com/vi/oMwa6priW3k/0.jpg)](http://www.youtube.com/watch?v=oMwa6priW3k)
 
-## Setup
-**1. Downloading.**
-  * Go to the releases tab.
-  * Select appropriate release for your blender version (2.79 / 2.80).
-  * Download `source.zip`.
+<iframe id="ytplayer" type="text/html" width="640" height="360"
+  src="https://www.youtube.com/embed/HLaWeToDmms"
+  frameborder="0"></iframe>
 
-**2. Installing in Blender.**
-  * In blender, go to : `Edit -> Preferences -> Add-ons -> Install`.
-  * Select the downloaded `source.zip` file and you're good to go.
-  * :exclamation:**See github issue #20 if you're having trouble installing**
+## Installation
+
+1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tool/archive/master.zip).
+2. In blender, go to : Edit -> Preferences -> Add-ons -> Install.
+3. Select the downloaded file and you're good to go.
+
 
 ## Features
-List of features ready:
+
 * Floorplans
 * Floors (slabs and walls)
 * Doors
 * Windows
+* Multigroup (door-window combinations)
 * Roof
 * Stairs
-
-To-do list:
 * Balcony
-* Rails
 
 ## Status
-Project is: **_in progress_.**
+
+Project is: **_in alpha_.**
 
   :exclamation:**Use at your own risk.**
 
-  :exclamation:**Support for the Blender 2.79 addon has been terminated.**
-
-  :exclamation:**Railing and balcony modules have been removed from `master` branch.**
-  > Modules are now in `unstable` branch and will be re-added when critical bugs are fixed.
-
 ## Inspiration
+
 Project inspired by `Ghost Town` addon for `3DS MAX`.
 
 ## Contributing
@@ -69,5 +66,6 @@ Project inspired by `Ghost Town` addon for `3DS MAX`.
 
   * For feature requests, create an issue and add **Enhancement** label.
 
-## Contact
-Created by [@ranjian0](https://github.com/ranjian0) - feel free to contact me!
+## Authors
+
+Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://github.com/luckykadam). Feel free to contact.
