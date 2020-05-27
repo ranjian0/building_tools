@@ -47,10 +47,10 @@ Estimated Duration: 2 - 3 weeks.
 
 4. Release Candidate
 
-Release candiate is the stage at wich the software has potential to be a stable product unless
+Release candiate is the stage at which the software has potential to be a stable product unless
 significant bugs emerge.
 
-This is a stage of product stabilization
+This is a stage of product stabilization.
 
 Estimated Duration: 1 week.
 
