@@ -81,8 +81,14 @@ def add_faces_to_map(bm, faces, group, skip=None):
     for face in list(filter(remove_skipped, faces)):
         face[face_map] = group_index
 
-    # -- if the facemap already has a material assigned, assign the new faces to the material
     obj = bpy.context.object
+
+    # -- if auto uv map is set, perform UV Mapping for given faces
+    if obj.facemap_materials[group_index].auto_map:
+        map_method = obj.facemap_materials[group_index].uv_mapping_method
+        uv_map_active_editmesh_selection(faces, map_method)
+
+    # -- if the facemap already has a material assigned, assign the new faces to the material
     mat = obj.facemap_materials[group_index].material
     mat_id = [idx for idx,  m in enumerate(obj.data.materials) if m == mat]
     if mat_id:
@@ -150,3 +156,24 @@ def has_material(obj, name):
     """ check if obj has a material with name
     """
     return name in obj.data.materials.keys()
+
+
+def uv_map_active_editmesh_selection(faces, method):
+    # -- ensure we are in editmode
+    if not bpy.context.object.mode == "EDIT":
+        return
+
+    # -- if faces are not selected, do selection
+    selection_state = [f.select for f in faces]
+    for f in faces:
+        f.select_set(True)
+
+    # -- perform mapping
+    if method == "UNWRAP":
+        bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
+    elif method == "CUBE_PROJECTION":
+        bpy.ops.uv.cube_project(cube_size=0.5)
+
+    # -- restore previous selection state
+    for f, sel in zip(faces, selection_state):
+        f.select_set(sel)
