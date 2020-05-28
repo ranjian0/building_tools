@@ -7,16 +7,17 @@ It will include details about:
 
 
 ## Stages
-
-- Pre-alpha.
-- Alpha.
-- Beta.
-- Release Candidate.
-- Stable Release.
+---
+1. Pre-alpha.
+2. Alpha.
+3. Beta.
+4. Release Candidate.
+5. Stable Release.
 
 ## Stage Details
+---
 
-1. Pre-alpha
+**1. Pre-alpha**
 
 Pre-alpha refers to the stage of development where a given set of features is completed
 in preparation for testing.
@@ -24,9 +25,9 @@ in preparation for testing.
 Activities in this stage include normal software development with aim of meeting stipulated
 requirements/functionality.
 
-Estimated Duration: 2 - 3 months.
+> Estimated Duration: **2 - 3 months**.
 
-2. Alpha
+**2. Alpha**
 
 Alpha refers to the stage in the release cycle when serious software testing begins.
 Software at this stage has not been tested by developers and may contain serious errors.
@@ -34,31 +35,31 @@ Software at this stage has not been tested by developers and may contain serious
 During the course of this stage, new feature may be added, but the end of this phase
 sets in a feature freeze, indicating that no more features should be added.
 
-Estimated Duration: 1 month.
+> Estimated Duration: **1 month**.
 
-3. Beta
+**3. Beta**
 
 The beta stage begins when the software is feature complete but may contain some known/unkown bugs.
 The goal of this stage is to reduce as much as possible bugs that may be in the software and
 also enhace usability. This means that arising issues such as performance should be tackled at this
 stage.
 
-Estimated Duration: 2 - 3 weeks.
+> Estimated Duration: **2 - 3 weeks**.
 
-4. Release Candidate
+**4. Release Candidate**
 
 Release candiate is the stage at which the software has potential to be a stable product unless
 significant bugs emerge.
 
 This is a stage of product stabilization.
 
-Estimated Duration: 1 week.
+> Estimated Duration: **1 week**.
 
-5. Stable Release
+**5. Stable Release**
 
 This is the last release candiate where remaining bugs have been considered acceptable.
 
 Stable release marks the end of one software development cycle after which iteration may be made to include more
 features.
 
-Estimated Duration: undefined.
+> Estimated Duration: **undefined**.
