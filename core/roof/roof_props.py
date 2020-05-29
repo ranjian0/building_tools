@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import EnumProperty, FloatProperty, BoolProperty
+from bpy.props import EnumProperty, FloatProperty
 
 
 class RoofProperty(bpy.types.PropertyGroup):
@@ -11,8 +11,19 @@ class RoofProperty(bpy.types.PropertyGroup):
     type: EnumProperty(
         name="Roof Type",
         items=roof_items,
-        default="FLAT",
+        default="GABLE",
         description="Type of roof to create",
+    )
+
+    gable_types = [
+        ("OPEN", "OPEN", "", 0),
+        ("BOX", "BOX", "", 1),
+    ]
+    gable_type: EnumProperty(
+        name="Gable Type",
+        items=gable_types,
+        default="OPEN",
+        description="Type of gable roof to create",
     )
 
     thickness: FloatProperty(
@@ -39,14 +50,6 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of entire roof",
     )
 
-    roof_hangs: BoolProperty(
-        name="Roof Hangs", default=True, description="Whether to add roof hangs"
-    )
-
-    flip_direction: BoolProperty(
-        name="Flip Direction", default=False, description="Whether to change direction of roof axis"
-    )
-
     def draw(self, context, layout):
         layout.prop(self, "type", text="")
 
@@ -58,14 +61,12 @@ class RoofProperty(bpy.types.PropertyGroup):
 
         elif self.type == "GABLE":
             row = box.row(align=True)
-            row.prop(self, "flip_direction", toggle=True)
+            row.prop(self, "gable_type", expand=True)
 
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
             col.prop(self, "height")
-
-            box.prop(self, "roof_hangs", toggle=True)
 
         else:
             col = box.column(align=True)
