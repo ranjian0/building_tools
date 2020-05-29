@@ -15,6 +15,9 @@ from ...utils import (
     calc_edge_median,
     add_faces_to_map,
     calc_verts_median,
+    set_roof_type_hip,
+    set_roof_type_gable,
+    filter_vertical_edges,
     add_facemap_for_groups,
 )
 
@@ -60,7 +63,7 @@ def create_flat_roof(bm, faces, prop):
     return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")
 
 
-def create_gable_roof(bm, faces, prop):
+def create_gable_roof_old(bm, faces, prop):
     """Create a gable roof
     """
     if len(faces) > 1:
@@ -103,6 +106,44 @@ def create_gable_roof(bm, faces, prop):
         fill_roof_faces_from_hang(bm, hang_edges, prop.thickness)
 
 
+def create_gable_roof(bm, faces, prop):
+    if prop.gable_type == "BOX":
+        roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(create_flat_roof)
+        faces = roof_hang(bm, faces, prop)
+
+    if len(faces) > 1:
+        faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
+
+    face = faces[-1]
+    median = face.calc_center_median()
+
+    dissolve_lone_verts(bm, face, list(face.edges))
+    original_edges = validate(face.edges)
+
+    # get verts in anti-clockwise order
+    verts = [v for v in sort_verts_by_loops(face)]
+    points = [v.co.to_tuple()[:2] for v in verts]
+
+    # compute straight skeleton
+    set_roof_type_gable()
+    skeleton = skeletonize(points, [])
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+
+    height_scale = prop.height / max([arc.height for arc in skeleton])
+
+    # -- create edges and vertices
+    skeleton_edges = create_hiproof_verts_and_edges(
+        bm, skeleton, original_edges, median, height_scale
+    )
+
+    # -- create faces
+    roof_faces = create_hiproof_faces(bm, original_edges, skeleton_edges)
+    if prop.gable_type == "OPEN":
+        gable_process_open(bm, roof_faces, prop)
+    elif prop.gable_type == "BOX":
+        gable_process_box(bm, roof_faces, prop)
+
+
 def create_hip_roof(bm, faces, prop):
     """Create a hip roof
     """
@@ -119,6 +160,7 @@ def create_hip_roof(bm, faces, prop):
     points = [v.co.to_tuple()[:2] for v in verts]
 
     # compute straight skeleton
+    set_roof_type_hip()
     skeleton = skeletonize(points, [])
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
@@ -304,6 +346,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
     """ Create faces formed from hiproof verts and edges
     """
+    result = []
     for ed in validate(original_edges):
         verts = ed.verts
         linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
@@ -312,19 +355,23 @@ def create_hiproof_faces(bm, original_edges, skeleton_edges):
 
         if len(opposite_verts) == 1:
             # -- triangle
-            bmesh.ops.contextual_create(bm, geom=linked_skeleton_edges + [ed])
+            r = bmesh.ops.contextual_create(bm, geom=linked_skeleton_edges + [ed])
+            result.extend(r.get('faces', []))
         else:
             edge = bm.edges.get(opposite_verts)
             if edge:
                 # -- quad
                 geometry = linked_skeleton_edges + [ed, edge]
-                bmesh.ops.contextual_create(bm, geom=geometry)
+                r = bmesh.ops.contextual_create(bm, geom=geometry)
+                result.extend(r.get('faces', []))
             else:
                 # -- polygon
                 edges = cycle_edges_form_polygon(
                     bm, opposite_verts, skeleton_edges, linked_skeleton_edges
                 )
-                bmesh.ops.contextual_create(bm, geom=[ed] + edges)
+                r = bmesh.ops.contextual_create(bm, geom=[ed] + edges)
+                result.extend(r.get('faces', []))
+    return result
 
 
 def make_vert(bm, location):
@@ -420,3 +467,54 @@ def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
             return cycle_edges_form_polygon(
                 bm, verts, skeleton_edges, linked_edges + list(pair)
             )
+
+
+def gable_process_box(bm, roof_faces, prop):
+    """ Create box gable roof type
+    """
+    # -- extrude new faces and move up
+    top_faces = [f for f in roof_faces if f.normal.z]
+    result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
+    new_verts = filter_geom(result, BMVert)
+    bmesh.ops.translate(bm, verts=new_verts, vec=(0, 0, prop.thickness))
+    bmesh.ops.delete(bm, geom=top_faces, context="FACES")
+
+
+def gable_process_open(bm, roof_faces, prop):
+    """ Create open gable roof type
+    """
+    # -- find only the upward facing faces
+    top_faces = [f for f in roof_faces if f.normal.z]
+
+    # -- extrude and move up
+    result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
+    new_verts = filter_geom(result, BMVert)
+    bmesh.ops.translate(bm, verts=new_verts, vec=(0, 0, prop.thickness))
+    bmesh.ops.delete(bm, geom=top_faces, context="FACES")
+
+    # -- find new created side faces
+    side_faces = []
+    new_faces = filter_geom(result, BMFace)
+    for f in new_faces:
+        for e in f.edges:
+            link_faces = e.link_faces
+            len_valid = len(link_faces) == 2
+            link_valid = sum([f in new_faces for f in link_faces]) == 1
+
+            if len_valid and link_valid:
+                side_faces.extend(set(link_faces) - set(new_faces))
+
+    # -- outset faces along
+    bmesh.ops.inset_region(
+        bm, use_even_offset=True, faces=side_faces, depth=prop.outset).get("faces")
+
+    # -- move lower vertical edges abit down (inorder to maintain roof slope)
+    v_edges = []
+    for f in side_faces:
+        v_edges.extend(filter_vertical_edges(f.edges, f.normal))
+
+    # -- find ones with lowest z
+    min_z = min([calc_edge_median(e).z for e in v_edges])
+    min_z_edges = [e for e in v_edges if calc_edge_median(e).z == min_z]
+    min_z_verts = list(set(v for e in min_z_edges for v in e.verts))
+    bmesh.ops.translate(bm, verts=min_z_verts, vec=(0, 0, -prop.thickness/2))
