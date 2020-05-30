@@ -70,8 +70,7 @@ def create_gable_roof(bm, faces, prop):
     """
     # -- create initial outset for box gable roof
     if prop.gable_type == "BOX":
-        roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(create_flat_roof)
-        faces = roof_hang(bm, faces, prop)
+        faces = create_flat_roof(bm, faces, prop)
         link_faces = {f for fa in faces for e in fa.edges for f in e.link_faces}
         all_edges = {e for f in link_faces for e in f.edges}
         bmesh.ops.delete(bm, geom=list(link_faces), context="FACES")
