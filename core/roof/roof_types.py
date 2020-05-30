@@ -215,6 +215,10 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
 def create_hiproof_faces(bm, original_edges, skeleton_edges):
     """ Create faces formed from hiproof verts and edges
     """
+    # TODO(ranjian0) This fails for more complex polygons
+    # Try angle based strategy from
+    # Automatically Generating Roof Models from Building Footprints by R. G. Laycock and  A. M. Day
+
     result = []
     for ed in validate(original_edges):
         verts = ed.verts
