@@ -488,23 +488,30 @@ def gable_process_open(bm, roof_faces, prop):
 
     # -- extrude and move up
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
-    new_verts = filter_geom(result, BMVert)
-    bmesh.ops.translate(bm, verts=new_verts, vec=(0, 0, prop.thickness))
+    bmesh.ops.translate(
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
-    # -- find new created side faces
+    # -- find newly created side faces
     side_faces = []
     new_faces = filter_geom(result, BMFace)
-    for f in new_faces:
-        for e in f.edges:
-            link_faces = e.link_faces
-            len_valid = len(link_faces) == 2
-            link_valid = sum([f in new_faces for f in link_faces]) == 1
+    for e in [ed for f in new_faces for ed in f.edges]:
+        link_faces = e.link_faces
+        len_valid = len(link_faces) == 2
+        link_valid = sum([f in new_faces for f in link_faces]) == 1
 
-            if len_valid and link_valid:
-                side_faces.extend(set(link_faces) - set(new_faces))
+        if len_valid and link_valid:
+            side_faces.extend(set(link_faces) - set(new_faces))
 
-    # -- outset faces along
+    # --determine upper bounding edges to be dissolved after outset
+    dissolve_edges = []
+    for f in side_faces:
+        v_edges = filter_vertical_edges(f.edges, f.normal)
+        edges = list(set(f.edges) - set(v_edges))
+        max_edge = max(edges, key=lambda e: calc_edge_median(e).z)
+        dissolve_edges.append(max_edge)
+
+    # -- outset side faces
     bmesh.ops.inset_region(
         bm, use_even_offset=True, faces=side_faces, depth=prop.outset).get("faces")
 
@@ -517,4 +524,7 @@ def gable_process_open(bm, roof_faces, prop):
     min_z = min([calc_edge_median(e).z for e in v_edges])
     min_z_edges = [e for e in v_edges if calc_edge_median(e).z == min_z]
     min_z_verts = list(set(v for e in min_z_edges for v in e.verts))
-    bmesh.ops.translate(bm, verts=min_z_verts, vec=(0, 0, -prop.thickness/2))
+    bmesh.ops.translate(bm, verts=min_z_verts, vec=(0, 0, -prop.outset/2))
+
+    # -- post cleanup
+    bmesh.ops.dissolve_edges(bm, edges=dissolve_edges)
