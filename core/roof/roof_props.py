@@ -11,7 +11,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     type: EnumProperty(
         name="Roof Type",
         items=roof_items,
-        default="GABLE",
+        default="FLAT",
         description="Type of roof to create",
     )
 
@@ -22,7 +22,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     gable_type: EnumProperty(
         name="Gable Type",
         items=gable_types,
-        default="FLAT",
+        default="OPEN",
         description="Type of gable roof to create",
     )
 
