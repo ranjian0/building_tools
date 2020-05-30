@@ -107,20 +107,26 @@ def create_gable_roof_old(bm, faces, prop):
 
 
 def create_gable_roof(bm, faces, prop):
+    # -- create initial outset for box gable roof
     if prop.gable_type == "BOX":
         roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(create_flat_roof)
         faces = roof_hang(bm, faces, prop)
+        link_faces = {f for fa in faces for e in fa.edges for f in e.link_faces}
+        all_edges = {e for f in link_faces for e in f.edges}
+        bmesh.ops.delete(bm, geom=list(link_faces), context="FACES")
+        faces = bmesh.ops.contextual_create(bm, geom=validate(all_edges)).get("faces")
 
+    # -- dissolve if faces are many
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
-
     face = faces[-1]
     median = face.calc_center_median()
 
+    # -- remove verts that are between two parallel edges
     dissolve_lone_verts(bm, face, list(face.edges))
     original_edges = validate(face.edges)
 
-    # get verts in anti-clockwise order
+    # -- get verts in anti-clockwise order (required by straight skeleton)
     verts = [v for v in sort_verts_by_loops(face)]
     points = [v.co.to_tuple()[:2] for v in verts]
 
@@ -472,11 +478,13 @@ def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
 def gable_process_box(bm, roof_faces, prop):
     """ Create box gable roof type
     """
-    # -- extrude new faces and move up
+    # -- extrude upward faces
     top_faces = [f for f in roof_faces if f.normal.z]
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
-    new_verts = filter_geom(result, BMVert)
-    bmesh.ops.translate(bm, verts=new_verts, vec=(0, 0, prop.thickness))
+
+    # -- move abit upwards (by amount roof thickness)
+    bmesh.ops.translate(
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
 
