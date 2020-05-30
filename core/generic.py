@@ -238,6 +238,23 @@ class FaceMapMaterial(bpy.types.PropertyGroup):
 
     material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
+    auto_map: BoolProperty(
+        name="Auto UV Mapping",
+        default=True,
+        description="Automatically UV Map faces belonging to active facemap.")
+
+    mapping_methods = [
+        ("UNWRAP", "Unwrap", "", 0),
+        ("CUBE_PROJECTION", "Cube_Projection", "", 1),
+    ]
+
+    uv_mapping_method: EnumProperty(
+        name="UV Mapping Method",
+        items=mapping_methods,
+        default="CUBE_PROJECTION",
+        description="How to perform UV Mapping"
+    )
+
 
 classes = (
     ArchProperty,
