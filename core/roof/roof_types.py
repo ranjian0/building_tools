@@ -10,6 +10,7 @@ from ...utils import (
     skeletonize,
     filter_geom,
     map_new_faces,
+    add_faces_to_map,
     calc_edge_median,
     set_roof_type_hip,
     set_roof_type_gable,
@@ -98,12 +99,12 @@ def create_gable_roof(bm, faces, prop):
     height_scale = prop.height / max([arc.height for arc in skeleton])
 
     # -- create edges and vertices
-    skeleton_edges = create_hiproof_verts_and_edges(
+    skeleton_edges = create_skeleton_verts_and_edges(
         bm, skeleton, original_edges, median, height_scale
     )
 
     # -- create faces
-    roof_faces = create_hiproof_faces(bm, original_edges, skeleton_edges)
+    roof_faces = create_skeleton_faces(bm, original_edges, skeleton_edges)
     if prop.gable_type == "OPEN":
         gable_process_open(bm, roof_faces, prop)
     elif prop.gable_type == "BOX":
@@ -135,12 +136,12 @@ def create_hip_roof(bm, faces, prop):
     height_scale = prop.height / max([arc.height for arc in skeleton])
 
     # -- create edges and vertices
-    skeleton_edges = create_hiproof_verts_and_edges(
+    skeleton_edges = create_skeleton_verts_and_edges(
         bm, skeleton, original_edges, median, height_scale
     )
 
     # -- create faces
-    create_hiproof_faces(bm, original_edges, skeleton_edges)
+    create_skeleton_faces(bm, original_edges, skeleton_edges)
 
 
 def sort_verts_by_loops(face):
@@ -175,7 +176,7 @@ def vert_at_loc(loc, verts, loc_z=None):
     return None
 
 
-def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_scale):
+def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height_scale):
     """ Create the vertices and edges from output of straight skeleton
     """
     skeleton_edges = []
@@ -211,7 +212,7 @@ def create_hiproof_verts_and_edges(bm, skeleton, original_edges, median, height_
 
 
 @map_new_faces(FaceMap.ROOF)
-def create_hiproof_faces(bm, original_edges, skeleton_edges):
+def create_skeleton_faces(bm, original_edges, skeleton_edges):
     """ Create faces formed from hiproof verts and edges
     """
     # TODO(ranjian0) This fails for more complex polygons
@@ -357,6 +358,8 @@ def gable_process_box(bm, roof_faces, prop):
 def gable_process_open(bm, roof_faces, prop):
     """ Finaliza open gable roof type
     """
+    add_faces_to_map(bm, roof_faces, FaceMap.WALLS)
+
     # -- find only the upward facing faces
     top_faces = [f for f in roof_faces if f.normal.z]
 
@@ -402,3 +405,12 @@ def gable_process_open(bm, roof_faces, prop):
 
     # -- post cleanup
     bmesh.ops.dissolve_edges(bm, edges=dissolve_edges)
+
+    # -- facemaps
+    linked = {
+        f for fc in side_faces for e in fc.edges for f in e.link_faces
+    }
+    linked_top = [f for f in linked if f.normal.z > 0]
+    linked_bot = [f for f in linked if f.normal.z < 0]
+    add_faces_to_map(bm, linked_top, FaceMap.ROOF)
+    add_faces_to_map(bm, side_faces + linked_bot, FaceMap.ROOF_HANGS)
