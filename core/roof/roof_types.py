@@ -77,6 +77,9 @@ def create_gable_roof(bm, faces, prop):
         bmesh.ops.delete(bm, geom=list(link_faces), context="FACES")
         faces = bmesh.ops.contextual_create(bm, geom=validate(all_edges)).get("faces")
 
+        bot_faces = [f for e in faces[-1].edges for f in e.link_faces if f not in faces]
+        add_faces_to_map(bm, bot_faces, FaceMap.ROOF_HANGS)
+
     # -- dissolve if faces are many
     if len(faces) > 1:
         faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
@@ -353,6 +356,14 @@ def gable_process_box(bm, roof_faces, prop):
     bmesh.ops.translate(
         bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
+
+    # -- face maps
+    link_faces = {
+        f for fc in filter_geom(result, BMFace) for e in fc.edges
+        for f in e.link_faces if not f.normal.z
+    }
+    link_faces.update(set(validate(roof_faces)))
+    add_faces_to_map(bm, list(link_faces), FaceMap.ROOF_HANGS)
 
 
 def gable_process_open(bm, roof_faces, prop):
