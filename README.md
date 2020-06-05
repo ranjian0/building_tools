@@ -7,7 +7,7 @@ Artists should redirect to: https://ranjian0.github.io/building_tool/
 ## Table of contents
 
 * [Background](#background)
-* [Preview](#preview)
+* [Usage](#usage)
 * [Installation](#installation)
 * [Features](#features)
 * [Status](#status)
@@ -23,9 +23,9 @@ After a couple of months of development, I noticed that most of the scripts were
 towards creating buildings and environments. I decided to create a proper addon for them
 and `Building Tools` was born.
 
-## Preview
+## Usage
 
-[![Preview video](http://img.youtube.com/vi/HLaWeToDmms/0.jpg)](http://www.youtube.com/watch?v=HLaWeToDmms)
+[![Tutorial Videos](http://img.youtube.com/vi/rB1fm4I_bW4/0.jpg)](http://www.youtube.com/watch?v=rB1fm4I_bW4)
 
 ## Installation
 
