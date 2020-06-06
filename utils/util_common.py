@@ -70,6 +70,16 @@ def kwargs_from_props(props):
     return result
 
 
+def crash_safe(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            popup_message("Error: {}".format(e))
+            return {"CANCELLED"}
+    return inner
+
+
 def restricted_size(parent_dimensions, offset, size_min, size):
     """ Get size restricted by various factors
     """

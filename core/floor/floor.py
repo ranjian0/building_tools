@@ -7,11 +7,13 @@ from ...utils import (
     get_edit_mesh,
     add_facemap_for_groups,
     verify_facemaps_for_object,
+    crash_safe,
 )
 
 
 class Floor:
     @classmethod
+    @crash_safe
     def build(cls, context, prop):
         verify_facemaps_for_object(context.object)
         context.object.tracked_properties.slab_outset = prop.slab_outset
