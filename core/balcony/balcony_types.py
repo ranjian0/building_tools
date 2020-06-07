@@ -4,14 +4,15 @@ from mathutils import Vector
 
 from ...utils import (
     FaceMap,
-    filter_geom,
-    add_faces_to_map,
-    get_top_faces,
-    sort_edges,
     local_xyz,
-    create_face,
+    sort_edges,
     valid_ngon,
+    filter_geom,
+    create_face,
+    get_top_faces,
     popup_message,
+    add_faces_to_map,
+    calc_face_dimensions,
 )
 
 from ..railing.railing import create_railing
@@ -86,7 +87,8 @@ def create_balcony_split(bm, face, prop):
     """Use properties to create face
     """
     xyz = local_xyz(face)
-    size = Vector((prop.size_offset.size.x, prop.slab_height))
+    width = min(calc_face_dimensions(face)[0], prop.size_offset.size.x)
+    size = Vector((width, prop.slab_height))
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
