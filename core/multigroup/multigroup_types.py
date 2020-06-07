@@ -226,6 +226,9 @@ def parse_components(components):
         if c == previous:
             dws[-1]["count"] += 1
         else:
-            dws.append({"type": char_to_type.get(c), "count": 1})
-            previous = c
+            if char_to_type.get(c):
+                dws.append({"type": char_to_type.get(c), "count": 1})
+                previous = c
+            else:
+                raise Exception("Unsupported component: {}".format(c))
     return dws
