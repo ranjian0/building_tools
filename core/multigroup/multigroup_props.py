@@ -23,6 +23,15 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         description="Depth of door/window Frame",
     )
 
+    window_height: FloatProperty(
+        name="Window Height",
+        min=0.1,
+        max=1000.0,
+        default=1.0,
+        step=1,
+        description="Height of windows",
+    )
+
     dw_depth: FloatProperty(
         name="Door/Window Depth",
         min=0.0,
@@ -79,6 +88,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     def draw(self, context, layout):
         box = layout.box()
         self.size_offset.draw(context, box)
+        box.prop(self, "window_height")
 
         box = layout.box()
         col = box.column(align=True)

@@ -3,15 +3,17 @@ from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
 from ...utils import (
+    clamp,
     FaceMap,
-    filter_geom,
-    add_faces_to_map,
-    get_top_faces,
-    sort_edges,
     local_xyz,
-    create_face,
+    sort_edges,
     valid_ngon,
+    filter_geom,
+    create_face,
+    get_top_faces,
     popup_message,
+    add_faces_to_map,
+    calc_face_dimensions,
 )
 
 from ..railing.railing import create_railing
@@ -55,6 +57,8 @@ def add_railing_to_balcony(bm, top, balcony_normal, prop):
     ret = bmesh.ops.duplicate(bm, geom=[top])
     dup_top = filter_geom(ret["geom"], BMFace)[0]
 
+    max_offset = min([*calc_face_dimensions(dup_top)])/2
+    prop.rail.offset = clamp(prop.rail.offset, 0.0, max_offset - 0.001)
     ret = bmesh.ops.inset_individual(
         bm, faces=[dup_top], thickness=prop.rail.offset, use_even_offset=True
     )
@@ -86,7 +90,8 @@ def create_balcony_split(bm, face, prop):
     """Use properties to create face
     """
     xyz = local_xyz(face)
-    size = Vector((prop.size_offset.size.x, prop.slab_height))
+    width = min(calc_face_dimensions(face)[0], prop.size_offset.size.x)
+    size = Vector((width, prop.slab_height))
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset

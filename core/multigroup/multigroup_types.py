@@ -60,7 +60,8 @@ def create_multigroup_split(bm, face, size, offset):
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 + offset.y + size.y/2, wall_h/2 - offset.y - size.y/2]
+    size_y = min(size.y, wall_h - 0.0011) # prevent door frame from collapsing when maximized
+    v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[0]
@@ -72,7 +73,7 @@ def create_multigroup_frame(bm, face, prop):
     normal = face.normal.copy()
 
     dws = parse_components(prop.components)
-    door_faces, window_faces, frame_faces = make_multigroup_insets(bm, face, prop.size_offset.size, prop.frame_thickness, dws)
+    door_faces, window_faces, frame_faces = make_multigroup_insets(bm, face, prop, dws)
     arch_face = None
 
     # create arch
@@ -129,11 +130,13 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
     return new_window_faces, new_frame_faces
 
 
-def make_multigroup_insets(bm, face, size, frame_thickness, dws):
+def make_multigroup_insets(bm, face, prop, dws):
+    size, frame_thickness = prop.size_offset.size, prop.frame_thickness
+
     dw_count = count(dws)
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
     door_height = calc_face_dimensions(face)[1] - frame_thickness
-    window_height = size.y - 2 * frame_thickness
+    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - 0.0011)
 
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
@@ -149,7 +152,7 @@ def make_multigroup_insets(bm, face, size, frame_thickness, dws):
             doors.extend(ds)
             frames.extend(fs)
         elif dw['type'] == 'window':
-            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ws, fs = make_window_insets(bm, f, dw['count'], prop.window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
             windows.extend(ws)
             frames.extend(fs)
     return doors, windows, frames
@@ -223,6 +226,9 @@ def parse_components(components):
         if c == previous:
             dws[-1]["count"] += 1
         else:
-            dws.append({"type": char_to_type.get(c), "count": 1})
-            previous = c
+            if char_to_type.get(c):
+                dws.append({"type": char_to_type.get(c), "count": 1})
+                previous = c
+            else:
+                raise Exception("Unsupported component: {}".format(c))
     return dws

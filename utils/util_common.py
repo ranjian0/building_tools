@@ -1,4 +1,5 @@
 import bpy
+import traceback
 from math import radians
 from mathutils import Vector, Euler
 
@@ -68,6 +69,17 @@ def kwargs_from_props(props):
             # property group within this property
             result.update(kwargs_from_props(prop))
     return result
+
+
+def crash_safe(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            popup_message("See console for errors", title="Operator Failed!")
+            traceback.print_exc()
+            return {"CANCELLED"}
+    return inner
 
 
 def restricted_size(parent_dimensions, offset, size_min, size):

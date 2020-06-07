@@ -8,11 +8,12 @@ from .floorplan_types import (
     create_rectangular_floorplan,
 )
 
-from ...utils import link_obj, bm_to_obj, bm_from_obj, create_mesh, create_object
+from ...utils import link_obj, bm_to_obj, bm_from_obj, create_mesh, create_object, crash_safe
 
 
 class Floorplan:
     @classmethod
+    @crash_safe
     def build(cls, context, prop):
         name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
