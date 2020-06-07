@@ -3,6 +3,7 @@ from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
 from ...utils import (
+    clamp,
     FaceMap,
     local_xyz,
     sort_edges,
@@ -56,6 +57,8 @@ def add_railing_to_balcony(bm, top, balcony_normal, prop):
     ret = bmesh.ops.duplicate(bm, geom=[top])
     dup_top = filter_geom(ret["geom"], BMFace)[0]
 
+    max_offset = min([*calc_face_dimensions(dup_top)])/2
+    prop.rail.offset = clamp(prop.rail.offset, 0.0, max_offset - 0.001)
     ret = bmesh.ops.inset_individual(
         bm, faces=[dup_top], thickness=prop.rail.offset, use_even_offset=True
     )

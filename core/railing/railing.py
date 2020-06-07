@@ -174,5 +174,5 @@ def scale_railing_edge(bm, edge, amount):
     edge_scale = (edge_len - amount) / edge_len
     bmesh.ops.scale(bm,
                     verts=edge.verts,
-                    vec=Vector((1.,1.,1.))*edge_scale,
+                    vec=Vector((1., 1., 1.))*edge_scale,
                     space=Matrix.Translation(-calc_edge_median(edge)))
