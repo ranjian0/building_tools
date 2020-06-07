@@ -1,4 +1,5 @@
 import bpy
+import traceback
 from math import radians
 from mathutils import Vector, Euler
 
@@ -74,8 +75,9 @@ def crash_safe(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as e:
-            popup_message("Error: {}".format(e))
+        except Exception:
+            popup_message("See console for errors", title="Operator Failed!")
+            traceback.print_exc()
             return {"CANCELLED"}
     return inner
 
