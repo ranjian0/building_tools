@@ -33,7 +33,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0], self['wall_dimensions'][1]), default_size=(1.6, 1.0), default_offset=(0.0, 0.0), restricted=False)
+        self.size_offset.init((self['wall_dimensions'][0], self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=False)
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
