@@ -6,7 +6,6 @@ from ..generic import SizeOffsetProperty
 
 
 class BalconyProperty(bpy.types.PropertyGroup):
-    redo: BoolProperty()
 
     slab_height: FloatProperty(
         name="Slab Height",
