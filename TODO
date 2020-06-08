@@ -4,8 +4,6 @@ BALCONY NITPICK FEATURES
  - more robust implementation of corner balcony (current open implementation
    may not be abvious to users)
 
-- roof is also abit unstable esp hip roof and straight skeleton
-
 SLANTED FACES:
   Window tool should allow  for slanted faces
 
