@@ -30,6 +30,11 @@ def create_multigroup(bm, faces, prop):
     """ Create multigroup from face selection
     """
 
+    # Prevent error when there are no components
+    if len(str(prop.components)) == 0:
+        popup_message("No components are chosen", "No Components Error")
+        return False
+
     for face in faces:
         if not valid_ngon(face):
             popup_message("Multigroup creation not supported for non-rectangular n-gon!", "Ngon Error")
