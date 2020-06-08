@@ -88,7 +88,9 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     def draw(self, context, layout):
         box = layout.box()
         self.size_offset.draw(context, box)
-        box.prop(self, "window_height")
+        
+        if str(self.components).find("w") != -1:
+            box.prop(self, "window_height")
 
         box = layout.box()
         col = box.column(align=True)
