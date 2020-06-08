@@ -1,5 +1,6 @@
 import bmesh
 import mathutils
+import numpy as np
 from mathutils import Vector
 from bmesh.types import BMVert, BMFace
 from ...utils import (
@@ -218,35 +219,43 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
 def create_skeleton_faces(bm, original_edges, skeleton_edges):
     """ Create faces formed from hiproof verts and edges
     """
-    # TODO(ranjian0) This fails for more complex polygons
-    # Try angle based strategy from
-    # Automatically Generating Roof Models from Building Footprints by R. G. Laycock and  A. M. Day
+
+    def interior_angle(vert, e1, e2):
+        """ Determine anti-clockwise interior angle between edges
+        https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python
+        """
+        # XXX Order of vector creation is really important
+        v1 = vert.co - e1.other_vert(vert).co
+        v2 = e2.other_vert(vert).co - vert.co
+        return np.math.atan2(np.linalg.det([v1.xy, v2.xy]), np.dot(v1.xy, v2.xy))
+
+    def boundary_walk(e):
+        """ Perform boundary walk using least interior angle
+        """
+        v, last = e.verts
+
+        previous = e
+        found_edges = [e]
+        while v != last:
+            linked = [
+                e for e in v.link_edges
+                if e in skeleton_edges and e not in found_edges
+            ]
+            next_edge = linked[0]
+            if len(linked) > 1:
+                next_edge = min(linked, key=lambda e: interior_angle(v, previous, e))
+            previous = next_edge
+            found_edges.append(next_edge)
+            v = next_edge.other_vert(v)
+
+        return found_edges
 
     result = []
     for ed in validate(original_edges):
-        verts = ed.verts
-        linked_skeleton_edges = get_linked_edges(verts, skeleton_edges)
-        all_verts = [v for e in linked_skeleton_edges for v in e.verts]
-        opposite_verts = list(set(all_verts) - set(verts))
-
-        if len(opposite_verts) == 1:
-            # -- triangle
-            r = bmesh.ops.contextual_create(bm, geom=linked_skeleton_edges + [ed])
-            result.extend(r.get('faces', []))
-        else:
-            edge = bm.edges.get(opposite_verts)
-            if edge:
-                # -- quad
-                geometry = linked_skeleton_edges + [ed, edge]
-                r = bmesh.ops.contextual_create(bm, geom=geometry)
-                result.extend(r.get('faces', []))
-            else:
-                # -- polygon
-                edges = cycle_edges_form_polygon(
-                    bm, opposite_verts, skeleton_edges, linked_skeleton_edges
-                )
-                r = bmesh.ops.contextual_create(bm, geom=[ed] + edges)
-                result.extend(r.get('faces', []))
+        walk = boundary_walk(ed)
+        result.extend(
+            bmesh.ops.contextual_create(bm, geom=walk).get("faces")
+        )
     return result
 
 
@@ -367,7 +376,7 @@ def gable_process_box(bm, roof_faces, prop):
 
 
 def gable_process_open(bm, roof_faces, prop):
-    """ Finaliza open gable roof type
+    """ Finalize open gable roof type
     """
     add_faces_to_map(bm, roof_faces, FaceMap.WALLS)
 
