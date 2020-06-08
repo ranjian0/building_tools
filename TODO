@@ -24,7 +24,6 @@ REMOVE ALL DEAD CODE / UNREACHABLE
 
 
 ROOF:
-    - XXX support gable roof for complex shapes
     - support adding roofs to faces that have boundary geometry e.g for patio
 
 STAIRS:
@@ -32,9 +31,6 @@ STAIRS:
 
     - if landing is provided, perhaps option to slim down the stairs
       should be there
-
-      plus, when 'move_slabface_to_wall' is used, and stair direction is
-      not front, stairs intersect with the slab
 
 
 MATERIAL API:
