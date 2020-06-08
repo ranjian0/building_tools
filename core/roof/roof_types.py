@@ -328,32 +328,6 @@ def dissolve_lone_verts(bm, face, original_edges):
     bmesh.ops.dissolve_edges(bm, edges=lone_edges, use_verts=True)
 
 
-def cycle_edges_form_polygon(bm, verts, skeleton_edges, linked_edges):
-    """ Move in opposite directions along edges linked to verts until
-        you form a polygon
-    """
-    v1, v2 = verts
-    next_skeleton_edges = list(set(skeleton_edges) - set(linked_edges))
-    v1_edges = get_linked_edges([v1], next_skeleton_edges)
-    v2_edges = get_linked_edges([v2], next_skeleton_edges)
-    if not v1_edges or not v2_edges:
-        return linked_edges
-    pair = find_closest_pair_edges(v1_edges, v2_edges)
-
-    all_verts = [v for e in pair for v in e.verts]
-    verts = list(set(all_verts) - set(verts))
-    if len(verts) == 1:
-        return linked_edges + list(pair)
-    else:
-        edge = bm.edges.get(verts)
-        if edge:
-            return list(pair) + linked_edges + [edge]
-        else:
-            return cycle_edges_form_polygon(
-                bm, verts, skeleton_edges, linked_edges + list(pair)
-            )
-
-
 def gable_process_box(bm, roof_faces, prop):
     """ Finalize box gable roof type
     """
