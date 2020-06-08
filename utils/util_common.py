@@ -72,6 +72,8 @@ def kwargs_from_props(props):
 
 
 def crash_safe(func):
+    """ Decorator to handle exceptions in bpy Operators safely
+    """
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
