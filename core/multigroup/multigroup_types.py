@@ -14,6 +14,7 @@ from ..door.door_types import (
 from ...utils import (
     clamp,
     FaceMap,
+    validate,
     local_xyz,
     valid_ngon,
     get_top_faces,
@@ -48,7 +49,7 @@ def create_multigroup(bm, faces, prop):
 
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
-            face = create_multigroup_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            face = create_multigroup_split(bm, aface, prop)
             doors, windows, arch = create_multigroup_frame(bm, face, prop)
             for door in doors:
                 create_door_fill(bm, door, prop)
@@ -60,17 +61,23 @@ def create_multigroup(bm, faces, prop):
 
 
 @map_new_faces(FaceMap.WALLS)
-def create_multigroup_split(bm, face, size, offset):
+def create_multigroup_split(bm, face, prop):
     """ Use properties from SizeOffset to subdivide face into regular quads
     """
 
+    size, offset = prop.size_offset.size, prop.size_offset.offset
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
-    v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
+    if str(prop.components).find("d") == -1:
+        # XXX Only windows, use the y offset
+        v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
+    else:
+        # XXX A door exists, split starts from bottom, no need for y offset
+        v_width = [size_y, wall_h - size_y]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[0]
@@ -112,7 +119,7 @@ def create_multigroup_frame(bm, face, prop):
     # add face maps
     add_faces_to_map(bm, door_faces, FaceMap.DOOR)
     add_faces_to_map(bm, window_faces, FaceMap.WINDOW)
-    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
     if prop.add_arch:
         add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
 
@@ -143,9 +150,12 @@ def make_multigroup_insets(bm, face, prop, dws):
     size, frame_thickness = prop.size_offset.size, prop.frame_thickness
 
     dw_count = count(dws)
+    window_height = size.y
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
     door_height = calc_face_dimensions(face)[1] - frame_thickness
-    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - SPLIT_EPS)
+    if "d" in str(prop.components):
+        window_height = min(prop.window_height, calc_face_dimensions(face)[1] - SPLIT_EPS)
+
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
@@ -160,7 +170,7 @@ def make_multigroup_insets(bm, face, prop, dws):
             doors.extend(ds)
             frames.extend(fs)
         elif dw['type'] == 'window':
-            ws, fs = make_window_insets(bm, f, dw['count'], prop.window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
             windows.extend(ws)
             frames.extend(fs)
     return doors, windows, frames

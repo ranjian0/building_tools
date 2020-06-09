@@ -82,14 +82,20 @@ class MultigroupProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(2.0, 1.0), default_offset=(0.0, 0.0))
-        self.arch.init(wall_dimensions[1]/2 - self.size_offset.offset.y - self.size_offset.size.y/2)
+        def_h = 1.5 if "d" in str(self.components) else 1.0
+        self.size_offset.init(
+            (self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]),
+            default_size=(2.0, def_h), default_offset=(0.0, 0.0))
+        if "d" not in str(self.components):
+            self.arch.init(wall_dimensions[1]/2 - self.size_offset.offset.y - self.size_offset.size.y/2)
+        else:
+            self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 
     def draw(self, context, layout):
         box = layout.box()
         self.size_offset.draw(context, box)
-        
-        if str(self.components).find("w") != -1:
+
+        if "w" in str(self.components) and "d" in str(self.components):
             box.prop(self, "window_height")
 
         box = layout.box()
@@ -106,7 +112,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         col = box.column(align=True)
         col.prop(self, "count")
 
-        if str(self.components).find("d") != -1:
+        if "d" in str(self.components):
             col = box.column(align=True)
             col.prop(self, "double_door")
 
