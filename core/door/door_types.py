@@ -9,6 +9,7 @@ from ..arch import (
     add_arch_depth,
 )
 from ...utils import (
+    clamp,
     FaceMap,
     local_xyz,
     valid_ngon,
@@ -66,6 +67,10 @@ def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
     normal = face.normal.copy()
+
+    # XXX Frame thickness should not exceed size of door
+    min_frame_size = min(calc_face_dimensions(face)) / 2
+    prop.frame_thickness = clamp(prop.frame_thickness, 0.01, min_frame_size - 0.001)
 
     door_face, frame_faces = make_door_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
     arch_face = None
