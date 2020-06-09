@@ -5,12 +5,14 @@ from mathutils import Vector, Matrix, Quaternion
 from ...utils import (
     clamp,
     FaceMap,
+    validate,
     sort_edges,
+    sort_verts,
     edge_vector,
     filter_geom,
     map_new_faces,
     subdivide_edges,
-    calc_edge_median,
+    calc_verts_median,
     filter_vertical_edges,
     add_facemap_for_groups,
 )
@@ -60,14 +62,22 @@ def make_fill(bm, face, prop):
 def create_railing_top(bm, top_edge, prop):
     ret = bmesh.ops.duplicate(bm, geom=[top_edge])
     top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-    horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
-    up = edge_vector(top_dup_edge)
+    vec = edge_vector(top_dup_edge)
+
+    up = vec.copy()
+    horizon = vec.cross(Vector((0., 0., 1.)))
     up.rotate(Quaternion(horizon, math.pi/2).to_euler())
 
-    if not edge_vector(top_dup_edge).z:
-        scale_railing_edge(bm, top_dup_edge, prop.corner_post_width)
+    angle = edge_angle(top_dup_edge)
+    sloped = edge_is_sloped(top_dup_edge)
+    edge_len = top_dup_edge.calc_length()
 
-    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
+    cylinder = edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
+    if sloped:
+        rotate_sloped_rail_bounds(bm, cylinder, vec, angle)
+        edge_len = (edge_len - prop.corner_post_width) / math.acos(angle)
+    # scale_rail(bm, cylinder, (edge_len - prop.corner_post_width) / edge_len)
+
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
 
@@ -91,6 +101,7 @@ def create_fill_posts(bm, face, prop):
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
+            # print("Posts FILL")
             edge_to_cylinder(bm, dup_edge, post_size/2, up)
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
@@ -113,9 +124,19 @@ def create_fill_rails(bm, face, prop):
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
-            if not edge_vector(dup_edge).z:
-                scale_railing_edge(bm, dup_edge, prop.corner_post_width)
-            edge_to_cylinder(bm, dup_edge, rail_size/2, up)
+
+            vec = edge_vector(dup_edge)
+            angle = edge_angle(dup_edge)
+            sloped = edge_is_sloped(dup_edge)
+            edge_len = dup_edge.calc_length()
+
+            cylinder = edge_to_cylinder(bm, dup_edge, rail_size/2, up)
+            if sloped:
+                rotate_sloped_rail_bounds(bm, cylinder, vec, angle)
+                edge_len = (edge_len - prop.corner_post_width) / math.acos(angle)
+                # edge_len = hypot / math.acos(math.atan(vec.z / sum(vec.xy)))
+            # scale_rail(bm, cylinder, (edge_len - prop.corner_post_width) / edge_len)
+
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
@@ -168,11 +189,62 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
         bmesh.ops.holes_fill(bm, edges=top_edges)
         bmesh.ops.holes_fill(bm, edges=bottom_edges)
 
+    return validate(all_verts)
 
-def scale_railing_edge(bm, edge, amount):
-    edge_len = edge.calc_length()
-    edge_scale = (edge_len - amount) / edge_len
+
+def scale_rail(bm, verts, factor):
+    """ Scale a rail by factor (for perfect fit between corner posts)
+    """
     bmesh.ops.scale(bm,
-                    verts=edge.verts,
-                    vec=Vector((1., 1., 1.))*edge_scale,
-                    space=Matrix.Translation(-calc_edge_median(edge)))
+                    verts=verts,
+                    vec=Vector((factor, factor, 1.0)),
+                    space=Matrix.Translation(-calc_verts_median(verts)))
+
+
+def rotate_sloped_rail_bounds(bm, cylinder_verts, dir, angle):
+    """ Rotate the end faces of sloping cylinder rail to be vertically aligned
+    """
+    if len(cylinder_verts) != 8:
+        return
+
+    vts = sort_verts(cylinder_verts, dir)
+    for bunch in [vts[:4], vts[-4:]]:
+        bmesh.ops.rotate(
+            bm, verts=bunch, cent=calc_verts_median(bunch),
+            matrix=Matrix.Rotation(angle, 4, dir.cross(Vector((0, 0, -1))))
+        )
+
+
+def edge_slope(e):
+    """ Calculate the slope of an edge, 'inf' for vertical edges
+    """
+    v = edge_vector(e)
+    try:
+        return v.z / v.xy.length
+    except ZeroDivisionError:
+        return float('inf')
+
+
+def edge_angle(e):
+    """ Calculate the angle an edge makes with horizontal axis
+    """
+    return math.atan(edge_slope(e))
+
+
+def edge_is_vertical(e):
+    """ Check if edge is vertical (infinite slope)
+    """
+    return edge_slope(e) == float('inf')
+
+
+def edge_is_horizontal(e):
+    """ Check if edge is horizontal (zero slope)
+    """
+    return edge_slope(e) == 0.0
+
+
+def edge_is_sloped(e):
+    """ Check if edge
+    """
+    sl = edge_slope(e)
+    return sl > float('-inf') and sl < float('inf') and sl != 0.0
