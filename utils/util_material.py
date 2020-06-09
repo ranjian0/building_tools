@@ -87,7 +87,7 @@ def add_faces_to_map(bm, faces, group, skip=None):
     mat_id = [idx for idx,  m in enumerate(obj.data.materials) if m == mat]
     if mat_id:
         for f in faces:
-            f.material_index = mat_id.pop()
+            f.material_index = mat_id[-1]
 
 
 def add_facemap_for_groups(groups):
