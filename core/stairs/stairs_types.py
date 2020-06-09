@@ -6,20 +6,21 @@ from bmesh.types import BMFace, BMEdge
 
 from ...utils import (
     FaceMap,
-    valid_ngon,
-    filter_geom,
-    popup_message,
-    add_faces_to_map,
-    create_face,
+    vec_equal,
     local_xyz,
-    subdivide_face_vertically,
-    subdivide_edges,
+    valid_ngon,
     sort_faces,
     sort_edges,
     sort_verts,
-    filter_parallel_edges,
-    vec_equal,
+    filter_geom,
+    create_face,
     extrude_face,
+    popup_message,
+    subdivide_edges,
+    add_faces_to_map,
+    calc_face_dimensions,
+    filter_parallel_edges,
+    subdivide_face_vertically,
 )
 
 from ..railing.railing import create_railing
@@ -169,6 +170,9 @@ def create_stairs_split(bm, face, prop):
     """
     xyz = local_xyz(face)
     size = Vector((prop.size_offset.size.x, prop.step_height))
+    # XXX Diplace balcony to bottom of face
+    prop.size_offset.offset.y = -((calc_face_dimensions(face)[1]/2) - prop.step_height/2)
+
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
