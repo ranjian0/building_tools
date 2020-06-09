@@ -149,6 +149,10 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 def make_multigroup_insets(bm, face, prop, dws):
     size, frame_thickness = prop.size_offset.size, prop.frame_thickness
 
+    # XXX Frame thickness should not exceed size of any multigroup component
+    min_frame_size = min([size.x / count(dws), calc_face_dimensions(face)[1]]) / 2
+    frame_thickness = clamp(frame_thickness, 0.01, min_frame_size - 0.001)
+
     dw_count = count(dws)
     window_height = size.y
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
