@@ -25,6 +25,9 @@ from ...utils import (
     subdivide_face_vertically,
 )
 
+# XXX small value to provide split margins
+SPLIT_EPS = 0.0011
+
 
 def create_multigroup(bm, faces, prop):
     """ Create multigroup from face selection
@@ -65,7 +68,7 @@ def create_multigroup_split(bm, face, size, offset):
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    size_y = min(size.y, wall_h - 0.0011) # prevent door frame from collapsing when maximized
+    size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
     v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
@@ -141,8 +144,7 @@ def make_multigroup_insets(bm, face, prop, dws):
     dw_count = count(dws)
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
     door_height = calc_face_dimensions(face)[1] - frame_thickness
-    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - 0.0011)
-
+    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
