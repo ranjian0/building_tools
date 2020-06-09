@@ -44,6 +44,9 @@ def make_fill(bm, face, prop):
     top_edge = sort_edges(non_vertical, Vector((0., 0., -1.)))[0]
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
+    # make dupface fit flush between corner posts
+    translate_bounds(bm, dup_face.verts, edge_vector(top_edge), prop.corner_post_width/2)
+
     # create railing top
     add_facemap_for_groups(FaceMap.RAILING_RAILS)
     create_railing_top(bm, top_edge, prop)
@@ -72,7 +75,6 @@ def create_railing_top(bm, top_edge, prop):
     cylinder = edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
     if sloped:
         rotate_sloped_rail_bounds(bm, cylinder, vec)
-    translate_rail_bounds(bm, cylinder, vec, prop.corner_post_width / 2)
 
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
@@ -125,7 +127,6 @@ def create_fill_rails(bm, face, prop):
             cylinder = edge_to_cylinder(bm, dup_edge, rail_size/2, up)
             if sloped:
                 rotate_sloped_rail_bounds(bm, cylinder, vec)
-            translate_rail_bounds(bm, cylinder, vec, prop.corner_post_width / 2)
 
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
@@ -182,8 +183,8 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     return validate(all_verts)
 
 
-def translate_rail_bounds(bm, verts, dir, trans):
-    """ Translate the end faces of rail inwards
+def translate_bounds(bm, verts, dir, trans):
+    """ Translate the end verts inwards
     """
     if dir.z: # if rail is sloping, make vector horizontal
         left = dir.cross(Vector((0, 0, -1)))
