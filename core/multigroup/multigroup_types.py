@@ -145,9 +145,7 @@ def make_multigroup_insets(bm, face, prop, dws):
     dw_count = count(dws)
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
     door_height = calc_face_dimensions(face)[1] - frame_thickness
-    # prop.window_height = clamp(
-    #     prop.window_height, 0.01, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
-    # prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
+    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - SPLIT_EPS)
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
