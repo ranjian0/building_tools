@@ -11,6 +11,7 @@ from ..arch import (
 from ...utils import (
     clamp,
     FaceMap,
+    validate,
     local_xyz,
     valid_ngon,
     popup_message,
@@ -57,7 +58,7 @@ def create_door_split(bm, face, size, offset):
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 + offset.y + size.y/2, wall_h/2 - offset.y - size.y/2]
+    v_width = [size.y, wall_h - size.y]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[0]
@@ -97,7 +98,7 @@ def create_door_frame(bm, face, prop):
 
     # add face maps
     add_faces_to_map(bm, [door_face], FaceMap.DOOR)
-    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
     if prop.add_arch:
         add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
 
