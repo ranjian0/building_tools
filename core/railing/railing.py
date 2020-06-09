@@ -68,15 +68,11 @@ def create_railing_top(bm, top_edge, prop):
     horizon = vec.cross(Vector((0., 0., 1.)))
     up.rotate(Quaternion(horizon, math.pi/2).to_euler())
 
-    angle = edge_angle(top_dup_edge)
     sloped = edge_is_sloped(top_dup_edge)
-    edge_len = top_dup_edge.calc_length()
-
     cylinder = edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
     if sloped:
-        rotate_sloped_rail_bounds(bm, cylinder, vec, angle)
-        edge_len = (edge_len - prop.corner_post_width) / math.acos(angle)
-    # scale_rail(bm, cylinder, (edge_len - prop.corner_post_width) / edge_len)
+        rotate_sloped_rail_bounds(bm, cylinder, vec)
+    translate_rail_bounds(bm, cylinder, vec, prop.corner_post_width / 2)
 
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
@@ -126,16 +122,11 @@ def create_fill_rails(bm, face, prop):
             up = face.normal
 
             vec = edge_vector(dup_edge)
-            angle = edge_angle(dup_edge)
             sloped = edge_is_sloped(dup_edge)
-            edge_len = dup_edge.calc_length()
-
             cylinder = edge_to_cylinder(bm, dup_edge, rail_size/2, up)
             if sloped:
-                rotate_sloped_rail_bounds(bm, cylinder, vec, angle)
-                edge_len = (edge_len - prop.corner_post_width) / math.acos(angle)
-                # edge_len = hypot / math.acos(math.atan(vec.z / sum(vec.xy)))
-            # scale_rail(bm, cylinder, (edge_len - prop.corner_post_width) / edge_len)
+                rotate_sloped_rail_bounds(bm, cylinder, vec)
+            translate_rail_bounds(bm, cylinder, vec, prop.corner_post_width / 2)
 
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
@@ -192,23 +183,27 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     return validate(all_verts)
 
 
-def scale_rail(bm, verts, factor):
-    """ Scale a rail by factor (for perfect fit between corner posts)
+def translate_rail_bounds(bm, verts, dir, trans):
+    """ Translate the end faces of rail inwards
     """
-    bmesh.ops.scale(bm,
-                    verts=verts,
-                    vec=Vector((factor, factor, 1.0)),
-                    space=Matrix.Translation(-calc_verts_median(verts)))
+    if dir.z: # if rail is sloping, make vector horizontal
+        left = dir.cross(Vector((0, 0, -1)))
+        dir.rotate(Quaternion(left, math.atan(dir.z / dir.xy.length)).to_euler())
+
+    vec = dir.xy*trans
+    mid = len(verts) // 2
+    vts = sort_verts(verts, dir)
+    bmesh.ops.translate(bm, verts=vts[:mid], vec=(vec.x, vec.y, 0.0))
+    bmesh.ops.translate(bm, verts=vts[-mid:], vec=(-vec.x, -vec.y, 0.0))
 
 
-def rotate_sloped_rail_bounds(bm, cylinder_verts, dir, angle):
+def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
     """ Rotate the end faces of sloping cylinder rail to be vertically aligned
     """
-    if len(cylinder_verts) != 8:
-        return
-
+    mid = len(cylinder_verts) // 2
     vts = sort_verts(cylinder_verts, dir)
-    for bunch in [vts[:4], vts[-4:]]:
+    angle = math.atan(dir.z / dir.xy.length)
+    for bunch in [vts[:mid], vts[-mid:]]:
         bmesh.ops.rotate(
             bm, verts=bunch, cent=calc_verts_median(bunch),
             matrix=Matrix.Rotation(angle, 4, dir.cross(Vector((0, 0, -1))))
