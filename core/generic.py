@@ -12,6 +12,8 @@ from bpy.props import (
 
 from ..utils import (
     clamp,
+    bm_to_obj,
+    bm_from_obj,
     get_edit_mesh,
     restricted_size,
     restricted_offset,
@@ -196,8 +198,11 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.object
-        me = get_edit_mesh()
-        bm = bmesh.from_edit_mesh(me)
+        if obj.mode == "EDIT":
+            me = get_edit_mesh()
+            bm = bmesh.from_edit_mesh(me)
+        else:
+            bm = bm_from_obj(obj)
 
         face_map = bm.faces.layers.face_map.active
         used_indices = {f[face_map] for f in bm.faces}
@@ -213,7 +218,10 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         for idx in reversed(list(tag_remove_indices)):
             obj.facemap_materials.remove(idx)
 
-        bmesh.update_edit_mesh(me, True)
+        if obj.mode == "EDIT":
+            bmesh.update_edit_mesh(me, True)
+        else:
+            bm_to_obj(bm, obj)
         return {"FINISHED"}
 
 
