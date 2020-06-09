@@ -97,7 +97,6 @@ def create_fill_posts(bm, face, prop):
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
-            # print("Posts FILL")
             edge_to_cylinder(bm, dup_edge, post_size/2, up)
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
