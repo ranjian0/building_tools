@@ -105,7 +105,7 @@ def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=3)
+    rnd = ft.partial(round, ndigits=4)
 
     for e in edges:
         if rnd(normal.x):
@@ -122,7 +122,7 @@ def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=3)
+    rnd = ft.partial(round, ndigits=4)
 
     for e in edges:
         if rnd(normal.z):
