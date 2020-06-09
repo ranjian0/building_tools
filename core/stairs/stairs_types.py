@@ -170,9 +170,6 @@ def create_stairs_split(bm, face, prop):
     """
     xyz = local_xyz(face)
     size = Vector((prop.size_offset.size.x, prop.step_height))
-    # XXX Diplace balcony to bottom of face
-    prop.size_offset.offset.y = -((calc_face_dimensions(face)[1]/2) - prop.step_height/2)
-
     f = create_face(bm, size, prop.size_offset.offset, xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
