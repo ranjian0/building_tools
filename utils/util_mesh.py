@@ -105,7 +105,7 @@ def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=3)
+    rnd = ft.partial(round, ndigits=4)
 
     for e in edges:
         if rnd(normal.x):
@@ -122,7 +122,7 @@ def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=3)
+    rnd = ft.partial(round, ndigits=4)
 
     for e in edges:
         if rnd(normal.z):
@@ -158,8 +158,8 @@ def calc_face_dimensions(face):
     """
     horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
-    width = sum(e.calc_length() for e in horizontal_edges)/2
-    height = sum(e.calc_length() for e in vertical_edges)/2
+    width = sum(e.calc_length() for e in horizontal_edges) / 2
+    height = sum(e.calc_length() for e in vertical_edges) / 2
     return width, height
 
 
@@ -169,8 +169,8 @@ def face_with_verts(bm, verts, default=None):
     for face in bm.faces:
         equal = map(
             operator.eq,
-            sorted(verts, key=operator.attrgetter('index')),
-            sorted(face.verts, key=operator.attrgetter('index')),
+            sorted(verts, key=operator.attrgetter("index")),
+            sorted(face.verts, key=operator.attrgetter("index")),
         )
         if len(face.verts) == len(verts) and all(equal):
             return face
@@ -206,13 +206,13 @@ def subdivide_edges(bm, edges, direction, widths):
     cuts = len(widths) - 1
     res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=cuts)
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
-    distance = sum(widths)/len(widths)
+    distance = sum(widths) / len(widths)
     final_position = 0.0
     for i, edge in enumerate(sort_edges(inner_edges, dir)):
-        original_position = (i+1) * distance
+        original_position = (i + 1) * distance
         final_position += widths[i]
         diff = final_position - original_position
-        bmesh.ops.translate(bm, verts=edge.verts, vec=diff*dir)
+        bmesh.ops.translate(bm, verts=edge.verts, vec=diff * dir)
     return inner_edges
 
 
@@ -236,7 +236,7 @@ def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
             angle = math.pi - (theta * idx)
-            v.co = median + xyz[0] * math.cos(angle) * length/2
+            v.co = median + xyz[0] * math.cos(angle) * length / 2
             v.co.z += math.sin(angle) * height
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
@@ -264,7 +264,7 @@ def extrude_face_region(bm, faces, depth, normal):
 
     extruded_faces = filter_geom(geom, BMFace)
     # order extruded faces as per initially passed
-    final_locations = [loc+depth*normal for loc in initial_locations]
+    final_locations = [loc + depth * normal for loc in initial_locations]
     extruded_faces = closest_faces(extruded_faces, final_locations)
     surrounding_faces = list({f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces})
     return extruded_faces, surrounding_faces
@@ -273,8 +273,9 @@ def extrude_face_region(bm, faces, depth, normal):
 def closest_faces(faces, locations):
     def get_face(faces, location):
         for f in faces:
-            if equal((f.calc_center_bounds()-location).length, 0):
+            if equal((f.calc_center_bounds() - location).length, 0):
                 return f
+
     return [get_face(faces, l) for l in locations]
 
 

@@ -5,6 +5,8 @@ import math
 import heapq
 import operator
 import itertools as it
+
+from enum import Enum
 from collections import namedtuple
 
 
@@ -445,6 +447,32 @@ def normalize_contour(contour):
     ]
 
 
+class RoofType(Enum):
+    HIP_ROOF = 1
+    GABLE_ROOF = 2
+
+
+SkeletonRoofType = RoofType.HIP_ROOF
+
+
+def set_roof_type_hip():
+    global SkeletonRoofType
+    SkeletonRoofType = RoofType.HIP_ROOF
+
+
+def set_roof_type_gable():
+    global SkeletonRoofType
+    SkeletonRoofType = RoofType.GABLE_ROOF
+
+
+def roof_is_hip():
+    return SkeletonRoofType == RoofType.HIP_ROOF
+
+
+def roof_is_gable():
+    return SkeletonRoofType == RoofType.GABLE_ROOF
+
+
 # -- Event Type (etype) is 1
 class SplitEvent(
     namedtuple("SplitEvent", "distance intersection_point etype vertex opposite_edge")
@@ -664,6 +692,27 @@ class SLAV:
             next_event = new_vertex.next_event()
             if next_event is not None:
                 events.append(next_event)
+
+        # -- gable roof processing
+        if roof_is_gable():
+            original_points = []
+            for e in self._original_edges:
+                original_points.extend([e.edge.p1, e.edge.p2])
+
+            len_sinks = len(sinks)
+            set_diff = set(sinks) - set(original_points)
+            len_diff = len(list(set_diff))
+
+            midpoint = event.intersection_point
+            if len_sinks == 2 and len_diff == 0:
+                midpoint = sum(sinks, (0, 0)) / 2
+            elif len_sinks == 3 and len_diff == 1:
+                new_sinks = [s for s in sinks]
+                new_sinks.remove(set_diff.pop())
+                midpoint = sum(new_sinks, (0, 0)) / 2
+
+            event.intersection_point.x = midpoint.x
+            event.intersection_point.y = midpoint.y
 
         return (Subtree(event.intersection_point, event.distance, sinks), events)
 

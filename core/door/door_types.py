@@ -9,7 +9,9 @@ from ..arch import (
     add_arch_depth,
 )
 from ...utils import (
+    clamp,
     FaceMap,
+    validate,
     local_xyz,
     valid_ngon,
     popup_message,
@@ -36,9 +38,11 @@ def create_door(bm, faces, prop):
 
         face.select = False
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+        array_faces = subdivide_face_horizontally(
+            bm, face, widths=[prop.size_offset.size.x] * prop.count
+        )
         for aface in array_faces:
-            face = create_door_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            face = create_door_split(bm, aface, prop)
             door, arch = create_door_frame(bm, face, prop)
             create_door_fill(bm, door, prop)
             if prop.add_arch:
@@ -47,16 +51,16 @@ def create_door(bm, faces, prop):
 
 
 @map_new_faces(FaceMap.WALLS)
-def create_door_split(bm, face, size, offset):
+def create_door_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads
     """
-
     wall_w, wall_h = calc_face_dimensions(face)
+    size, offset = prop.size_offset.size, prop.size_offset.offset
     # horizontal split
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 + offset.y + size.y/2, wall_h/2 - offset.y - size.y/2]
+    v_width = [size.y, wall_h - size.y]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[0]
@@ -66,6 +70,10 @@ def create_door_frame(bm, face, prop):
     """Extrude and inset face to make door frame
     """
     normal = face.normal.copy()
+
+    # XXX Frame thickness should not exceed size of door
+    min_frame_size = min(calc_face_dimensions(face)) / 2
+    prop.frame_thickness = clamp(prop.frame_thickness, 0.01, min_frame_size - 0.001)
 
     door_face, frame_faces = make_door_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
     arch_face = None
@@ -92,7 +100,7 @@ def create_door_frame(bm, face, prop):
 
     # add face maps
     add_faces_to_map(bm, [door_face], FaceMap.DOOR)
-    add_faces_to_map(bm, frame_faces, FaceMap.FRAME)
+    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
     if prop.add_arch:
         add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
 

@@ -1,17 +1,24 @@
 import bmesh
 
 from .stairs_types import create_stairs
-from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups, verify_facemaps_for_object
+from ...utils import (
+    FaceMap,
+    crash_safe,
+    get_edit_mesh,
+    add_facemap_for_groups,
+    verify_facemaps_for_object,
+)
 
 
 class Stairs:
     @classmethod
+    @crash_safe
     def build(cls, context, prop):
         verify_facemaps_for_object(context.object)
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
         faces = [f for f in bm.faces if f.select]
-    
+
         if cls.validate(faces):
             cls.add_stairs_facemaps()
             if create_stairs(bm, faces, prop):

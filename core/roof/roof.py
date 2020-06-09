@@ -1,11 +1,18 @@
 import bmesh
 
 from .roof_types import create_roof
-from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups, verify_facemaps_for_object
+from ...utils import (
+    FaceMap,
+    crash_safe,
+    get_edit_mesh,
+    add_facemap_for_groups,
+    verify_facemaps_for_object,
+)
 
 
 class Roof:
     @classmethod
+    @crash_safe
     def build(cls, context, props):
         verify_facemaps_for_object(context.object)
         me = get_edit_mesh()
