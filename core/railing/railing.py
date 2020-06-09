@@ -93,13 +93,17 @@ def create_fill_posts(bm, face, prop):
     top_edge_vector.z = 0
     n_posts = round(top_edge_vector.length*prop.post_fill.density/post_size)
     dir = edge_vector(top_edge)
+    sloped = edge_is_sloped(top_edge)
     if n_posts != 0:
         inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
         for edge in inner_edges:
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
-            edge_to_cylinder(bm, dup_edge, post_size/2, up)
+            vec = edge_vector(dup_edge)
+            cylinder = edge_to_cylinder(bm, dup_edge, post_size/2, up)
+            if sloped:
+                rotate_top_faces(bm, cylinder, vec, dir)
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
@@ -195,6 +199,18 @@ def translate_bounds(bm, verts, dir, trans):
     vts = sort_verts(verts, dir)
     bmesh.ops.translate(bm, verts=vts[:mid], vec=(vec.x, vec.y, 0.0))
     bmesh.ops.translate(bm, verts=vts[-mid:], vec=(-vec.x, -vec.y, 0.0))
+
+
+def rotate_top_faces(bm, cylinder, dir, left):
+    """ Rotate the upper faces (align posts to slanted railing)
+    """
+    mid = len(cylinder) // 2
+    vts = sort_verts(cylinder, dir)
+    angle = math.atan(left.z / left.xy.length)
+    bmesh.ops.rotate(
+            bm, verts=vts[-mid:], cent=calc_verts_median(vts[-mid:]),
+            matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
+        )
 
 
 def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
