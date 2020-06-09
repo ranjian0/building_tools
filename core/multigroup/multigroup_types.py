@@ -12,6 +12,7 @@ from ..door.door_types import (
     create_door_fill,
 )
 from ...utils import (
+    clamp,
     FaceMap,
     local_xyz,
     valid_ngon,
@@ -144,7 +145,9 @@ def make_multigroup_insets(bm, face, prop, dws):
     dw_count = count(dws)
     dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
     door_height = calc_face_dimensions(face)[1] - frame_thickness
-    prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
+    # prop.window_height = clamp(
+    #     prop.window_height, 0.01, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
+    # prop.window_height = min(prop.window_height, calc_face_dimensions(face)[1] - 2 * frame_thickness - SPLIT_EPS)
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
@@ -180,7 +183,7 @@ def clubbed_width(width, frame_thickness, type, count, first=False, last=False):
 def make_window_insets(bm, face, count, window_height, window_width, frame_thickness, first=False, last=False):
     # split vertically for window
     face_height = calc_face_dimensions(face)[1]
-    res = subdivide_face_vertically(bm, face, [face_height - (window_height+2*frame_thickness), window_height+2*frame_thickness])
+    res = subdivide_face_vertically(bm, face, [face_height - window_height, window_height])
     if not res:
         return [], []
 
@@ -202,7 +205,7 @@ def make_window_insets(bm, face, count, window_height, window_width, frame_thick
     else:
         work_faces = h_faces[::2]
         v_frames = h_faces[1::2]
-    v_widths = [frame_thickness, window_height, frame_thickness]
+    v_widths = [frame_thickness, window_height-2*frame_thickness, frame_thickness]
     v_faces = [f for h_face in work_faces for f in subdivide_face_vertically(bm, h_face, v_widths)]
 
     return v_faces[1::3], v_frames + v_faces[::3] + v_faces[2::3]
