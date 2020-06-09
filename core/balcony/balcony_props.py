@@ -32,11 +32,14 @@ class BalconyProperty(bpy.types.PropertyGroup):
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def init(self, wall_dimensions):
-        self['wall_dimensions'] = wall_dimensions
-        start_y = -((wall_dimensions[1]/2) - (self.slab_height/2))
+        self["wall_dimensions"] = wall_dimensions
+        start_y = -((wall_dimensions[1] / 2) - (self.slab_height / 2))
         self.size_offset.init(
-            self['wall_dimensions'],
-            default_size=(1.0, 1.0), default_offset=(0.0, start_y), restricted=False)
+            self["wall_dimensions"],
+            default_size=(1.0, 1.0),
+            default_offset=(0.0, start_y),
+            restricted=False,
+        )
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)

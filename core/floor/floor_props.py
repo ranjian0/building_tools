@@ -16,9 +16,7 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     add_slab: BoolProperty(
-        name="Add Slab",
-        default=True,
-        description="Add slab between each floor",
+        name="Add Slab", default=True, description="Add slab between each floor"
     )
 
     slab_thickness: FloatProperty(

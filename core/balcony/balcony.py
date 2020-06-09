@@ -1,7 +1,13 @@
 import bmesh
 
 from .balcony_types import create_balcony
-from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups, verify_facemaps_for_object, crash_safe
+from ...utils import (
+    FaceMap,
+    crash_safe,
+    get_edit_mesh,
+    add_facemap_for_groups,
+    verify_facemaps_for_object,
+)
 
 
 class Balcony:

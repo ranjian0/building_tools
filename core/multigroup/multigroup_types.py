@@ -2,15 +2,8 @@ import bmesh
 from ..frame import add_frame_depth
 from ..window.window_types import fill_window_face
 
-from ..arch import (
-    fill_arch,
-    create_arch,
-    add_arch_depth,
-)
-from ..door.door_types import (
-    add_door_depth,
-    create_door_fill,
-)
+from ..arch import fill_arch, create_arch, add_arch_depth
+from ..door.door_types import add_door_depth, create_door_fill
 from ...utils import (
     clamp,
     FaceMap,
@@ -182,14 +175,14 @@ def make_multigroup_insets(bm, face, prop, dws):
 
 def clubbed_width(width, frame_thickness, type, count, first=False, last=False):
     if type == "door":
-        return (width * count) + (frame_thickness * (count+1))
+        return (width * count) + (frame_thickness * (count + 1))
     elif type == "window":
         if first and last:
-            return (width * count) + (frame_thickness * (count+1))
+            return (width * count) + (frame_thickness * (count + 1))
         elif first or last:
             return (width * count) + (frame_thickness * count)
         else:
-            return (width * count) + (frame_thickness * (count-1))
+            return (width * count) + (frame_thickness * (count - 1))
 
 
 def make_window_insets(bm, face, count, window_height, window_width, frame_thickness, first=False, last=False):
@@ -208,7 +201,7 @@ def make_window_insets(bm, face, count, window_height, window_width, frame_thick
     elif last:
         h_widths = [window_width, frame_thickness] * count
     else:
-        h_widths = [window_width, frame_thickness] * (count-1) + [window_width]
+        h_widths = [window_width, frame_thickness] * (count - 1) + [window_width]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # horizontal frames
     if first:
@@ -217,7 +210,7 @@ def make_window_insets(bm, face, count, window_height, window_width, frame_thick
     else:
         work_faces = h_faces[::2]
         v_frames = h_faces[1::2]
-    v_widths = [frame_thickness, window_height-2*frame_thickness, frame_thickness]
+    v_widths = [frame_thickness, window_height - 2 * frame_thickness, frame_thickness]
     v_faces = [f for h_face in work_faces for f in subdivide_face_vertically(bm, h_face, v_widths)]
 
     return v_faces[1::3], v_frames + v_faces[::3] + v_faces[2::3]

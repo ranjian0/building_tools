@@ -38,9 +38,11 @@ def create_door(bm, faces, prop):
 
         face.select = False
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+        array_faces = subdivide_face_horizontally(
+            bm, face, widths=[prop.size_offset.size.x] * prop.count
+        )
         for aface in array_faces:
-            face = create_door_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            face = create_door_split(bm, aface, prop)
             door, arch = create_door_frame(bm, face, prop)
             create_door_fill(bm, door, prop)
             if prop.add_arch:
@@ -49,11 +51,11 @@ def create_door(bm, faces, prop):
 
 
 @map_new_faces(FaceMap.WALLS)
-def create_door_split(bm, face, size, offset):
+def create_door_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads
     """
-
     wall_w, wall_h = calc_face_dimensions(face)
+    size, offset = prop.size_offset.size, prop.size_offset.offset
     # horizontal split
     h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)

@@ -59,7 +59,9 @@ def map_new_faces(group, skip=None):
             new_faces = set(bm.faces) - faces
             add_faces_to_map(bm, list(new_faces), group, skip)
             return result
+
         return wrapper
+
     return outer
 
 
@@ -84,7 +86,7 @@ def add_faces_to_map(bm, faces, group, skip=None):
     # -- if the facemap already has a material assigned, assign the new faces to the material
     obj = bpy.context.object
     mat = obj.facemap_materials[group_index].material
-    mat_id = [idx for idx,  m in enumerate(obj.data.materials) if m == mat]
+    mat_id = [idx for idx, m in enumerate(obj.data.materials) if m == mat]
     if mat_id:
         for f in faces:
             f.material_index = mat_id[-1]

@@ -82,8 +82,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw1"),
-        set=lambda self, value : self.set_segment_width(value, "tw1"),
+        get=lambda self: self.get_segment_width("tw1"),
+        set=lambda self, value: self.set_segment_width(value, "tw1"),
     )
 
     tl1: FloatProperty(
@@ -99,8 +99,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw2"),
-        set=lambda self, value : self.set_segment_width(value, "tw2"),
+        get=lambda self: self.get_segment_width("tw2"),
+        set=lambda self, value: self.set_segment_width(value, "tw2"),
     )
 
     tl2: FloatProperty(
@@ -116,8 +116,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw3"),
-        set=lambda self, value : self.set_segment_width(value, "tw3"),
+        get=lambda self: self.get_segment_width("tw3"),
+        set=lambda self, value: self.set_segment_width(value, "tw3"),
     )
 
     tl3: FloatProperty(
@@ -133,8 +133,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw4"),
-        set=lambda self, value : self.set_segment_width(value, "tw4"),
+        get=lambda self: self.get_segment_width("tw4"),
+        set=lambda self, value: self.set_segment_width(value, "tw4"),
     )
 
     tl4: FloatProperty(

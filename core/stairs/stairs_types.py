@@ -145,7 +145,7 @@ def extrude_step(bm, face, normal, step_height, step_width):
     # extrude down
     n = face.normal.copy()
     face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[0]
-    bmesh.ops.translate(bm, vec=n*step_height, verts=face.verts)
+    bmesh.ops.translate(bm, vec=n * step_height, verts=face.verts)
 
     # extrude front
     front_face = list({f for e in face.edges for f in e.link_faces if vec_equal(f.normal, normal)})[0]
@@ -212,12 +212,12 @@ def add_railing_to_stairs(bm, top_faces, normal, prop):
 
 def railing_verts(bm, verts, normal, offset, depth):
     tangent = normal.copy()
-    tangent.rotate(Quaternion(Vector((0., 0., 1.)), math.pi/2).to_euler())
+    tangent.rotate(Quaternion(Vector((0.0, 0.0, 1.0)), math.pi / 2).to_euler())
     verts = sort_verts(verts, tangent)
     co1 = verts[0].co + depth * normal
     co2 = verts[1].co + depth * normal
     v1 = bmesh.ops.create_vert(bm, co=co1)["vert"][0]
     v2 = bmesh.ops.create_vert(bm, co=co2)["vert"][0]
-    bmesh.ops.translate(bm, verts=[v1], vec=tangent*offset)
-    bmesh.ops.translate(bm, verts=[v2], vec=-tangent*offset)
+    bmesh.ops.translate(bm, verts=[v1], vec=tangent * offset)
+    bmesh.ops.translate(bm, verts=[v2], vec=-tangent * offset)
     return v1, v2

@@ -34,7 +34,7 @@ def args_from_props(props, names):
     return tuple(getattr(props, name) for name in names)
 
 
-def popup_message(message, title="Error", icon='ERROR'):
+def popup_message(message, title="Error", icon="ERROR"):
     def oops(self, context):
         self.layout.label(text=message)
 
@@ -74,6 +74,7 @@ def kwargs_from_props(props):
 def crash_safe(func):
     """ Decorator to handle exceptions in bpy Operators safely
     """
+
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -81,14 +82,15 @@ def crash_safe(func):
             popup_message("See console for errors", title="Operator Failed!")
             traceback.print_exc()
             return {"CANCELLED"}
+
     return inner
 
 
 def restricted_size(parent_dimensions, offset, size_min, size):
     """ Get size restricted by various factors
     """
-    limit_x = min(parent_dimensions[0] + 2*offset[0], parent_dimensions[0] - 2*offset[0])
-    limit_y = min(parent_dimensions[1] + 2*offset[1], parent_dimensions[1] - 2*offset[1])
+    limit_x = min(parent_dimensions[0] + 2 * offset[0], parent_dimensions[0] - 2 * offset[0])
+    limit_y = min(parent_dimensions[1] + 2 * offset[1], parent_dimensions[1] - 2 * offset[1])
     x = clamp(size[0], size_min[0], limit_x)
     y = clamp(size[1], size_min[1], limit_y)
     return x, y
@@ -97,8 +99,8 @@ def restricted_size(parent_dimensions, offset, size_min, size):
 def restricted_offset(parent_dimensions, size, offset):
     """ Get offset restricted by various factors
     """
-    limit_x = (parent_dimensions[0]-size[0]) / 2
-    limit_y = (parent_dimensions[1]-size[1]) / 2
+    limit_x = (parent_dimensions[0] - size[0]) / 2
+    limit_y = (parent_dimensions[1] - size[1]) / 2
     x = clamp(offset[0], -limit_x, limit_x)
     y = clamp(offset[1], -limit_y, limit_y)
     return x, y
@@ -117,6 +119,6 @@ def local_xyz(face):
     """
     z = face.normal.copy()
     x = face.normal.copy()
-    x.rotate(Euler((0.0, 0.0, radians(90)), 'XYZ'))
+    x.rotate(Euler((0.0, 0.0, radians(90)), "XYZ"))
     y = z.cross(x)
     return x, y, z

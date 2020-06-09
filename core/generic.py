@@ -24,14 +24,14 @@ from ..utils import (
 def get_count(self):
     """ Return count value with a default of 1
     """
-    return self.get('count', 1)
+    return self.get("count", 1)
 
 
 def set_count(self, value):
     """ Set count value ensuring that element fit nicely in parent
     """
     # -- Make each element in array fit into the parent
-    parent_width = self['wall_dimensions'][0]
+    parent_width = self["wall_dimensions"][0]
     if self.size_offset.size.x > parent_width / value:
         self.size_offset.size.x = parent_width / value
 
@@ -39,10 +39,12 @@ def set_count(self, value):
     element_width = parent_width / value
     item_width = self.size_offset.size.x
     max_offset = (element_width / 2) - (item_width / 2)
-    self.size_offset.offset.x = clamp(self.size_offset.offset.x, -max_offset, max_offset)
+    self.size_offset.offset.x = clamp(
+        self.size_offset.offset.x, -max_offset, max_offset
+    )
 
     # -- set count
-    self['count'] = value
+    self["count"] = value
 
 
 def clamp_count(face_width, frame_width, prop):
@@ -63,18 +65,18 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
     def get_size(self):
-        if self['restricted']:
+        if self["restricted"]:
             return self.get("size", restricted_size(
-                self['parent_dimensions'], self.offset, (0.1, 0.1), self['default_size']
+                self["parent_dimensions"], self.offset, (0.1, 0.1), self["default_size"]
             ))
         else:
-            return self.get("size", self['default_size'])
+            return self.get("size", self["default_size"])
 
     def set_size(self, value):
-        if self['restricted']:
+        if self["restricted"]:
             value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
             self["size"] = restricted_size(
-                self['parent_dimensions'], self.offset, (0.1, 0.1), value
+                self["parent_dimensions"], self.offset, (0.1, 0.1), value
             )
         else:
             self["size"] = value
@@ -89,10 +91,12 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     )
 
     def get_offset(self):
-        return self.get("offset", self['default_offset'])
+        return self.get("offset", self["default_offset"])
 
     def set_offset(self, value):
-        self["offset"] = restricted_offset(self['parent_dimensions'], self.size, value) if self['restricted'] else value
+        self["offset"] = (
+            restricted_offset(self["parent_dimensions"], self.size, value) if self["restricted"] else value
+        )
 
     offset: FloatVectorProperty(
         name="Offset",
@@ -106,10 +110,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     show_props: BoolProperty(default=False)
 
     def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=True):
-        self['parent_dimensions'] = parent_dimensions
-        self['default_size'] = default_size
-        self['default_offset'] = default_offset
-        self['restricted'] = restricted
+        self["parent_dimensions"] = parent_dimensions
+        self["default_size"] = default_size
+        self["default_offset"] = default_offset
+        self["restricted"] = restricted
 
     def draw(self, context, box):
 
@@ -123,8 +127,9 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
 class ArchProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup to create arched features """
+
     def get_height(self):
-        return self.get("height", min(self['parent_height'], self["default_height"]))
+        return self.get("height", min(self["parent_height"], self["default_height"]))
 
     def set_height(self, value):
         self["height"] = clamp(value, 0.1, self["parent_height"] - 0.0001)
@@ -161,8 +166,8 @@ class ArchProperty(bpy.types.PropertyGroup):
     )
 
     def init(self, parent_height):
-        self['parent_height'] = parent_height
-        self['default_height'] = 0.4
+        self["parent_height"] = parent_height
+        self["default_height"] = 0.4
 
     def draw(self, context, box):
 

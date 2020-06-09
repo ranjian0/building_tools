@@ -30,7 +30,7 @@ def make_corner_posts(bm, edges, prop, up):
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
         dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        edge_to_cylinder(bm, dup_edge, prop.corner_post_width/2, up, fill=True)
+        edge_to_cylinder(bm, dup_edge, prop.corner_post_width / 2, up, fill=True)
 
 
 def make_fill(bm, face, prop):
@@ -60,21 +60,25 @@ def make_fill(bm, face, prop):
 def create_railing_top(bm, top_edge, prop):
     ret = bmesh.ops.duplicate(bm, geom=[top_edge])
     top_dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-    horizon = edge_vector(top_dup_edge).cross(Vector((0., 0., 1.)))
+    horizon = edge_vector(top_dup_edge).cross(Vector((0.0, 0.0, 1.0)))
     up = edge_vector(top_dup_edge)
-    up.rotate(Quaternion(horizon, math.pi/2).to_euler())
+    up.rotate(Quaternion(horizon, math.pi / 2).to_euler())
 
     if not edge_vector(top_dup_edge).z:
         scale_railing_edge(bm, top_dup_edge, prop.corner_post_width)
 
-    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
-    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
+    edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width / 2, up)
+    bmesh.ops.translate(
+        bm, verts=top_edge.verts, vec=Vector((0.0, 0.0, -1.0)) * prop.corner_post_width / 2,
+    )
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
-    sorted_edges = sort_edges([e for e in face.edges if e not in vertical_edges], Vector((0., 0., -1.)))
+    sorted_edges = sort_edges(
+        [e for e in face.edges if e not in vertical_edges], Vector((0.0, 0.0, -1.0))
+    )
 
     # create posts
     post_size = min(prop.post_fill.size, prop.corner_post_width)
@@ -83,15 +87,17 @@ def create_fill_posts(bm, face, prop):
     bottom_edge = sorted_edges[-1]
     top_edge_vector = top_edge.verts[0].co - top_edge.verts[1].co
     top_edge_vector.z = 0
-    n_posts = round(top_edge_vector.length*prop.post_fill.density/post_size)
+    n_posts = round(top_edge_vector.length * prop.post_fill.density / post_size)
     dir = edge_vector(top_edge)
     if n_posts != 0:
-        inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.]*(n_posts+1))
+        inner_edges = subdivide_edges(
+            bm, [top_edge, bottom_edge], dir, widths=[1.0] * (n_posts + 1)
+        )
         for edge in inner_edges:
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
-            edge_to_cylinder(bm, dup_edge, post_size/2, up)
+            edge_to_cylinder(bm, dup_edge, post_size / 2, up)
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
@@ -106,16 +112,20 @@ def create_fill_rails(bm, face, prop):
     rail_size = min(prop.rail_fill.size, prop.corner_post_width)
 
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
-    n_rails = math.floor(vertical_edges[0].calc_length()*prop.rail_fill.density/rail_size)
+    n_rails = math.floor(
+        vertical_edges[0].calc_length() * prop.rail_fill.density / rail_size
+    )
     if n_rails != 0:
-        inner_edges = subdivide_edges(bm, vertical_edges, Vector((0., 0., 1.)), widths=[1.]*(n_rails+1))
+        inner_edges = subdivide_edges(
+            bm, vertical_edges, Vector((0.0, 0.0, 1.0)), widths=[1.0] * (n_rails + 1)
+        )
         for edge in inner_edges:
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
             if not edge_vector(dup_edge).z:
                 scale_railing_edge(bm, dup_edge, prop.corner_post_width)
-            edge_to_cylinder(bm, dup_edge, rail_size/2, up)
+            edge_to_cylinder(bm, dup_edge, rail_size / 2, up)
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
@@ -131,31 +141,31 @@ def create_fill_walls(bm, face, prop):
 
     ret = bmesh.ops.duplicate(bm, geom=[face])
     dup_face = filter_geom(ret["geom"], BMFace)[0]
-    bmesh.ops.translate(bm, verts=dup_face.verts, vec=-face.normal*wall_size/2)
+    bmesh.ops.translate(bm, verts=dup_face.verts, vec=-face.normal * wall_size / 2)
     ret = bmesh.ops.extrude_edge_only(bm, edges=dup_face.edges)
     verts = filter_geom(ret["geom"], BMVert)
-    bmesh.ops.translate(bm, verts=verts, vec=face.normal*wall_size)
+    bmesh.ops.translate(bm, verts=verts, vec=face.normal * wall_size)
     bmesh.ops.contextual_create(bm, geom=verts)
 
     # delete reference faces and hidden faces
-    bmesh.ops.delete(bm, geom=[face] + filter_geom(ret['geom'], BMFace), context="FACES")
+    bmesh.ops.delete(bm, geom=[face] + filter_geom(ret["geom"], BMFace), context="FACES")
 
 
 def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     edge_vec = edge_vector(edge)
-    theta = (n-2)*math.pi/n
-    length = 2 * radius * math.tan(theta/2)
+    theta = (n - 2) * math.pi / n
+    length = 2 * radius * math.tan(theta / 2)
 
     dir = up.copy()
-    dir.rotate(Quaternion(edge_vec, -math.pi+theta/2).to_euler())
-    bmesh.ops.translate(bm, verts=edge.verts, vec=dir*radius/math.sin(theta/2))
+    dir.rotate(Quaternion(edge_vec, -math.pi + theta / 2).to_euler())
+    bmesh.ops.translate(bm, verts=edge.verts, vec=dir * radius / math.sin(theta / 2))
     all_verts = [v for v in edge.verts]
-    dir.rotate(Quaternion(edge_vec, math.pi-theta/2).to_euler())
+    dir.rotate(Quaternion(edge_vec, math.pi - theta / 2).to_euler())
     for i in range(0, n):
         ret = bmesh.ops.extrude_edge_only(bm, edges=[edge])
         edge = filter_geom(ret["geom"], BMEdge)[0]
-        bmesh.ops.translate(bm, verts=edge.verts, vec=dir*length)
-        dir.rotate(Quaternion(edge_vec, math.radians(360/n)).to_euler())
+        bmesh.ops.translate(bm, verts=edge.verts, vec=dir * length)
+        dir.rotate(Quaternion(edge_vec, math.radians(360 / n)).to_euler())
         all_verts += edge.verts
 
     bmesh.ops.remove_doubles(bm, verts=all_verts, dist=0.001)

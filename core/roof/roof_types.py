@@ -238,8 +238,7 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         found_edges = [e]
         while v != last:
             linked = [
-                e for e in v.link_edges
-                if e in skeleton_edges and e not in found_edges
+                e for e in v.link_edges if e in skeleton_edges and e not in found_edges
             ]
             next_edge = linked[0]
             if len(linked) > 1:
@@ -253,9 +252,7 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
     result = []
     for ed in validate(original_edges):
         walk = boundary_walk(ed)
-        result.extend(
-            bmesh.ops.contextual_create(bm, geom=walk).get("faces")
-        )
+        result.extend(bmesh.ops.contextual_create(bm, geom=walk).get("faces"))
     return result
 
 
@@ -337,7 +334,8 @@ def gable_process_box(bm, roof_faces, prop):
 
     # -- move abit upwards (by amount roof thickness)
     bmesh.ops.translate(
-        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
+    )
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- face maps
@@ -360,7 +358,8 @@ def gable_process_open(bm, roof_faces, prop):
     # -- extrude and move up
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
     bmesh.ops.translate(
-        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
+    )
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- find newly created side faces
@@ -384,7 +383,8 @@ def gable_process_open(bm, roof_faces, prop):
 
     # -- outset side faces
     bmesh.ops.inset_region(
-        bm, use_even_offset=True, faces=side_faces, depth=prop.outset).get("faces")
+        bm, use_even_offset=True, faces=side_faces, depth=prop.outset
+    )
 
     # -- move lower vertical edges abit down (inorder to maintain roof slope)
     v_edges = []
@@ -395,15 +395,13 @@ def gable_process_open(bm, roof_faces, prop):
     min_z = min([calc_edge_median(e).z for e in v_edges])
     min_z_edges = [e for e in v_edges if calc_edge_median(e).z == min_z]
     min_z_verts = list(set(v for e in min_z_edges for v in e.verts))
-    bmesh.ops.translate(bm, verts=min_z_verts, vec=(0, 0, -prop.outset/2))
+    bmesh.ops.translate(bm, verts=min_z_verts, vec=(0, 0, -prop.outset / 2))
 
     # -- post cleanup
     bmesh.ops.dissolve_edges(bm, edges=dissolve_edges)
 
     # -- facemaps
-    linked = {
-        f for fc in side_faces for e in fc.edges for f in e.link_faces
-    }
+    linked = {f for fc in side_faces for e in fc.edges for f in e.link_faces}
     linked_top = [f for f in linked if f.normal.z > 0]
     linked_bot = [f for f in linked if f.normal.z < 0]
     add_faces_to_map(bm, linked_top, FaceMap.ROOF)
