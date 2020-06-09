@@ -18,7 +18,6 @@ from ...utils import (
     popup_message,
     subdivide_edges,
     add_faces_to_map,
-    calc_face_dimensions,
     filter_parallel_edges,
     subdivide_face_vertically,
 )
