@@ -86,12 +86,11 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
 def fill_bar(bm, face, prop):
     """Create horizontal and vertical bars along a face
     """
-    try:
-        width, height = calc_face_dimensions(face)
-    except IndexError:
-        # -- face is too small / has no width or height after sizeoffset prop adjusted
+    if prop.bar_count_x + prop.bar_count_y == 0:
         return
+
     face_center = face.calc_center_median()
+    width, height = calc_face_dimensions(face)
 
     # XXX bar width should not exceed window size
     min_dimension = min(
