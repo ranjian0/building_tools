@@ -47,9 +47,7 @@ and `Building Tools` was born.
 
 ## Status
 
-Project is: **_in alpha_.**
-
-  :exclamation:**Use at your own risk.**
+`Version` : `v1.0a`
 
 ## Inspiration
 
