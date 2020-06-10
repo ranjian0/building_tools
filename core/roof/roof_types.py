@@ -249,6 +249,8 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
             linked = [
                 e for e in v.link_edges if e in skeleton_edges and e not in found_edges
             ]
+            if not linked:
+                continue
             next_edge = linked[0]
             if len(linked) > 1:
                 next_edge = min(linked, key=lambda e: interior_angle(v, previous, e))
