@@ -91,7 +91,9 @@ class MultigroupProperty(bpy.types.PropertyGroup):
             default_offset=(0.0, 0.0),
         )
         if "d" not in str(self.components):
-            self.arch.init(wall_dimensions[1] / 2 - self.size_offset.offset.y * 1.5)
+            self.arch.init(
+                wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2
+            )
         else:
             self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 
