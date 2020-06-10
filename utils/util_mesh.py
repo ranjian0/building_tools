@@ -105,15 +105,12 @@ def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=4)
+    rnd = ft.partial(round, ndigits=3)
 
+    right = Vector((0, 1, 0)) if normal.x else Vector((1, 0, 0))
     for e in edges:
-        if rnd(normal.x):
-            s = set([rnd(v.co.y) for v in e.verts])
-        else:
-            s = set([rnd(v.co.x) for v in e.verts])
-
-        if len(s) == 1:
+        vec = edge_vector(e)
+        if rnd(vec.angle(right)) == rnd(math.pi / 2):
             res.append(e)
     return res
 
@@ -122,15 +119,12 @@ def filter_horizontal_edges(edges, normal):
     """ Determine edges that are horizontal based on a normal value
     """
     res = []
-    rnd = ft.partial(round, ndigits=4)
+    rnd = ft.partial(round, ndigits=3)
 
+    up = Vector((1, 0, 0)) if normal.z else Vector((0, 0, 1))
     for e in edges:
-        if rnd(normal.z):
-            s = set([rnd(v.co.y) for v in e.verts])
-        else:
-            s = set([rnd(v.co.z) for v in e.verts])
-
-        if len(s) == 1:
+        vec = edge_vector(e)
+        if rnd(vec.angle(up)) == rnd(math.pi / 2):
             res.append(e)
     return res
 
