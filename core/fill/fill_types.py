@@ -66,6 +66,10 @@ def fill_bar(bm, face, prop):
         return
     face_center = face.calc_center_median()
 
+    # XXX bar width should not exceed window size
+    min_dimension = min([width / prop.bar_count_x, height / prop.bar_count_y])
+    prop.bar_width = min(prop.bar_width, min_dimension / 2)
+
     # -- horizontal
     offset = height / (prop.bar_count_x + 1)
     for i in range(prop.bar_count_x):
