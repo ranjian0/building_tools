@@ -74,10 +74,10 @@ def fill_bar(bm, face, prop):
     offset = height / (prop.bar_count_x + 1)
     for i in range(prop.bar_count_x):
         scale = (1, 1, prop.bar_width / height)
-        position = Vector((face.normal * prop.bar_depth / 2)) + Vector(
+        position = Vector((face.normal * prop.bar_depth)) + Vector(
             (0, 0, -height / 2 + (i + 1) * offset)
         )
-        depth = -face.normal * prop.bar_depth / 2
+        depth = -face.normal * prop.bar_depth
         create_bar_from_face(bm, face, face_center, position, scale, depth)
 
     # -- vertical
@@ -86,10 +86,10 @@ def fill_bar(bm, face, prop):
     for i in range(prop.bar_count_y):
         scale = (prop.bar_width / width, prop.bar_width / width, 1)
         perp = face.normal.cross(Vector((0, 0, 1)))
-        position = Vector((face.normal * ((prop.bar_depth / 2) - eps))) + perp * (
+        position = Vector((face.normal * ((prop.bar_depth) - eps))) + perp * (
             -width / 2 + ((i + 1) * offset)
         )
-        depth = -face.normal * ((prop.bar_depth / 2) - eps)
+        depth = -face.normal * ((prop.bar_depth) - eps)
         create_bar_from_face(bm, face, face_center, position, scale, depth, True)
 
 
