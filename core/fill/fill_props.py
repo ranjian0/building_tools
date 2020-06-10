@@ -32,7 +32,7 @@ class FillPanel(bpy.types.PropertyGroup):
         name="Panel Margin",
         min=0.01,
         max=1.0,
-        default=0.1,
+        default=0.05,
         description="Margins of each panel",
     )
 

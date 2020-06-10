@@ -27,9 +27,21 @@ def fill_panel(bm, face, prop):
     if prop.panel_count_x + prop.panel_count_y == 0:
         return
 
+    # XXX Ensure panel border is less than parent face size
+    min_dimension = min(calc_face_dimensions(face))
+    prop.panel_border_size = min(
+        prop.panel_border_size, min_dimension / 2)
+
     bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.panel_border_size)
     quads = subdivide_face_into_quads(bm, face, prop.panel_count_x, prop.panel_count_y)
-    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.panel_margin / 2)
+
+    # XXX Ensure panel margin is less that size of each quad)
+    min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
+    prop.panel_margin = min(prop.panel_margin, min_dimension / 2)
+
+    bmesh.ops.inset_individual(
+        bm, faces=quads, thickness=prop.panel_margin, use_even_offset=True
+    )
     bmesh.ops.translate(
         bm,
         verts=list({v for f in quads for v in f.verts}),
@@ -48,7 +60,7 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     bmesh.ops.inset_individual(bm, faces=[face], thickness=0.0001) # to isolate the working quad and not leave adjacent face as n-gon
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
 
-    # XXX Ensure pane margine is less that size of each quad)
+    # XXX Ensure pane margin is less that size of each quad)
     min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
     prop.pane_margin = min(prop.pane_margin, min_dimension)
 
