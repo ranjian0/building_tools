@@ -89,7 +89,7 @@ def fill_bar(bm, face, prop):
     min_dimension = min(
         [width / max(prop.bar_count_x, 1), height / max(prop.bar_count_y, 1)]
     )
-    prop.bar_width = min(prop.bar_width, min_dimension / 2)
+    prop.bar_width = min(prop.bar_width, min_dimension)
 
     # -- horizontal
     offset = height / (prop.bar_count_x + 1)
