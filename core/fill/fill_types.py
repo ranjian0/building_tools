@@ -49,7 +49,8 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
 
     # XXX Ensure pane margine is less that size of each quad)
-    prop.pane_margin = min(prop.pane_margin, min(calc_face_dimensions(quads[-1])))
+    min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
+    prop.pane_margin = min(prop.pane_margin, min_dimension)
 
     inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
     inset(
