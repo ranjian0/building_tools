@@ -29,7 +29,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     thickness: FloatProperty(
         name="Thickness",
         min=0.01,
-        max=1000.0,
+        max=1.0,
         default=0.1,
         description="Thickness of roof hangs",
     )
@@ -45,7 +45,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     height: FloatProperty(
         name="Height",
         min=0.01,
-        max=1000.0,
+        max=10.0,
         default=1,
         description="Height of entire roof",
     )
