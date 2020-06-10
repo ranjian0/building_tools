@@ -145,3 +145,8 @@ def validate_fill_props(prop):
         # XXX keep bar depth smaller than window depth
         fill = prop.bar_fill
         fill.bar_depth = min(fill.bar_depth, prop.window_depth)
+    elif prop.fill_type == "LOUVER":
+        # XXX keep louver depth less than window depth
+        fill = prop.louver_fill
+        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
+        fill.louver_depth = min(fill.louver_depth, depth)

@@ -105,14 +105,14 @@ class FillLouver(bpy.types.PropertyGroup):
     louver_count: IntProperty(
         name="Louver Count",
         min=0,
-        max=1000,
+        max=100,
         default=10,
         description="Number of louvers on to create face",
     )
 
     louver_margin: FloatProperty(
         name="Louver Margin",
-        min=0.0,
+        min=0.001,
         max=100.0,
         default=0.1,
         step=1,

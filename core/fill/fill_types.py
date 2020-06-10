@@ -98,6 +98,8 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     """
     normal = face.normal.copy()
     if prop.louver_margin:
+        # XXX Louver margin should not exceed smallest face dimension
+        prop.louver_margin = min(prop.louver_margin, min(calc_face_dimensions(face)) / 2)
         inset = map_new_faces(FaceMap.FRAME)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 
