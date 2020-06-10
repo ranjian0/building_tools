@@ -1,5 +1,6 @@
 import math
 import bmesh
+from collections import namedtuple
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Matrix, Quaternion
 from ...utils import (
@@ -11,28 +12,38 @@ from ...utils import (
     edge_vector,
     filter_geom,
     map_new_faces,
+    edge_is_sloped,
     subdivide_edges,
     calc_verts_median,
     filter_vertical_edges,
     add_facemap_for_groups,
 )
 
+RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")
+
 
 def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
     add_facemap_for_groups(FaceMap.RAILING_POSTS)
-    make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
+    cposts = make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
+    top_rails, fills = [], []
     for f in faces:
-        make_fill(bm, f, prop)
+        top_rail, fill = make_fill(bm, f, prop)
+        fills.append(fill)
+        top_rails.append(top_rail)
     bmesh.ops.delete(bm, geom=faces, context="FACES")  # delete reference faces
+    return RailingResult(cposts, top_rails, fills)
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
 def make_corner_posts(bm, edges, prop, up):
+    posts = []
     for edge in edges:
         ret = bmesh.ops.duplicate(bm, geom=[edge])
         dup_edge = filter_geom(ret["geom"], BMEdge)[0]
-        edge_to_cylinder(bm, dup_edge, prop.corner_post_width / 2, up, fill=True)
+        post = edge_to_cylinder(bm, dup_edge, prop.corner_post_width / 2, up, fill=True)
+        posts.append(list({f for v in post for f in v.link_faces}))
+    return posts
 
 
 def make_fill(bm, face, prop):
@@ -49,16 +60,18 @@ def make_fill(bm, face, prop):
 
     # create railing top
     add_facemap_for_groups(FaceMap.RAILING_RAILS)
-    create_railing_top(bm, top_edge, prop)
+    top_rail = create_railing_top(bm, top_edge, prop)
 
     # create fill
     if prop.fill == "POSTS":
-        create_fill_posts(bm, dup_face, prop)
+        fill = create_fill_posts(bm, dup_face, prop)
     elif prop.fill == "RAILS":
-        create_fill_rails(bm, dup_face, prop)
+        fill = create_fill_rails(bm, dup_face, prop)
     elif prop.fill == "WALL":
         add_facemap_for_groups(FaceMap.RAILING_WALLS)
-        create_fill_walls(bm, dup_face, prop)
+        fill = create_fill_walls(bm, dup_face, prop)
+
+    return top_rail, fill
 
 
 @map_new_faces(FaceMap.RAILING_RAILS)
@@ -77,10 +90,12 @@ def create_railing_top(bm, top_edge, prop):
         rotate_sloped_rail_bounds(bm, cylinder, vec)
 
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
+    return list({f for v in cylinder for f in v.link_faces})
 
 
 @map_new_faces(FaceMap.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
+    result = []
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
     sorted_edges = sort_edges(
         [e for e in face.edges if e not in vertical_edges], Vector((0.0, 0.0, -1.0))
@@ -111,14 +126,17 @@ def create_fill_posts(bm, face, prop):
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+        result.append(list({f for v in cylinder for f in v.link_faces}))
     else:
         # delete reference faces
         bmesh.ops.delete(bm, geom=[face], context="FACES")
+    return result
 
 
 @map_new_faces(FaceMap.RAILING_RAILS)
 def create_fill_rails(bm, face, prop):
     # create rails
+    result = []
     rail_size = min(prop.rail_fill.size, prop.corner_post_width)
 
     vertical_edges = filter_vertical_edges(face.edges, face.normal)
@@ -143,9 +161,11 @@ def create_fill_rails(bm, face, prop):
         # delete reference faces
         dup_faces = list({f for e in inner_edges for f in e.link_faces})
         bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
+        result.append(list({f for v in cylinder for f in v.link_faces}))
     else:
         # delete reference faces
         bmesh.ops.delete(bm, geom=[face], context="FACES")
+    return result
 
 
 @map_new_faces(FaceMap.RAILING_WALLS)
@@ -159,10 +179,11 @@ def create_fill_walls(bm, face, prop):
     ret = bmesh.ops.extrude_edge_only(bm, edges=dup_face.edges)
     verts = filter_geom(ret["geom"], BMVert)
     bmesh.ops.translate(bm, verts=verts, vec=face.normal * wall_size)
-    bmesh.ops.contextual_create(bm, geom=verts)
+    f = bmesh.ops.contextual_create(bm, geom=verts).get("faces")
 
     # delete reference faces and hidden faces
     bmesh.ops.delete(bm, geom=[face] + filter_geom(ret["geom"], BMFace), context="FACES")
+    return [f[-1], dup_face]
 
 
 def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
@@ -232,38 +253,3 @@ def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
             bm, verts=bunch, cent=calc_verts_median(bunch),
             matrix=Matrix.Rotation(angle, 4, dir.cross(Vector((0, 0, -1))))
         )
-
-
-def edge_slope(e):
-    """ Calculate the slope of an edge, 'inf' for vertical edges
-    """
-    v = edge_vector(e)
-    try:
-        return v.z / v.xy.length
-    except ZeroDivisionError:
-        return float('inf')
-
-
-def edge_angle(e):
-    """ Calculate the angle an edge makes with horizontal axis
-    """
-    return math.atan(edge_slope(e))
-
-
-def edge_is_vertical(e):
-    """ Check if edge is vertical (infinite slope)
-    """
-    return edge_slope(e) == float('inf')
-
-
-def edge_is_horizontal(e):
-    """ Check if edge is horizontal (zero slope)
-    """
-    return edge_slope(e) == 0.0
-
-
-def edge_is_sloped(e):
-    """ Check if edge
-    """
-    sl = edge_slope(e)
-    return sl > float('-inf') and sl < float('inf') and sl != 0.0
