@@ -129,6 +129,7 @@ def create_door_fill(bm, face, prop):
 def fill_door_face(bm, face, prop):
     """ Fill individual door face
     """
+    validate_fill_props(prop)
     if prop.fill_type == "PANELS":
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, prop.panel_fill)
@@ -153,3 +154,11 @@ def make_door_inset(bm, face, size, frame_thickness):
     v_widths = [door_height, frame_thickness]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
     return v_faces[0], h_faces[::2] + [v_faces[1]]
+
+
+def validate_fill_props(prop):
+    if prop.fill_type == "LOUVER":
+        # XXX keep louver depth less than window depth
+        fill = prop.louver_fill
+        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
+        fill.louver_depth = min(fill.louver_depth, depth)
