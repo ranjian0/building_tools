@@ -97,8 +97,8 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "pane_count_x")
         row.prop(self, "pane_count_y")
-        col.prop(self, "pane_margin", slider=True)
-        col.prop(self, "pane_depth", slider=True)
+        col.prop(self, "pane_margin")
+        col.prop(self, "pane_depth")
 
 
 class FillLouver(bpy.types.PropertyGroup):
