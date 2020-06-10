@@ -27,6 +27,10 @@ def fill_panel(bm, face, prop):
     if prop.panel_count_x + prop.panel_count_y == 0:
         return
 
+    width, height = calc_face_dimensions(face)
+    if not round(width, 2) or not round(height, 2):
+        return
+
     # XXX Ensure panel border is less than parent face size
     min_dimension = min(calc_face_dimensions(face))
     prop.panel_border_size = min(
@@ -54,6 +58,10 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     """Create glass panes on face
     """
     if prop.pane_count_x + prop.pane_count_y == 0:
+        return
+
+    width, height = calc_face_dimensions(face)
+    if not round(width, 2) or not round(height, 2):
         return
 
     userframe = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
