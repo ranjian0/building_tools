@@ -40,6 +40,20 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Base Length of floorplan",
     )
 
+    random_extension_amount: BoolProperty(
+        name="Random Extension Amount",
+        default=True,
+        description="Randomize the amount of extensions"
+    )
+
+    extension_amount: IntProperty(
+        name="Extension Amount",
+        min=1,
+        max=4,
+        default=1,
+        description="Amount of extensions to generate",
+    )
+
     radius: FloatProperty(
         name="Radius", min=0.1, max=100.0, default=1.0, description="Radius of circle"
     )
@@ -166,6 +180,10 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             col.prop(self, "seed")
             col.prop(self, "width")
             col.prop(self, "length")
+            col.prop(self, "random_extension_amount")
+
+            if not self.random_extension_amount:
+                col.prop(self, "extension_amount")
 
         elif self.type == "CIRCULAR":
             col = box.column(align=True)
