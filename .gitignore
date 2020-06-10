@@ -6,3 +6,4 @@
 *.sublime-project
 *.sublime-workspace
 *.vscode
+.idea

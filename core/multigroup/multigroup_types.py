@@ -1,4 +1,5 @@
 import bmesh
+import re
 from ..frame import add_frame_depth
 from ..window.window_types import fill_window_face
 
@@ -36,6 +37,11 @@ def create_multigroup(bm, faces, prop):
     # Prevent error when there are no components
     if len(str(prop.components)) == 0:
         popup_message("No components are chosen", "No Components Error")
+        return False
+
+    # Prevent error when there are invalid chars
+    if not re.match("^[dw]*$", str(prop.components)):
+        popup_message("Components cannot contain chars other than d and w", "Invalid Characters Error")
         return False
 
     for face in faces:
