@@ -80,6 +80,15 @@ def create_gable_roof(bm, faces, prop):
 
         bot_faces = [f for e in faces[-1].edges for f in e.link_faces if f not in faces]
         add_faces_to_map(bm, bot_faces, FaceMap.ROOF_HANGS)
+    else:
+        # -- Open GABLE
+        #  XXX prevent dissolve_lone_verts from destroying lower geometry
+        ret = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
+        bmesh.ops.translate(
+            bm, vec=(0, 0, 0.0011), verts=filter_geom(ret, BMVert)
+        )
+        bmesh.ops.delete(bm, geom=faces, context="FACES")
+        faces = filter_geom(ret, BMFace)
 
     # -- dissolve if faces are many
     if len(faces) > 1:
@@ -279,7 +288,7 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
                 split_factor = (v1.co - v.co).length / e.calc_length()
                 new_edge, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
                 new_verts.append(new_vert)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return validate(new_verts)
 
 
