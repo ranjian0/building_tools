@@ -111,8 +111,12 @@ def create_random_floorplan(bm, prop):
         bm, x_segments=1, y_segments=1, size=1, matrix=scale_x @ scale_y
     )
 
+    amount = prop.extension_amount
+    if prop.random_extension_amount:
+        amount = random.randrange(len(bm.edges) // 3, len(bm.edges))
+
     random_edges = random.sample(
-        list(bm.edges), random.randrange(len(bm.edges) // 3, len(bm.edges))
+        list(bm.edges), amount
     )
     median_reference = list(bm.faces).pop().calc_center_median()
     for edge in random_edges:
