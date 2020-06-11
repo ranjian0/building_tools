@@ -40,6 +40,20 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Base Length of floorplan",
     )
 
+    random_extension_amount: BoolProperty(
+        name="Random Extension Amount",
+        default=True,
+        description="Randomize the amount of extensions"
+    )
+
+    extension_amount: IntProperty(
+        name="Extension Amount",
+        min=1,
+        max=4,
+        default=1,
+        description="Amount of extensions to generate",
+    )
+
     radius: FloatProperty(
         name="Radius", min=0.1, max=100.0, default=1.0, description="Radius of circle"
     )
@@ -82,8 +96,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw1"),
-        set=lambda self, value : self.set_segment_width(value, "tw1"),
+        get=lambda self: self.get_segment_width("tw1"),
+        set=lambda self, value: self.set_segment_width(value, "tw1"),
     )
 
     tl1: FloatProperty(
@@ -99,8 +113,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw2"),
-        set=lambda self, value : self.set_segment_width(value, "tw2"),
+        get=lambda self: self.get_segment_width("tw2"),
+        set=lambda self, value: self.set_segment_width(value, "tw2"),
     )
 
     tl2: FloatProperty(
@@ -116,8 +130,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw3"),
-        set=lambda self, value : self.set_segment_width(value, "tw3"),
+        get=lambda self: self.get_segment_width("tw3"),
+        set=lambda self, value: self.set_segment_width(value, "tw3"),
     )
 
     tl3: FloatProperty(
@@ -133,8 +147,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         description="Width of floorplan segment",
-        get=lambda self : self.get_segment_width("tw4"),
-        set=lambda self, value : self.set_segment_width(value, "tw4"),
+        get=lambda self: self.get_segment_width("tw4"),
+        set=lambda self, value: self.set_segment_width(value, "tw4"),
     )
 
     tl4: FloatProperty(
@@ -166,6 +180,10 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             col.prop(self, "seed")
             col.prop(self, "width")
             col.prop(self, "length")
+            col.prop(self, "random_extension_amount")
+
+            if not self.random_extension_amount:
+                col.prop(self, "extension_amount")
 
         elif self.type == "CIRCULAR":
             col = box.column(align=True)

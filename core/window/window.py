@@ -1,10 +1,17 @@
 import bmesh
 from .window_types import create_window
-from ...utils import get_edit_mesh, FaceMap, add_facemap_for_groups, verify_facemaps_for_object
+from ...utils import (
+    FaceMap,
+    crash_safe,
+    get_edit_mesh,
+    add_facemap_for_groups,
+    verify_facemaps_for_object,
+)
 
 
 class Window:
     @classmethod
+    @crash_safe
     def build(cls, context, prop):
         verify_facemaps_for_object(context.object)
         me = get_edit_mesh()

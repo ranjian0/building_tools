@@ -32,7 +32,7 @@ class FillPanel(bpy.types.PropertyGroup):
         name="Panel Margin",
         min=0.01,
         max=1.0,
-        default=0.1,
+        default=0.05,
         description="Margins of each panel",
     )
 
@@ -97,22 +97,22 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "pane_count_x")
         row.prop(self, "pane_count_y")
-        col.prop(self, "pane_margin", slider=True)
-        col.prop(self, "pane_depth", slider=True)
+        col.prop(self, "pane_margin")
+        col.prop(self, "pane_depth")
 
 
 class FillLouver(bpy.types.PropertyGroup):
     louver_count: IntProperty(
         name="Louver Count",
         min=0,
-        max=1000,
+        max=100,
         default=10,
         description="Number of louvers on to create face",
     )
 
     louver_margin: FloatProperty(
         name="Louver Margin",
-        min=0.0,
+        min=0.001,
         max=100.0,
         default=0.1,
         step=1,
@@ -171,8 +171,8 @@ class FillBars(bpy.types.PropertyGroup):
     bar_depth: FloatProperty(
         name="Bar Depth",
         min=0.01,
-        max=100.0,
-        default=0.1,
+        max=1.0,
+        default=0.04,
         step=1,
         description="Depth of bars",
     )

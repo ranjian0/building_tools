@@ -7,7 +7,7 @@ Artists should redirect to: https://ranjian0.github.io/building_tool/
 ## Table of contents
 
 * [Background](#background)
-* [Preview](#preview)
+* [Usage](#usage)
 * [Installation](#installation)
 * [Features](#features)
 * [Status](#status)
@@ -23,13 +23,13 @@ After a couple of months of development, I noticed that most of the scripts were
 towards creating buildings and environments. I decided to create a proper addon for them
 and `Building Tools` was born.
 
-## Preview
+## Usage
 
-[![Preview video](http://img.youtube.com/vi/HLaWeToDmms/0.jpg)](http://www.youtube.com/watch?v=HLaWeToDmms)
+[![Tutorial Videos](http://img.youtube.com/vi/rB1fm4I_bW4/0.jpg)](http://www.youtube.com/watch?v=rB1fm4I_bW4)
 
 ## Installation
 
-1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tool/archive/master.zip).
+1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tool/archive/release.zip).
 2. In blender, go to : Edit -> Preferences -> Add-ons -> Install.
 3. Select the downloaded file and you're good to go.
 
@@ -47,9 +47,7 @@ and `Building Tools` was born.
 
 ## Status
 
-Project is: **_in alpha_.**
-
-  :exclamation:**Use at your own risk.**
+`Version` : `v1.0a`
 
 ## Inspiration
 

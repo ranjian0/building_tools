@@ -1,10 +1,10 @@
+separate multigroup fill types
+
 
 BALCONY NITPICK FEATURES
  - have rounded/circular balconies
  - more robust implementation of corner balcony (current open implementation
    may not be abvious to users)
-
-- roof is also abit unstable esp hip roof and straight skeleton
 
 SLANTED FACES:
   Window tool should allow  for slanted faces
@@ -24,7 +24,6 @@ REMOVE ALL DEAD CODE / UNREACHABLE
 
 
 ROOF:
-    - XXX support gable roof for complex shapes
     - support adding roofs to faces that have boundary geometry e.g for patio
 
 STAIRS:
@@ -32,9 +31,6 @@ STAIRS:
 
     - if landing is provided, perhaps option to slim down the stairs
       should be there
-
-      plus, when 'move_slabface_to_wall' is used, and stair direction is
-      not front, stairs intersect with the slab
 
 
 MATERIAL API:

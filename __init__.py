@@ -126,11 +126,12 @@ def unregister():
 
 if __name__ == "__main__":
     import os
+
     os.system("clear")
 
     # -- custom unregister for script watcher
     for tp in dir(bpy.types):
-        if 'BTOOLS_' in tp:
+        if "BTOOLS_" in tp:
             bpy.utils.unregister_class(getattr(bpy.types, tp))
 
     register()

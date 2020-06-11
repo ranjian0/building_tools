@@ -31,9 +31,7 @@ class WindowProperty(bpy.types.PropertyGroup):
     )
 
     add_arch: BoolProperty(
-        name="Add Arch",
-        default=False,
-        description="Add arch over door/window",
+        name="Add Arch", default=False, description="Add arch over door/window"
     )
 
     count: CountProperty
@@ -58,9 +56,13 @@ class WindowProperty(bpy.types.PropertyGroup):
     glass_fill: PointerProperty(type=FillGlassPanes)
 
     def init(self, wall_dimensions):
-        self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
-        self.arch.init(wall_dimensions[1]/2 - self.size_offset.offset.y - self.size_offset.size.y/2)
+        self["wall_dimensions"] = wall_dimensions
+        self.size_offset.init(
+            (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
+            default_size=(1.0, 1.0),
+            default_offset=(0.0, 0.0),
+        )
+        self.arch.init(wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2)
 
     def draw(self, context, layout):
         box = layout.box()
@@ -85,7 +87,11 @@ class WindowProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        prop_name = "Fill Type" if self.fill_type == "NONE" else self.fill_type.title().replace('_', ' ')
+        prop_name = (
+            "Fill Type"
+            if self.fill_type == "NONE"
+            else self.fill_type.title().replace("_", " ")
+        )
         col.prop_menu_enum(self, "fill_type", text=prop_name)
 
         # -- draw fill types

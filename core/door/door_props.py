@@ -32,9 +32,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     )
 
     add_arch: BoolProperty(
-        name="Add Arch",
-        default=False,
-        description="Add arch over door/window",
+        name="Add Arch", default=False, description="Add arch over door/window"
     )
 
     fill_items = [
@@ -56,9 +54,7 @@ class DoorProperty(bpy.types.PropertyGroup):
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     double_door: BoolProperty(
-        name="Double Door",
-        default=False,
-        description="Double door",
+        name="Double Door", default=False, description="Double door"
     )
 
     panel_fill: PointerProperty(type=FillPanel)
@@ -66,9 +62,13 @@ class DoorProperty(bpy.types.PropertyGroup):
     louver_fill: PointerProperty(type=FillLouver)
 
     def init(self, wall_dimensions):
-        self['wall_dimensions'] = wall_dimensions
-        self.size_offset.init((self['wall_dimensions'][0]/self.count, self['wall_dimensions'][1]), default_size=(1.0, 1.0), default_offset=(0.0, 0.0))
-        self.arch.init(wall_dimensions[1]/2 - self.size_offset.offset.y - self.size_offset.size.y/2)
+        self["wall_dimensions"] = wall_dimensions
+        self.size_offset.init(
+            (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
+            default_size=(1.0, 1.5),
+            default_offset=(0.0, 0.0),
+        )
+        self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 
     def draw(self, context, layout):
         box = layout.box()
@@ -96,7 +96,11 @@ class DoorProperty(bpy.types.PropertyGroup):
 
         box = layout.box()
         col = box.column(align=True)
-        prop_name = "Fill Type" if self.fill_type == "NONE" else self.fill_type.title().replace('_', ' ')
+        prop_name = (
+            "Fill Type"
+            if self.fill_type == "NONE"
+            else self.fill_type.title().replace("_", " ")
+        )
         col.prop_menu_enum(self, "fill_type", text=prop_name)
 
         # -- draw fill types

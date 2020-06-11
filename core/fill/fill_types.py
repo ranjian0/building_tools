@@ -27,9 +27,25 @@ def fill_panel(bm, face, prop):
     if prop.panel_count_x + prop.panel_count_y == 0:
         return
 
+    width, height = calc_face_dimensions(face)
+    if not round(width) or not round(height):
+        return
+
+    # XXX Ensure panel border is less than parent face size
+    min_dimension = min(calc_face_dimensions(face))
+    prop.panel_border_size = min(
+        prop.panel_border_size, min_dimension / 2)
+
     bmesh.ops.inset_individual(bm, faces=[face], thickness=prop.panel_border_size)
     quads = subdivide_face_into_quads(bm, face, prop.panel_count_x, prop.panel_count_y)
-    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.panel_margin / 2)
+
+    # XXX Ensure panel margin is less that size of each quad)
+    min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
+    prop.panel_margin = min(prop.panel_margin, min_dimension / 2)
+
+    bmesh.ops.inset_individual(
+        bm, faces=quads, thickness=prop.panel_margin, use_even_offset=True
+    )
     bmesh.ops.translate(
         bm,
         verts=list({v for f in quads for v in f.verts}),
@@ -44,12 +60,23 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     if prop.pane_count_x + prop.pane_count_y == 0:
         return
 
+    width, height = calc_face_dimensions(face)
+    if not round(width) or not round(height):
+        return
+
     userframe = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
     bmesh.ops.inset_individual(bm, faces=[face], thickness=0.0001) # to isolate the working quad and not leave adjacent face as n-gon
     quads = subdivide_face_into_quads(bm, face, prop.pane_count_x, prop.pane_count_y)
 
+    # XXX Ensure pane margin is less that size of each quad)
+    min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
+    prop.pane_margin = min(prop.pane_margin, min_dimension / 2)
+
     inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
-    inset(bm, faces=quads, thickness=prop.pane_margin, depth=-prop.pane_depth)
+    inset(
+        bm, faces=quads, thickness=prop.pane_margin,
+        depth=-prop.pane_depth, use_even_offset=True
+    )
 
     usergroup = FaceMap.DOOR if user == FillUser.DOOR else FaceMap.WINDOW
     add_faces_to_map(bm, quads, usergroup)
@@ -59,21 +86,26 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
 def fill_bar(bm, face, prop):
     """Create horizontal and vertical bars along a face
     """
-    try:
-        width, height = calc_face_dimensions(face)
-    except IndexError:
-        # -- face is too small / has no width or height after sizeoffset prop adjusted
+    if prop.bar_count_x + prop.bar_count_y == 0:
         return
+
     face_center = face.calc_center_median()
+    width, height = calc_face_dimensions(face)
+
+    # XXX bar width should not exceed window size
+    min_dimension = min(
+        [width / max(prop.bar_count_x, 1), height / max(prop.bar_count_y, 1)]
+    )
+    prop.bar_width = min(prop.bar_width, min_dimension)
 
     # -- horizontal
     offset = height / (prop.bar_count_x + 1)
     for i in range(prop.bar_count_x):
         scale = (1, 1, prop.bar_width / height)
-        position = Vector((face.normal * prop.bar_depth / 2)) + Vector(
+        position = Vector((face.normal * prop.bar_depth)) + Vector(
             (0, 0, -height / 2 + (i + 1) * offset)
         )
-        depth = -face.normal * prop.bar_depth / 2
+        depth = -face.normal * prop.bar_depth
         create_bar_from_face(bm, face, face_center, position, scale, depth)
 
     # -- vertical
@@ -82,10 +114,10 @@ def fill_bar(bm, face, prop):
     for i in range(prop.bar_count_y):
         scale = (prop.bar_width / width, prop.bar_width / width, 1)
         perp = face.normal.cross(Vector((0, 0, 1)))
-        position = Vector((face.normal * ((prop.bar_depth / 2) - eps))) + perp * (
+        position = Vector((face.normal * ((prop.bar_depth) - eps))) + perp * (
             -width / 2 + ((i + 1) * offset)
         )
-        depth = -face.normal * ((prop.bar_depth / 2) - eps)
+        depth = -face.normal * ((prop.bar_depth) - eps)
         create_bar_from_face(bm, face, face_center, position, scale, depth, True)
 
 
@@ -94,6 +126,8 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     """
     normal = face.normal.copy()
     if prop.louver_margin:
+        # XXX Louver margin should not exceed smallest face dimension
+        prop.louver_margin = min(prop.louver_margin, min(calc_face_dimensions(face)) / 2)
         inset = map_new_faces(FaceMap.FRAME)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 

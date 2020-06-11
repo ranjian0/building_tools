@@ -25,8 +25,8 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
     """
     verts = sort_verts([v for e in top_edges for v in e.verts], xyz[0])
     arc_edges = [
-        bmesh.ops.connect_verts(bm, verts=[verts[0], verts[-1]])['edges'].pop(),
-        bmesh.ops.connect_verts(bm, verts=[verts[1], verts[-2]])['edges'].pop(),
+        bmesh.ops.connect_verts(bm, verts=[verts[0], verts[-1]])["edges"].pop(),
+        bmesh.ops.connect_verts(bm, verts=[verts[1], verts[-2]])["edges"].pop(),
     ]
 
     upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, arch_prop.depth, xyz, arch_prop.function)["geom_split"], BMEdge)
@@ -56,9 +56,7 @@ def pane_arch_face(bm, face, prop):
     bmesh.ops.inset_individual(
         bm, faces=[face], thickness=prop.pane_margin * 0.75, use_even_offset=True
     )
-    bmesh.ops.translate(
-        bm, verts=face.verts, vec=-face.normal * prop.pane_depth
-    )
+    bmesh.ops.translate(bm, verts=face.verts, vec=-face.normal * prop.pane_depth)
 
 
 def add_arch_depth(bm, arch_face, depth, normal):

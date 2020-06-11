@@ -20,7 +20,7 @@
 ## Usage
 
 <iframe id="ytplayer" type="text/html" width="640" height="360"
-  src="https://www.youtube.com/embed/HLaWeToDmms"
+  src="https://www.youtube.com/embed/rB1fm4I_bW4"
   frameborder="0"></iframe>
 
 ## Authors
