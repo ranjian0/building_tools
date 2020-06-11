@@ -154,7 +154,7 @@ def create_fill_rails(bm, face, prop):
 
             vec = edge_vector(dup_edge)
             sloped = edge_is_sloped(dup_edge)
-            cylinder = edge_to_cylinder(bm, dup_edge, rail_size/2, up)
+            cylinder = edge_to_cylinder(bm, dup_edge, rail_size / 2, up)
             if sloped:
                 rotate_sloped_rail_bounds(bm, cylinder, vec)
 
