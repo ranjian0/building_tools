@@ -8,8 +8,10 @@ from ...utils import (
     select,
     FaceMap,
     validate,
+    sort_verts,
     skeletonize,
     filter_geom,
+    edge_vector,
     map_new_faces,
     add_faces_to_map,
     calc_edge_median,
@@ -242,6 +244,10 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         """ Perform boundary walk using least interior angle
         """
         v, last = e.verts
+        vec = edge_vector(e)
+        if vec.x and vec.y:
+            # Edge is not parallel to x-axis / y-axis
+            last, v = sort_verts(e.verts, edge_vector(e))
 
         previous = e
         found_edges = [e]
