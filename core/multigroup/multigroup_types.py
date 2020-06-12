@@ -30,14 +30,13 @@ def create_multigroup(bm, faces, prop):
     """
 
     # Prevent error when there are no components
-    if len(str(prop.components)) == 0:
+    if len(prop.components) == 0:
         popup_message("No components are chosen", "No Components Error")
         return False
 
     # Prevent error when there are invalid chars
-    if not re.match("^[dw]*$", str(prop.components)):
-        popup_message("Components cannot contain chars other than d and w", "Invalid Characters Error")
-        return False
+    if not re.match("^[dw]*$", prop.components):
+        prop.components = re.sub("[^d|w|]", "", prop.components)
 
     for face in faces:
         if not valid_ngon(face):

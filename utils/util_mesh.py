@@ -64,7 +64,7 @@ def edge_slope(e):
     try:
         return v.z / v.xy.length
     except ZeroDivisionError:
-        return float('inf')
+        return float("inf")
 
 
 def edge_angle(e):
@@ -76,7 +76,7 @@ def edge_angle(e):
 def edge_is_vertical(e):
     """ Check if edge is vertical (infinite slope)
     """
-    return edge_slope(e) == float('inf')
+    return edge_slope(e) == float("inf")
 
 
 def edge_is_horizontal(e):
@@ -89,7 +89,7 @@ def edge_is_sloped(e):
     """ Check if edge slope is between vertical and horizontal axis
     """
     sl = edge_slope(e)
-    return sl > float('-inf') and sl < float('inf') and sl != 0.0
+    return sl > float("-inf") and sl < float("inf") and sl != 0.0
 
 
 def valid_ngon(face):
