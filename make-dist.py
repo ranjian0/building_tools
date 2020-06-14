@@ -24,7 +24,6 @@ REPO_FILES = (
     "__init__.py",
     "LICENSE",
     "README.md",
-    "TODO",
     "core/",
     "docs/",
     "utils/",
