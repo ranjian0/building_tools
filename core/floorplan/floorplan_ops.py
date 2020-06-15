@@ -2,6 +2,8 @@ import bpy
 from .floorplan import Floorplan
 from .floorplan_props import FloorplanProperty
 
+from ...utils import profile
+
 
 class BTOOLS_OT_add_floorplan(bpy.types.Operator):
     """Create a starting building floorplan"""
@@ -17,7 +19,8 @@ class BTOOLS_OT_add_floorplan(bpy.types.Operator):
         return context.mode == "OBJECT"
 
     def execute(self, context):
-        Floorplan.build(context, self.props)
+        with profile():
+            Floorplan.build(context, self.props)
         return {"FINISHED"}
 
     def draw(self, context):
