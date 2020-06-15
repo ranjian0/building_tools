@@ -159,6 +159,16 @@ def has_material(obj, name):
     return name in obj.data.materials.keys()
 
 
+def create_object_material(obj, mat_name):
+    """ Create a new material and link it to the given object
+    """
+    if not has_material(obj, mat_name):
+        mat = bpy.data.materials.new(mat_name)
+        link_material(obj, mat)
+        return mat
+    return obj.data.materials.get(mat_name)
+
+
 def uv_map_active_editmesh_selection(faces, method):
     # -- ensure we are in editmode
     if not bpy.context.object.mode == "EDIT":

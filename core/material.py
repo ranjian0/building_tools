@@ -7,6 +7,7 @@ from bpy.props import (
 )
 
 from ..utils import (
+    create_object_material,
     bmesh_from_active_object,
     set_material_for_active_facemap,
 )
@@ -60,6 +61,32 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         return {"FINISHED"}
 
 
+
+class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
+    """Create and assign a new material for the active facemap"""
+
+    bl_idname = "btools.create_facemap_material"
+    bl_label = "Assign New Material"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        return obj and obj.type == "MESH"
+
+    def execute(self, context):
+        obj = context.object
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+
+        # -- create new material
+        mat = create_object_material(obj, "mat_" + active_facemap.name)
+
+        # -- assign to active facemap
+        set_material_for_active_facemap(mat, context)
+        obj.facemap_materials[active_facemap.index].material = mat
+        return {"FINISHED"}
+
+
 def update_facemap_material(self, context):
     """ Assign the updated material to all faces belonging to active facemap
     """
@@ -95,6 +122,7 @@ classes = (
     FaceMapMaterial,
     BTOOLS_UL_fmaps,
     BTOOLS_OT_fmaps_clear,
+    BTOOLS_OT_create_facemap_material,
 )
 
 
