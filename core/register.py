@@ -7,6 +7,7 @@ from .window import register_window, unregister_window
 from .railing import register_railing, unregister_railing
 from .balcony import register_balcony, unregister_balcony
 from .generic import register_generic, unregister_generic
+from .material import register_material, unregister_material
 from .floorplan import register_floorplan, unregister_floorplan
 from .multigroup import register_multigroup, unregister_multigroup
 
@@ -14,6 +15,7 @@ from .multigroup import register_multigroup, unregister_multigroup
 # -- ORDER MATTERS --
 register_funcs = (
     register_generic,
+    register_material,
     register_railing,
     register_balcony,
     register_fill,
@@ -28,6 +30,7 @@ register_funcs = (
 
 unregister_funcs = (
     unregister_generic,
+    unregister_material,
     unregister_railing,
     unregister_balcony,
     unregister_fill,
