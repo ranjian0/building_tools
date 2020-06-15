@@ -36,7 +36,7 @@ class Floor:
 
     @classmethod
     def add_floor_facemaps(cls):
-        groups = FaceMap.SLABS, FaceMap.WALLS, FaceMap.ROOF
+        groups = FaceMap.SLABS, FaceMap.WALLS, FaceMap.ROOF, FaceMap.COLUMNS
         add_facemap_for_groups(groups)
 
     @classmethod

@@ -9,6 +9,7 @@ from ...utils import (
     add_faces_to_map,
     extrude_face_region,
     filter_vertical_edges,
+    create_cube_without_faces,
 )
 from mathutils import Vector
 
@@ -33,6 +34,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
     normal = faces[0].normal.copy()
 
     faces = bmesh.ops.dissolve_faces(bm, faces=faces)["region"]
+    create_columns(bm, faces[-1], prop)
 
     # extrude vertically
     if prop.add_slab:
@@ -69,12 +71,18 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
 
 def dissolve_flat_edges(bm, faces):
-    flat_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal) if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)})
+    flat_edges = list({
+        e for f in faces for e in filter_vertical_edges(f.edges, f.normal)
+        if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
+    })
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)
 
 
 def get_flat_faces(faces, visited):
-    flat_edges = list({e for f in faces for e in f.edges if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)})
+    flat_edges = list({
+        e for f in faces for e in f.edges
+        if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
+    })
     flat_faces = []
     for e in flat_edges:
         for f in e.link_faces:
@@ -82,3 +90,21 @@ def get_flat_faces(faces, visited):
                 visited[f] = True
                 flat_faces += get_flat_faces([f], visited)
     return list(set(faces + flat_faces))
+
+
+def create_columns(bm, face, prop):
+    if not prop.add_columns:
+        return
+
+    res = []
+    col_w = 2 * prop.slab_outset
+    pos_h = prop.floor_height / 2 + (prop.slab_thickness if prop.add_slab else 0)
+    for v in face.verts:
+        for i in range(prop.floor_count):
+            cube = create_cube_without_faces(
+                bm, (col_w, col_w, prop.floor_height),
+                (v.co.x, v.co.y, v.co.z + (pos_h * (i+1)) + ((prop.floor_height / 2) * i)), bottom=True)
+            res.extend(cube.get("verts"))
+
+    columns = list({f for v in res for f in v.link_faces})
+    add_faces_to_map(bm, columns, FaceMap.COLUMNS)

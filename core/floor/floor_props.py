@@ -19,6 +19,10 @@ class FloorProperty(bpy.types.PropertyGroup):
         name="Add Slab", default=True, description="Add slab between each floor"
     )
 
+    add_columns: BoolProperty(
+        name="Add Columns", default=False, description="Add Columns"
+    )
+
     slab_thickness: FloatProperty(
         name="Slab Thickness",
         min=0.01,
@@ -36,14 +40,14 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     def draw(self, context, layout):
-        box = layout.box()
-
-        col = box.column(align=True)
+        col = layout.column(align=True)
         col.prop(self, "floor_count")
         col.prop(self, "floor_height")
 
-        col = box.column(align=True)
+        col = layout.column(align=True)
         col.prop(self, "add_slab")
         if self.add_slab:
             col.prop(self, "slab_thickness")
             col.prop(self, "slab_outset")
+
+        layout.prop(self, "add_columns")

@@ -17,6 +17,7 @@ class FaceMap(AutoIndex):
 
     SLABS = auto()
     WALLS = auto()
+    COLUMNS = auto()
 
     FRAME = auto()
 
