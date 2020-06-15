@@ -12,8 +12,6 @@ from ..generic import SizeOffsetProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):
-    redo: BoolProperty()
-
     depth_offset: FloatProperty(
         name="Depth Offset",
         min=0.0,

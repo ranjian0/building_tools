@@ -219,14 +219,6 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class TrackedProperty(bpy.types.PropertyGroup):
-    """ Convinience property group to keep track of properties being
-        shared between modules
-    """
-
-    slab_outset: FloatProperty()
-
-
 def update_facemap_material(self, context):
     """ Assign the updated material to all faces belonging to active facemap
     """
@@ -272,7 +264,6 @@ def register_generic():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Object.tracked_properties = PointerProperty(type=TrackedProperty)
     bpy.types.Object.facemap_materials = CollectionProperty(type=FaceMapMaterial)
 
 
@@ -281,4 +272,3 @@ def unregister_generic():
         bpy.utils.unregister_class(cls)
 
     del bpy.types.Object.facemap_materials
-    del bpy.types.Object.tracked_properties
