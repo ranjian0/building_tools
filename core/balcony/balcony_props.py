@@ -33,11 +33,9 @@ class BalconyProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self["wall_dimensions"] = wall_dimensions
-        start_y = -((wall_dimensions[1] / 2) - (self.slab_height / 2))
         self.size_offset.init(
             self["wall_dimensions"],
             default_size=(1.0, 1.0),
-            default_offset=(0.0, start_y),
             restricted=False,
         )
 

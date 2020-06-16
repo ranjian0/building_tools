@@ -77,11 +77,9 @@ class StairsProperty(bpy.types.PropertyGroup):
 
     def init(self, wall_dimensions):
         self["wall_dimensions"] = wall_dimensions
-        start_y = -((wall_dimensions[1] / 2) - (self.step_height / 2))
         self.size_offset.init(
             (self["wall_dimensions"][0], 0.0),
             default_size=(1.0, 0.0),
-            default_offset=(0.0, start_y),
             restricted=False,
         )
         self.rail.init(self.step_width, self.step_count)

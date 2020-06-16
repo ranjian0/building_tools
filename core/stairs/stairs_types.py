@@ -21,6 +21,7 @@ from ...utils import (
     add_faces_to_map,
     filter_parallel_edges,
     subdivide_face_vertically,
+    calc_face_dimensions,
 )
 
 from ..railing.railing import create_railing
@@ -170,7 +171,7 @@ def create_stairs_split(bm, face, prop):
     """
     xyz = local_xyz(face)
     size = Vector((prop.size_offset.size.x, prop.step_height))
-    f = create_face(bm, size, prop.size_offset.offset, xyz)
+    f = create_face(bm, size, prop.size_offset.offset - Vector((0, (calc_face_dimensions(face)[1]/2) - prop.step_height * (prop.step_count + 0.5))), xyz)
     bmesh.ops.translate(
         bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
     )
