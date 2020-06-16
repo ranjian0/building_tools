@@ -1,7 +1,8 @@
 import bpy
 import bmesh
+from contextlib import contextmanager
 
-from .util_mesh import select
+from .util_mesh import select, get_edit_mesh
 
 
 def create_object(name, data=None):
@@ -41,3 +42,21 @@ def obj_clear_data(obj):
     bm = bm_from_obj(obj)
     bmesh.ops.delete(bm, geom=list(bm.verts), context=1)
     bm_to_obj(bm, obj)
+
+
+@contextmanager
+def bmesh_from_active_object(context=None):
+    context = context or bpy.context
+
+    if context.mode == "EDIT_MESH":
+        me = get_edit_mesh()
+        bm = bmesh.from_edit_mesh(me)
+    elif context.mode == "OBJECT":
+        bm = bm_from_obj(context.object)
+
+    yield bm
+
+    if context.mode == "EDIT_MESH":
+        bmesh.update_edit_mesh(me, True)
+    elif context.mode == "OBJECT":
+        bm_to_obj(bm, context.object)

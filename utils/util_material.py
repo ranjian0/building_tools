@@ -4,6 +4,7 @@ from enum import Enum, auto
 from functools import wraps
 
 from .util_mesh import get_edit_mesh
+from .util_object import bmesh_from_active_object
 
 
 class AutoIndex(Enum):
@@ -16,6 +17,7 @@ class FaceMap(AutoIndex):
 
     SLABS = auto()
     WALLS = auto()
+    COLUMNS = auto()
 
     FRAME = auto()
 
@@ -129,15 +131,12 @@ def set_material_for_active_facemap(material, context):
         idx for idx, mat in enumerate(obj.data.materials) if mat == material
     ].pop()
 
-    me = get_edit_mesh()
-    bm = bmesh.from_edit_mesh(me)
+    with bmesh_from_active_object(context) as bm:
 
-    face_map = bm.faces.layers.face_map.active
-    for face in bm.faces:
-        if face[face_map] == active_facemap.index:
-            face.material_index = mat_id
-
-    bmesh.update_edit_mesh(me, True)
+        face_map = bm.faces.layers.face_map.active
+        for face in bm.faces:
+            if face[face_map] == active_facemap.index:
+                face.material_index = mat_id
 
 
 def face_map_index_from_name(name):
@@ -158,6 +157,16 @@ def has_material(obj, name):
     """ check if obj has a material with name
     """
     return name in obj.data.materials.keys()
+
+
+def create_object_material(obj, mat_name):
+    """ Create a new material and link it to the given object
+    """
+    if not has_material(obj, mat_name):
+        mat = bpy.data.materials.new(mat_name)
+        link_material(obj, mat)
+        return mat
+    return obj.data.materials.get(mat_name)
 
 
 def uv_map_active_editmesh_selection(faces, method):
