@@ -8,10 +8,8 @@ from ...utils import (
     select,
     FaceMap,
     validate,
-    sort_verts,
     skeletonize,
     filter_geom,
-    edge_vector,
     map_new_faces,
     add_faces_to_map,
     calc_edge_median,
@@ -240,14 +238,12 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         v2 = e2.other_vert(vert).co - vert.co
         return np.math.atan2(np.linalg.det([v1.xy, v2.xy]), np.dot(v1.xy, v2.xy))
 
-    def boundary_walk(e):
+    def boundary_walk(e, reverse=False):
         """ Perform boundary walk using least interior angle
         """
         v, last = e.verts
-        vec = edge_vector(e)
-        if vec.x and vec.y:
-            # Edge is not parallel to x-axis / y-axis
-            last, v = sort_verts(e.verts, edge_vector(e))
+        if reverse:
+            last, v = e.verts
 
         previous = e
         found_edges = [e]
@@ -256,7 +252,11 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
                 e for e in v.link_edges if e in skeleton_edges and e not in found_edges
             ]
             if not linked:
-                continue
+                # XXX Failure here is always caused by wrong order of verts
+                # -- Since there is no clear condition of failure, repeat boudary walk with
+                #    reversed vertex order
+                return boundary_walk(e, not reverse)
+
             next_edge = linked[0]
             if len(linked) > 1:
                 next_edge = min(linked, key=lambda e: interior_angle(v, previous, e))
