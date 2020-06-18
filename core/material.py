@@ -61,7 +61,6 @@ class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
         return {"FINISHED"}
 
 
-
 class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
     """Create and assign a new material for the active facemap"""
 
@@ -80,6 +79,8 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
 
         # -- create new material
         mat = create_object_material(obj, "mat_" + active_facemap.name)
+        mat_id = [idx for idx, m in enumerate(obj.data.materials) if m == mat].pop()
+        obj.active_material_index = mat_id # make the new material active
 
         # -- assign to active facemap
         set_material_for_active_facemap(mat, context)
