@@ -11,6 +11,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Thickness of door Frame",
     )
 
@@ -18,8 +19,9 @@ class DoorProperty(bpy.types.PropertyGroup):
         name="Frame Depth",
         min=-1.0,
         max=1.0,
-        default=0.0,
         step=1,
+        default=0.0,
+        unit="LENGTH",
         description="Depth of door Frame",
     )
 
@@ -28,6 +30,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.05,
+        unit="LENGTH",
         description="Depth of door",
     )
 

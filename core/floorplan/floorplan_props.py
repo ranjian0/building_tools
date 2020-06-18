@@ -29,6 +29,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=4,
+        unit="LENGTH",
         description="Base Width of floorplan",
     )
 
@@ -37,6 +38,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=4,
+        unit="LENGTH",
         description="Base Length of floorplan",
     )
 
@@ -55,7 +57,12 @@ class FloorplanProperty(bpy.types.PropertyGroup):
     )
 
     radius: FloatProperty(
-        name="Radius", min=0.1, max=100.0, default=1.0, description="Radius of circle"
+        name="Radius",
+        min=0.1,
+        max=100.0,
+        default=1.0,
+        unit="LENGTH",
+        description="Radius of circle"
     )
 
     segments: IntProperty(
@@ -95,6 +102,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 1",
         min=0.0,
         max=100.0,
+        unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw1"),
         set=lambda self, value: self.set_segment_width(value, "tw1"),
@@ -105,6 +113,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=1,
+        unit="LENGTH",
         description="Length of floorplan segment",
     )
 
@@ -112,6 +121,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 2",
         min=0.0,
         max=100.0,
+        unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw2"),
         set=lambda self, value: self.set_segment_width(value, "tw2"),
@@ -122,6 +132,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=1,
+        unit="LENGTH",
         description="Length of floorplan segment",
     )
 
@@ -129,6 +140,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 3",
         min=0.0,
         max=100.0,
+        unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw3"),
         set=lambda self, value: self.set_segment_width(value, "tw3"),
@@ -139,6 +151,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=1,
+        unit="LENGTH",
         description="Length of floorplan segment",
     )
 
@@ -146,6 +159,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         name="Tail Width 4",
         min=0.0,
         max=100.0,
+        unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw4"),
         set=lambda self, value: self.set_segment_width(value, "tw4"),
@@ -156,6 +170,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=1,
+        unit="LENGTH",
         description="Length of floorplan segment",
     )
 

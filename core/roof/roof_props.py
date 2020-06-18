@@ -31,6 +31,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Thickness of roof hangs",
     )
 
@@ -39,6 +40,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Outset of roof hangs",
     )
 
@@ -47,6 +49,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=10.0,
         default=1,
+        unit="LENGTH",
         description="Height of entire roof",
     )
 
@@ -61,6 +64,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Width of extruded border",
     )
 

@@ -16,6 +16,7 @@ class PostFillProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.05,
+        unit="LENGTH",
         description="Size of each post",
     )
 
@@ -23,6 +24,7 @@ class PostFillProperty(bpy.types.PropertyGroup):
         name="Density",
         min=0.0,
         max=1.0,
+        unit="LENGTH",
         get=get_density,
         set=set_density,
         description="Number of posts along each edge",
@@ -43,6 +45,7 @@ class RailFillProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.05,
+        unit="LENGTH",
         description="Size of each rail",
     )
 
@@ -51,6 +54,7 @@ class RailFillProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.3,
+        unit="LENGTH",
         description="Number of rails over each edge",
     )
 
@@ -66,6 +70,7 @@ class WallFillProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=0.075,
+        unit="LENGTH",
         description="Width of each wall",
     )
 
@@ -94,6 +99,7 @@ class RailProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.1,
+        unit="LENGTH",
         description="Width of each corner post",
     )
 
@@ -102,6 +108,7 @@ class RailProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.7,
+        unit="LENGTH",
         description="Height of each corner post",
     )
 
@@ -114,6 +121,7 @@ class RailProperty(bpy.types.PropertyGroup):
     offset: FloatProperty(
         name="Offset",
         default=0.05,
+        unit="LENGTH",
         description="Railings offset",
     )
 

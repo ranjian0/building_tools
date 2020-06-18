@@ -17,6 +17,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=0.0,
+        unit="LENGTH",
         description="Depth offset of stairs",
     )
 
@@ -29,6 +30,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.2,
+        unit="LENGTH",
         description="Width of each step",
     )
 
@@ -37,6 +39,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.12,
+        unit="LENGTH",
         description="Height of each step",
     )
 
@@ -45,6 +48,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=1.0,
+        unit="LENGTH",
         description="Width of each stairs landing",
     )
 

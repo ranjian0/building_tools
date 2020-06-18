@@ -11,6 +11,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Thickness of window Frame",
     )
 
@@ -19,6 +20,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         min=-1.0,
         max=1.0,
         default=0.0,
+        unit="LENGTH",
         description="Depth of window Frame",
     )
 
@@ -27,6 +29,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.05,
+        unit="LENGTH",
         description="Depth of window",
     )
 

@@ -80,6 +80,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         set=set_size,
         subtype="XYZ",
         size=2,
+        unit="LENGTH",
         description="Size of geometry",
     )
 
@@ -97,6 +98,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         set=set_offset,
         subtype="TRANSLATION",
         size=2,
+        unit="LENGTH",
         description="How much to offset geometry",
     )
 
@@ -140,6 +142,7 @@ class ArchProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.05,
+        unit="LENGTH",
         description="How far arc is from top",
     )
 
@@ -147,6 +150,7 @@ class ArchProperty(bpy.types.PropertyGroup):
         name="Arc Height",
         get=get_height,
         set=set_height,
+        unit="LENGTH",
         description="Radius of the arc",
     )
 

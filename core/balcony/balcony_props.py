@@ -12,6 +12,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=100.0,
         default=0.2,
+        unit="LENGTH",
         description="Height of balcony slab",
     )
 
@@ -20,6 +21,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=100.0,
         default=0.0,
+        unit="LENGTH",
         description="Depth offset of balcony",
     )
 

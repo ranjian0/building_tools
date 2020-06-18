@@ -25,6 +25,7 @@ class FillPanel(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Border for panels",
     )
 
@@ -33,15 +34,17 @@ class FillPanel(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.05,
+        unit="LENGTH",
         description="Margins of each panel",
     )
 
     panel_depth: FloatProperty(
         name="Panel Depth",
+        step=1,
         min=0.01,
         max=100.0,
         default=0.01,
-        step=1,
+        unit="LENGTH",
         description="Depth of panels",
     )
 
@@ -79,6 +82,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Margin of glass pane frames",
     )
 
@@ -88,6 +92,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         max=0.1,
         default=0.01,
         step=0.1,
+        unit="LENGTH",
         description="Depth of glass panes",
     )
 
@@ -112,28 +117,31 @@ class FillLouver(bpy.types.PropertyGroup):
 
     louver_margin: FloatProperty(
         name="Louver Margin",
+        step=1,
         min=0.001,
         max=100.0,
         default=0.1,
-        step=1,
+        unit="LENGTH",
         description="Offset of louvers from face border",
     )
 
     louver_depth: FloatProperty(
         name="Louver Depth",
+        step=1,
         min=0.01,
         max=100.0,
         default=0.05,
-        step=1,
+        unit="LENGTH",
         description="Depth of each louver",
     )
 
     louver_border: FloatProperty(
         name="Louver Border",
+        step=1,
         min=0.0,
         max=1.0,
         default=0.01,
-        step=1,
+        unit="LENGTH",
         description="Distance between louvers",
     )
 
@@ -165,15 +173,21 @@ class FillBars(bpy.types.PropertyGroup):
     )
 
     bar_width: FloatProperty(
-        name="Bar Width", min=0.01, max=100.0, default=0.1, description="Width of bars"
+        name="Bar Width",
+        min=0.01,
+        max=100.0,
+        default=0.1,
+        unit="LENGTH",
+        description="Width of bars"
     )
 
     bar_depth: FloatProperty(
         name="Bar Depth",
+        step=1,
         min=0.01,
         max=1.0,
         default=0.04,
-        step=1,
+        unit="LENGTH",
         description="Depth of bars",
     )
 

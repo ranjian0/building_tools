@@ -17,24 +17,27 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1.0,
         default=0.1,
+        unit="LENGTH",
         description="Thickness of door/window Frame",
     )
 
     frame_depth: FloatProperty(
         name="Frame Depth",
+        step=1,
         min=-1.0,
         max=1.0,
         default=0.0,
-        step=1,
+        unit="LENGTH",
         description="Depth of door/window Frame",
     )
 
     window_height: FloatProperty(
         name="Window Height",
+        step=1,
         min=0.1,
         max=1000.0,
         default=1.0,
-        step=1,
+        unit="LENGTH",
         description="Height of windows",
     )
 
@@ -43,6 +46,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.05,
+        unit="LENGTH",
         description="Depth of door/window",
     )
 

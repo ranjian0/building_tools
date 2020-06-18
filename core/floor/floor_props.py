@@ -12,6 +12,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1000.0,
         default=2.0,
+        unit="LENGTH",
         description="Height of each floor",
     )
 
@@ -28,6 +29,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         min=0.01,
         max=1000.0,
         default=0.2,
+        unit="LENGTH",
         description="Thickness of each slab",
     )
 
@@ -36,6 +38,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=10.0,
         default=0.1,
+        unit="LENGTH",
         description="Outset of each slab",
     )
 
