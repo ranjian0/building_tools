@@ -38,33 +38,22 @@ def create_roof(bm, faces, prop):
 def create_flat_roof(bm, faces, prop):
     """Create a flat roof
     """
-    # -- extrude faces upwards
-    ret = bmesh.ops.extrude_face_region(bm, geom=faces)
-    bmesh.ops.translate(
-        bm, vec=(0, 0, prop.thickness), verts=filter_geom(ret["geom"], BMVert)
-    )
+    # -- extrude up and outset
+    top_face = extrude_and_outset(bm, faces, prop.thickness, prop.outset)
 
-    # -- dissolve top faces if they are more than one
-    top_face = filter_geom(ret["geom"], BMFace)
-    if len(top_face) > 1:
-        top_face = bmesh.ops.dissolve_faces(
-            bm, faces=top_face, use_verts=True).get("region").pop()
-    else:
-        top_face = top_face.pop()
+    # -- add border
+    if prop.add_border:
+        # -- inset top face
+        bmesh.ops.inset_region(
+            bm, faces=top_face, thickness=prop.border, use_even_offset=True
+        )
 
-    # -- outset the side faces from earlier extrusion
-    link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
-
-    bmesh.ops.inset_region(
-        bm, faces=link_faces, depth=prop.outset, use_even_offset=True
-    )
-
-    # -- cleanup hidden faces
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bmesh.ops.delete(bm, geom=faces, context="FACES")
-
-    new_faces = list({f for e in top_face.edges for f in e.link_faces})
-    return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")
+        # -- extrude downwards
+        ret = bmesh.ops.extrude_face_region(bm, geom=top_face).get("geom")
+        bmesh.ops.translate(
+            bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert)
+        )
+        bmesh.ops.delete(bm, geom=top_face, context="FACES")
 
 
 def create_gable_roof(bm, faces, prop):
@@ -72,7 +61,7 @@ def create_gable_roof(bm, faces, prop):
     """
     # -- create initial outset for box gable roof
     if prop.gable_type == "BOX":
-        faces = create_flat_roof(bm, faces, prop)
+        faces = extrude_and_outset(bm, faces, prop.thickness, prop.outset)
         link_faces = {f for fa in faces for e in fa.edges for f in e.link_faces}
         all_edges = {e for f in link_faces for e in f.edges}
         bmesh.ops.delete(bm, geom=list(link_faces), context="FACES")
@@ -128,8 +117,8 @@ def create_hip_roof(bm, faces, prop):
     """Create a hip roof
     """
     # -- create base for hip roof
-    roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(create_flat_roof)
-    faces = roof_hang(bm, faces, prop)
+    roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(extrude_and_outset)
+    faces = roof_hang(bm, faces, prop.thickness, prop.outset)
     face = faces[-1]
     median = face.calc_center_median()
 
@@ -423,3 +412,35 @@ def gable_process_open(bm, roof_faces, prop):
     linked_bot = [f for f in linked if f.normal.z < 0]
     add_faces_to_map(bm, linked_top, FaceMap.ROOF)
     add_faces_to_map(bm, side_faces + linked_bot, FaceMap.ROOF_HANGS)
+
+
+def extrude_and_outset(bm, faces, thickness, outset):
+    """ Extrude the given faces upwards and outset resulting side faces
+    """
+    # -- extrude faces upwards
+    ret = bmesh.ops.extrude_face_region(bm, geom=faces)
+    bmesh.ops.translate(
+        bm, vec=(0, 0, thickness), verts=filter_geom(ret["geom"], BMVert)
+    )
+
+    # -- dissolve top faces if they are more than one
+    top_face = filter_geom(ret["geom"], BMFace)
+    if len(top_face) > 1:
+        top_face = bmesh.ops.dissolve_faces(
+            bm, faces=top_face, use_verts=True).get("region").pop()
+    else:
+        top_face = top_face.pop()
+
+    # -- outset the side faces from earlier extrusion
+    link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
+
+    bmesh.ops.inset_region(
+        bm, faces=link_faces, depth=outset, use_even_offset=True
+    )
+
+    # -- cleanup hidden faces
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bmesh.ops.delete(bm, geom=faces, context="FACES")
+
+    new_faces = list({f for e in top_face.edges for f in e.link_faces})
+    return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")

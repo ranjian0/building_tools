@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import EnumProperty, FloatProperty
+from bpy.props import EnumProperty, FloatProperty, BoolProperty
 
 
 class RoofProperty(bpy.types.PropertyGroup):
@@ -50,6 +50,20 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of entire roof",
     )
 
+    add_border: BoolProperty(
+        name="Add Border",
+        default=True,
+        description="Whether to add extruded border around flat roof"
+    )
+
+    border: FloatProperty(
+        name="Border",
+        min=0.01,
+        max=1.0,
+        default=0.1,
+        description="Width of extruded border",
+    )
+
     def draw(self, context, layout):
         layout.prop(self, "type", text="")
 
@@ -58,6 +72,10 @@ class RoofProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
+
+            col.prop(self, "add_border")
+            if self.add_border:
+                col.prop(self, "border")
 
         elif self.type == "GABLE":
             row = box.row(align=True)
