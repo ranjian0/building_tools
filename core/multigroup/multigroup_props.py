@@ -56,7 +56,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
         description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows",
     )
 
-    fill_items = [
+    fill_types = [
         ("NONE", "None", "", 0),
         ("PANELS", "Panels", "", 1),
         ("GLASS_PANES", "Glass_Panes", "", 2),
@@ -65,7 +65,7 @@ class MultigroupProperty(bpy.types.PropertyGroup):
 
     fill_type: EnumProperty(
         name="Fill Type",
-        items=fill_items,
+        items=fill_types,
         default="NONE",
         description="Type of fill for door/window",
     )

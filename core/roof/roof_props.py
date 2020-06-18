@@ -3,14 +3,14 @@ from bpy.props import EnumProperty, FloatProperty, BoolProperty
 
 
 class RoofProperty(bpy.types.PropertyGroup):
-    roof_items = [
+    roof_types = [
         ("FLAT", "Flat", "", 0),
         ("GABLE", "Gable", "", 1),
         ("HIP", "Hip", "", 2),
     ]
     type: EnumProperty(
         name="Roof Type",
-        items=roof_items,
+        items=roof_types,
         default="HIP",
         description="Type of roof to create",
     )
