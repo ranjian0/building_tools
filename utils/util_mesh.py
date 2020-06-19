@@ -250,8 +250,8 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)
+    arc_direction = edge_vector(edge).cross(xyz[2])
     orient = xyz[1] if edge_is_vertical(edge) else xyz[0]
-    arc_direction = Vector(map(abs, edge_vector(edge).cross(xyz[2])))
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
 
     verts = sort_verts(
