@@ -29,8 +29,8 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
         bmesh.ops.connect_verts(bm, verts=[verts[1], verts[-2]])["edges"].pop(),
     ]
 
-    upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, arch_prop.depth, xyz, arch_prop.function)["geom_split"], BMEdge)
-    lower_arc = filter_geom(arc_edge(bm, arc_edges[1], arch_prop.resolution, arch_prop.height-frame_thickness, arch_prop.depth, xyz, arch_prop.function)["geom_split"], BMEdge)
+    upper_arc = filter_geom(arc_edge(bm, arc_edges[0], arch_prop.resolution, arch_prop.height, xyz, arch_prop.function)["geom_split"], BMEdge)
+    lower_arc = filter_geom(arc_edge(bm, arc_edges[1], arch_prop.resolution, arch_prop.height-frame_thickness, xyz, arch_prop.function)["geom_split"], BMEdge)
     arc_edges = [
         *upper_arc,
         *lower_arc,

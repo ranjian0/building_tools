@@ -245,7 +245,7 @@ def subdivide_edges(bm, edges, direction, widths):
     return inner_edges
 
 
-def arc_edge(bm, edge, resolution, height, offset, xyz, function="SPHERE"):
+def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     """ Subdivide the given edge and offset vertices to form an arc
     """
     length = edge.calc_length()
