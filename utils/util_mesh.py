@@ -250,23 +250,28 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)
-
+    orient = xyz[1] if edge_is_vertical(edge) else xyz[0]
+    arc_direction = Vector(map(abs, edge_vector(edge).cross(xyz[2])))
+    # print(xyz)
+    # print("Arc Dir: ", arc_direction)
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
+
     verts = sort_verts(
         list({v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}),
-        xyz[0]
+        orient
     )
     theta = math.pi / (len(verts) - 1)
 
     def arc_sine(verts):
         for idx, v in enumerate(verts):
-            v.co.z += math.sin(theta * idx) * height
+            v.co += arc_direction * math.sin(theta * idx) * height
 
     def arc_sphere(verts):
         for idx, v in enumerate(verts):
             angle = math.pi - (theta * idx)
-            v.co = median + xyz[0] * math.cos(angle) * length / 2
-            v.co.z += math.sin(angle) * height
+            v.co = median + orient * math.cos(angle) * length / 2
+            v.co += arc_direction * math.sin(angle) * height
+            # print("Add: ", arc_direction * math.sin(angle) * height)
 
     {"SINE": arc_sine, "SPHERE": arc_sphere}.get(function)(verts)
     return ret
