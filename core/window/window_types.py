@@ -83,9 +83,10 @@ def create_circular_frame(bm, face, prop):
     """ Create extrude and inset around circular face
     """
     xyz = local_xyz(face)
+    width, length = calc_face_dimensions(face)
+    prop.frame_thickness = min(prop.frame_thickness, min(length, width) / 2)
 
     # -- subdivide the face along the shortest side
-    width, length = calc_face_dimensions(face)
     func = [subdivide_face_vertically, subdivide_face_horizontally][width > length]
     sections = [[length / 2] * 3, [width / 2] * 3][width > length]
     faces = func(bm, face, sections)
@@ -113,8 +114,9 @@ def create_circular_frame(bm, face, prop):
         bm, faces=[mid], use_even_offset=True, thickness=prop.frame_thickness
     )
 
+    # return None, None
     # -- add window depth
-    win, frames = add_window_depth(bm, mid, prop.window_depth, mid.normal.copy())
+    win, frames = add_window_depth(bm, mid, prop.window_depth, xyz[2])
     add_faces_to_map(bm, [win], FaceMap.WINDOW)
     add_faces_to_map(bm, res.get("faces", []) + frames, FaceMap.FRAME)
     return win, None
