@@ -71,7 +71,9 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         obj = context.object
-        return obj and obj.type == "MESH"
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+        mat = obj.facemap_materials[active_facemap.index].material
+        return obj and obj.type == "MESH" and not mat
 
     def execute(self, context):
         obj = context.object
