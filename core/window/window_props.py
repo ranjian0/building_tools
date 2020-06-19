@@ -1,11 +1,29 @@
 import bpy
-from bpy.props import FloatProperty, PointerProperty, EnumProperty, BoolProperty
+from bpy.props import (
+    IntProperty,
+    BoolProperty,
+    EnumProperty,
+    FloatProperty,
+    PointerProperty
+)
 
 from ..fill import FillBars, FillLouver, FillGlassPanes
 from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
 
 
 class WindowProperty(bpy.types.PropertyGroup):
+    win_types = [
+        ("CIRCULAR", "Circular", "", 0),
+        ("RECTANGULAR", "Rectangular", "", 1),
+    ]
+
+    type: EnumProperty(
+        name="Window Type",
+        items=win_types,
+        default="RECTANGULAR",
+        description="Type of window",
+    )
+
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.01,
@@ -31,6 +49,14 @@ class WindowProperty(bpy.types.PropertyGroup):
         default=0.05,
         unit="LENGTH",
         description="Depth of window",
+    )
+
+    resolution: IntProperty(
+        name="Resolution",
+        min=1,
+        max=128,
+        default=20,
+        description="Number of segements for the circle",
     )
 
     add_arch: BoolProperty(
@@ -71,6 +97,11 @@ class WindowProperty(bpy.types.PropertyGroup):
         box = layout.box()
         self.size_offset.draw(context, box)
 
+        col = layout.column(align=True)
+        col.row(align=True).prop(self, "type", expand=True)
+        if self.type == "CIRCULAR":
+            col.prop(self, "resolution", text="Resolution")
+
         box = layout.box()
         col = box.column(align=True)
         row = col.row(align=True)
@@ -82,27 +113,28 @@ class WindowProperty(bpy.types.PropertyGroup):
         col = box.column(align=True)
         col.prop(self, "count")
 
-        box = layout.box()
-        col = box.column(align=True)
-        col.prop(self, "add_arch")
-        if self.add_arch:
-            self.arch.draw(context, box)
+        if self.type == "RECTANGULAR":
+            box = layout.box()
+            col = box.column(align=True)
+            col.prop(self, "add_arch")
+            if self.add_arch:
+                self.arch.draw(context, box)
 
-        box = layout.box()
-        col = box.column(align=True)
-        prop_name = (
-            "Fill Type"
-            if self.fill_type == "NONE"
-            else self.fill_type.title().replace("_", " ")
-        )
-        col.prop_menu_enum(self, "fill_type", text=prop_name)
+            box = layout.box()
+            col = box.column(align=True)
+            prop_name = (
+                "Fill Type"
+                if self.fill_type == "NONE"
+                else self.fill_type.title().replace("_", " ")
+            )
+            col.prop_menu_enum(self, "fill_type", text=prop_name)
 
-        # -- draw fill types
-        fill_map = {
-            "BAR": self.bar_fill,
-            "LOUVER": self.louver_fill,
-            "GLASS_PANES": self.glass_fill,
-        }
-        fill = fill_map.get(self.fill_type)
-        if fill:
-            fill.draw(box)
+            # -- draw fill types
+            fill_map = {
+                "BAR": self.bar_fill,
+                "LOUVER": self.louver_fill,
+                "GLASS_PANES": self.glass_fill,
+            }
+            fill = fill_map.get(self.fill_type)
+            if fill:
+                fill.draw(box)

@@ -1,5 +1,6 @@
 import bmesh
-
+from mathutils import Vector
+from bmesh.types import BMEdge
 from ..generic import clamp_count
 from ..frame import add_frame_depth
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
@@ -7,19 +8,27 @@ from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ...utils import (
     clamp,
+    select,
     FaceMap,
     validate,
+    arc_edge,
     local_xyz,
     valid_ngon,
+    sort_faces,
+    sort_edges,
+    filter_geom,
     popup_message,
     get_top_edges,
     get_top_faces,
     map_new_faces,
+    calc_edge_median,
     get_bottom_faces,
     add_faces_to_map,
     extrude_face_region,
     calc_face_dimensions,
+    filter_vertical_edges,
     add_facemap_for_groups,
+    filter_horizontal_edges,
     subdivide_face_vertically,
     subdivide_face_horizontally,
 )
@@ -39,9 +48,10 @@ def create_window(bm, faces, prop):
         for aface in array_faces:
             face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
             window, arch = create_window_frame(bm, face, prop)
-            fill_window_face(bm, window, prop)
-            if prop.add_arch:
-                fill_arch(bm, arch, prop)
+            if prop.type == "RECTANGULAR":
+                fill_window_face(bm, window, prop)
+                if prop.add_arch:
+                    fill_arch(bm, arch, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return True
 
@@ -64,9 +74,56 @@ def create_window_split(bm, face, size, offset):
 def create_window_frame(bm, face, prop):
     """Create extrude and inset around a face to make window frame
     """
+    if prop.type == "CIRCULAR":
+        return create_circular_frame(bm, face, prop)
+    return create_rectangular_frame(bm, face, prop)
 
+
+def create_circular_frame(bm, face, prop):
+    """ Create extrude and inset around circular face
+    """
+    xyz = local_xyz(face)
+
+    # -- subdivide the face along the shortest side
+    width, length = calc_face_dimensions(face)
+    func = [subdivide_face_vertically, subdivide_face_horizontally][width > length]
+    sections = [[length / 2] * 3, [width / 2] * 3][width > length]
+    faces = func(bm, face, sections)
+
+    # -- get edges that will be used to make circle
+    mid = sort_faces(faces, Vector((0, 0, 1)))[1]
+    func = [filter_horizontal_edges, filter_vertical_edges][width > length]
+    edges = func(mid.edges, mid.normal)
+
+    # -- move the edges towards each other
+    median = mid.calc_center_median()
+    end, start = sort_edges(edges, xyz[0] if width > length else xyz[1])
+    for e in edges:
+        bmesh.ops.translate(bm, verts=list(e.verts), vec=median - calc_edge_median(e))
+
+    # -- arch the edges
+    res = prop.resolution // 2
+    radius = min(length, width) / 2
+    arc_edge(bm, start, res, radius, xyz)
+    arc_edge(bm, end, res, -radius, xyz)
+
+    # -- inset for frame thicknes
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+    res = bmesh.ops.inset_region(
+        bm, faces=[mid], use_even_offset=True, thickness=prop.frame_thickness
+    )
+
+    # -- add window depth
+    win, frames = add_window_depth(bm, mid, prop.window_depth, mid.normal.copy())
+    add_faces_to_map(bm, [win], FaceMap.WINDOW)
+    add_faces_to_map(bm, res.get("faces", []) + frames, FaceMap.FRAME)
+    return win, None
+
+
+def create_rectangular_frame(bm, face, prop):
+    """Create extrude and inset around a face to make rectangular window frame
+    """
     normal = face.normal.copy()
-
     # XXX Frame thickness should not exceed size of window
     min_frame_size = min(calc_face_dimensions(face)) / 2
     prop.frame_thickness = clamp(prop.frame_thickness, 0.01, min_frame_size - 0.001)
