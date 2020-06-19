@@ -1,14 +1,14 @@
 import bmesh
 from bmesh.types import BMEdge
 from ..utils import (
-    add_facemap_for_groups,
+    FaceMap,
+    arc_edge,
     sort_verts,
     filter_geom,
     map_new_faces,
-    FaceMap,
-    arc_edge,
     get_bottom_faces,
     extrude_face_region,
+    add_facemap_for_groups,
 )
 
 
