@@ -1,6 +1,5 @@
 import bmesh
 from mathutils import Vector
-from bmesh.types import BMEdge
 from ..generic import clamp_count
 from ..frame import add_frame_depth
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
@@ -8,7 +7,6 @@ from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ...utils import (
     clamp,
-    select,
     FaceMap,
     validate,
     arc_edge,
@@ -16,7 +14,6 @@ from ...utils import (
     valid_ngon,
     sort_faces,
     sort_edges,
-    filter_geom,
     popup_message,
     get_top_edges,
     get_top_faces,
