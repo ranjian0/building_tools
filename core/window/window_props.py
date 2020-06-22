@@ -53,7 +53,7 @@ class WindowProperty(bpy.types.PropertyGroup):
 
     resolution: IntProperty(
         name="Resolution",
-        min=1,
+        min=3,
         max=128,
         default=20,
         description="Number of segements for the circle",
