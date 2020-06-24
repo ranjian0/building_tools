@@ -21,12 +21,7 @@ import subprocess
 
 
 REPO_FILES = (
-    "__init__.py",
-    "LICENSE",
-    "README.md",
-    "core/",
-    "docs/",
-    "utils/",
+    "btools/"
 )
 
 

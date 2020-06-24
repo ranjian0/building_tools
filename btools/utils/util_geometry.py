@@ -69,7 +69,7 @@ Convinience functions
 """
 
 
-def create_cube(bm, size, position=Vector()):
+def create_cube(bm, size, position=Vector((0, 0, 0))):
     """ Create cube with size and at position
     """
     geom = cube(bm, *size)
@@ -77,7 +77,7 @@ def create_cube(bm, size, position=Vector()):
     return geom
 
 
-def create_cylinder(bm, radius, height, segs, position=Vector()):
+def create_cylinder(bm, radius, height, segs, position=Vector((0, 0, 0))):
     """ Create cylinder at position
     """
     cy = cylinder(bm, radius, height, segs)
@@ -85,7 +85,7 @@ def create_cylinder(bm, radius, height, segs, position=Vector()):
     return cy
 
 
-def create_cube_without_faces(bm, size, position=Vector(), **directions):
+def create_cube_without_faces(bm, size, position=Vector((0, 0, 0)), **directions):
     """ Create cube without faces in the given directions
     """
     cube = create_cube(bm, size, position)
