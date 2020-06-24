@@ -22,6 +22,7 @@ def main():
     # initialize a runner, pass it your suite and run it
     runner = unittest.TextTestRunner(verbosity=3)
     runner.run(suite)
+    sys.exit(0)
 
 
 main()
