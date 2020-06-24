@@ -16,18 +16,6 @@ def clamp(value, minimum, maximum):
     return max(min(value, maximum), minimum)
 
 
-def condition(condition, value_true, value_false):
-    """ Return value_true if condition is True else value_false
-    """
-    return value_true if condition else value_false
-
-
-def ifeven(number, value_even, value_odd):
-    """ Return value_even if number is an even number else value_odd
-    """
-    return condition(number % 2 == 0, value_even, value_odd)
-
-
 def args_from_props(props, names):
     """ returns a tuple with the properties in props for the given names
     """
