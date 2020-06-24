@@ -241,10 +241,12 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
                 e for e in v.link_edges if e in skeleton_edges and e not in found_edges
             ]
             if not linked:
-                # XXX Failure here is always caused by wrong order of verts
-                # -- Since there is no clear condition of failure, repeat boudary walk with
-                #    reversed vertex order
-                return boundary_walk(e, not reverse)
+                common_edge = set(v.link_edges) & set(last.link_edges)
+                if common_edge:
+                    found_edges.append(common_edge.pop())
+                    break
+                # XXX not so lucky, just fail
+                return []
 
             next_edge = linked[0]
             if len(linked) > 1:
