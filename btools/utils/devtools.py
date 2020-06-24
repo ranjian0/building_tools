@@ -1,8 +1,9 @@
 import io
 import pstats
 import cProfile
+from os import devnull
 
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 
 
 @contextmanager
@@ -19,3 +20,11 @@ def profile():
     ps.print_stats()
 
     print(s.getvalue())
+
+
+@contextmanager
+def suppress_stdout_stderr():
+    """A context manager that redirects stdout and stderr to devnull"""
+    with open(devnull, 'w') as fnull:
+        with redirect_stderr(fnull) as err, redirect_stdout(fnull) as out:
+            yield (err, out)
