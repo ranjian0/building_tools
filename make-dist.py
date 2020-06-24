@@ -21,7 +21,7 @@ import subprocess
 
 
 REPO_FILES = (
-    "btools/"
+    "btools/",
 )
 
 
