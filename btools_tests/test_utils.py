@@ -1,6 +1,7 @@
-import bmesh
+import bpy
 import btools
 import unittest
+from mathutils import Vector
 
 
 class TestUtilsCommon(unittest.TestCase):
@@ -16,6 +17,44 @@ class TestUtilsCommon(unittest.TestCase):
     def test_clamp(self):
         self.assertEqual(btools.utils.clamp(2, 0.2, 1), 1)
         self.assertEqual(btools.utils.clamp(0.1, 0.2, 1), 0.2)
+
+    def test_crashsafe(self):
+
+        @btools.utils.crash_safe
+        def run_failed():
+            raise IndexError
+            return {"FINISHED"}
+
+        @btools.utils.crash_safe
+        def run_passed():
+            return {"FINISHED"}
+
+        class DummyOpFail(bpy.types.Operator):
+            bl_idname = "btools_test.dummy_op_fail"
+            bl_label = "Dummy Test Fail"
+            bl_options = {"REGISTER", "UNDO"}
+
+            def execute(self, context):
+                return run_failed()
+
+        bpy.utils.register_class(DummyOpFail)
+        with btools.utils.suppress_stdout_stderr():
+            res = bpy.ops.btools_test.dummy_op_fail()
+            self.assertEqual(res, {"CANCELLED"})
+        bpy.utils.unregister_class(DummyOpFail)
+
+        class DummyOpPass(bpy.types.Operator):
+            bl_idname = "btools_test.dummy_op_pass"
+            bl_label = "Dummy Test Pass"
+            bl_options = {"REGISTER", "UNDO"}
+
+            def execute(self, context):
+                return run_passed()
+
+        bpy.utils.register_class(DummyOpPass)
+        res = bpy.ops.btools_test.dummy_op_pass()
+        self.assertEqual(res, {"FINISHED"})
+        bpy.utils.unregister_class(DummyOpPass)
 
     def test_restricted_sizeoffset(self):
         # XXX OFFSET
@@ -43,3 +82,50 @@ class TestUtilsCommon(unittest.TestCase):
         # -- restrict with offset
         self.assertEqual(
             btools.utils.restricted_size([1, 1], [0.5, 0.5], [0.5, 0.5], [0.75, 0.75]), (0.5, 0.5))
+
+    def test_local_to_global(self):
+        X = Vector((1, 0, 0))
+        Y = Vector((0, 1, 0))
+
+        class Face:
+            pass
+
+        dummy = Face()
+        dummy.normal = Vector()
+
+        self.assertEqual(btools.utils.local_to_global(dummy, Vector()), Vector())
+
+        dummy.normal = Y
+        gb = btools.utils.local_to_global(dummy, X)
+        self.assertEqual(gb.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+
+        dummy.normal = X
+        gb = btools.utils.local_to_global(dummy, Y)
+        self.assertEqual(gb.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
+
+    def test_local_xyz(self):
+        class Face:
+            pass
+
+        dummy = Face()
+        dummy.normal = Vector()
+
+        self.assertEqual(btools.utils.local_xyz(dummy), (Vector(),)*3)
+
+        dummy.normal = Vector((1, 0, 0))
+        x, y, z = btools.utils.local_xyz(dummy)
+        self.assertEqual(x.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+        self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
+        self.assertEqual(z.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
+
+        dummy.normal = Vector((0, 1, 0))
+        x, y, z = btools.utils.local_xyz(dummy)
+        self.assertEqual(x.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+        self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
+        self.assertEqual(z.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+
+        dummy.normal = Vector((0, 0, 1))
+        x, y, z = btools.utils.local_xyz(dummy)
+        self.assertEqual(x.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
+        self.assertEqual(y.to_tuple(1), Vector((0, 0, 0)).to_tuple(1))
+        self.assertEqual(z.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
