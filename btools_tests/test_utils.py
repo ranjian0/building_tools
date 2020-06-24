@@ -1,4 +1,5 @@
 import bpy
+import bmesh
 import btools
 import unittest
 from mathutils import Vector
@@ -129,3 +130,69 @@ class TestUtilsCommon(unittest.TestCase):
         self.assertEqual(x.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
         self.assertEqual(y.to_tuple(1), Vector((0, 0, 0)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
+
+
+class TestUtilsGeometry(unittest.TestCase):
+
+    def setUp(self):
+        self.bm = bmesh.new()
+
+    def tearDown(self):
+        self.bm.free()
+
+    def clean_bmesh(self):
+        [self.bm.verts.remove(v) for v in self.bm.verts]
+        [self.bm.edges.remove(e) for e in self.bm.edges]
+        [self.bm.faces.remove(f) for f in self.bm.faces]
+
+    def test_cube(self):
+        btools.utils.cube(self.bm)
+        self.assertEquals(len(self.bm.faces), 6)
+        self.assertEquals(len(self.bm.verts), 8)
+
+    def test_plane(self):
+        btools.utils.plane(self.bm)
+        self.assertEquals(len(self.bm.faces), 1)
+        self.assertEquals(len(self.bm.verts), 4)
+
+    def test_circle(self):
+        btools.utils.circle(self.bm)
+        self.assertEquals(len(self.bm.faces), 1)
+        self.assertEquals(len(self.bm.verts), 10)
+
+        self.clean_bmesh()
+
+        btools.utils.circle(self.bm, segs=12, cap_tris=True)
+        self.assertEquals(len(self.bm.faces), 12)
+        self.assertEquals(len(self.bm.verts), 13)
+
+    def test_cone(self):
+        btools.utils.cone(self.bm)
+        self.assertEquals(len(self.bm.faces), 96)
+        self.assertEquals(len(self.bm.verts), 66)
+
+    def test_cylinder(self):
+        btools.utils.cylinder(self.bm)
+        self.assertEquals(len(self.bm.faces), 11)
+        self.assertEquals(len(self.bm.verts), 20)
+
+    def test_cube_without_faces(self):
+        btools.utils.create_cube_without_faces(
+            self.bm, Vector((1, 1, 1)))
+        self.assertEquals(len(self.bm.faces), 6)
+        self.assertEquals(len(self.bm.verts), 8)
+
+        self.clean_bmesh()
+
+        btools.utils.create_cube_without_faces(
+            self.bm, Vector((1, 1, 1)), top=True, bottom=True)
+        self.assertEquals(len(self.bm.faces), 4)
+        self.assertEquals(len(self.bm.verts), 8)
+
+        self.clean_bmesh()
+
+        btools.utils.create_cube_without_faces(
+            self.bm, Vector((1, 1, 1)), top=True, bottom=True,
+            left=True, right=True, front=True, back=True)
+        self.assertEquals(len(self.bm.faces), 0)
+        self.assertEquals(len(self.bm.verts), 8)
