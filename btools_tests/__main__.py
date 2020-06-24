@@ -12,6 +12,8 @@ import test_utils
 
 
 def main():
+    print()
+    print('-'*70)
     # initialize the test suite
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
