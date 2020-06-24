@@ -156,7 +156,7 @@ def filter_horizontal_edges(edges, normal):
     res = []
     rnd = ft.partial(round, ndigits=3)
 
-    up = Vector((1, 0, 0)) if normal.z else Vector((0, 0, 1))
+    up = Vector((0, 1, 0)) if normal.z else Vector((0, 0, 1))
     for e in edges:
         vec = edge_vector(e)
         if rnd(vec.angle(up)) == rnd(math.pi / 2):
