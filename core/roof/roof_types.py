@@ -8,6 +8,7 @@ from ...utils import (
     select,
     FaceMap,
     validate,
+    edge_vector,
     skeletonize,
     filter_geom,
     map_new_faces,
@@ -274,6 +275,7 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
     """ Find all vertices that intersect/ lie at an edge and merge
         them to that edge
     """
+    eps = 0.0001
     new_verts = []
     for v in verts:
         for e in edges:
@@ -281,8 +283,12 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
                 continue
 
             v1, v2 = e.verts
+            ortho = edge_vector(e).orthogonal().normalized() * eps
             res = mathutils.geometry.intersect_line_line_2d(v.co, v.co, v1.co, v2.co)
-            if res is not None:
+            if res is None:
+                res = mathutils.geometry.intersect_line_line_2d(v.co - ortho, v.co + ortho, v1.co, v2.co)
+
+            if res:
                 split_vert = v1
                 split_factor = (v1.co - v.co).length / e.calc_length()
                 new_edge, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
