@@ -142,8 +142,6 @@ class TestUtilsGeometry(unittest.TestCase):
 
     def clean_bmesh(self):
         [self.bm.verts.remove(v) for v in self.bm.verts]
-        [self.bm.edges.remove(e) for e in self.bm.edges]
-        [self.bm.faces.remove(f) for f in self.bm.faces]
 
     def test_cube(self):
         btools.utils.cube(self.bm)
