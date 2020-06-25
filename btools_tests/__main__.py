@@ -14,8 +14,7 @@ import test_floorplan
 
 
 def main():
-    print()
-    print('-'*70)
+    print('-'*70, end="\n\n")
     # Load the addon module
     tools.load_module(os.path.join(addon_dir, "btools", "__init__.py"))
 
