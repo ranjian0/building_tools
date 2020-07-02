@@ -8,7 +8,7 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
 
     bl_idname = "btools.add_road"
     bl_label = "Add Road"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=RoadProperty)
 
