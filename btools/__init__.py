@@ -4,7 +4,7 @@ from .core import register_core, unregister_core
 
 bl_info = {
     "name": "Building Tools",
-    "author": "Ian Ichung'wa Karanja (ranjian0), Lucky Kadam (luckykadam)",
+    "author": "Ian Ichung'wa Karanja (ranjian0), Lucky Kadam (luckykadam), Marcus (MCrafterzz)",
     "version": (1, 0, 2),
     "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
@@ -43,6 +43,9 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
         row.operator("btools.add_window")
         row.operator("btools.add_door")
         col.operator("btools.add_multigroup")
+
+        col = layout.column(align=True)
+        col.operator("btools.add_road")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):

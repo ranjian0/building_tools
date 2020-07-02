@@ -10,6 +10,7 @@ from .railing import register_railing, unregister_railing
 from .roof import register_roof, unregister_roof
 from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
+from .road import register_road, unregister_road
 
 # -- ORDER MATTERS --
 register_funcs = (
@@ -25,6 +26,7 @@ register_funcs = (
     register_stairs,
     register_roof,
     register_multigroup,
+    register_road,
 )
 
 unregister_funcs = (
@@ -40,6 +42,7 @@ unregister_funcs = (
     unregister_stairs,
     unregister_roof,
     unregister_multigroup,
+    unregister_road,
 )
 
 
