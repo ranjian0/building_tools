@@ -20,7 +20,8 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
         return context.object is not None and context.object.type == 'CURVE' and context.mode == "EDIT_CURVE"
 
     def execute(self, context):
-        return Road.build(context, self.props)
+        Road.build(context, self.props)
+        return {"FINISHED"}
 
     def draw(self, context):
         self.props.draw(context, self.layout)
