@@ -61,6 +61,8 @@ Project inspired by `Ghost Town` addon for `3DS MAX`.
     and attach any relevant info/logs.
 
   * For feature requests, create an issue and add **Enhancement** label.
+  
+  You can chat with other contributors over at our [discord server](https://discord.gg/hK4UaGu).
 
 ## Authors
 
