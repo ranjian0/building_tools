@@ -9,7 +9,7 @@ class BTOOLS_OT_add_multigroup(bpy.types.Operator):
 
     bl_idname = "btools.add_multigroup"
     bl_label = "Add Multigroup"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=MultigroupProperty)
 

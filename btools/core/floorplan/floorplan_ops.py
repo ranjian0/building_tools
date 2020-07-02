@@ -8,7 +8,7 @@ class BTOOLS_OT_add_floorplan(bpy.types.Operator):
 
     bl_idname = "btools.add_floorplan"
     bl_label = "Create Floorplan"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=FloorplanProperty)
 

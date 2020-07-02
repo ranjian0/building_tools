@@ -8,7 +8,7 @@ class BTOOLS_OT_add_roof(bpy.types.Operator):
 
     bl_idname = "btools.add_roof"
     bl_label = "Add Roof"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=RoofProperty)
 

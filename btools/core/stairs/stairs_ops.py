@@ -9,7 +9,7 @@ class BTOOLS_OT_add_stairs(bpy.types.Operator):
 
     bl_idname = "btools.add_stairs"
     bl_label = "Add Stairs"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=StairsProperty)
 
