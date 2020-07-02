@@ -61,9 +61,10 @@ class RoadProperty(bpy.types.PropertyGroup):
 
     shoulder_angle: FloatProperty(
         name="Shoulder Angle",
+        subtype="ANGLE",
         min=0,
-        max=180.0,
-        default=45,
+        max=3.14159,
+        default=0.785398,
         description="Angle of the shoulder connecting to the ground",
     )
 
