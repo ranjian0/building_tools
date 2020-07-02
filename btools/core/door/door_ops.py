@@ -9,7 +9,7 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
 
     bl_idname = "btools.add_door"
     bl_label = "Add Door"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=DoorProperty)
 

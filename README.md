@@ -2,7 +2,7 @@
 
 > ⚡️ Crazy fast way to model buildings in Blender!
 
-Artists should redirect to: https://ranjian0.github.io/building_tool/
+Artists should redirect to: https://ranjian0.github.io/building_tools/
 
 ## Table of contents
 
