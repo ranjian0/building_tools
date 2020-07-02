@@ -8,7 +8,7 @@ class BTOOLS_OT_add_floors(bpy.types.Operator):
 
     bl_idname = "btools.add_floors"
     bl_label = "Add Floors"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: bpy.props.PointerProperty(type=FloorProperty)
 
