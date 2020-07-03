@@ -44,10 +44,10 @@ class RoadProperty(bpy.types.PropertyGroup):
         description="Height of sidewalk",
     )
 
-    generate_shoulder: BoolProperty(
-        name="Generate Shoulder",
+    generate_shoulders: BoolProperty(
+        name="Generate Shoulders",
         default=True,
-        description="Generate a shoulder",
+        description="Generate a shoulders",
     )
 
     shoulder_width: FloatProperty(
@@ -91,8 +91,8 @@ class RoadProperty(bpy.types.PropertyGroup):
             col.prop(self, "sidewalk_width", text="Sidewalk Width")
             col.prop(self, "sidewalk_height", text="Sidewalk Height")
 
-        col.prop(self, "generate_shoulder", text="Shoulder")
-        if self.generate_shoulder:
+        col.prop(self, "generate_shoulders", text="Shoulders")
+        if self.generate_shoulders:
             col.prop(self, "shoulder_width", text="Shoulder Width")
 
         if not self.generate_left_sidewalk or not self.generate_right_sidewalk:

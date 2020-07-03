@@ -14,10 +14,7 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        print(context.object.type)
-        print((context.object.type == 'CURVE'))
-        print(context.mode == "EDIT_CURVE")
-        return context.object is not None and context.object.type == 'CURVE' and context.mode == "EDIT_CURVE"
+        return context.mode == "OBJECT"
 
     def execute(self, context):
         Road.build(context, self.props)
