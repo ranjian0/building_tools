@@ -22,7 +22,6 @@ def create_road(bm, prop):
 
     shoulder_width = sin(prop.shoulder_angle) * prop.shoulder_height
     shoulder_height = cos(prop.shoulder_angle) * prop.shoulder_height
-    width = 0
     total_width_left = prop.width / 2
     total_width_right = 0
 
