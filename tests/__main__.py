@@ -10,6 +10,7 @@ sys.path.insert(0, addon_dir)
 
 import tools
 import test_utils
+import test_floors
 import test_floorplan
 
 
@@ -24,6 +25,7 @@ def main():
 
     # add tests to the test suite
     suite.addTests(loader.loadTestsFromModule(test_utils))
+    suite.addTests(loader.loadTestsFromModule(test_floors))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
 
     # initialize a runner, pass it your suite and run it
