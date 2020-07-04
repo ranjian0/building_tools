@@ -1,5 +1,6 @@
 import bpy
 import btools
+import random
 import unittest
 
 floorplan = btools.core.floorplan
@@ -90,3 +91,82 @@ class TestFloorplan(unittest.TestCase):
 
         faces = context.object.data.polygons
         self.assertEquals(len(faces), prop.segments) # cap_tris False
+
+    def test_composite(self):
+        context = bpy.context
+        prop = context.scene.test_prop
+
+        prop.type = "COMPOSITE"
+        res = builder.build(context, prop)
+        self.assertIsNotNone(res)
+
+        faces = context.object.data.polygons
+        self.assertEquals(len(faces), 5)
+
+        verts = context.object.data.vertices
+        self.assertEquals(len(verts), 12)
+
+        self.clear_objects()
+
+        # -- use polygon areas to validate fan sizes
+        prop.width, prop.length = (1, 1)
+        prop.tl1, prop.tl2, prop.tl3, prop.tl4 = (1, 2, 3, 4)
+
+        res = builder.build(context, prop)
+        self.assertIsNotNone(res)
+
+        areas = {p.area for p in context.object.data.polygons}
+        self.assertEquals(areas, {1, 2, 3, 4})
+
+    def test_hshaped(self):
+        context = bpy.context
+        prop = context.scene.test_prop
+
+        prop.type = "H-SHAPED"
+        res = builder.build(context, prop)
+        self.assertIsNotNone(res)
+
+        faces = context.object.data.polygons
+        self.assertEquals(len(faces), 7)
+
+        verts = context.object.data.vertices
+        self.assertEquals(len(verts), 16)
+
+        # with default size (4, 4) and 1 for fans
+        areas = {p.area for p in context.object.data.polygons}
+        self.assertEquals(areas, {1, 4, 16})
+
+        self.clear_objects()
+
+        # -- use polygon areas to validate fan sizes
+        prop.width, prop.length = (2, 2)
+        prop.tw1, prop.tw2, prop.tw3, prop.tw4 = (1, 1, 1, 1)
+        prop.tl1, prop.tl2, prop.tl3, prop.tl4 = (1, 2, 3, 4)
+
+        res = builder.build(context, prop)
+        self.assertIsNotNone(res)
+
+        areas = {p.area for p in context.object.data.polygons}
+        self.assertEquals(areas, {1, 2, 3, 4})
+
+    def test_random(self):
+        context = bpy.context
+        prop = context.scene.test_prop
+
+        prop.type = "RANDOM"
+        for s in range(100):
+            prop.seed = random.randrange(0, 10000)
+            res = builder.build(context, prop)
+            self.assertIsNotNone(res)
+            self.clear_objects()
+
+        prop.random_extension_amount = False
+        for i in range(1, 5):
+            prop.extension_amount = i
+
+            res = builder.build(context, prop)
+            self.assertIsNotNone(res)
+
+            faces = context.object.data.polygons
+            self.assertEquals(len(faces), i+1)
+            self.clear_objects()
