@@ -22,6 +22,7 @@ import subprocess
 
 REPO_FILES = (
     "btools/",
+    "LICENSE",
 )
 
 
@@ -53,9 +54,10 @@ for item in REPO_FILES:
     for filename in items :
         info = git("log", "--format=%ct:%H", "-n1", "%s..%s" % (earliest, upto), "--", filename).strip()
 
+        fn = "/".join(filename.split('/')[1:]) if "btools" in filename else filename
         if info != b"" :
             item = zipfile.ZipInfo()
-            item.filename = "/".join((basename, filename))
+            item.filename = fn
             item.external_attr = 0o100644 << 16
             item.compress_type = zipfile.ZIP_DEFLATED
             timestamp, commit_hash = info.split(b":")
