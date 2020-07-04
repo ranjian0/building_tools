@@ -16,7 +16,7 @@ import test_floorplan
 def main():
     print('-'*70, end="\n\n")
     # Load the addon module
-    tools.load_module(os.path.join(addon_dir, "btools", "__init__.py"))
+    tools.LoadModule(os.path.join(addon_dir, "btools", "__init__.py"))
 
     # initialize the test suite
     loader = unittest.TestLoader()
