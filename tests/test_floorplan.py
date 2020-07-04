@@ -11,13 +11,13 @@ class TestFloorplan(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        bpy.utils.register_class(btools.core.floorplan.FloorplanProperty)
-        bpy.types.Scene.test_prop = bpy.props.PointerProperty(type=btools.core.floorplan.FloorplanProperty)
+        bpy.utils.register_class(floorplan.FloorplanProperty)
+        bpy.types.Scene.test_prop = bpy.props.PointerProperty(type=floorplan.FloorplanProperty)
 
     @classmethod
     def tearDownClass(cls):
         del bpy.types.Scene.test_prop
-        bpy.utils.unregister_class(btools.core.floorplan.FloorplanProperty)
+        bpy.utils.unregister_class(floorplan.FloorplanProperty)
 
     def setUp(self):
         self.clear_objects()
