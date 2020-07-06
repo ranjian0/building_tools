@@ -67,3 +67,9 @@ Project inspired by `Ghost Town` addon for `3DS MAX`.
 ## Authors
 
 Created by [ranjian0](https://github.com/ranjian0), [luckykadam](https://github.com/luckykadam) and [MCrafterzz](https://github.com/MCrafterzz). Feel free to contact.
+
+## Support
+
+If you would like to support our work you can do so on our patreon page.
+
+[![Patreon](https://imgur.com/FOii5wr)](https://www.patreon.com/ranjian0)
