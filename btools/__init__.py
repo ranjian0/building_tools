@@ -46,6 +46,7 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
 
         col = layout.column(align=True)
         col.operator("btools.add_road")
+        col.operator("btools.extrude_road")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):

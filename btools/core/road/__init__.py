@@ -1,10 +1,10 @@
 import bpy
 
 from .road import Road
-from .road_ops import BTOOLS_OT_add_road
-from .road_props import RoadProperty
+from .road_ops import BTOOLS_OT_add_road, BTOOLS_OT_extrude_road
+from .road_props import RoadProperty, RoadExtrudeProperty
 
-classes = (RoadProperty, BTOOLS_OT_add_road)
+classes = (RoadProperty, RoadExtrudeProperty, BTOOLS_OT_add_road, BTOOLS_OT_extrude_road)
 
 
 def register_road():

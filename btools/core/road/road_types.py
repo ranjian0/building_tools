@@ -1,7 +1,7 @@
 import bmesh
 import bpy
 from math import sin, cos
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 
 def extrude_staight_road(bm, prop):
@@ -77,3 +77,14 @@ def create_road(bm, prop):
     bm.verts.ensure_lookup_table()
     for i in range(len(bm.verts) - 1):
         bm.edges.new((bm.verts[i], bm.verts[i + 1]))
+
+
+def continuous_extrude(bm, context, prop, edges, times):
+    geom = bmesh.ops.extrude_face_region(bm, geom=edges)
+    verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
+    edges = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMEdge)]
+    bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world, verts=verts)
+
+    times -= 1
+    if times > 0:
+        continuous_extrude(bm, context, prop, edges, times)

@@ -77,9 +77,6 @@ class RoadProperty(bpy.types.PropertyGroup):
         description="Height of the shoulder connecting to the ground",
     )
 
-    def init(self, wall_dimensions):
-        pass
-
     def draw(self, context, layout):
         box = layout.box()
         col = box.column(align=True)
@@ -98,3 +95,28 @@ class RoadProperty(bpy.types.PropertyGroup):
         if not self.generate_left_sidewalk or not self.generate_right_sidewalk:
             col.prop(self, "shoulder_angle", text="Shoulder Angle")
             col.prop(self, "shoulder_height", text="Shoulder Height")
+
+
+class RoadExtrudeProperty(bpy.types.PropertyGroup):
+    interval: FloatProperty(
+        name="Interval",
+        min=0.01,
+        max=5,
+        default=0.25,
+        unit="LENGTH",
+        description="Interval of vertices",
+    )
+
+    length: FloatProperty(
+        name="Length",
+        min=0.01,
+        default=10,
+        unit="LENGTH",
+        description="Length of road",
+    )
+
+    def draw(self, context, layout):
+        box = layout.box()
+        col = box.column(align=True)
+        col.prop(self, "interval", text="Interval")
+        col.prop(self, "length", text="Length")

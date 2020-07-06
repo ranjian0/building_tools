@@ -1,6 +1,6 @@
 import bpy
 import bmesh
-from .road_types import create_road
+from .road_types import create_road, continuous_extrude
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -8,6 +8,7 @@ from ...utils import (
     bm_from_obj,
     create_mesh,
     create_object,
+    get_edit_mesh,
 )
 
 
@@ -27,3 +28,15 @@ class Road:
         link_obj(obj)
 
         return obj
+
+    @classmethod
+    @crash_safe
+    def extrude(cls, context, prop):
+        times = prop.length / prop.interval
+        me = get_edit_mesh()
+
+        bm = bmesh.from_edit_mesh(me)
+        continuous_extrude(bm, context, prop, bm.edges, times)
+        bmesh.update_edit_mesh(me, True)
+
+        return {"FINISHED"}
