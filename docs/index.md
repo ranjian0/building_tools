@@ -31,4 +31,4 @@ Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://gith
 
 If you would like to support our work you can do so on our patreon page.
 
-[![Patreon](https://imgur.com/FOii5wr)](https://www.patreon.com/ranjian0)
+[![Patreon](https://i.imgur.com/FOii5wr.png)](https://www.patreon.com/ranjian0)
