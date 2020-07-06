@@ -7,5 +7,5 @@
 *.sublime-workspace
 *.vscode
 .idea
-*/docs/_site
-*/docs/Gemfile.lock
+/docs/_site
+/docs/Gemfile.lock
