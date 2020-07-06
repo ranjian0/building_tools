@@ -29,7 +29,7 @@ and `Building Tools` was born.
 
 ## Installation
 
-1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tools/archive/release.zip).
+1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tools/releases/download/v1.0.1/building_tool-v1.0.1.zip).
 2. In blender, go to : Edit -> Preferences -> Add-ons -> Install.
 3. Select the downloaded file and you're good to go.
 
@@ -61,7 +61,7 @@ Project inspired by `Ghost Town` addon for `3DS MAX`.
     and attach any relevant info/logs.
 
   * For feature requests, create an issue and add **Enhancement** label.
-  
+
   You can chat with other contributors over at our [discord server](https://discord.gg/hK4UaGu).
 
 ## Authors
