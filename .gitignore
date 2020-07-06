@@ -6,6 +6,7 @@
 *.sublime-project
 *.sublime-workspace
 *.vscode
+*.zip
 .idea
 /docs/_site
 /docs/Gemfile.lock
