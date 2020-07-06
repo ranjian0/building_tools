@@ -26,3 +26,9 @@
 ## Authors
 
 Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://github.com/luckykadam). Feel free to contact.
+
+## Support
+
+If you would like to support our work you can do so on our patreon page.
+
+<a href="https://www.patreon.com/bePatron?u=11731249" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
