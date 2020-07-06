@@ -12,7 +12,7 @@
 # will make an archive for the commit tagged “v1.0” (assuming it exists).
 # This tag name will also be included in the created archive name.
 
-
+import os
 import sys
 import time
 import getopt
@@ -23,6 +23,8 @@ import subprocess
 REPO_FILES = (
     "btools/",
     "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
 )
 
 
@@ -38,7 +40,7 @@ if len(args) != 1 :
 upto = args[0]
 earliest = git("rev-list", "--reverse", upto).split(b"\n")[0].strip().decode()
 
-basename = "building_tool"
+basename = "building_tools"
 outfilename = "%s-%s.zip" % (basename, upto)
 out = zipfile.ZipFile(outfilename, "x")
 for item in REPO_FILES:
@@ -54,10 +56,9 @@ for item in REPO_FILES:
     for filename in items :
         info = git("log", "--format=%ct:%H", "-n1", "%s..%s" % (earliest, upto), "--", filename).strip()
 
-        fn = "/".join(filename.split('/')[1:]) if "btools" in filename else filename
         if info != b"" :
             item = zipfile.ZipInfo()
-            item.filename = fn
+            item.filename = os.path.join(basename, filename.replace("btools/", ""))
             item.external_attr = 0o100644 << 16
             item.compress_type = zipfile.ZIP_DEFLATED
             timestamp, commit_hash = info.split(b":")
