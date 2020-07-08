@@ -47,7 +47,7 @@ and `Building Tools` was born.
 
 ## Status
 
-`Version` : `v1.0a`
+`Version` : `v1.0.2`
 
 ## Inspiration
 
