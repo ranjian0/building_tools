@@ -4,18 +4,6 @@ from math import sin, cos
 from mathutils import Vector, Matrix
 
 
-def extrude_staight_road(bm, prop):
-    """Create straight road
-    """
-    pass
-
-
-def extrude_curved_road(bm, prop):
-    """Create curved road
-    """
-    pass
-
-
 def create_road(bm, prop):
     """Creates the original vertices
     """
@@ -80,6 +68,9 @@ def create_road(bm, prop):
 
 
 def continuous_extrude(bm, context, prop, edges, times):
+    """ Extrudes road straight
+    """
+
     geom = bmesh.ops.extrude_face_region(bm, geom=edges)
     verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
     edges = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMEdge)]

@@ -1,6 +1,7 @@
 import bpy
+
 from bpy.props import (
-    FloatProperty, BoolProperty
+    FloatProperty, BoolProperty, PointerProperty, EnumProperty
 )
 
 
@@ -96,8 +97,19 @@ class RoadProperty(bpy.types.PropertyGroup):
             col.prop(self, "shoulder_angle", text="Shoulder Angle")
             col.prop(self, "shoulder_height", text="Shoulder Height")
 
+        col.operator("btools.create_curve")
+
 
 class RoadExtrudeProperty(bpy.types.PropertyGroup):
+    extrusion_types = [
+        ("STRAIGHT", "Straight", "", 0),
+        ("CURVE", "Curve", "", 1),
+    ]
+
+    extrusion_type: EnumProperty(
+        items=extrusion_types, default="STRAIGHT", description="Extrusion mode"
+    )
+
     interval: FloatProperty(
         name="Interval",
         min=0.01,
@@ -115,8 +127,12 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
         description="Length of road",
     )
 
+    bpy.types.Object.curve = PointerProperty(type=bpy.types.Curve)
+
     def draw(self, context, layout):
         box = layout.box()
         col = box.column(align=True)
+        col.prop(self, "extrusion_type", text="Extrusion Mode")
+        #col.prop(self, "curve", text="Curve")
         col.prop(self, "interval", text="Interval")
         col.prop(self, "length", text="Length")
