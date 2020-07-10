@@ -13,6 +13,8 @@ from ..utils import (
     restricted_offset,
 )
 
+from mathutils import Vector
+
 
 def get_count(self):
     """ Return count value with a default of 1
@@ -173,8 +175,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         self["default_size"] = default_size
         self["default_offset"] = default_offset
         self["restricted"] = restricted
-        self.size = default_size
-        self.offset = default_offset
+
+        if self.size == Vector((0, 0)):
+            self.size = default_size
+            self.offset = default_offset
 
     def draw(self, context, box):
 
