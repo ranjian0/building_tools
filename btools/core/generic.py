@@ -57,49 +57,113 @@ CountProperty = IntProperty(
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
+    def clamp_size(self):
+        if self["restricted"]:
+            value = (clamp(self.size[0], 0.1, self["parent_dimensions"][0] - 0.0001), self.size[1])
+            self.size = restricted_size(
+                self["parent_dimensions"], self.offset, (0.1, 0.1), value
+            )
+
+    def set_size_width(self, value):
+        self.size_width = value
+        self.size[0] = value
+        self.clamp_size()
+
+    def set_size_height(self, value):
+        self.size_height = value
+        self.size[1] = value
+        self.clamp_size()
+
     def get_size(self):
         if self["restricted"]:
-            return self.get("size", restricted_size(
+            size = self.get("size", restricted_size(
                 self["parent_dimensions"], self.offset, (0.1, 0.1), self["default_size"]
             ))
         else:
-            return self.get("size", self["default_size"])
+            size = self.get("size", self["default_size"])
+        self.size = size
+        return size
 
-    def set_size(self, value):
-        if self["restricted"]:
-            value = (clamp(value[0], 0.1, self["parent_dimensions"][0] - 0.0001), value[1])
-            self["size"] = restricted_size(
-                self["parent_dimensions"], self.offset, (0.1, 0.1), value
-            )
-        else:
-            self["size"] = value
+    def get_size_width(self):
+        return self.get_size()[0]
 
+    def get_size_height(self):
+        return self.get_size()[1]
+
+    # Used internally, hidden
     size: FloatVectorProperty(
         name="Size",
-        get=get_size,
-        set=set_size,
         subtype="XYZ",
         size=2,
         unit="LENGTH",
         description="Size of geometry",
     )
 
-    def get_offset(self):
-        return self.get("offset", self["default_offset"])
+    size_width: FloatProperty(
+        name="Width",
+        set=set_size_width,
+        get=get_size_width,
+        unit="LENGTH",
+        description="Width of geometry",
+    )
 
-    def set_offset(self, value):
-        self["offset"] = (
-            restricted_offset(self["parent_dimensions"], self.size, value) if self["restricted"] else value
+    size_height: FloatProperty(
+        name="Height",
+        set=set_size_height,
+        get=get_size_height,
+        unit="LENGTH",
+        description="Height of geometry",
+    )
+
+    def clamp_offset(self):
+        self.offset = (
+            restricted_offset(self["parent_dimensions"], self.size, self.offset) if self["restricted"] else self.offset
         )
 
+    def set_offset_horizontal(self, value):
+        self.offset_horizontal = value
+        self.offset[0] = value
+        self.clamp_offset()
+
+    def set_offset_vertical(self, value):
+        self.offset_vertical = value
+        self.offset[1] = value
+        self.clamp_offset()
+
+    def get_offset(self):
+        offset = self.get("offset", self["default_offset"])
+        self.offset = offset
+        return offset
+
+    def get_offset_horizontal(self):
+        return self.get_offset()[0]
+
+    def get_offset_vertical(self):
+        return self.get_offset()[1]
+
+    # Used internally, hidden
     offset: FloatVectorProperty(
         name="Offset",
-        get=get_offset,
-        set=set_offset,
         subtype="TRANSLATION",
         size=2,
         unit="LENGTH",
         description="How much to offset geometry",
+    )
+
+    offset_horizontal: FloatProperty(
+        name="Horizontal",
+        set=set_offset_horizontal,
+        get=get_offset_horizontal,
+        unit="LENGTH",
+        description="How much to offset geometry horizontally",
+    )
+
+    offset_vertical: FloatProperty(
+        name="Vertical",
+        set=set_offset_vertical,
+        get=get_offset_vertical,
+        unit="LENGTH",
+        description="How much to offset geometry vertically",
     )
 
     show_props: BoolProperty(default=False)
@@ -109,15 +173,21 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         self["default_size"] = default_size
         self["default_offset"] = default_offset
         self["restricted"] = restricted
+        self.size = default_size
+        self.offset = default_offset
 
     def draw(self, context, box):
 
         row = box.row(align=False)
         col = row.column(align=True)
-        col.prop(self, "size")
+        col.label(text="Size:")
+        col.prop(self, "size_width")
+        col.prop(self, "size_height")
 
         col = row.column(align=True)
-        col.prop(self, "offset")
+        col.label(text="Offset:")
+        col.prop(self, "offset_horizontal")
+        col.prop(self, "offset_vertical")
 
 
 class ArchProperty(bpy.types.PropertyGroup):
