@@ -67,12 +67,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
             )
 
     def set_size_width(self, value):
-        self.size_width = value
         self.size[0] = value
         self.clamp_size()
 
     def set_size_height(self, value):
-        self.size_height = value
         self.size[1] = value
         self.clamp_size()
 
@@ -123,12 +121,10 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         )
 
     def set_offset_horizontal(self, value):
-        self.offset_horizontal = value
         self.offset[0] = value
         self.clamp_offset()
 
     def set_offset_vertical(self, value):
-        self.offset_vertical = value
         self.offset[1] = value
         self.clamp_offset()
 
