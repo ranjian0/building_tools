@@ -1,5 +1,4 @@
 import bmesh
-import bpy
 from math import sin, cos
 from mathutils import Vector, Matrix
 

@@ -97,8 +97,6 @@ class RoadProperty(bpy.types.PropertyGroup):
             col.prop(self, "shoulder_angle", text="Shoulder Angle")
             col.prop(self, "shoulder_height", text="Shoulder Height")
 
-        col.operator("btools.create_curve")
-
 
 class RoadExtrudeProperty(bpy.types.PropertyGroup):
     extrusion_types = [
@@ -127,12 +125,11 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
         description="Length of road",
     )
 
-    bpy.types.Object.curve = PointerProperty(type=bpy.types.Curve)
-
     def draw(self, context, layout):
         box = layout.box()
         col = box.column(align=True)
         col.prop(self, "extrusion_type", text="Extrusion Mode")
-        #col.prop(self, "curve", text="Curve")
         col.prop(self, "interval", text="Interval")
-        col.prop(self, "length", text="Length")
+
+        if self.extrusion_type == "STRAIGHT":
+            col.prop(self, "length", text="Length")
