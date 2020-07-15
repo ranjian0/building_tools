@@ -2,7 +2,7 @@ import math
 
 import bpy
 import bmesh
-from mathutils import Vector
+from mathutils import Matrix
 
 from .road_types import create_road, continuous_extrude
 from ...utils import (
@@ -70,6 +70,10 @@ class Road:
     @crash_safe
     def extrude_curved(cls, context, prop):
         curve = context.active_object.children[0]
+
+        # Rotate vertices
+        bm = bmesh.from_edit_mesh(get_edit_mesh())
+        bmesh.ops.rotate(bm, matrix=Matrix.Rotation(math.radians(-90.0), 3, 'X'), verts=bm.verts)
 
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
         bpy.ops.object.convert(target="CURVE", keep_original=False)
