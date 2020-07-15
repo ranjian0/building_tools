@@ -44,8 +44,9 @@ class Road:
 
         # Add point
         spline.bezier_points.add(1)
-        spline.bezier_points[-1].co = (0, 10, 0)
-        spline.bezier_points[-1].handle_left = spline.bezier_points[-1].handle_right = (0, 10, 0)
+        spline.bezier_points[1].co = (0, 10, 0)
+        spline.bezier_points[0].handle_left_type = spline.bezier_points[0].handle_right_type = "AUTO"
+        spline.bezier_points[1].handle_left_type = spline.bezier_points[1].handle_right_type = "AUTO"
 
         # Add to scene
         curve_obj = bpy.data.objects.new(name=name, object_data=curve_data)
