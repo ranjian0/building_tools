@@ -2,7 +2,7 @@ import math
 
 import bpy
 import bmesh
-from mathutils import Matrix
+from mathutils import Vector
 
 from .road_types import create_road, continuous_extrude
 from ...utils import (
@@ -45,6 +45,7 @@ class Road:
         # Add point
         spline.bezier_points.add(1)
         spline.bezier_points[-1].co = (0, 10, 0)
+        spline.bezier_points[-1].handle_left = spline.bezier_points[-1].handle_right = (0, 10, 0)
 
         # Add to scene
         curve_obj = bpy.data.objects.new(name=name, object_data=curve_data)
@@ -61,11 +62,18 @@ class Road:
             bm = bmesh.from_edit_mesh(me)
             continuous_extrude(bm, context, prop, bm.edges, times)
             bmesh.update_edit_mesh(me, True)
-        else:
-            curve = context.active_object.children[0]
 
-            bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-            bpy.ops.object.convert(target="CURVE", keep_original=False)
-            curve.data.bevel_object = context.object
+        return {"FINISHED"}
+
+    @classmethod
+    @crash_safe
+    def extrude_curved(cls, context, prop):
+        curve = context.active_object.children[0]
+
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.object.convert(target="CURVE", keep_original=False)
+        curve.data.bevel_object = context.object
+        curve_length = (curve.data.splines[0].bezier_points[0].co - curve.data.splines[0].bezier_points[1].co).length
+        curve.data.resolution_u = curve_length / prop.interval
 
         return {"FINISHED"}

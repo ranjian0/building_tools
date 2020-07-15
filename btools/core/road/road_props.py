@@ -133,3 +133,5 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
 
         if self.extrusion_type == "STRAIGHT":
             col.prop(self, "length", text="Length")
+        else:
+            col.operator("btools.extrude_road_curve")
