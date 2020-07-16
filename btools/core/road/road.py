@@ -57,7 +57,7 @@ class Road:
     @crash_safe
     def extrude(cls, context, prop):
         if prop.extrusion_type == "STRAIGHT":
-            times = prop.length / prop.interval
+            times = math.ceil(prop.length / prop.interval)
             me = get_edit_mesh()
 
             bm = bmesh.from_edit_mesh(me)

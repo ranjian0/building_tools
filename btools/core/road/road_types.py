@@ -69,10 +69,16 @@ def create_road(bm, prop):
 def continuous_extrude(bm, context, prop, edges, times):
     """ Extrudes road straight
     """
+    original_times = times
 
     while times > 0:
         geom = bmesh.ops.extrude_face_region(bm, geom=edges)
         verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
         edges = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMEdge)]
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world, verts=verts)
+
+        interval = prop.interval
+        if times == 1:
+            interval = min(interval, prop.length - (original_times - 1) * interval)
+
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, interval, 0)), space=context.object.matrix_world, verts=verts)
         times -= 1
