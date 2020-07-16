@@ -63,6 +63,8 @@ class Road:
             bm = bmesh.from_edit_mesh(me)
             continuous_extrude(bm, context, prop, bm.edges, times)
             bmesh.update_edit_mesh(me, True)
+        else:
+            cls.extrude_curved(context=context, prop=prop)
 
         return {"FINISHED"}
 
@@ -71,14 +73,30 @@ class Road:
     def extrude_curved(cls, context, prop):
         curve = context.active_object.children[0]
 
-        # Rotate vertices
-        bm = bmesh.from_edit_mesh(get_edit_mesh())
-        bmesh.ops.rotate(bm, matrix=Matrix.Rotation(math.radians(-90.0), 3, 'X'), verts=bm.verts)
+        # Extrude once
+        me = get_edit_mesh()
+        bm = bmesh.from_edit_mesh(me)
+        geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
+        verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
 
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        bpy.ops.object.convert(target="CURVE", keep_original=False)
-        curve.data.bevel_object = context.object
-        curve_length = (curve.data.splines[0].bezier_points[0].co - curve.data.splines[0].bezier_points[1].co).length
-        curve.data.resolution_u = curve_length / prop.interval
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world,
+                            verts=verts)
+        bmesh.update_edit_mesh(me, True)
+
+        # Add modifiers
+        if not context.object.modifiers:
+            # Array
+            bpy.ops.object.modifier_add(type="ARRAY")
+            modifier = context.object.modifiers["Array"]
+            modifier.show_on_cage = True
+            modifier.fit_type = "FIT_CURVE"
+            modifier.curve = curve
+            modifier.relative_offset_displace = [0, 1, 0]
+
+            # Curve
+            bpy.ops.object.modifier_add(type="CURVE")
+            modifier = context.object.modifiers["Curve"]
+            modifier.show_on_cage = True
+            modifier.object = curve
 
         return {"FINISHED"}
