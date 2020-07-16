@@ -40,7 +40,7 @@ class RoadProperty(bpy.types.PropertyGroup):
         name="Sidewalk Height",
         min=0.01,
         max=1,
-        default=0.1,
+        default=0.2,
         unit="LENGTH",
         description="Height of sidewalk",
     )
@@ -133,5 +133,3 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
 
         if self.extrusion_type == "STRAIGHT":
             col.prop(self, "length", text="Length")
-        else:
-            col.operator("btools.extrude_road_curve")

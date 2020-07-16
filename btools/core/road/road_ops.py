@@ -48,21 +48,3 @@ class BTOOLS_OT_extrude_road(bpy.types.Operator):
 
     def draw(self, context):
         self.props.draw(context, self.layout)
-
-class BTOOLS_OT_extrude_curved(bpy.types.Operator):
-    """Extrude road vertex outline alongst curve
-    """
-
-    bl_idname = "btools.extrude_road_curve"
-    bl_label = "Extrude"
-    bl_options = {"REGISTER", "UNDO", "PRESET", "INTERNAL"}
-
-    props: bpy.props.PointerProperty(type=RoadExtrudeProperty)
-
-    @classmethod
-    def poll(cls, context):
-        return context.mode == "EDIT_MESH"
-
-    def execute(self, context):
-        Road.extrude_curved(context, self.props)
-        return {"FINISHED"}

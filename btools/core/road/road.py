@@ -81,7 +81,9 @@ class Road:
 
         bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world,
                             verts=verts)
-        bmesh.update_edit_mesh(me, True)
+
+        # Rotate vertices
+        bmesh.ops.rotate(bm, matrix=Matrix.Rotation(math.radians(90.0), 3, 'Y'), verts=bm.verts)
 
         # Add modifiers
         if not context.object.modifiers:
@@ -97,6 +99,8 @@ class Road:
             bpy.ops.object.modifier_add(type="CURVE")
             modifier = context.object.modifiers["Curve"]
             modifier.show_on_cage = True
+            modifier.show_in_editmode = True
             modifier.object = curve
+            modifier.deform_axis = "POS_Y"
 
         return {"FINISHED"}
