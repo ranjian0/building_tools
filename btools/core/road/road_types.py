@@ -70,11 +70,9 @@ def continuous_extrude(bm, context, prop, edges, times):
     """ Extrudes road straight
     """
 
-    geom = bmesh.ops.extrude_face_region(bm, geom=edges)
-    verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
-    edges = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMEdge)]
-    bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world, verts=verts)
-
-    times -= 1
-    if times > 0:
-        continuous_extrude(bm, context, prop, edges, times)
+    while times > 0:
+        geom = bmesh.ops.extrude_face_region(bm, geom=edges)
+        verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
+        edges = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMEdge)]
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world, verts=verts)
+        times -= 1

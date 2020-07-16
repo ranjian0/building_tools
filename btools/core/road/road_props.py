@@ -110,7 +110,7 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
 
     interval: FloatProperty(
         name="Interval",
-        min=0.01,
+        min=0.1,
         max=5,
         default=0.25,
         unit="LENGTH",
