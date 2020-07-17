@@ -1,10 +1,10 @@
 import math
 
-import bpy
 import bmesh
+import bpy
 from mathutils import Matrix
 
-from .road_types import create_road, continuous_extrude
+from .road_types import create_road
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -62,6 +62,13 @@ class Road:
     @classmethod
     @crash_safe
     def extrude_road(cls, context, prop, bm):
+        # Extrude once
+        geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
+        verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
+
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
+                            verts=verts)
+
         if prop.extrusion_type == "STRAIGHT":
             cls.extrude_straight(context, prop, bm)
         else:
@@ -72,8 +79,14 @@ class Road:
     @classmethod
     @crash_safe
     def extrude_straight(cls, context, prop, bm):
-        times = math.ceil(prop.length / prop.interval)
-        continuous_extrude(bm, context, prop, bm.edges, times)
+        # Add modifiers
+        if not context.object.modifiers:
+            # Array
+            bpy.ops.object.modifier_add(type="ARRAY")
+            modifier = context.object.modifiers["Array"]
+            modifier.fit_type = "FIT_LENGTH"
+            modifier.fit_length = prop.length
+            modifier.relative_offset_displace = [0, 1, 0]
 
         return {"FINISHED"}
 
@@ -81,13 +94,6 @@ class Road:
     @crash_safe
     def extrude_curved(cls, context, prop, bm):
         curve = context.object.children[0]
-
-        # Extrude once
-        geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
-        verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
-
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
-                            verts=verts)
 
         # Rotate vertices
         bmesh.ops.rotate(bm, matrix=Matrix.Rotation(math.radians(90.0), 3, 'Y'), verts=bm.verts)
