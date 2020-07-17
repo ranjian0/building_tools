@@ -41,5 +41,5 @@ class BTOOLS_OT_finalize_road(bpy.types.Operator):
         return context.mode == "OBJECT"
 
     def execute(self, context):
-        # TODO
+        Road.finalize_road(context)
         return {"FINISHED"}

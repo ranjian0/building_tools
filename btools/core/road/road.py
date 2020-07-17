@@ -108,3 +108,19 @@ class Road:
             modifier.deform_axis = "POS_Y"
 
         return {"FINISHED"}
+
+    @classmethod
+    @crash_safe
+    def finalize_road(cls, context):
+        if context.active_object is None:
+            return {"FINISHED"}
+
+        # Apply modifiers
+        bpy.ops.object.modifier_apply(modifier="Array")
+        bpy.ops.object.modifier_apply(modifier="Curve")
+
+        # Remove curve
+        if len(context.active_object.children) > 0:
+            bpy.data.objects.remove(context.active_object.children[0])
+
+        return {"FINISHED"}
