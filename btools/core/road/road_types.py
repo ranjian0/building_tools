@@ -37,6 +37,9 @@ def create_road(bm, prop):
 
         bm.verts.new(Vector((-prop.width / 2 - prop.shoulder_width, 0, 0)))
     else:
+        if prop.generate_left_sidewalk:
+            bm.verts.new(Vector((-prop.width / 2, 0, prop.sidewalk_height)))
+
         bm.verts.new(Vector((-prop.width / 2, 0, 0)))
 
     # Main road
@@ -51,6 +54,9 @@ def create_road(bm, prop):
             bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, prop.sidewalk_height)))
     else:
         bm.verts.new(Vector((prop.width / 2, 0, 0)))
+
+        if prop.generate_right_sidewalk:
+            bm.verts.new(Vector((prop.width / 2, 0, prop.sidewalk_height)))
 
     # Left sidewalk top
     if prop.generate_right_sidewalk:
