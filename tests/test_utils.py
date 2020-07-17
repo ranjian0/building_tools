@@ -1,8 +1,10 @@
-import bpy
-import bmesh
-import btools
 import unittest
+
+import bmesh
+import bpy
 from mathutils import Vector
+
+import btools
 
 
 class TestUtilsCommon(unittest.TestCase):

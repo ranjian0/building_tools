@@ -1,5 +1,6 @@
 import bmesh
 from bmesh.types import BMFace
+from mathutils import Vector
 
 from ...utils import (
     equal,
@@ -11,7 +12,6 @@ from ...utils import (
     filter_vertical_edges,
     create_cube_without_faces,
 )
-from mathutils import Vector
 
 
 def create_floors(bm, faces, prop):

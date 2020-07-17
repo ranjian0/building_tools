@@ -1,5 +1,6 @@
 import bmesh
 from bmesh.types import BMEdge
+
 from ..utils import (
     FaceMap,
     arc_edge,

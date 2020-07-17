@@ -1,7 +1,9 @@
-import bmesh
 from enum import Enum, auto
-from mathutils import Vector, Matrix
+
+import bmesh
 from bmesh.types import BMEdge, BMVert
+from mathutils import Vector, Matrix
+
 from ...utils import (
     FaceMap,
     validate,

@@ -1,8 +1,8 @@
 import bpy
 from bpy.props import BoolProperty, FloatProperty, PointerProperty
 
-from ..railing.railing_props import RailProperty
 from ..generic import SizeOffsetProperty
+from ..railing.railing_props import RailProperty
 
 
 class BalconyProperty(bpy.types.PropertyGroup):

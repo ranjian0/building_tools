@@ -1,6 +1,7 @@
-import bpy
-import bmesh
 from contextlib import contextmanager
+
+import bmesh
+import bpy
 
 from .util_mesh import select, get_edit_mesh
 

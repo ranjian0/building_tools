@@ -1,10 +1,10 @@
 import bmesh
 from mathutils import Vector
-from ..generic import clamp_count
-from ..frame import add_frame_depth
-from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
 
 from ..arch import fill_arch, create_arch, add_arch_depth
+from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
+from ..frame import add_frame_depth
+from ..generic import clamp_count
 from ...utils import (
     clamp,
     FaceMap,

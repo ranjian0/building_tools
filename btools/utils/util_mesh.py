@@ -1,10 +1,12 @@
-import bpy
-import math
-import bmesh
-import operator
 import functools as ft
-from mathutils import Vector
+import math
+import operator
+
+import bmesh
+import bpy
 from bmesh.types import BMVert, BMEdge, BMFace
+from mathutils import Vector
+
 from .util_common import local_xyz, equal
 
 

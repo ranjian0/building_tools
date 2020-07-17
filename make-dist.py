@@ -12,13 +12,11 @@
 # will make an archive for the commit tagged “v1.0” (assuming it exists).
 # This tag name will also be included in the created archive name.
 
-import os
+import getopt
+import subprocess
 import sys
 import time
-import getopt
 import zipfile
-import subprocess
-
 
 REPO_FILES = (
     "btools/",

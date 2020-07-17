@@ -1,9 +1,8 @@
+import cProfile
 import io
 import pstats
-import cProfile
-from os import devnull
-
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from os import devnull
 
 
 @contextmanager

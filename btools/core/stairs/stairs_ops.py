@@ -1,4 +1,5 @@
 import bpy
+
 from .stairs import Stairs
 from .stairs_props import StairsProperty
 from ...utils import get_selected_face_dimensions

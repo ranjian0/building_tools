@@ -7,8 +7,8 @@ from bpy.props import (
     EnumProperty,
 )
 
-from ..railing.railing_props import RailProperty
 from ..generic import SizeOffsetProperty
+from ..railing.railing_props import RailProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):

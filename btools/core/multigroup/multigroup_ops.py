@@ -1,4 +1,5 @@
 import bpy
+
 from .multigroup import Multigroup
 from .multigroup_props import MultigroupProperty
 from ...utils import get_selected_face_dimensions
