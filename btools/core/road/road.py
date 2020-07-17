@@ -120,7 +120,7 @@ class Road:
         bpy.ops.object.modifier_apply(modifier="Curve")
 
         # Remove curve
-        if len(context.active_object.children) > 0:
+        if len(context.active_object.children) > 0 and context.active_object.children[0].type == "CURVE":
             bpy.data.objects.remove(context.active_object.children[0])
 
         return {"FINISHED"}
