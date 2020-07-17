@@ -110,6 +110,8 @@ class Road:
             # Curve
             bpy.ops.object.modifier_add(type="CURVE")
             modifier = context.object.modifiers["Curve"]
+            modifier.show_in_editmode = True
+            modifier.show_on_cage = True
             modifier.object = curve
             modifier.deform_axis = "POS_Y"
 
