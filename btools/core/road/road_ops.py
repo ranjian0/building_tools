@@ -1,6 +1,6 @@
 import bpy
 from .road import Road
-from .road_props import RoadProperty, RoadExtrudeProperty
+from .road_props import RoadProperty
 
 
 class BTOOLS_OT_add_road(bpy.types.Operator):
@@ -28,23 +28,18 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
         print("TEST")
 
 
-class BTOOLS_OT_extrude_road(bpy.types.Operator):
-    """Extrude road vertex outline
+class BTOOLS_OT_finalize_road(bpy.types.Operator):
+    """Apply mofiers, remove curve etc
     """
 
-    bl_idname = "btools.extrude_road"
-    bl_label = "Extrude Road"
-    bl_options = {"REGISTER", "UNDO", "PRESET"}
-
-    props: bpy.props.PointerProperty(type=RoadExtrudeProperty)
+    bl_idname = "btools.finalize_road"
+    bl_label = "Finalize Road"
+    bl_options = {"REGISTER", "PRESET"}
 
     @classmethod
     def poll(cls, context):
-        return context.mode == "EDIT_MESH"
+        return context.mode == "OBJECT"
 
     def execute(self, context):
-        Road.extrude(context, self.props)
+        # TODO
         return {"FINISHED"}
-
-    def draw(self, context):
-        self.props.draw(context, self.layout)

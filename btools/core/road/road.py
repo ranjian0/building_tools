@@ -12,7 +12,6 @@ from ...utils import (
     bm_from_obj,
     create_mesh,
     create_object,
-    get_edit_mesh,
 )
 
 
@@ -24,18 +23,25 @@ class Road:
         """
         name = "road_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
+        link_obj(obj)
+        context.view_layer.objects.active = obj
 
+        # Create outline
         bm = bm_from_obj(obj)
         create_road(bm, prop)
-        bm_to_obj(bm, obj)
 
-        link_obj(obj)
-        cls.create_curve(context, obj)
+        # Create curve
+        cls.create_curve(context)
+
+        # Extrude road
+        cls.extrude_road(context, prop, bm)
+
+        bm_to_obj(bm, obj)
 
         return obj
 
     @classmethod
-    def create_curve(cls, context, obj):
+    def create_curve(cls, context):
         # Create curve
         name = "curve_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         curve_data = bpy.data.curves.new(name=name, type='CURVE')
@@ -50,36 +56,37 @@ class Road:
 
         # Add to scene
         curve_obj = bpy.data.objects.new(name=name, object_data=curve_data)
-        curve_obj.parent = obj
+        curve_obj.parent = context.object
         context.collection.objects.link(curve_obj)
 
     @classmethod
     @crash_safe
-    def extrude(cls, context, prop):
+    def extrude_road(cls, context, prop, bm):
         if prop.extrusion_type == "STRAIGHT":
-            times = math.ceil(prop.length / prop.interval)
-            me = get_edit_mesh()
-
-            bm = bmesh.from_edit_mesh(me)
-            continuous_extrude(bm, context, prop, bm.edges, times)
-            bmesh.update_edit_mesh(me, True)
+            cls.extrude_straight(context, prop, bm)
         else:
-            cls.extrude_curved(context=context, prop=prop)
+            cls.extrude_curved(context, prop, bm)
 
         return {"FINISHED"}
 
     @classmethod
     @crash_safe
-    def extrude_curved(cls, context, prop):
-        curve = context.active_object.children[0]
+    def extrude_straight(cls, context, prop, bm):
+        times = math.ceil(prop.length / prop.interval)
+        continuous_extrude(bm, context, prop, bm.edges, times)
+
+        return {"FINISHED"}
+
+    @classmethod
+    @crash_safe
+    def extrude_curved(cls, context, prop, bm):
+        curve = context.object.children[0]
 
         # Extrude once
-        me = get_edit_mesh()
-        bm = bmesh.from_edit_mesh(me)
         geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
         verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
 
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), space=context.object.matrix_world,
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
                             verts=verts)
 
         # Rotate vertices
@@ -90,7 +97,6 @@ class Road:
             # Array
             bpy.ops.object.modifier_add(type="ARRAY")
             modifier = context.object.modifiers["Array"]
-            modifier.show_on_cage = True
             modifier.fit_type = "FIT_CURVE"
             modifier.curve = curve
             modifier.relative_offset_displace = [0, 1, 0]
@@ -98,8 +104,6 @@ class Road:
             # Curve
             bpy.ops.object.modifier_add(type="CURVE")
             modifier = context.object.modifiers["Curve"]
-            modifier.show_on_cage = True
-            modifier.show_in_editmode = True
             modifier.object = curve
             modifier.deform_axis = "POS_Y"
 

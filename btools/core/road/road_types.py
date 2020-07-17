@@ -80,5 +80,5 @@ def continuous_extrude(bm, context, prop, edges, times):
         if times == 1:
             interval = min(interval, prop.length - (original_times - 1) * interval)
 
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, interval, 0)), space=context.object.matrix_world, verts=verts)
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, interval, 0)), verts=verts)
         times -= 1

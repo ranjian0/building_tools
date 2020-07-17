@@ -78,27 +78,6 @@ class RoadProperty(bpy.types.PropertyGroup):
         description="Height of the shoulder connecting to the ground",
     )
 
-    def draw(self, context, layout):
-        box = layout.box()
-        col = box.column(align=True)
-        col.prop(self, "width", text="Width")
-        col.prop(self, "generate_left_sidewalk", text="Left Sidewalk")
-        col.prop(self, "generate_right_sidewalk", text="Right Sidewalk")
-
-        if self.generate_left_sidewalk or self.generate_right_sidewalk:
-            col.prop(self, "sidewalk_width", text="Sidewalk Width")
-            col.prop(self, "sidewalk_height", text="Sidewalk Height")
-
-        col.prop(self, "generate_shoulders", text="Shoulders")
-        if self.generate_shoulders:
-            col.prop(self, "shoulder_width", text="Shoulder Width")
-
-        if not self.generate_left_sidewalk or not self.generate_right_sidewalk:
-            col.prop(self, "shoulder_angle", text="Shoulder Angle")
-            col.prop(self, "shoulder_height", text="Shoulder Height")
-
-
-class RoadExtrudeProperty(bpy.types.PropertyGroup):
     extrusion_types = [
         ("STRAIGHT", "Straight", "", 0),
         ("CURVE", "Curve", "", 1),
@@ -126,7 +105,29 @@ class RoadExtrudeProperty(bpy.types.PropertyGroup):
     )
 
     def draw(self, context, layout):
+        # Shape
         box = layout.box()
+        box.label(text="Shape")
+        col = box.column(align=True)
+        col.prop(self, "width", text="Width")
+        col.prop(self, "generate_left_sidewalk", text="Left Sidewalk")
+        col.prop(self, "generate_right_sidewalk", text="Right Sidewalk")
+
+        if self.generate_left_sidewalk or self.generate_right_sidewalk:
+            col.prop(self, "sidewalk_width", text="Sidewalk Width")
+            col.prop(self, "sidewalk_height", text="Sidewalk Height")
+
+        col.prop(self, "generate_shoulders", text="Shoulders")
+        if self.generate_shoulders:
+            col.prop(self, "shoulder_width", text="Shoulder Width")
+
+        if not self.generate_left_sidewalk or not self.generate_right_sidewalk:
+            col.prop(self, "shoulder_angle", text="Shoulder Angle")
+            col.prop(self, "shoulder_height", text="Shoulder Height")
+
+        # Extrusion
+        box = layout.box()
+        box.label(text="Extrusion")
         col = box.column(align=True)
         col.prop(self, "extrusion_type", text="Extrusion Mode")
         col.prop(self, "interval", text="Interval")
