@@ -84,8 +84,11 @@ class Road:
             # Array
             bpy.ops.object.modifier_add(type="ARRAY")
             modifier = context.object.modifiers["Array"]
+            modifier.show_in_editmode = True
+            modifier.show_on_cage = True
             modifier.fit_type = "FIT_LENGTH"
             modifier.fit_length = prop.length
+            modifier.use_merge_vertices = True
             modifier.relative_offset_displace = [0, 1, 0]
 
         return {"FINISHED"}
@@ -104,6 +107,7 @@ class Road:
             bpy.ops.object.modifier_add(type="ARRAY")
             modifier = context.object.modifiers["Array"]
             modifier.fit_type = "FIT_CURVE"
+            modifier.use_merge_vertices = True
             modifier.curve = curve
             modifier.relative_offset_displace = [0, 1, 0]
 
