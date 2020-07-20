@@ -135,4 +135,6 @@ class Road:
         if len(context.active_object.children) > 0 and context.active_object.children[0].type == "CURVE":
             bpy.data.objects.remove(context.active_object.children[0])
 
+        # Set uvs
+
         return {"FINISHED"}

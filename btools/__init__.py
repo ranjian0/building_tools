@@ -16,9 +16,26 @@ bl_info = {
 }
 
 
-class BTOOLS_PT_mesh_tools(bpy.types.Panel):
+class BTOOLS_PT_road_tools(bpy.types.Panel):
 
-    bl_label = "Mesh Tools"
+    bl_label = "Road Tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
+
+    def draw(self, context):
+        layout = self.layout
+
+        # Draw Operators
+        # ``````````````
+        col = layout.column(align=True)
+        col.operator("btools.add_road")
+        col.operator("btools.finalize_road")
+
+
+class BTOOLS_PT_building_tools(bpy.types.Panel):
+
+    bl_label = "Building Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Building Tools"
@@ -43,10 +60,6 @@ class BTOOLS_PT_mesh_tools(bpy.types.Panel):
         row.operator("btools.add_window")
         row.operator("btools.add_door")
         col.operator("btools.add_multigroup")
-
-        col = layout.column(align=True)
-        col.operator("btools.add_road")
-        col.operator("btools.finalize_road")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):
@@ -115,7 +128,7 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
             layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 
-classes = (BTOOLS_PT_mesh_tools, BTOOLS_PT_material_tools)
+classes = (BTOOLS_PT_road_tools, BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
 
 def register():
