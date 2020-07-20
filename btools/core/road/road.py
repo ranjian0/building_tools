@@ -1,10 +1,9 @@
-import math
+from math import sin, cos
 
 import bmesh
 import bpy
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 
-from .road_types import create_road
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -28,7 +27,7 @@ class Road:
 
         # Create outline
         bm = bm_from_obj(obj)
-        create_road(bm, prop)
+        face_count = cls.create_vertex_outline(bm, prop)
 
         # Create curve
         cls.create_curve(context)
@@ -38,7 +37,83 @@ class Road:
 
         bm_to_obj(bm, obj)
 
+        # Add custom property
+        obj["FaceCount"] = face_count
+
         return obj
+
+    @classmethod
+    def create_vertex_outline(bm, prop):
+        """Creates the original vertices
+        """
+
+        shoulder_width = sin(prop.shoulder_angle) * prop.shoulder_height
+        shoulder_height = cos(prop.shoulder_angle) * prop.shoulder_height
+        total_width_left = prop.width / 2
+        total_width_right = 0
+
+        if prop.generate_shoulders:
+            total_width_left += prop.shoulder_width
+
+        total_width_right = total_width_left
+        if prop.generate_left_sidewalk:
+            total_width_left += prop.sidewalk_width
+        if prop.generate_right_sidewalk:
+            total_width_right += prop.sidewalk_width
+
+        # Left to right
+        # Left shoulder down
+        if not prop.generate_left_sidewalk and prop.generate_shoulders:
+            bm.verts.new(Vector((-total_width_left - shoulder_width, 0, -shoulder_height)))
+
+        # Left sidewalk top
+        if prop.generate_left_sidewalk:
+            bm.verts.new(Vector((-total_width_left, 0, prop.sidewalk_height)))
+
+        # Left shoulder
+        if prop.generate_shoulders:
+            if prop.generate_left_sidewalk:
+                bm.verts.new(Vector((-prop.width / 2 - prop.shoulder_width, 0, prop.sidewalk_height)))
+
+            bm.verts.new(Vector((-prop.width / 2 - prop.shoulder_width, 0, 0)))
+        else:
+            if prop.generate_left_sidewalk:
+                bm.verts.new(Vector((-prop.width / 2, 0, prop.sidewalk_height)))
+
+            bm.verts.new(Vector((-prop.width / 2, 0, 0)))
+
+        # Main road
+        bm.verts.new(Vector((-prop.width / 2, 0, 0)))
+        bm.verts.new(Vector((prop.width / 2, 0, 0)))
+
+        # Right shoulder
+        if prop.generate_shoulders:
+            bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, 0)))
+
+            if prop.generate_right_sidewalk:
+                bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, prop.sidewalk_height)))
+        else:
+            bm.verts.new(Vector((prop.width / 2, 0, 0)))
+
+            if prop.generate_right_sidewalk:
+                bm.verts.new(Vector((prop.width / 2, 0, prop.sidewalk_height)))
+
+        # Left sidewalk top
+        if prop.generate_right_sidewalk:
+            bm.verts.new(Vector((total_width_right, 0, prop.sidewalk_height)))
+
+        # Left shoulder down
+        if not prop.generate_right_sidewalk and prop.generate_shoulders:
+            bm.verts.new(Vector((total_width_right + shoulder_width, 0, -shoulder_height)))
+
+        # Generate edges
+        bm.verts.ensure_lookup_table()
+        for i in range(len(bm.verts) - 1):
+            bm.edges.new((bm.verts[i], bm.verts[i + 1]))
+
+        # Return amount of faces/edges (vertices - 1)
+        return len(bm.verts) - 1
+
 
     @classmethod
     def create_curve(cls, context):
@@ -136,5 +211,6 @@ class Road:
             bpy.data.objects.remove(context.active_object.children[0])
 
         # Set uvs
+
 
         return {"FINISHED"}
