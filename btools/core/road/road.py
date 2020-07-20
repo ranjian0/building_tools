@@ -1,4 +1,6 @@
+import math
 from math import sin, cos
+from random import randrange, random
 
 import bmesh
 import bpy
@@ -43,7 +45,6 @@ class Road:
         return obj
 
     @classmethod
-    def create_vertex_outline(bm, prop):
     def create_vertex_outline(cls, bm, prop):
         """Creates the original vertices
         """
@@ -212,6 +213,16 @@ class Road:
             bpy.data.objects.remove(context.active_object.children[0])
 
         # Set uvs
+        bm = bm_from_obj(context.active_object)
+        count = int(context.active_object["FaceCount"])
+        context.active_object.data.uv_layers.new(name="Road")
+        sections = int(len(bm.verts) / count)
 
+        for i in range(sections):
+            for j in range(count):
+                if j % 2 == 0:
+                    context.active_object.data.uv_layers.active.data[j + i * count].uv = (0.0, random())
+                else:
+                    context.active_object.data.uv_layers.active.data[j + i * count].uv = (1.0, random())
 
         return {"FINISHED"}
