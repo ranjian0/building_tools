@@ -44,6 +44,7 @@ class Road:
 
     @classmethod
     def create_vertex_outline(bm, prop):
+    def create_vertex_outline(cls, bm, prop):
         """Creates the original vertices
         """
 
