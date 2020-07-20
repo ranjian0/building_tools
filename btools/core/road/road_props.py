@@ -90,7 +90,6 @@ class RoadProperty(bpy.types.PropertyGroup):
     interval: FloatProperty(
         name="Interval",
         min=0.1,
-        max=5,
         default=0.5,
         unit="LENGTH",
         description="Interval of vertices",
