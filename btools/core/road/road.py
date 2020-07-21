@@ -221,8 +221,8 @@ class Road:
         for i in range(sections):
             for j in range(count):
                 if j % 2 == 0:
-                    context.active_object.data.uv_layers.active.data[j + i * count].uv = (0.0, random())
+                    context.active_object.data.uv_layers.active.data[j + i * (count)].uv = (i / 2.0, 0.0)
                 else:
-                    context.active_object.data.uv_layers.active.data[j + i * count].uv = (1.0, random())
+                    context.active_object.data.uv_layers.active.data[j + i * (count)].uv = (i / 2.0, 1.0)
 
         return {"FINISHED"}
