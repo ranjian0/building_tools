@@ -1,5 +1,6 @@
 import bpy
 from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
+
 from ...utils import clamp
 
 

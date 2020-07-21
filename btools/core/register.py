@@ -1,16 +1,15 @@
-from .fill import register_fill, unregister_fill
-from .door import register_door, unregister_door
-from .roof import register_roof, unregister_roof
-from .floor import register_floor, unregister_floor
-from .stairs import register_stairs, unregister_stairs
-from .window import register_window, unregister_window
-from .railing import register_railing, unregister_railing
 from .balcony import register_balcony, unregister_balcony
+from .door import register_door, unregister_door
+from .fill import register_fill, unregister_fill
+from .floor import register_floor, unregister_floor
+from .floorplan import register_floorplan, unregister_floorplan
 from .generic import register_generic, unregister_generic
 from .material import register_material, unregister_material
-from .floorplan import register_floorplan, unregister_floorplan
 from .multigroup import register_multigroup, unregister_multigroup
-
+from .railing import register_railing, unregister_railing
+from .roof import register_roof, unregister_roof
+from .stairs import register_stairs, unregister_stairs
+from .window import register_window, unregister_window
 
 # -- ORDER MATTERS --
 register_funcs = (

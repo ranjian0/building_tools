@@ -1,8 +1,9 @@
 import bmesh
 import mathutils
 import numpy as np
-from mathutils import Vector
 from bmesh.types import BMVert, BMFace
+from mathutils import Vector
+
 from ...utils import (
     equal,
     select,

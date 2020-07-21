@@ -1,4 +1,5 @@
 import bpy
+
 from .core import register_core, unregister_core
 
 bl_info = {

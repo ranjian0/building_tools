@@ -1,10 +1,11 @@
-import bmesh
 import re
-from ..frame import add_frame_depth
-from ..window.window_types import fill_window_face
+
+import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ..door.door_types import add_door_depth, create_door_fill
+from ..frame import add_frame_depth
+from ..window.window_types import fill_window_face
 from ...utils import (
     clamp,
     FaceMap,

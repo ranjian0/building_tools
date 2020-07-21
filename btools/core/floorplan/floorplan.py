@@ -7,7 +7,6 @@ from .floorplan_types import (
     create_composite_floorplan,
     create_rectangular_floorplan,
 )
-
 from ...utils import (
     link_obj,
     bm_to_obj,

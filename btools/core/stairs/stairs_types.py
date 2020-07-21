@@ -1,9 +1,10 @@
 import math
+
 import bmesh
-
-from mathutils import Vector, Quaternion
 from bmesh.types import BMFace, BMEdge
+from mathutils import Vector, Quaternion
 
+from ..railing.railing import create_railing
 from ...utils import (
     FaceMap,
     vec_equal,
@@ -23,8 +24,6 @@ from ...utils import (
     subdivide_face_vertically,
     calc_face_dimensions,
 )
-
-from ..railing.railing import create_railing
 
 
 def create_stairs(bm, faces, prop):

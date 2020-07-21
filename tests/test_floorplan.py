@@ -1,11 +1,10 @@
-import bpy
 import btools
 import random
 import unittest
+import bpy
 
 floorplan = btools.core.floorplan
 builder = floorplan.floorplan.Floorplan
-
 
 class TestFloorplan(unittest.TestCase):
 

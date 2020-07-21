@@ -1,6 +1,7 @@
-import bpy
 import traceback
 from math import radians
+
+import bpy
 from mathutils import Vector, Euler
 
 

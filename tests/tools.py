@@ -1,7 +1,7 @@
 import os
 import sys
-import types
 import traceback
+import types
 
 
 class LoadModule:

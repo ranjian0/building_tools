@@ -2,6 +2,7 @@ import bmesh
 from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
+from ..railing.railing import create_railing
 from ...utils import (
     clamp,
     FaceMap,
@@ -15,8 +16,6 @@ from ...utils import (
     add_faces_to_map,
     calc_face_dimensions,
 )
-
-from ..railing.railing import create_railing
 
 
 def create_balcony(bm, faces, prop):

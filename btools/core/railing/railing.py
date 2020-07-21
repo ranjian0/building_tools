@@ -1,8 +1,10 @@
 import math
-import bmesh
 from collections import namedtuple
+
+import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Matrix, Quaternion
+
 from ...utils import (
     clamp,
     FaceMap,

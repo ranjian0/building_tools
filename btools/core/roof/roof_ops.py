@@ -1,4 +1,5 @@
 import bpy
+
 from .roof import Roof
 from .roof_props import RoofProperty
 

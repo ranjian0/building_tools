@@ -1,13 +1,12 @@
 """ Adapted from https://github.com/yonghah/polyskel
 """
 
-import math
 import heapq
-import operator
 import itertools as it
-
-from enum import Enum
+import math
+import operator
 from collections import namedtuple
+from enum import Enum
 
 
 class Vector2:

@@ -1,7 +1,8 @@
-import bpy
-import bmesh
 from enum import Enum, auto
 from functools import wraps
+
+import bmesh
+import bpy
 
 from .util_mesh import get_edit_mesh
 from .util_object import bmesh_from_active_object

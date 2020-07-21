@@ -1,4 +1,5 @@
 import bpy
+
 from .door import Door
 from .door_props import DoorProperty
 from ...utils import get_selected_face_dimensions

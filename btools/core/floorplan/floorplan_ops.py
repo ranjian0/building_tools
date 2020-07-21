@@ -1,4 +1,5 @@
 import bpy
+
 from .floorplan import Floorplan
 from .floorplan_props import FloorplanProperty
 

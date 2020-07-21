@@ -1,5 +1,6 @@
-import bmesh
 import itertools as it
+
+import bmesh
 from mathutils import Matrix, Vector
 
 from .util_mesh import face_with_verts

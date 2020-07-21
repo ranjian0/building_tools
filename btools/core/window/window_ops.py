@@ -1,4 +1,5 @@
 import bpy
+
 from .window import Window
 from .window_props import WindowProperty
 from ...utils import get_selected_face_dimensions
