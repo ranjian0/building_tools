@@ -123,6 +123,7 @@ class Road:
         name = "curve_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         curve_data = bpy.data.curves.new(name=name, type='CURVE')
         curve_data.dimensions = '3D'
+        curve_data.resolution_u = 500
         spline = curve_data.splines.new(type='BEZIER')
 
         # Add point
