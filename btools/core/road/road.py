@@ -29,7 +29,7 @@ class Road:
 
         # Create outline
         bm = bm_from_obj(obj)
-        face_count = cls.create_vertex_outline(bm, prop)
+        vertex_count = cls.create_vertex_outline(bm, prop)
 
         # Create curve
         cls.create_curve(context)
@@ -40,7 +40,7 @@ class Road:
         bm_to_obj(bm, obj)
 
         # Add custom property
-        obj["FaceCount"] = face_count
+        obj["VertexCount"] = vertex_count
 
         return obj
 
@@ -113,8 +113,8 @@ class Road:
         for i in range(len(bm.verts) - 1):
             bm.edges.new((bm.verts[i], bm.verts[i + 1]))
 
-        # Return amount of faces/edges (vertices - 1)
-        return len(bm.verts) - 1
+        # Return amount of vertices per ring
+        return len(bm.verts)
 
 
     @classmethod
@@ -212,17 +212,36 @@ class Road:
         if len(context.active_object.children) > 0 and context.active_object.children[0].type == "CURVE":
             bpy.data.objects.remove(context.active_object.children[0])
 
-        # Set uvs
+        # Uv calculations
         bm = bm_from_obj(context.active_object)
-        count = int(context.active_object["FaceCount"])
-        context.active_object.data.uv_layers.new(name="Road")
-        sections = int(len(bm.verts) / count)
+        count = int(context.active_object["VertexCount"])
+        uv_layer = bm.loops.layers.uv.new()
+        sections = math.floor(len(bm.verts) / count)
+        total_distance = 0
 
+        uv_coords = []
+
+        bm.verts.ensure_lookup_table()
+        bm.verts.index_update()
+        last_position = (bm.verts[0].co + bm.verts[count].co) / 2  # Calculate center of road
+        texture_scale = 0.1
+
+        # Calculate uvs for all vertices
         for i in range(sections):
+            current_position = (bm.verts[i * count].co + bm.verts[(i + 1) * count - 1].co) / 2  # Calculate center of road
+            total_distance += (last_position - current_position).length
+
             for j in range(count):
-                if j % 2 == 0:
-                    context.active_object.data.uv_layers.active.data[j + i * (count)].uv = (i / 2.0, 0.0)
-                else:
-                    context.active_object.data.uv_layers.active.data[j + i * (count)].uv = (i / 2.0, 1.0)
+                uv_coords.append((j % 2, total_distance * texture_scale))
+
+            last_position = current_position
+
+        # Set uvs
+        for f in bm.faces:
+            for l in f.loops:
+                if l.vert.index < len(uv_coords):
+                    l[uv_layer].uv = uv_coords[l.vert.index]
+
+        bm_to_obj(bm, context.active_object)
 
         return {"FINISHED"}
