@@ -16,6 +16,7 @@ class AutoIndex(Enum):
 class FaceMap(AutoIndex):
     """ Enum provides names for face_maps """
 
+    # Buildings
     SLABS = auto()
     WALLS = auto()
     COLUMNS = auto()
@@ -41,6 +42,13 @@ class FaceMap(AutoIndex):
 
     ROOF = auto()
     ROOF_HANGS = auto()
+
+    # Roads
+    ROAD = auto()
+    SHOULDER = auto()
+    SIDEWALK = auto()
+    SIDEWALK_SIDE = auto()
+    SHOULDER_EXTENSION = auto()
 
 
 def map_new_faces(group, skip=None):

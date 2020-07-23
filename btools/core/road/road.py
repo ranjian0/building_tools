@@ -1,11 +1,11 @@
 import math
 from math import sin, cos
-from random import randrange, random
 
 import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
+from ..material import clear_empty_facemaps
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -13,6 +13,8 @@ from ...utils import (
     bm_from_obj,
     create_mesh,
     create_object,
+    add_faces_to_map,
+    FaceMap, add_facemap_for_groups, verify_facemaps_for_object,
 )
 
 
@@ -147,6 +149,35 @@ class Road:
         bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
                             verts=verts)
 
+        # Set facemaps
+        bm.faces.layers.face_map.verify()
+        add_facemap_for_groups((FaceMap.ROAD, FaceMap.SIDEWALK, FaceMap.SIDEWALK_SIDE, FaceMap.SHOULDER, FaceMap.SHOULDER_EXTENSION))
+        bm.faces.index_update()
+        bm.faces.ensure_lookup_table()
+        face_count = 0
+
+        if not prop.generate_left_sidewalk:
+            print((bm.faces[0]))
+
+            if prop.generate_shoulders:
+                add_faces_to_map(bm, (bm.faces[0],), FaceMap.SHOULDER_EXTENSION)
+                add_faces_to_map(bm, (bm.faces[1],), FaceMap.SHOULDER)
+                face_count = 2
+        else:
+            add_faces_to_map(bm, (bm.faces[0],), FaceMap.SIDEWALK)
+            add_faces_to_map(bm, (bm.faces[1],), FaceMap.SIDEWALK_SIDE)
+            face_count = 2
+
+            if prop.generate_shoulders:
+                add_faces_to_map(bm, (bm.faces[2],), FaceMap.SHOULDER)
+                face_count += 1
+
+        add_faces_to_map(bm, (bm.faces[face_count],), FaceMap.ROAD)
+
+
+        #clear_empty_facemaps(context)
+
+        # Continue to extrude
         if prop.extrusion_type == "STRAIGHT":
             cls.extrude_straight(context, prop, bm)
         else:
