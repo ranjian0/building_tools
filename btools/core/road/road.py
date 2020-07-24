@@ -147,7 +147,20 @@ class Road:
         # Set facemaps
         # Face order is totally random, vertex and edge order is not so get the faces from the edges
         bm.faces.layers.face_map.verify()
-        add_facemap_for_groups((FaceMap.ROAD, FaceMap.SIDEWALK, FaceMap.SIDEWALK_SIDE, FaceMap.SHOULDER, FaceMap.SHOULDER_EXTENSION))
+
+        groups = [FaceMap.ROAD]
+
+        if prop.generate_left_sidewalk or prop.generate_right_sidewalk:
+            groups.append(FaceMap.SIDEWALK)
+            groups.append(FaceMap.SIDEWALK_SIDE)
+
+        if not prop.generate_left_sidewalk or not prop.generate_right_sidewalk:
+            groups.append(FaceMap.SHOULDER_EXTENSION)
+
+        if prop.generate_shoulders:
+            groups.append(FaceMap.SHOULDER)
+
+        add_facemap_for_groups(groups)
         bm.edges.ensure_lookup_table()
 
         # Left side of road
