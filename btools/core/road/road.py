@@ -182,8 +182,6 @@ class Road:
         else:
             add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER_EXTENSION)
 
-        clear_empty_facemaps(context, bm)
-
         # Continue to extrude
         if prop.extrusion_type == "STRAIGHT":
             cls.extrude_straight(context, prop, bm)
@@ -242,7 +240,7 @@ class Road:
     def finalize_road(cls, context):
         if context.active_object is None:
             return {"FINISHED"}
-
+        
         # Apply modifiers
         bpy.ops.object.modifier_apply(modifier="Array")
         bpy.ops.object.modifier_apply(modifier="Curve")
