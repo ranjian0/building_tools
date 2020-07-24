@@ -26,22 +26,26 @@ class BTOOLS_UL_fmaps(bpy.types.UIList):
 def clear_empty_facemaps(context):
     """ Remove all facemaps that don't have any faces assigned
     """
+    clear_empty_facemaps(context, bmesh_from_active_object(context))
+
+
+def clear_empty_facemaps(context, bm):
+    """ Remove all facemaps that don't have any faces assigned
+    """
     obj = context.object
-    with bmesh_from_active_object(context) as bm:
+    face_map = bm.faces.layers.face_map.active
+    used_indices = {f[face_map] for f in bm.faces}
+    all_indices = {f.index for f in obj.face_maps}
+    tag_remove_indices = all_indices - used_indices
 
-        face_map = bm.faces.layers.face_map.active
-        used_indices = {f[face_map] for f in bm.faces}
-        all_indices = {f.index for f in obj.face_maps}
-        tag_remove_indices = all_indices - used_indices
+    # -- remove face maps
+    tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove_indices]
+    for fmap in tag_remove_maps:
+        obj.face_maps.remove(fmap)
 
-        # -- remove face maps
-        tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove_indices]
-        for fmap in tag_remove_maps:
-            obj.face_maps.remove(fmap)
-
-        # -- remove facemap materials:
-        for idx in reversed(list(tag_remove_indices)):
-            obj.facemap_materials.remove(idx)
+    # -- remove facemap materials:
+    for idx in reversed(list(tag_remove_indices)):
+        obj.facemap_materials.remove(idx)
 
 
 class BTOOLS_OT_fmaps_clear(bpy.types.Operator):

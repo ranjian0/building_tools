@@ -54,7 +54,6 @@ class Road:
         shoulder_width = sin(prop.shoulder_angle) * prop.shoulder_height
         shoulder_height = cos(prop.shoulder_angle) * prop.shoulder_height
         total_width_left = prop.width / 2
-        total_width_right = 0
 
         if prop.generate_shoulders:
             total_width_left += prop.shoulder_width
@@ -67,7 +66,7 @@ class Road:
 
         # Left to right
         # Left shoulder down
-        if not prop.generate_left_sidewalk and prop.generate_shoulders:
+        if not prop.generate_left_sidewalk:
             bm.verts.new(Vector((-total_width_left - shoulder_width, 0, -shoulder_height)))
 
         # Left sidewalk top
@@ -84,8 +83,6 @@ class Road:
             if prop.generate_left_sidewalk:
                 bm.verts.new(Vector((-prop.width / 2, 0, prop.sidewalk_height)))
 
-            bm.verts.new(Vector((-prop.width / 2, 0, 0)))
-
         # Main road
         bm.verts.new(Vector((-prop.width / 2, 0, 0)))
         bm.verts.new(Vector((prop.width / 2, 0, 0)))
@@ -97,8 +94,6 @@ class Road:
             if prop.generate_right_sidewalk:
                 bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, prop.sidewalk_height)))
         else:
-            bm.verts.new(Vector((prop.width / 2, 0, 0)))
-
             if prop.generate_right_sidewalk:
                 bm.verts.new(Vector((prop.width / 2, 0, prop.sidewalk_height)))
 
@@ -107,7 +102,7 @@ class Road:
             bm.verts.new(Vector((total_width_right, 0, prop.sidewalk_height)))
 
         # Left shoulder down
-        if not prop.generate_right_sidewalk and prop.generate_shoulders:
+        if not prop.generate_right_sidewalk:
             bm.verts.new(Vector((total_width_right + shoulder_width, 0, -shoulder_height)))
 
         # Generate edges
@@ -150,32 +145,44 @@ class Road:
                             verts=verts)
 
         # Set facemaps
+        # Face order is totally random, vertex and edge order is not so get the faces from the edges
         bm.faces.layers.face_map.verify()
         add_facemap_for_groups((FaceMap.ROAD, FaceMap.SIDEWALK, FaceMap.SIDEWALK_SIDE, FaceMap.SHOULDER, FaceMap.SHOULDER_EXTENSION))
-        bm.faces.index_update()
-        bm.faces.ensure_lookup_table()
-        face_count = 0
+        bm.edges.ensure_lookup_table()
 
+        # Left side of road
         if not prop.generate_left_sidewalk:
-            print((bm.faces[0]))
+            add_faces_to_map(bm, (bm.edges[0].link_faces[0],), FaceMap.SHOULDER_EXTENSION)
+            face_count = 1
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.faces[0],), FaceMap.SHOULDER_EXTENSION)
-                add_faces_to_map(bm, (bm.faces[1],), FaceMap.SHOULDER)
-                face_count = 2
+                add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SHOULDER)
+                face_count += 1
         else:
-            add_faces_to_map(bm, (bm.faces[0],), FaceMap.SIDEWALK)
-            add_faces_to_map(bm, (bm.faces[1],), FaceMap.SIDEWALK_SIDE)
+            add_faces_to_map(bm, (bm.edges[0].link_faces[0],), FaceMap.SIDEWALK)
+            add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SIDEWALK_SIDE)
             face_count = 2
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.faces[2],), FaceMap.SHOULDER)
+                add_faces_to_map(bm, (bm.edges[2].link_faces[0],), FaceMap.SHOULDER)
                 face_count += 1
 
-        add_faces_to_map(bm, (bm.faces[face_count],), FaceMap.ROAD)
+        # Central road
+        add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.ROAD)
+        face_count += 1
 
+        # Right side of road
+        if prop.generate_shoulders:
+            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER)
+            face_count += 1
 
-        #clear_empty_facemaps(context)
+        if prop.generate_right_sidewalk:
+            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SIDEWALK_SIDE)
+            add_faces_to_map(bm, (bm.edges[face_count + 1].link_faces[0],), FaceMap.SIDEWALK)
+        else:
+            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER_EXTENSION)
+
+        clear_empty_facemaps(context, bm)
 
         # Continue to extrude
         if prop.extrusion_type == "STRAIGHT":
