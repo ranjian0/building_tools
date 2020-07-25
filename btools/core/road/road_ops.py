@@ -24,9 +24,6 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
     def draw(self, context):
         self.props.draw(context, self.layout)
 
-    def cancel(self, context):
-        print("TEST")
-
 
 class BTOOLS_OT_finalize_road(bpy.types.Operator):
     """Apply mofiers, remove curve etc

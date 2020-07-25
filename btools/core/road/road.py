@@ -5,7 +5,6 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-from ..material import clear_empty_facemaps
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -14,7 +13,9 @@ from ...utils import (
     create_mesh,
     create_object,
     add_faces_to_map,
-    FaceMap, add_facemap_for_groups, verify_facemaps_for_object,
+    FaceMap,
+    add_facemap_for_groups,
+    filter_geom
 )
 
 
@@ -27,7 +28,6 @@ class Road:
         name = "road_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
         link_obj(obj)
-        context.view_layer.objects.active = obj
 
         # Create outline
         bm = bm_from_obj(obj)
@@ -139,7 +139,7 @@ class Road:
     def extrude_road(cls, context, prop, bm):
         # Extrude once
         geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
-        verts = [e for e in geom['geom'] if isinstance(e, bmesh.types.BMVert)]
+        verts = filter_geom(geom["geom"], bmesh.types.BMVert)
 
         bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
                             verts=verts)
@@ -266,7 +266,7 @@ class Road:
         bm = bm_from_obj(context.active_object)
         count = int(context.active_object["VertexCount"])
         uv_layer = bm.loops.layers.uv.new()
-        sections = math.floor(len(bm.verts) / count)
+        sections = len(bm.verts) // count
         total_distance = 0
 
         uv_coords = []
