@@ -7,7 +7,7 @@ from ...utils import (
     plane,
     bm_from_obj,
     bm_to_obj,
-    link_obj,
+    link_obj, Matrix,
 )
 
 
@@ -37,7 +37,9 @@ class CurvedArray:
         curve.select_set(True)
         object.select_set(True)
         bpy.ops.object.origin_clear()
-        bpy.ops.transform.translate(value=position)
+
+        # Set location again
+        curve.data.transform(matrix=Matrix.Translation(position))
 
         # Set up modifiers
         bpy.ops.object.modifier_add(type="ARRAY")
