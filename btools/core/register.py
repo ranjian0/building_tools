@@ -7,10 +7,10 @@ from .generic import register_generic, unregister_generic
 from .material import register_material, unregister_material
 from .multigroup import register_multigroup, unregister_multigroup
 from .railing import register_railing, unregister_railing
+from .road import register_road, unregister_road
 from .roof import register_roof, unregister_roof
 from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
-from .road import register_road, unregister_road
 
 # -- ORDER MATTERS --
 register_funcs = (
