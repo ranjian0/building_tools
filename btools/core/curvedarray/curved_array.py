@@ -24,11 +24,20 @@ class CurvedArray:
 
         # Create children
         object = context.object
+        position = object.location
         curve = cls.create_curve(context)
         plane = cls.create_plane(context, curve)
 
         object.parent = plane
         plane.parent = curve
+
+        # Make sure that the objects aren't offsetted from eachother
+        context.scene.cursor.location = position
+        plane.select_set(True)
+        curve.select_set(True)
+        object.select_set(True)
+        bpy.ops.object.origin_clear()
+        bpy.ops.transform.translate(value=position)
 
         # Set up modifiers
         bpy.ops.object.modifier_add(type="ARRAY")
@@ -41,22 +50,6 @@ class CurvedArray:
         modifier.object = curve
 
         context.object.instance_type = "FACES"
-
-        """name = "road_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
-        obj = create_object(name, create_mesh(name + "_mesh"))
-        link_obj(obj)
-
-        # Create outline
-        bm = bm_from_obj(obj)
-        vertex_count = cls.create_vertex_outline(bm, prop)
-
-        # Create curve
-        cls.create_curve(context)
-
-        # Extrude road
-        cls.extrude_road(context, prop, bm)
-
-        bm_to_obj(bm, obj)"""
 
     @classmethod
     def create_curve(cls, context):
