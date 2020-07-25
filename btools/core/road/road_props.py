@@ -1,7 +1,7 @@
 import bpy
 
 from bpy.props import (
-    FloatProperty, BoolProperty, PointerProperty, EnumProperty
+    FloatProperty, BoolProperty, EnumProperty
 )
 
 

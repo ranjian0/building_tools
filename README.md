@@ -44,6 +44,7 @@ and `Building Tools` was born.
 * Roof
 * Stairs
 * Balcony
+* Roads (with shoulder, sidewalks etc. supports both straight and curved extrusion)
 
 ## Status
 
