@@ -1,4 +1,5 @@
 from .balcony import register_balcony, unregister_balcony
+from .curvedarray import register_curved_array, unregister_curved_array
 from .door import register_door, unregister_door
 from .fill import register_fill, unregister_fill
 from .floor import register_floor, unregister_floor
@@ -27,6 +28,7 @@ register_funcs = (
     register_roof,
     register_multigroup,
     register_road,
+    register_curved_array,
 )
 
 unregister_funcs = (
@@ -43,6 +45,7 @@ unregister_funcs = (
     unregister_roof,
     unregister_multigroup,
     unregister_road,
+    unregister_curved_array,
 )
 
 

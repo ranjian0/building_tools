@@ -32,6 +32,10 @@ class BTOOLS_PT_road_tools(bpy.types.Panel):
         col.operator("btools.add_road")
         col.operator("btools.finalize_road")
 
+        col = layout.column(align=True)
+        col.operator("btools.add_curved_array")
+        col.operator("btools.finalize_curved_array")
+
 
 class BTOOLS_PT_building_tools(bpy.types.Panel):
 
