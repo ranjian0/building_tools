@@ -105,11 +105,13 @@ class CurvedArray:
         # Convert instances to real objects
         bpy.ops.object.duplicates_make_real()
 
-        # Set cube parent and remove other objects
+        # Set object parent and remove other objects
         curve = context.active_object.parent
         plane = context.active_object
+        object = plane.children[0]
         context.active_object.children[0].parent = None
         bpy.data.objects.remove(curve)
         bpy.data.objects.remove(plane)
+        bpy.data.objects.remove(object)
 
         return {"FINISHED"}
