@@ -7,7 +7,9 @@ from ...utils import (
     plane,
     bm_from_obj,
     bm_to_obj,
-    link_obj, Matrix,
+    link_obj,
+    Matrix,
+    select,
 )
 
 
@@ -33,9 +35,7 @@ class CurvedArray:
 
         # Make sure that the objects aren't offsetted from eachother
         context.scene.cursor.location = position
-        plane.select_set(True)
-        curve.select_set(True)
-        object.select_set(True)
+        select([plane, curve, object])
         bpy.ops.object.origin_clear()
 
         # Set location again
