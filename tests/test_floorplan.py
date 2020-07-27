@@ -6,6 +6,7 @@ import bpy
 floorplan = btools.core.floorplan
 builder = floorplan.floorplan.Floorplan
 
+
 class TestFloorplan(unittest.TestCase):
 
     @classmethod
