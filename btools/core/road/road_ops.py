@@ -36,7 +36,8 @@ class BTOOLS_OT_finalize_road(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == "OBJECT"
+        obj = context.object
+        return context.mode == "OBJECT" and obj and obj.type == "MESH"
 
     def execute(self, context):
         Road.finalize_road(context)
