@@ -13,6 +13,7 @@
 # This tag name will also be included in the created archive name.
 
 import getopt
+import os
 import subprocess
 import sys
 import time
