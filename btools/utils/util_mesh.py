@@ -138,17 +138,20 @@ def sort_edges_clockwise(edges):
     return sorted(edges, key=sort_function, reverse=True)
 
 
-def filter_vertical_edges(edges, normal):
+def filter_vertical_edges(edges, normal, debug=False):
     """ Determine edges that are vertical based on a normal value
     """
     res = []
     rnd = ft.partial(round, ndigits=3)
 
-    right = Vector((0, 1, 0)) if normal.x else Vector((1, 0, 0))
     for e in edges:
         vec = edge_vector(e)
-        if rnd(vec.angle(right)) == rnd(math.pi / 2):
-            res.append(e)
+        if normal.z:
+            if rnd(vec.angle(Vector((1, 0, 0)))) == rnd(math.pi / 2):
+                res.append(e)
+        else:
+            if round(abs(vec.z)) == 1.0:
+                res.append(e)
     return res
 
 
@@ -224,7 +227,8 @@ def subdivide_face_vertically(bm, face, widths):
     """
     if len(widths) < 2:
         return [face]
-    edges = filter_vertical_edges(face.edges, face.normal)
+    edges = filter_vertical_edges(face.edges, face.normal, True)
+    select(edges)
     _, direction, _ = local_xyz(face)
     inner_edges = subdivide_edges(bm, edges, direction, widths)
     return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
