@@ -138,7 +138,7 @@ def sort_edges_clockwise(edges):
     return sorted(edges, key=sort_function, reverse=True)
 
 
-def filter_vertical_edges(edges, normal, debug=False):
+def filter_vertical_edges(edges, normal):
     """ Determine edges that are vertical based on a normal value
     """
     res = []
@@ -227,7 +227,7 @@ def subdivide_face_vertically(bm, face, widths):
     """
     if len(widths) < 2:
         return [face]
-    edges = filter_vertical_edges(face.edges, face.normal, True)
+    edges = filter_vertical_edges(face.edges, face.normal)
     select(edges)
     _, direction, _ = local_xyz(face)
     inner_edges = subdivide_edges(bm, edges, direction, widths)
