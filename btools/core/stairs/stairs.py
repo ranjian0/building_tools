@@ -24,6 +24,8 @@ class Stairs:
             if create_stairs(bm, faces, prop):
                 bmesh.update_edit_mesh(me, True)
                 return {"FINISHED"}
+
+        bmesh.update_edit_mesh(me, True)
         return {"CANCELLED"}
 
     @classmethod

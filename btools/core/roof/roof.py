@@ -24,6 +24,8 @@ class Roof:
             create_roof(bm, faces, props)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
+
+        bmesh.update_edit_mesh(me, True)
         return {"CANCELLED"}
 
     @classmethod

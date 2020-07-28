@@ -113,7 +113,6 @@ class Road:
         # Return amount of vertices per ring
         return len(bm.verts)
 
-
     @classmethod
     def create_curve(cls, context):
         # Create curve
@@ -253,7 +252,7 @@ class Road:
     def finalize_road(cls, context):
         if context.active_object is None:
             return {"FINISHED"}
-        
+
         # Apply modifiers
         bpy.ops.object.modifier_apply(modifier="Array")
         bpy.ops.object.modifier_apply(modifier="Curve")

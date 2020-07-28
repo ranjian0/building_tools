@@ -24,6 +24,8 @@ class Multigroup:
             if create_multigroup(bm, faces, props):
                 bmesh.update_edit_mesh(me, True)
                 return {"FINISHED"}
+
+        bmesh.update_edit_mesh(me, True)
         return {"CANCELLED"}
 
     @classmethod

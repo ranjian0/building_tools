@@ -32,6 +32,8 @@ class Floor:
                 create_floors(bm, all_faces, prop)
             bmesh.update_edit_mesh(me, True)
             return {"FINISHED"}
+
+        bmesh.update_edit_mesh(me, True)
         return {"CANCELLED"}
 
     @classmethod
