@@ -71,7 +71,8 @@ def create_multigroup_split(bm, face, prop):
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
-    if str(prop.components).find("d") == -1:
+
+    if "d" not in prop.components:
         # XXX Only windows, use the y offset
         v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
     else:
