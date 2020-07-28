@@ -11,8 +11,8 @@ from ...utils import (
     valid_ngon,
     filter_geom,
     create_face,
+    ngon_to_quad,
     get_top_faces,
-    popup_message,
     add_faces_to_map,
     calc_face_dimensions,
 )
@@ -22,11 +22,9 @@ def create_balcony(bm, faces, prop):
     """Generate balcony geometry
     """
     for f in faces:
-        if not valid_ngon(f):
-            popup_message("Balcony creation not supported for non-rectangular n-gon!", "Ngon Error")
-            return False
-
         f.select = False
+        if not valid_ngon(f):
+            ngon_to_quad(bm, f)
 
         normal = f.normal.copy()
         f = create_balcony_split(bm, f, prop)

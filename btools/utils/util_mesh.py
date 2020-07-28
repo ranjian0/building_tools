@@ -367,3 +367,22 @@ def sort_edges(edges, direction):
 
 def sort_verts(verts, direction):
     return sorted(verts, key=lambda v: direction.dot(v.co))
+
+
+def ngon_to_quad(bm, face):
+    """ Try to convert rectangular ngon to quad
+    Method:
+    - Perform inset.
+    - Dissolve all edges that are created from lone(non-corner) verts.
+    - Dissolve all the lone(non-corner) verts.
+    """
+
+    INSET_EPS = 0.0011
+    bmesh.ops.inset_individual(
+        bm, faces=[face], thickness=INSET_EPS, use_even_offset=True
+    )
+
+    diss_verts = list({loop.vert for loop in face.loops if equal(loop.calc_angle(), math.pi)})
+    diss_edges = list({e for v in diss_verts for e in v.link_edges if e not in face.edges})
+    bmesh.ops.dissolve_edges(bm, edges=diss_edges)
+    bmesh.ops.dissolve_verts(bm, verts=diss_verts)

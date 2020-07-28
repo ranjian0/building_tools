@@ -14,7 +14,7 @@ from ...utils import (
     valid_ngon,
     sort_faces,
     sort_edges,
-    popup_message,
+    ngon_to_quad,
     get_top_edges,
     get_top_faces,
     map_new_faces,
@@ -35,15 +35,15 @@ def create_window(bm, faces, prop):
     """Generate a window
     """
     for face in faces:
-        if not valid_ngon(face):
-            popup_message("Window creation not supported for non-rectangular n-gon", "Ngon Error")
-            return False
-
         face.select = False
+        if not valid_ngon(face):
+            ngon_to_quad(bm, face)
+
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:
             face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+
             window, arch = create_window_frame(bm, face, prop)
             if prop.type == "RECTANGULAR":
                 fill_window_face(bm, window, prop)

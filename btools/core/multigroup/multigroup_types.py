@@ -12,6 +12,7 @@ from ...utils import (
     validate,
     local_xyz,
     valid_ngon,
+    ngon_to_quad,
     get_top_faces,
     get_top_edges,
     popup_message,
@@ -40,11 +41,9 @@ def create_multigroup(bm, faces, prop):
         prop.components = re.sub("[^d|w|]", "", prop.components)
 
     for face in faces:
-        if not valid_ngon(face):
-            popup_message("Multigroup creation not supported for non-rectangular n-gon!", "Ngon Error")
-            return False
-
         face.select = False
+        if not valid_ngon(face):
+            ngon_to_quad(bm, face)
 
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
         for aface in array_faces:

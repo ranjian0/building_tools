@@ -14,7 +14,7 @@ from ...utils import (
     validate,
     local_xyz,
     valid_ngon,
-    popup_message,
+    ngon_to_quad,
     map_new_faces,
     get_top_edges,
     get_top_faces,
@@ -32,11 +32,10 @@ def create_door(bm, faces, prop):
     """Create door from face selection
     """
     for face in faces:
-        if not valid_ngon(face):
-            popup_message("Door creation not supported non-rectangular n-gon!", "Ngon Error")
-            return False
-
         face.select = False
+        if not valid_ngon(face):
+            ngon_to_quad(bm, face)
+
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
         array_faces = subdivide_face_horizontally(
             bm, face, widths=[prop.size_offset.size.x] * prop.count
