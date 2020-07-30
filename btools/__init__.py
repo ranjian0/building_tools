@@ -1,6 +1,7 @@
 import bpy
 
-from .core import register_core, unregister_core
+from .road import register_road, unregister_road
+from .building import register_building, unregister_building
 
 bl_info = {
     "name": "Building Tools",
@@ -33,8 +34,8 @@ class BTOOLS_PT_road_tools(bpy.types.Panel):
         col.operator("btools.finalize_road")
 
         col = layout.column(align=True)
-        col.operator("btools.add_curved_array")
-        col.operator("btools.finalize_curved_array")
+        col.operator("btools.add_array")
+        col.operator("btools.finalize_array")
 
 
 class BTOOLS_PT_building_tools(bpy.types.Panel):
@@ -136,13 +137,15 @@ classes = (BTOOLS_PT_road_tools, BTOOLS_PT_building_tools, BTOOLS_PT_material_to
 
 
 def register():
-    register_core()
+    register_road()
+    register_building()
     for cls in classes:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    unregister_core()
+    unregister_road()
+    unregister_building()
     for cls in classes:
         bpy.utils.unregister_class(cls)
 
