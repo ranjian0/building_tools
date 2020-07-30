@@ -228,7 +228,6 @@ def subdivide_face_vertically(bm, face, widths):
     if len(widths) < 2:
         return [face]
     edges = filter_vertical_edges(face.edges, face.normal)
-    select(edges)
     _, direction, _ = local_xyz(face)
     inner_edges = subdivide_edges(bm, edges, direction, widths)
     return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
