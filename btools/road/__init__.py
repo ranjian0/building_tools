@@ -1,13 +1,13 @@
-from .road import register_road as r_road, unregister_road as un_road
+from .road import register_road as reg_road, unregister_road as unreg_road
 from .array import register_array, unregister_array
 
 register_funcs = (
-    r_road,
+    reg_road,
     register_array,
 )
 
 unregister_funcs = (
-    un_road,
+    unreg_road,
     unregister_array,
 )
 
