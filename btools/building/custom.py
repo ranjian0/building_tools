@@ -73,8 +73,13 @@ def place_custom_object(context, prop, custom_obj):
     with bmesh_from_active_object(context) as bm:
         # -- get all selected faces
         faces = [face for face in bm.faces if face.select]
+        face_data = [f.verts for f in faces]
 
-        for face in faces:
+        for idx, face in enumerate(faces):
+            # XXX TODO(ranjian0) investigate why reference was lost here
+            if not face.is_valid:
+                face = bm.faces.get(face_data[idx])
+
             face.select = False
             # XXX subdivide horizontally for array
             array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
