@@ -21,6 +21,11 @@ class Floor:
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
 
+        # XXX Fix normals if they are inverted(Z-)
+        for f in bm.faces:
+            if f.normal.z < 0:
+                f.normal_flip()
+
         if cls.validate(bm):
             cls.add_floor_facemaps(context, prop)
             selected_faces = [f for f in bm.faces if f.select]
