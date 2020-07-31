@@ -90,6 +90,7 @@ def place_custom_object(context, prop, custom_obj):
                 # Place custom object mesh
                 place_object_on_face(bm, split_face, custom_obj, prop)
 
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return {"FINISHED"}
 
 
