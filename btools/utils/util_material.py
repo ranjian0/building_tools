@@ -172,7 +172,9 @@ def create_object_material(obj, mat_name):
     """ Create a new material and link it to the given object
     """
     if not has_material(obj, mat_name):
-        mat = bpy.data.materials.new(mat_name)
+        mat = bpy.data.materials.get(
+            mat_name, bpy.data.materials.new(mat_name)
+        )
         link_material(obj, mat)
         return mat
     return obj.data.materials.get(mat_name)
