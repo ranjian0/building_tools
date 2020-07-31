@@ -10,6 +10,8 @@ from bpy.props import PointerProperty
 from ..utils import (
     select,
     local_xyz,
+    bm_to_obj,
+    bm_from_obj,
     calc_verts_median,
     calc_face_dimensions,
     bmesh_from_active_object,
@@ -92,6 +94,31 @@ def place_custom_object(context, prop, custom_obj):
 
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return {"FINISHED"}
+
+
+def transfer_materials(from_object, to_obj):
+    """ Copy materials from 'from_object' to 'to_object'
+    """
+    materials = from_object.data.materials
+    if not materials:
+        return
+
+    # -- copy materials
+    list(map(to_obj.data.materials.append, materials))
+
+    def mat_name_from_idx(idx):
+        for i, m in enumerate(materials):
+            if i == idx:
+                return m.name.encode()
+        return "".encode()
+
+    # -- store material names on the face layer
+    bm = bm_from_obj(from_object)
+    bm.faces.layers.string.verify()
+    mat_name = bm.faces.layers.string.active
+    for face in bm.faces:
+        face[mat_name] = mat_name_from_idx(face.material_index)
+    bm_to_obj(bm, from_object)
 
 
 def duplicate_into_bm(bm, obj):
