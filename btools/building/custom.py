@@ -14,6 +14,7 @@ from ..utils import (
     bm_from_obj,
     calc_verts_median,
     calc_face_dimensions,
+    create_object_material,
     bmesh_from_active_object,
     subdivide_face_vertically,
     subdivide_face_horizontally,
@@ -63,6 +64,8 @@ class BTOOLS_OT_add_custom(bpy.types.Operator):
             return {"CANCELLED"}
 
         self.props.init(get_selected_face_dimensions(context))
+
+        transfer_materials(custom_obj, context.object)
         place_custom_object(context, self.props, custom_obj)
         return {'FINISHED'}
 
@@ -96,14 +99,23 @@ def place_custom_object(context, prop, custom_obj):
 
 
 def transfer_materials(from_object, to_obj):
-    """ Copy materials from 'from_object' to 'to_object'
+    """ Transfer materials from 'from_object' to 'to_object'
     """
     materials = from_object.data.materials
     if not materials:
         return
 
     # -- copy materials
-    list(map(to_obj.data.materials.append, materials))
+    to_mats = to_obj.data.materials
+    if not to_mats:
+        # -- to_obj has no materials
+        create_object_material(to_obj, "default_mat")
+        list(map(to_mats.append, materials))
+    else:
+        # -- to_obj has some materials, ensure we are not duplicating
+        for mat in materials:
+            if mat not in to_mats:
+                to_mats.append(mat)
 
     def mat_name_from_idx(idx):
         for i, m in enumerate(materials):
@@ -152,6 +164,7 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
     custom_faces = duplicate_into_bm(bm, custom_obj)
     select(custom_faces, False)
+    set_face_materials(bm, custom_faces)
 
     # XXX TODO(ranjian0) reference to face changes here, why?
     if not face.is_valid:
@@ -191,7 +204,7 @@ def calc_verts_bounds(verts):
 
 def transform_parallel_to_face(bm, verts, face):
     """ Move and rotate verts(mesh) so that it lies with it's
-    forward-extremem faces parallel to `face`
+    forward-extreme faces parallel to `face`
     """
     normal = face.normal.copy()
     median = face.calc_center_median()
@@ -224,6 +237,14 @@ def scale_to_size(bm, verts, current_size, target_size, local_dir):
         bm, verts=verts, vec=scale_x + scale_y + scale_z,
         space=Matrix.Translation(-calc_verts_median(verts))
     )
+
+
+def set_face_materials(bm, faces):
+    mat_name = bm.faces.layers.string.active
+    obj_mats = bpy.context.object.data.materials
+    for f in faces:
+        mat = obj_mats.get(f[mat_name].decode())
+        f.material_index = list(obj_mats).index(mat)
 
 
 classes = (CustomObjectProperty, BTOOLS_OT_add_custom)
