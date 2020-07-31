@@ -97,9 +97,9 @@ def duplicate_into_bm(bm, obj):
     """ Copy all the mesh data in obj to the bm
     Return the newly inserted faces
     """
-    initial_faces = set(bm.faces)
+    initial_faces = {f.index for f in bm.faces}
     bm.from_mesh(obj.data.copy())
-    return list(set(bm.faces) - initial_faces)
+    return [f for f in bm.faces if f.index not in initial_faces]
 
 
 # TODO(ranjian0) refactor function (duplicated from create_window_split)
