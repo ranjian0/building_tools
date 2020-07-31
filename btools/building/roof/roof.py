@@ -19,6 +19,11 @@ class Roof:
         bm = bmesh.from_edit_mesh(me)
         faces = [f for f in bm.faces if f.select]
 
+        # XXX Fix normals if they are inverted(Z-)
+        for f in faces:
+            if f.normal.z < 0:
+                f.normal_flip()
+
         if cls.validate(bm):
             cls.add_roof_facemaps()
             create_roof(bm, faces, props)
