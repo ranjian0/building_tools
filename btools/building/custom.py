@@ -121,48 +121,82 @@ def place_object_on_face(bm, face, custom_obj, prop):
     """ Place the custom_object mesh flush on the face
     """
     # XXX get mesh from custom_obj into bm
+    verts = face.verts
+
     custom_faces = duplicate_into_bm(bm, custom_obj)
-    custom_verts = list({v for f in custom_faces for v in f.verts})
     select(custom_faces, False)
 
+    # XXX TODO(ranjian0) reference to face changes here, why?
+    if not face.is_valid:
+        face = bm.faces.get(verts)
+
+    custom_verts = list({v for f in custom_faces for v in f.verts})
+
     # (preprocess)calculate bounds of the object
-    sort_x = sorted([v.co.x for v in custom_verts])
-    sort_y = sorted([v.co.y for v in custom_verts])
-    current_width = sort_x[-1] - sort_x[0]
-    current_height = sort_y[-1] - sort_y[1]
+    # NOTE: bounds are calculated before any transform is made
+    *current_size, _ = calc_verts_bounds(custom_verts)
 
     # -- move the custom faces into proper position on this face
+    transform_parallel_to_face(bm, custom_verts, face)
+
+    # -- scale to size
+    scale_to_size(
+        bm, custom_verts,
+        current_size, prop.size_offset.size, local_xyz(face)
+    )
+
+    # cleanup
+    bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
+
+
+def calc_verts_bounds(verts):
+    """ Determine the bounds size of the verts
+    (assumes verts(mesh) is facing upwards)
+    """
+    sort_x = sorted([v.co.x for v in verts])
+    sort_y = sorted([v.co.y for v in verts])
+    sort_z = sorted([v.co.z for v in verts])
+    width = sort_x[-1] - sort_x[0]
+    height = sort_y[-1] - sort_y[1]
+    depth = sort_z[-1] - sort_z[1]
+    return width, height, depth
+
+
+def transform_parallel_to_face(bm, verts, face):
+    """ Move and rotate verts(mesh) so that it lies with it's
+    forward-extremem faces parallel to `face`
+    """
     normal = face.normal.copy()
     median = face.calc_center_median()
     bmesh.ops.rotate(
-        bm, verts=custom_verts,
-        cent=calc_verts_median(custom_verts),
+        bm, verts=verts,
+        cent=calc_verts_median(verts),
         matrix=Matrix.Rotation(math.pi / 2, 4, normal.cross(Vector((0, 0, -1))))
     )
 
     # -- calculate margin to make custom objes flush with this face
     # TODO(ranjian0) investigate this (current theory is order of scale, rotate, translate)
-    diff = max(normal.dot(v.co) for v in custom_verts)
+    diff = max(normal.dot(v.co) for v in verts)
     diff_norm = diff * normal           # distance between face median and object median along normal
     diff_up = diff * Vector((0, 0, 1))  # distance between face median and object median along z+
-    bmesh.ops.translate(bm, verts=custom_verts, vec=median - diff_norm + diff_up)
+    bmesh.ops.translate(bm, verts=verts, vec=median - diff_norm + diff_up)
 
-    # -- scale to size
-    x_dir, y_dir, z_dir = local_xyz(face)
-    target_width, target_height = prop.size_offset.size
+
+def scale_to_size(bm, verts, current_size, target_size, local_dir):
+    """ Scale verts to target size along local direction (x and y)
+    """
+    x_dir, y_dir, z_dir = local_dir
+    target_width, target_height = target_size
+    current_width, current_height = current_size
 
     # --scale
     scale_x = x_dir * (target_width / current_width)
     scale_y = y_dir * (target_height / current_height)
     scale_z = Vector(map(abs, z_dir))
     bmesh.ops.scale(
-        bm, verts=custom_verts, vec=scale_x + scale_y + scale_z,
-        space=Matrix.Translation(-calc_verts_median(custom_verts))
+        bm, verts=verts, vec=scale_x + scale_y + scale_z,
+        space=Matrix.Translation(-calc_verts_median(verts))
     )
-
-    # -- clean up
-    bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
 
 classes = (CustomObjectProperty, BTOOLS_OT_add_custom)
