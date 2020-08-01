@@ -43,7 +43,8 @@ class CustomObjectProperty(bpy.types.PropertyGroup):
 
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):
-    """Place custom meshes on the selected faces"""
+    """Place custom meshes on the selected faces
+    Mesh must be forward facing(Y+ axis)"""
 
     bl_idname = "btools.add_custom"
     bl_label = "Add Custom"
