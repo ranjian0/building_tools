@@ -218,8 +218,7 @@ def transform_parallel_to_face(bm, verts, face):
     # TODO(ranjian0) investigate this (current theory is order of scale, rotate, translate)
     diff = max(normal.dot(v.co) for v in verts)
     diff_norm = diff * normal           # distance between face median and object median along normal
-    diff_up = diff * Vector((0, 0, 1))  # distance between face median and object median along z+
-    bmesh.ops.translate(bm, verts=verts, vec=median - diff_norm + diff_up)
+    bmesh.ops.translate(bm, verts=verts, vec=median - diff_norm)
 
 
 def scale_to_size(bm, verts, current_size, target_size, local_dir):
