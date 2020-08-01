@@ -150,7 +150,7 @@ def filter_vertical_edges(edges, normal):
             if rnd(vec.angle(Vector((1, 0, 0)))) == rnd(math.pi / 2):
                 res.append(e)
         else:
-            if round(abs(vec.z)) == 1.0:
+            if rnd(abs(vec.z)) == 1.0:
                 res.append(e)
     return res
 
