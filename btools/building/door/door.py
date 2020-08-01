@@ -4,6 +4,7 @@ from .door_types import create_door
 from ...utils import (
     FaceMap,
     crash_safe,
+    is_rectangle,
     get_edit_mesh,
     add_facemap_for_groups,
     verify_facemaps_for_object,
@@ -36,6 +37,8 @@ class Door:
     @classmethod
     def validate(cls, faces):
         if faces:
-            if not any([round(f.normal.z, 1) for f in faces]):
+            not_flat = not any([round(f.normal.z, 1) for f in faces])
+            rectangular = all(is_rectangle(f) for f in faces)
+            if not_flat and rectangular:
                 return True
         return False
