@@ -242,7 +242,6 @@ def scale_to_size(bm, verts, current_size, target_size, local_dir):
 def set_face_materials(bm, faces):
     mat_name = bm.faces.layers.string.active
     if not mat_name:
-        # XXX No materials were transfered
         return
 
     obj_mats = bpy.context.object.data.materials
