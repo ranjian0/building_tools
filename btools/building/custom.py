@@ -114,7 +114,7 @@ def transfer_materials(from_object, to_obj):
     else:
         # -- to_obj has some materials, ensure we are not duplicating
         for mat in materials:
-            if mat not in to_mats:
+            if mat.name not in to_mats:
                 to_mats.append(mat)
 
     def mat_name_from_idx(idx):
