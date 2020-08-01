@@ -254,16 +254,9 @@ def set_face_materials(bm, faces):
 classes = (CustomObjectProperty, BTOOLS_OT_add_custom)
 
 
-# XXX Hack(prevent operator redo from unsetting the property)
-# -- happens when user selects custom object immediately before running 'Add Custom'
-def update_custom_obj(self, context):
-    bpy.ops.ed.undo_push()
-    bpy.ops.ed.undo_push()
-
-
 def register_custom():
     bpy.types.Scene.btools_custom_object = PointerProperty(
-        type=bpy.types.Object, description="Object to use for custom placement", update=update_custom_obj)
+        type=bpy.types.Object, description="Object to use for custom placement")
 
     for cls in classes:
         bpy.utils.register_class(cls)
