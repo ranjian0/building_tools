@@ -8,6 +8,7 @@ from mathutils import Vector, Matrix, Quaternion
 from ...utils import (
     clamp,
     FaceMap,
+    VEC_DOWN,
     validate,
     sort_edges,
     sort_verts,
@@ -222,7 +223,7 @@ def translate_bounds(bm, verts, dir, trans):
     """ Translate the end verts inwards
     """
     if dir.z: # if rail is sloping, make vector horizontal
-        left = dir.cross(Vector((0, 0, -1)))
+        left = dir.cross(VEC_DOWN)
         dir.rotate(Quaternion(left, math.atan(dir.z / dir.xy.length)).to_euler())
 
     vec = dir.xy*trans
@@ -253,5 +254,5 @@ def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
     for bunch in [vts[:mid], vts[-mid:]]:
         bmesh.ops.rotate(
             bm, verts=bunch, cent=calc_verts_median(bunch),
-            matrix=Matrix.Rotation(angle, 4, dir.cross(Vector((0, 0, -1))))
+            matrix=Matrix.Rotation(angle, 4, dir.cross(VEC_DOWN))
         )

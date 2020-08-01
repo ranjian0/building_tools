@@ -8,6 +8,7 @@ from bmesh.types import BMVert, BMEdge, BMFace
 from mathutils import Vector
 
 from .util_common import local_xyz, equal
+from .util_constants import VEC_UP, VEC_DOWN, VEC_FORWARD, VEC_RIGHT
 
 
 def get_edit_mesh():
@@ -147,7 +148,7 @@ def filter_vertical_edges(edges, normal):
     for e in edges:
         vec = edge_vector(e)
         if normal.z:
-            if rnd(vec.angle(Vector((1, 0, 0)))) == rnd(math.pi / 2):
+            if rnd(vec.angle(VEC_RIGHT)) == rnd(math.pi / 2):
                 res.append(e)
         else:
             if rnd(abs(vec.z)) == 1.0:
@@ -161,7 +162,7 @@ def filter_horizontal_edges(edges, normal):
     res = []
     rnd = ft.partial(round, ndigits=3)
 
-    up = Vector((0, 1, 0)) if normal.z else Vector((0, 0, 1))
+    up = VEC_FORWARD if normal.z else VEC_UP
     for e in edges:
         vec = edge_vector(e)
         if rnd(vec.angle(up)) == rnd(math.pi / 2):
@@ -341,19 +342,19 @@ def create_face(bm, size, offset, xyz):
 
 
 def get_top_edges(edges, n=1):
-    return sort_edges(edges, Vector((0, 0, -1)))[:n]
+    return sort_edges(edges, VEC_DOWN)[:n]
 
 
 def get_bottom_edges(edges, n=1):
-    return sort_edges(edges, Vector((0, 0, 1)))[:n]
+    return sort_edges(edges, VEC_UP)[:n]
 
 
 def get_top_faces(faces, n=1):
-    return sort_faces(faces, Vector((0, 0, -1)))[:n]
+    return sort_faces(faces, VEC_DOWN)[:n]
 
 
 def get_bottom_faces(faces, n=1):
-    return sort_faces(faces, Vector((0, 0, 1)))[:n]
+    return sort_faces(faces, VEC_UP)[:n]
 
 
 def sort_faces(faces, direction):

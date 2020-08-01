@@ -6,6 +6,7 @@ from mathutils import Vector, Quaternion
 
 from ..railing.railing import create_railing
 from ...utils import (
+    VEC_UP,
     FaceMap,
     vec_equal,
     local_xyz,
@@ -20,9 +21,9 @@ from ...utils import (
     edge_is_sloped,
     subdivide_edges,
     add_faces_to_map,
+    calc_face_dimensions,
     filter_parallel_edges,
     subdivide_face_vertically,
-    calc_face_dimensions,
 )
 
 
@@ -234,7 +235,7 @@ def post_process_railing(bm, railing, prop):
             sloped_edges = [e for f in wall for e in f.edges if edge_is_sloped(e)]
             if sloped_edges:
                 # -- translate bottom edges down by step height
-                srted = sort_edges(sloped_edges, Vector((0, 0, 1)))
+                srted = sort_edges(sloped_edges, VEC_UP)
                 bottom = srted[:len(srted) // 2]
                 bmesh.ops.translate(
                     bm, verts=[v for e in bottom for v in e.verts], vec=(0, 0, -prop.step_height)

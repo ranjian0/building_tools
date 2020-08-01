@@ -1,5 +1,4 @@
 import bmesh
-from mathutils import Vector
 
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
@@ -7,6 +6,7 @@ from ..frame import add_frame_depth
 from ..generic import clamp_count
 from ...utils import (
     clamp,
+    VEC_UP,
     FaceMap,
     validate,
     arc_edge,
@@ -89,7 +89,7 @@ def create_circular_frame(bm, face, prop):
     faces = func(bm, face, sections)
 
     # -- get edges that will be used to make circle
-    mid = sort_faces(faces, Vector((0, 0, 1)))[1]
+    mid = sort_faces(faces, VEC_UP)[1]
     func = [filter_horizontal_edges, filter_vertical_edges][width > length]
     edges = func(mid.edges, mid.normal)
 

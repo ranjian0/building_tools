@@ -5,6 +5,7 @@ from bmesh.types import BMEdge, BMVert
 from mathutils import Vector, Matrix
 
 from ...utils import (
+    VEC_UP,
     FaceMap,
     validate,
     filter_geom,
@@ -115,7 +116,7 @@ def fill_bar(bm, face, prop):
     offset = width / (prop.bar_count_y + 1)
     for i in range(prop.bar_count_y):
         scale = (prop.bar_width / width, prop.bar_width / width, 1)
-        perp = face.normal.cross(Vector((0, 0, 1)))
+        perp = face.normal.cross(VEC_UP)
         position = Vector((face.normal * ((prop.bar_depth) - eps))) + perp * (
             -width / 2 + ((i + 1) * offset)
         )

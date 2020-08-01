@@ -9,6 +9,8 @@ from ...utils import (
     clamp,
     plane,
     circle,
+    VEC_RIGHT,
+    VEC_FORWARD,
     filter_geom,
     calc_edge_median,
     sort_edges_clockwise,
@@ -166,7 +168,7 @@ def random_scale_and_translate(bm, middle_edge):
     length = middle_edge.calc_length()
     median = calc_edge_median(middle_edge)
 
-    axis = Vector((1, 0, 0)) if verts[0].co.y == verts[1].co.y else Vector((0, 1, 0))
+    axis = VEC_RIGHT if verts[0].co.y == verts[1].co.y else VEC_FORWARD
     scale_factor = clamp(random.random() * 3, 1, 2.95)
     bmesh.ops.scale(
         bm, verts=verts, vec=axis * scale_factor, space=Matrix.Translation(-median)

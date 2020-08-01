@@ -19,7 +19,7 @@ from ..utils import (
     subdivide_face_horizontally,
     get_selected_face_dimensions,
 )
-
+from ..utils import VEC_UP, VEC_FORWARD
 from .generic import CountProperty, SizeOffsetProperty
 
 
@@ -208,11 +208,11 @@ def transform_parallel_to_face(bm, verts, face):
     """
     normal = face.normal.copy()
     median = face.calc_center_median()
-    angle = normal.xy.angle_signed(Vector((0, 1)))
+    angle = normal.xy.angle_signed(VEC_FORWARD.xy)
     bmesh.ops.rotate(
         bm, verts=verts,
         cent=calc_verts_median(verts),
-        matrix=Matrix.Rotation(angle, 4, Vector((0, 0, 1)))
+        matrix=Matrix.Rotation(angle, 4, VEC_UP)
     )
 
     # -- calculate margin to make custom objes flush with this face
