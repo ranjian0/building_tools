@@ -191,14 +191,14 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
 def calc_verts_bounds(verts):
     """ Determine the bounds size of the verts
-    (assumes verts(mesh) is facing upwards)
+    (assumes verts(mesh) is facing forward(y+))
     """
     sort_x = sorted([v.co.x for v in verts])
     sort_y = sorted([v.co.y for v in verts])
     sort_z = sorted([v.co.z for v in verts])
     width = sort_x[-1] - sort_x[0]
-    height = sort_y[-1] - sort_y[1]
-    depth = sort_z[-1] - sort_z[1]
+    height = sort_z[-1] - sort_z[1]
+    depth = sort_y[-1] - sort_y[1]
     return width, height, depth
 
 
