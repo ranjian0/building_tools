@@ -247,8 +247,8 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
                 if common_edge:
                     found_edges.append(common_edge.pop())
                     break
-                # XXX not so lucky, just fail
-                return []
+                # Re-walk if we have not reversed already, otherwise fail quietly
+                return boundary_walk(e, True) if not reverse else []
 
             next_edge = linked[0]
             if len(linked) > 1:
