@@ -2,7 +2,6 @@
 Tools to allow users to place custom meshes on a building
 """
 import bpy
-import math
 import bmesh
 from mathutils import Matrix, Vector
 from bpy.props import PointerProperty
@@ -208,10 +207,11 @@ def transform_parallel_to_face(bm, verts, face):
     """
     normal = face.normal.copy()
     median = face.calc_center_median()
+    angle = normal.xy.angle_signed(Vector((0, 1)))
     bmesh.ops.rotate(
         bm, verts=verts,
         cent=calc_verts_median(verts),
-        matrix=Matrix.Rotation(math.pi / 2, 4, normal.cross(Vector((0, 0, -1))))
+        matrix=Matrix.Rotation(angle, 4, Vector((0, 0, 1)))
     )
 
     # -- calculate margin to make custom objes flush with this face
