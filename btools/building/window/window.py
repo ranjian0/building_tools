@@ -37,8 +37,7 @@ class Window:
     @classmethod
     def validate(cls, faces):
         if faces:
-            not_flat = not any([round(f.normal.z, 1) for f in faces])
             rectangular = all(is_rectangle(f) for f in faces)
-            if not_flat and rectangular:
+            if rectangular:
                 return True
         return False
