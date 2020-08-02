@@ -148,11 +148,14 @@ def filter_vertical_edges(edges):
     if space_2d:
         return list(filter(lambda e: rnd(edge_vector(e).y) == 1.0, edges))
 
-    # Any edge that has upward vector and slants on only one other axis (X or Y)
-    # is considered vertical
+    # Any edge that has upward vector is considered vertical
+    # if the edge is slanting, it must be slanting on only one axis
     def vertical_3d(e):
         vec = edge_vector(e)
-        return rnd(vec.z) and (not rnd(vec.x) or not rnd(vec.y))
+        straight = rnd(vec.z) and not rnd(vec.x) and not rnd(vec.y)
+        slanted_x = rnd(vec.z) and rnd(vec.x) and not rnd(vec.y)
+        slanted_y = rnd(vec.z) and not rnd(vec.x) and rnd(vec.y)
+        return straight or slanted_x or slanted_y
     return list(filter(lambda e: vertical_3d(e), edges))
 
 
