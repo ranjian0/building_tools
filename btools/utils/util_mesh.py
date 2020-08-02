@@ -168,6 +168,8 @@ def filter_horizontal_edges(edges):
     # Any edge that is at right angle to global up vector is horizontal
     def horizontal_3d(e):
         vec = edge_vector(e)
+        if rnd(vec.length) <= 0.0:
+            return False
         return rnd(vec.angle(VEC_UP)) == rnd(math.pi / 2)
     return list(filter(lambda e: horizontal_3d(e), edges))
 
