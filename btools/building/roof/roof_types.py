@@ -391,7 +391,7 @@ def gable_process_open(bm, roof_faces, prop):
     # --determine upper bounding edges to be dissolved after outset
     dissolve_edges = []
     for f in side_faces:
-        v_edges = filter_vertical_edges(f.edges, f.normal)
+        v_edges = filter_vertical_edges(f.edges)
         edges = list(set(f.edges) - set(v_edges))
         max_edge = max(edges, key=lambda e: calc_edge_median(e).z)
         dissolve_edges.append(max_edge)
@@ -404,7 +404,7 @@ def gable_process_open(bm, roof_faces, prop):
     # -- move lower vertical edges abit down (inorder to maintain roof slope)
     v_edges = []
     for f in side_faces:
-        v_edges.extend(filter_vertical_edges(f.edges, f.normal))
+        v_edges.extend(filter_vertical_edges(f.edges))
 
     # -- find ones with lowest z
     min_z = min([calc_edge_median(e).z for e in v_edges])

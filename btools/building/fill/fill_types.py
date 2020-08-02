@@ -157,8 +157,8 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
     """subdivide a face(quad) into more quads
     """
-    v_edges = filter_vertical_edges(face.edges, face.normal)
-    h_edges = filter_horizontal_edges(face.edges, face.normal)
+    v_edges = filter_vertical_edges(face.edges)
+    h_edges = filter_horizontal_edges(face.edges)
 
     edges = []
     if cuts_x > 0:
@@ -202,7 +202,7 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 
     for face in res["faces"]:
         top_edge = max(
-            filter_horizontal_edges(face.edges, face.normal),
+            filter_horizontal_edges(face.edges),
             key=lambda e: calc_edge_median(e).z,
         )
         bmesh.ops.translate(bm, vec=-face.normal * extrude_depth, verts=top_edge.verts)
@@ -212,7 +212,7 @@ def subdivide_face_into_vertical_segments(bm, face, segments):
     """Cut a face(quad) vertically into multiple faces
     """
     res = bmesh.ops.subdivide_edges(
-        bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=segments
+        bm, edges=filter_vertical_edges(face.edges), cuts=segments
     ).get("geom_inner")
 
     return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
@@ -230,6 +230,6 @@ def create_bar_from_face(bm, face, median, position, scale, depth, vertical=Fals
     """
     dup = duplicate_face_translate_scale(bm, face, position, scale, median).get("geom")
     edges = [filter_horizontal_edges, filter_vertical_edges][vertical](
-        filter_geom(dup, BMEdge), face.normal
+        filter_geom(dup, BMEdge)
     )
     extrude_edges_to_depth(bm, edges, depth)
