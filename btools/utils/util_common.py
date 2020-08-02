@@ -107,7 +107,6 @@ def local_xyz(face):
     """ Get local xyz directions
     """
     z = face.normal.copy()
-    x = face.normal.copy()
-    x.rotate(Euler((0.0, 0.0, radians(90)), "XYZ"))
-    y = z.cross(x)
+    x = z.cross(VEC_UP)
+    y = x.cross(z)
     return x, y, z
