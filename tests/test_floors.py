@@ -2,7 +2,7 @@ import bpy
 import btools
 import unittest
 
-floor = btools.core.floor
+floor = btools.building.floor
 builder = floor.floor.Floor
 
 

@@ -100,7 +100,7 @@ class TestUtilsCommon(unittest.TestCase):
 
         dummy.normal = Y
         gb = btools.utils.local_to_global(dummy, X)
-        self.assertEqual(gb.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+        self.assertEqual(gb.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
 
         dummy.normal = X
         gb = btools.utils.local_to_global(dummy, Y)
@@ -117,20 +117,20 @@ class TestUtilsCommon(unittest.TestCase):
 
         dummy.normal = Vector((1, 0, 0))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((0, -1, 0)).to_tuple(1))
         self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
 
         dummy.normal = Vector((0, 1, 0))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
         self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
 
         dummy.normal = Vector((0, 0, 1))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
-        self.assertEqual(y.to_tuple(1), Vector((0, 0, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+        self.assertEqual(y.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
 
 
