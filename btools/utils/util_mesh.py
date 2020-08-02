@@ -5,10 +5,9 @@ import operator
 import bmesh
 import bpy
 from bmesh.types import BMVert, BMEdge, BMFace
-from mathutils import Vector
 
 from .util_common import local_xyz, equal
-from .util_constants import VEC_UP, VEC_DOWN, VEC_FORWARD, VEC_RIGHT
+from .util_constants import VEC_UP, VEC_DOWN
 
 
 def get_edit_mesh():
