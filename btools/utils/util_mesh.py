@@ -145,7 +145,7 @@ def filter_vertical_edges(edges):
     rnd = ft.partial(round, ndigits=3)
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        return list(filter(lambda e: rnd(edge_vector(e).y) == 1.0, edges))
+        return list(filter(lambda e: abs(rnd(edge_vector(e).y)) == 1.0, edges))
 
     # Any edge that has upward vector is considered vertical
     # if the edge is slanting, it must be slanting on only one axis
@@ -165,7 +165,7 @@ def filter_horizontal_edges(edges):
     rnd = ft.partial(round, ndigits=3)
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        return list(filter(lambda e: rnd(edge_vector(e).x) == 1.0, edges))
+        return list(filter(lambda e: abs(rnd(edge_vector(e).x)) == 1.0, edges))
 
     # Any edge that is at right angle to global up vector is horizontal
     def horizontal_3d(e):
