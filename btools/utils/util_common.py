@@ -1,8 +1,8 @@
 import traceback
-from math import radians
 
 import bpy
-from mathutils import Vector, Euler
+from mathutils import Vector
+from .util_constants import VEC_UP
 
 
 def equal(a, b, eps=0.001):
