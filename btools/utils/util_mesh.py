@@ -64,7 +64,7 @@ def edge_slope(e):
     """
     v = edge_vector(e)
     try:
-        return v.z / v.xy.length
+        return v.z / round(v.xy.length, 4)
     except ZeroDivisionError:
         return float("inf")
 
