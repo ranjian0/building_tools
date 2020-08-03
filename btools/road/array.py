@@ -24,6 +24,8 @@ class Array:
         if context.active_object is None:
             return None
 
+        original = context.active_object
+
         # Create children
         object = context.object
         position = object.location
@@ -46,12 +48,16 @@ class Array:
         modifier = context.object.modifiers["Array"]
         modifier.fit_type = "FIT_CURVE"
         modifier.curve = curve
+        modifier.relative_offset_displace = [2, 0, 0]
 
         bpy.ops.object.modifier_add(type="CURVE")
         modifier = context.object.modifiers["Curve"]
         modifier.object = curve
 
         context.object.instance_type = "FACES"
+
+        # Hide plane object
+        context.object.show_instancer_for_viewport = False
 
     @classmethod
     def create_curve(cls, context):
@@ -83,6 +89,7 @@ class Array:
         bm = bm_from_obj(obj)
 
         plane(bm, context.active_object.dimensions.y / 2, context.active_object.dimensions.x / 2)
+
         bm_to_obj(bm, obj)
         link_obj(obj)
         return obj
