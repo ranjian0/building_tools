@@ -82,7 +82,7 @@ class Array:
         obj = create_object(name, create_mesh(name + "_mesh"))
         bm = bm_from_obj(obj)
 
-        plane(bm, 1, 1)
+        plane(bm, context.active_object.dimensions.y / 2, context.active_object.dimensions.x / 2)
         bm_to_obj(bm, obj)
         link_obj(obj)
         return obj
