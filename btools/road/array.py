@@ -24,8 +24,6 @@ class Array:
         if context.active_object is None:
             return None
 
-        original = context.active_object
-
         # Create children
         object = context.object
         position = object.location
@@ -125,7 +123,7 @@ class BTOOLS_OT_add_array(bpy.types.Operator):
 
     bl_idname = "btools.add_array"
     bl_label = "Add Array"
-    bl_options = {"REGISTER", "PRESET"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     @classmethod
     def poll(cls, context):
@@ -142,7 +140,7 @@ class BTOOLS_OT_finalize_array(bpy.types.Operator):
 
     bl_idname = "btools.finalize_array"
     bl_label = "Finalize Array"
-    bl_options = {"REGISTER", "PRESET"}
+    bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     @classmethod
     def poll(cls, context):
