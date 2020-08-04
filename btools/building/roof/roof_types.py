@@ -13,6 +13,7 @@ from ...utils import (
     skeletonize,
     filter_geom,
     map_new_faces,
+    popup_message,
     edge_is_vertical,
     add_faces_to_map,
     calc_edge_median,
@@ -260,6 +261,13 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
     result = []
     for ed in validate(original_edges):
         walk = boundary_walk(ed)
+        if len(walk) < 3:
+            # XXX Geometry error caused by intersecting roof edges
+            # esp when outset property is set high on concave polygons
+
+            # -- try to help user
+            popup_message("Roof Intersection Detected. Adjust(decrease) roof 'outset'", title="Geometry Error")
+            continue
         result.extend(bmesh.ops.contextual_create(bm, geom=walk).get("faces"))
     return result
 
