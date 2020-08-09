@@ -5,10 +5,9 @@ import operator
 import bmesh
 import bpy
 from bmesh.types import BMVert, BMEdge, BMFace
-from mathutils import Vector
 
 from .util_common import local_xyz, equal
-from .util_constants import VEC_UP, VEC_DOWN, VEC_FORWARD, VEC_RIGHT
+from .util_constants import VEC_UP, VEC_DOWN
 
 
 def get_edit_mesh():
@@ -65,7 +64,7 @@ def edge_slope(e):
     """
     v = edge_vector(e)
     try:
-        return v.z / v.xy.length
+        return v.z / round(v.xy.length, 4)
     except ZeroDivisionError:
         return float("inf")
 
@@ -98,7 +97,7 @@ def edge_is_sloped(e):
 def valid_ngon(face):
     """ faces with rectangular shape and undivided horizontal edges are valid
     """
-    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
+    horizontal_edges = filter_horizontal_edges(face.edges)
     return len(horizontal_edges) == 2 and is_rectangle(face)
 
 
@@ -139,35 +138,42 @@ def sort_edges_clockwise(edges):
     return sorted(edges, key=sort_function, reverse=True)
 
 
-def filter_vertical_edges(edges, normal):
-    """ Determine edges that are vertical based on a normal value
+def filter_vertical_edges(edges):
+    """ Determine edges that are vertical
+    In 2D space(XY Plane), vertical is Y-axis, In 3D, vertical is Z-axis
     """
-    res = []
     rnd = ft.partial(round, ndigits=3)
+    space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
+    if space_2d:
+        return list(filter(lambda e: abs(rnd(edge_vector(e).y)) == 1.0, edges))
 
-    for e in edges:
+    # Any edge that has upward vector is considered vertical
+    # if the edge is slanting, it must be slanting on only one axis
+    def vertical_3d(e):
         vec = edge_vector(e)
-        if normal.z:
-            if rnd(vec.angle(VEC_RIGHT)) == rnd(math.pi / 2):
-                res.append(e)
-        else:
-            if rnd(abs(vec.z)) == 1.0:
-                res.append(e)
-    return res
+        straight = rnd(vec.z) and not rnd(vec.x) and not rnd(vec.y)
+        slanted_x = rnd(vec.z) and rnd(vec.x) and not rnd(vec.y)
+        slanted_y = rnd(vec.z) and not rnd(vec.x) and rnd(vec.y)
+        return straight or slanted_x or slanted_y
+    return list(filter(lambda e: vertical_3d(e), edges))
 
 
-def filter_horizontal_edges(edges, normal):
-    """ Determine edges that are horizontal based on a normal value
+def filter_horizontal_edges(edges):
+    """ Determine edges that are horizontal
+    In 2D space(XY Plane), horizontal is X-axis, In 3D, horizontal is XY-plane
     """
-    res = []
     rnd = ft.partial(round, ndigits=3)
+    space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
+    if space_2d:
+        return list(filter(lambda e: abs(rnd(edge_vector(e).x)) == 1.0, edges))
 
-    up = VEC_FORWARD if normal.z else VEC_UP
-    for e in edges:
+    # Any edge that is at right angle to global up vector is horizontal
+    def horizontal_3d(e):
         vec = edge_vector(e)
-        if rnd(vec.angle(up)) == rnd(math.pi / 2):
-            res.append(e)
-    return res
+        if rnd(vec.length) <= 0.0:
+            return False
+        return rnd(vec.angle(VEC_UP)) == rnd(math.pi / 2)
+    return list(filter(lambda e: horizontal_3d(e), edges))
 
 
 def filter_parallel_edges(edges, dir):
@@ -191,8 +197,8 @@ def calc_verts_median(verts):
 def calc_face_dimensions(face):
     """ Determine the width and height of face
     """
-    horizontal_edges = filter_horizontal_edges(face.edges, face.normal)
-    vertical_edges = filter_vertical_edges(face.edges, face.normal)
+    horizontal_edges = filter_horizontal_edges(face.edges)
+    vertical_edges = filter_vertical_edges(face.edges)
     width = sum(e.calc_length() for e in horizontal_edges) / 2
     height = sum(e.calc_length() for e in vertical_edges) / 2
     return width, height
@@ -217,7 +223,7 @@ def subdivide_face_horizontally(bm, face, widths):
     """
     if len(widths) < 2:
         return [face]
-    edges = filter_horizontal_edges(face.edges, face.normal)
+    edges = filter_horizontal_edges(face.edges)
     direction, _, _ = local_xyz(face)
     inner_edges = subdivide_edges(bm, edges, direction, widths)
     return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
@@ -228,7 +234,7 @@ def subdivide_face_vertically(bm, face, widths):
     """
     if len(widths) < 2:
         return [face]
-    edges = filter_vertical_edges(face.edges, face.normal)
+    edges = filter_vertical_edges(face.edges)
     _, direction, _ = local_xyz(face)
     inner_edges = subdivide_edges(bm, edges, direction, widths)
     return sort_faces(list({f for e in inner_edges for f in e.link_faces}), direction)
@@ -256,10 +262,8 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     """
     length = edge.calc_length()
     median = calc_edge_median(edge)
-    arc_direction = Vector(map(abs, edge_vector(edge).cross(xyz[2])))
-    if edge_vector(edge).z:
-        arc_direction = edge_vector(edge).cross(xyz[2])
-    orient = xyz[1] if edge_is_vertical(edge) else xyz[0]
+    orient = xyz[0] if edge_is_horizontal(edge) else xyz[1]
+    arc_direction = xyz[1] if edge_is_horizontal(edge) else xyz[0]
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
 
     verts = sort_verts(
@@ -267,6 +271,7 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
         orient
     )
     theta = math.pi / (len(verts) - 1)
+    orient *= (1 / orient.length)
 
     def arc_sine(verts):
         for idx, v in enumerate(verts):

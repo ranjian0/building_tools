@@ -18,9 +18,8 @@ class Window:
         verify_facemaps_for_object(context.object)
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
-        faces = [face for face in bm.faces if face.select]
-
-        if cls.validate(faces):
+        faces = cls.validate([face for face in bm.faces if face.select])
+        if faces:
             cls.add_window_facemaps()
             if create_window(bm, faces, prop):
                 bmesh.update_edit_mesh(me, True)
@@ -36,9 +35,9 @@ class Window:
 
     @classmethod
     def validate(cls, faces):
-        if faces:
-            not_flat = not any([round(f.normal.z, 1) for f in faces])
-            rectangular = all(is_rectangle(f) for f in faces)
-            if not_flat and rectangular:
-                return True
-        return False
+        """ Filter out invalid faces """
+        # -- remove non-rectangular faces
+        faces = list(filter(lambda f: is_rectangle(f), faces))
+        # -- remove faces that are perpendicular to Z+
+        faces = list(filter(lambda f: round(abs(f.normal.z)) != 1.0, faces))
+        return faces

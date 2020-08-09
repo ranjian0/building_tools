@@ -1,10 +1,11 @@
-import unittest
-
 import bmesh
 import bpy
-from mathutils import Vector
-
 import btools
+import math
+import random
+import unittest
+
+from mathutils import Vector
 
 
 class TestUtilsCommon(unittest.TestCase):
@@ -100,7 +101,7 @@ class TestUtilsCommon(unittest.TestCase):
 
         dummy.normal = Y
         gb = btools.utils.local_to_global(dummy, X)
-        self.assertEqual(gb.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+        self.assertEqual(gb.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
 
         dummy.normal = X
         gb = btools.utils.local_to_global(dummy, Y)
@@ -117,20 +118,20 @@ class TestUtilsCommon(unittest.TestCase):
 
         dummy.normal = Vector((1, 0, 0))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((0, -1, 0)).to_tuple(1))
         self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
 
         dummy.normal = Vector((0, 1, 0))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((-1, 0, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
         self.assertEqual(y.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
 
         dummy.normal = Vector((0, 0, 1))
         x, y, z = btools.utils.local_xyz(dummy)
-        self.assertEqual(x.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
-        self.assertEqual(y.to_tuple(1), Vector((0, 0, 0)).to_tuple(1))
+        self.assertEqual(x.to_tuple(1), Vector((0, 1, 0)).to_tuple(1))
+        self.assertEqual(y.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
 
 
@@ -196,3 +197,115 @@ class TestUtilsGeometry(unittest.TestCase):
             left=True, right=True, front=True, back=True)
         self.assertEquals(len(self.bm.faces), 0)
         self.assertEquals(len(self.bm.verts), 8)
+
+
+class TestUtilsMesh(unittest.TestCase):
+    def setUp(self):
+        self.bm = bmesh.new()
+
+    def tearDown(self):
+        self.bm.free()
+
+    def clean_bmesh(self):
+        [self.bm.verts.remove(v) for v in self.bm.verts]
+
+    def test_filtergeom(self):
+        btools.utils.plane(self.bm)
+        fg = btools.utils.filter_geom
+        geom = list(self.bm.verts) + list(self.bm.edges) + list(self.bm.faces)
+        self.assertEqual(len(fg(geom, bmesh.types.BMVert)), 4)
+        self.assertEqual(len(fg(geom, bmesh.types.BMEdge)), 4)
+        self.assertEqual(len(fg(geom, bmesh.types.BMFace)), 1)
+
+    def test_edgetangent(self):
+        btools.utils.plane(self.bm)
+        et = btools.utils.edge_tangent
+        fm = list(self.bm.faces).pop().calc_center_median()
+
+        for edge in self.bm.edges:
+            em = btools.utils.calc_edge_median(edge)
+            self.assertEqual(
+                et(edge).to_tuple(1),
+                (fm-em).normalized().to_tuple(1)
+            )
+
+    def test_edgevector(self):
+        btools.utils.plane(self.bm)
+        ev = btools.utils.edge_vector
+        self.assertEqual(
+            sum([ev(e) for e in self.bm.edges], Vector()), Vector()
+        )
+
+    def test_edgeslope(self):
+        btools.utils.plane(self.bm)
+        es = btools.utils.edge_slope
+        self.assertEqual(sum(es(e) for e in self.bm.edges), 0.0)
+
+        self.clean_bmesh()
+        btools.utils.cube(self.bm)
+        slopes = [es(e) for e in self.bm.edges]
+        self.assertEqual(len([s for s in slopes if s == 0]), 8)
+        self.assertEqual(len([s for s in slopes if s == float('inf')]), 4)
+
+        angles = [btools.utils.edge_angle(e) for e in self.bm.edges]
+        self.assertEqual(len([a for a in angles if a == 0]), 8)
+        self.assertEqual(len([a for a in angles if round(a, 4) == round(math.pi / 2, 4)]), 4)
+
+
+        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_vertical(e)]), 4)
+        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_horizontal(e)]), 8)
+        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_sloped(e)]), 0)
+
+    def test_vec_equalopposite(self):
+        LEFT = Vector((-1, 0, 0))
+        RIGHT = Vector((1, 0, 0))
+
+        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT))
+        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT*1.0001))
+        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT*0.0009))
+
+        self.assertTrue(btools.utils.vec_opposite(RIGHT, LEFT))
+
+    def test_filteredges(self):
+        # -- 2D
+        btools.utils.plane(self.bm)
+        self.assertEqual(len(btools.utils.filter_vertical_edges(self.bm.edges)), 2)
+        self.assertEqual(len(btools.utils.filter_horizontal_edges(self.bm.edges)), 2)
+
+        self.clean_bmesh()
+        # -- 3D
+        btools.utils.cube(self.bm)
+        self.assertEqual(len(btools.utils.filter_vertical_edges(self.bm.edges)), 4)
+        self.assertEqual(len(btools.utils.filter_horizontal_edges(self.bm.edges)), 8)
+
+        # -- 3D Sloped
+        top_face = [f for f in self.bm.faces if f.normal.z > 0].pop()
+        bmesh.ops.scale(self.bm, verts=top_face.verts, vec=(0.2, 1, 1))
+        self.assertEqual(len(btools.utils.filter_vertical_edges(self.bm.edges)), 4)
+
+        # -- parallel
+        self.assertEqual(len(btools.utils.filter_parallel_edges(self.bm.edges, Vector((1, 0, 0)))), 4)
+
+
+    def test_rectangular_ngon(self):
+        btools.utils.plane(self.bm)
+
+        self.assertTrue(btools.utils.valid_ngon(list(self.bm.faces).pop()))
+        self.assertTrue(btools.utils.is_rectangle(list(self.bm.faces).pop()))
+
+        hedges = btools.utils.filter_horizontal_edges(self.bm.edges)
+        bmesh.ops.subdivide_edges(self.bm, edges=[hedges[0]], cuts=2)
+        bmesh.ops.subdivide_edges(self.bm, edges=[hedges[1]], cuts=2)
+
+        self.assertFalse(btools.utils.valid_ngon(list(self.bm.faces).pop()))
+
+        v = random.choice([v for v in self.bm.verts])
+        v.co += Vector((random.random() * 19, random.random() * 5, 0))
+        self.assertFalse(btools.utils.is_rectangle(list(self.bm.faces).pop()))
+
+    def test_median_dimensions(self):
+        btools.utils.plane(self.bm)
+
+        f = list(self.bm.faces).pop()
+        self.assertEqual(btools.utils.calc_face_dimensions(f), (4, 4))
+        self.assertEqual(btools.utils.calc_verts_median(f.verts), Vector())

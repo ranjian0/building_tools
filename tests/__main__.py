@@ -9,10 +9,14 @@ sys.path.insert(0, tests_dir)
 sys.path.insert(0, addon_dir)
 
 import tools
-import test_utils
-import test_floors
-import test_floorplan
 
+try:
+    import test_utils
+    import test_floors
+    import test_floorplan
+except Exception:
+    import traceback; traceback.print_exc()
+    sys.exit(0)
 
 def main():
     # Load the addon module

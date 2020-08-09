@@ -13,11 +13,12 @@ from ...utils import (
     skeletonize,
     filter_geom,
     map_new_faces,
+    popup_message,
+    edge_is_vertical,
     add_faces_to_map,
     calc_edge_median,
     set_roof_type_hip,
     set_roof_type_gable,
-    filter_vertical_edges,
     add_facemap_for_groups,
 )
 
@@ -185,9 +186,10 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
     """
     skeleton_edges = []
     skeleton_verts = []
+    O_verts = list({v for e in original_edges for v in e.verts})
     for arc in skeleton:
         source = arc.source
-        vsource = vert_at_loc(source, bm.verts)
+        vsource = vert_at_loc(source, O_verts + skeleton_verts)
         if not vsource:
             source_height = [arc.height for arc in skeleton if arc.source == source]
             ht = source_height.pop() * height_scale
@@ -195,7 +197,7 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
             skeleton_verts.append(vsource)
 
         for sink in arc.sinks:
-            vs = vert_at_loc(sink, bm.verts)
+            vs = vert_at_loc(sink, O_verts + skeleton_verts)
             if not vs:
                 sink_height = min([arc.height for arc in skeleton if sink in arc.sinks])
                 ht = height_scale * sink_height
@@ -206,13 +208,10 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
             if vs != vsource:
                 geom = bmesh.ops.contextual_create(bm, geom=[vsource, vs]).get("edges")
                 skeleton_edges.extend(geom)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
     skeleton_edges = validate(skeleton_edges)
-    S_verts = {v for e in skeleton_edges for v in e.verts}
-    O_verts = {v for e in original_edges for v in e.verts}
-    skeleton_verts = [v for v in skeleton_verts if v in S_verts and v not in O_verts]
-    return join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges)
+    S_verts = list({v for e in skeleton_edges for v in e.verts} - set(O_verts))
+    return join_intersections_and_get_skeleton_edges(bm, S_verts, skeleton_edges)
 
 
 @map_new_faces(FaceMap.ROOF)
@@ -262,6 +261,13 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
     result = []
     for ed in validate(original_edges):
         walk = boundary_walk(ed)
+        if len(walk) < 3:
+            # XXX Geometry error caused by intersecting roof edges
+            # esp when outset property is set high on concave polygons
+
+            # -- try to help user
+            popup_message("Roof Intersection Detected. Adjust(decrease) roof 'outset'", title="Geometry Error")
+            continue
         result.extend(bmesh.ops.contextual_create(bm, geom=walk).get("faces"))
     return result
 
@@ -294,7 +300,6 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
                 split_factor = (v1.co - v.co).length / e.calc_length()
                 new_edge, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
                 new_verts.append(new_vert)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return validate(new_verts)
 
 
@@ -322,7 +327,8 @@ def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges
     """
     new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
     skeleton_verts = validate(skeleton_verts) + new_verts
-    return list(set(e for v in skeleton_verts for e in v.link_edges))
+    bmesh.ops.remove_doubles(bm, verts=skeleton_verts, dist=0.0001)
+    return list(set(e for v in validate(skeleton_verts) for e in v.link_edges))
 
 
 def dissolve_lone_verts(bm, face, original_edges):
@@ -391,7 +397,7 @@ def gable_process_open(bm, roof_faces, prop):
     # --determine upper bounding edges to be dissolved after outset
     dissolve_edges = []
     for f in side_faces:
-        v_edges = filter_vertical_edges(f.edges, f.normal)
+        v_edges = list(filter(edge_is_vertical, f.edges))
         edges = list(set(f.edges) - set(v_edges))
         max_edge = max(edges, key=lambda e: calc_edge_median(e).z)
         dissolve_edges.append(max_edge)
@@ -404,7 +410,7 @@ def gable_process_open(bm, roof_faces, prop):
     # -- move lower vertical edges abit down (inorder to maintain roof slope)
     v_edges = []
     for f in side_faces:
-        v_edges.extend(filter_vertical_edges(f.edges, f.normal))
+        v_edges.extend(list(filter(edge_is_vertical, f.edges)))
 
     # -- find ones with lowest z
     min_z = min([calc_edge_median(e).z for e in v_edges])

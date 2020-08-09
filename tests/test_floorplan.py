@@ -3,7 +3,7 @@ import random
 import unittest
 import bpy
 
-floorplan = btools.core.floorplan
+floorplan = btools.building.floorplan
 builder = floorplan.floorplan.Floorplan
 
 
@@ -42,6 +42,7 @@ class TestFloorplan(unittest.TestCase):
         context = bpy.context
         prop = context.scene.test_prop
 
+        prop.type = "RECTANGULAR"
         res = builder.build(context, prop)
         self.assertIsNotNone(res)
 

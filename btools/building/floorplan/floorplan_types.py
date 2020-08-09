@@ -75,11 +75,10 @@ def create_hshaped_floorplan(bm, prop):
     """
     plane(bm, prop.width / 2, prop.length / 2)
     face = list(bm.faces).pop()
-    normal = face.normal
     median_reference = face.calc_center_median()
 
-    extrude_left_and_right_edges(bm, normal, median_reference)
-    extreme_edges = determine_clockwise_extreme_edges_for_extrusion(bm, normal)
+    extrude_left_and_right_edges(bm, median_reference)
+    extreme_edges = determine_clockwise_extreme_edges_for_extrusion(bm)
 
     extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     extrusion_widths = [prop.tw1, prop.tw2, prop.tw3, prop.tw4]
@@ -130,10 +129,10 @@ def create_random_floorplan(bm, prop):
         random_extrude(bm, middle_edge, (edge_median - median_reference).normalized())
 
 
-def extrude_left_and_right_edges(bm, normal, median_reference):
+def extrude_left_and_right_edges(bm, median_reference):
     """Extrude the left and right edges of a plane
     """
-    for edge in filter_vertical_edges(bm.edges, normal):
+    for edge in filter_vertical_edges(bm.edges):
         res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
         verts = filter_geom(res["geom"], BMVert)
         bmesh.ops.translate(
@@ -143,10 +142,10 @@ def extrude_left_and_right_edges(bm, normal, median_reference):
         )
 
 
-def determine_clockwise_extreme_edges_for_extrusion(bm, normal):
+def determine_clockwise_extreme_edges_for_extrusion(bm):
     """top and bottom extreme edges sorted clockwise
     """
-    all_upper_edges = filter_horizontal_edges(bm.edges, normal)
+    all_upper_edges = filter_horizontal_edges(bm.edges)
     all_upper_edges.sort(key=lambda ed: calc_edge_median(ed).x)
 
     upper_extreme_edges = all_upper_edges[:2] + all_upper_edges[4:]

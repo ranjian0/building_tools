@@ -16,9 +16,9 @@ from ...utils import (
     filter_geom,
     map_new_faces,
     edge_is_sloped,
+    edge_is_vertical,
     subdivide_edges,
     calc_verts_median,
-    filter_vertical_edges,
     add_facemap_for_groups,
 )
 
@@ -26,7 +26,7 @@ RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")
 
 
 def create_railing(bm, faces, prop, normal):
-    vertical_edges = list({e for f in faces for e in filter_vertical_edges(f.edges, f.normal)})
+    vertical_edges = list({e for f in faces for e in f.edges if edge_is_vertical(e)})
     add_facemap_for_groups(FaceMap.RAILING_POSTS)
     cposts = make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
     top_rails, fills = [], []
@@ -53,8 +53,7 @@ def make_fill(bm, face, prop):
     # duplicate original face and resize
     ret = bmesh.ops.duplicate(bm, geom=[face])
     dup_face = filter_geom(ret["geom"], BMFace)[0]
-    vertical = filter_vertical_edges(dup_face.edges, dup_face.normal)
-    non_vertical = [e for e in dup_face.edges if e not in vertical]
+    non_vertical = [e for e in dup_face.edges if not edge_is_vertical(e)]
     top_edge = sort_edges(non_vertical, Vector((0., 0., -1.)))[0]
     bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
 
@@ -99,9 +98,8 @@ def create_railing_top(bm, top_edge, prop):
 @map_new_faces(FaceMap.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
     result = []
-    vertical_edges = filter_vertical_edges(face.edges, face.normal)
     sorted_edges = sort_edges(
-        [e for e in face.edges if e not in vertical_edges], Vector((0.0, 0.0, -1.0))
+        [e for e in face.edges if not edge_is_vertical(e)], Vector((0.0, 0.0, -1.0))
     )
 
     # create posts
@@ -142,7 +140,7 @@ def create_fill_rails(bm, face, prop):
     result = []
     rail_size = min(prop.rail_fill.size, prop.corner_post_width)
 
-    vertical_edges = filter_vertical_edges(face.edges, face.normal)
+    vertical_edges = [e for e in face.edges if edge_is_vertical(e)]
     n_rails = math.floor(
         vertical_edges[0].calc_length() * prop.rail_fill.density / rail_size
     )

@@ -8,6 +8,7 @@ from ...utils import (
     VEC_UP,
     FaceMap,
     validate,
+    local_xyz,
     filter_geom,
     map_new_faces,
     add_faces_to_map,
@@ -92,6 +93,7 @@ def fill_bar(bm, face, prop):
     if prop.bar_count_x + prop.bar_count_y == 0:
         return
 
+    xyz = local_xyz(face)
     face_center = face.calc_center_median()
     width, height = calc_face_dimensions(face)
 
@@ -101,27 +103,33 @@ def fill_bar(bm, face, prop):
     )
     prop.bar_width = min(prop.bar_width, min_dimension)
 
+    # -- transform vars
+    transform_space = (
+        Matrix.Rotation(-VEC_UP.angle(xyz[1]), 4, xyz[0]) @ Matrix.Translation(-face_center)
+    )
+
     # -- horizontal
+    depth = face.normal * prop.bar_depth
     offset = height / (prop.bar_count_x + 1)
     for i in range(prop.bar_count_x):
-        scale = (1, 1, prop.bar_width / height)
-        position = Vector((face.normal * prop.bar_depth)) + Vector(
-            (0, 0, -height / 2 + (i + 1) * offset)
+        item_off = Vector((0, 0, -height / 2 + (i + 1) * offset))
+        transform = (
+            Matrix.Translation(depth + item_off) @
+            Matrix.Scale(prop.bar_width / height, 4, VEC_UP)
         )
-        depth = -face.normal * prop.bar_depth
-        create_bar_from_face(bm, face, face_center, position, scale, depth)
+        create_bar_from_face(bm, face, transform, transform_space, -depth)
 
     # -- vertical
     eps = 0.015
     offset = width / (prop.bar_count_y + 1)
+    depth = face.normal * (prop.bar_depth - eps)
     for i in range(prop.bar_count_y):
-        scale = (prop.bar_width / width, prop.bar_width / width, 1)
-        perp = face.normal.cross(VEC_UP)
-        position = Vector((face.normal * ((prop.bar_depth) - eps))) + perp * (
-            -width / 2 + ((i + 1) * offset)
+        item_off = xyz[0] * (-width / 2 + ((i + 1) * offset))
+        transform = (
+            Matrix.Translation(depth + item_off) @
+            Matrix.Scale(prop.bar_width / width, 4, xyz[0])
         )
-        depth = -face.normal * ((prop.bar_depth) - eps)
-        create_bar_from_face(bm, face, face_center, position, scale, depth, True)
+        create_bar_from_face(bm, face, transform, transform_space, -depth, True)
 
 
 def fill_louver(bm, face, prop, user=FillUser.DOOR):
@@ -157,8 +165,8 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
     """subdivide a face(quad) into more quads
     """
-    v_edges = filter_vertical_edges(face.edges, face.normal)
-    h_edges = filter_horizontal_edges(face.edges, face.normal)
+    v_edges = filter_vertical_edges(face.edges)
+    h_edges = filter_horizontal_edges(face.edges)
 
     edges = []
     if cuts_x > 0:
@@ -172,14 +180,22 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
     return list({f for ed in validate(edges) for f in ed.link_faces})
 
 
-def duplicate_face_translate_scale(bm, face, position, scale, scale_center):
+def create_bar_from_face(bm, face, trans, trans_space, depth, vertical=False):
+    """Create bar geometry from a face
+    """
+    dup = duplicate_face_translate_scale(bm, face, trans, trans_space).get("geom")
+    edges = [filter_horizontal_edges, filter_vertical_edges][vertical](
+        filter_geom(dup, BMEdge)
+    )
+    extrude_edges_to_depth(bm, edges, depth)
+
+
+def duplicate_face_translate_scale(bm, face, trans, trans_space):
     """Duplicate a face and transform it
     """
     ret = bmesh.ops.duplicate(bm, geom=[face])
     verts = filter_geom(ret["geom"], BMVert)
-
-    bmesh.ops.scale(bm, verts=verts, vec=scale, space=Matrix.Translation(-scale_center))
-    bmesh.ops.translate(bm, verts=verts, vec=position)
+    bmesh.ops.transform(bm, verts=verts, matrix=trans, space=trans_space)
     return ret
 
 
@@ -202,7 +218,7 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 
     for face in res["faces"]:
         top_edge = max(
-            filter_horizontal_edges(face.edges, face.normal),
+            filter_horizontal_edges(face.edges),
             key=lambda e: calc_edge_median(e).z,
         )
         bmesh.ops.translate(bm, vec=-face.normal * extrude_depth, verts=top_edge.verts)
@@ -212,7 +228,7 @@ def subdivide_face_into_vertical_segments(bm, face, segments):
     """Cut a face(quad) vertically into multiple faces
     """
     res = bmesh.ops.subdivide_edges(
-        bm, edges=filter_vertical_edges(face.edges, face.normal), cuts=segments
+        bm, edges=filter_vertical_edges(face.edges), cuts=segments
     ).get("geom_inner")
 
     return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
@@ -223,13 +239,3 @@ def double_and_make_even(value):
     """
     double = value * 2
     return double if double % 2 == 0 else double + 1
-
-
-def create_bar_from_face(bm, face, median, position, scale, depth, vertical=False):
-    """Create bar geometry from a face
-    """
-    dup = duplicate_face_translate_scale(bm, face, position, scale, median).get("geom")
-    edges = [filter_horizontal_edges, filter_vertical_edges][vertical](
-        filter_geom(dup, BMEdge), face.normal
-    )
-    extrude_edges_to_depth(bm, edges, depth)

@@ -72,7 +72,7 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
 def dissolve_flat_edges(bm, faces):
     flat_edges = list({
-        e for f in faces for e in filter_vertical_edges(f.edges, f.normal)
+        e for f in faces for e in filter_vertical_edges(f.edges)
         if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
     })
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)

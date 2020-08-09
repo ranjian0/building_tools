@@ -18,9 +18,8 @@ class Door:
         verify_facemaps_for_object(context.object)
         me = get_edit_mesh()
         bm = bmesh.from_edit_mesh(me)
-        faces = [face for face in bm.faces if face.select]
-
-        if cls.validate(faces):
+        faces = cls.validate([face for face in bm.faces if face.select])
+        if faces:
             cls.add_door_facemaps()
             if create_door(bm, faces, props):
                 bmesh.update_edit_mesh(me, True)
@@ -36,9 +35,9 @@ class Door:
 
     @classmethod
     def validate(cls, faces):
-        if faces:
-            not_flat = not any([round(f.normal.z, 1) for f in faces])
-            rectangular = all(is_rectangle(f) for f in faces)
-            if not_flat and rectangular:
-                return True
-        return False
+        """ Filter out invalid faces """
+        # -- remove upward facing faces
+        faces = list(filter(lambda f: abs(round(f.normal.z, 3)) == 0.0, faces))
+        # -- remove non-rectangular faces
+        faces = list(filter(lambda f: is_rectangle(f), faces))
+        return faces

@@ -1,8 +1,8 @@
 import traceback
-from math import radians
 
 import bpy
-from mathutils import Vector, Euler
+from mathutils import Vector
+from .util_constants import VEC_UP, VEC_RIGHT
 
 
 def equal(a, b, eps=0.001):
@@ -107,7 +107,6 @@ def local_xyz(face):
     """ Get local xyz directions
     """
     z = face.normal.copy()
-    x = face.normal.copy()
-    x.rotate(Euler((0.0, 0.0, radians(90)), "XYZ"))
-    y = z.cross(x)
+    x = z.cross(VEC_RIGHT if z.to_tuple(1) == VEC_UP.to_tuple(1) else VEC_UP)
+    y = x.cross(z)
     return x, y, z

@@ -6,7 +6,6 @@ from ..frame import add_frame_depth
 from ..generic import clamp_count
 from ...utils import (
     clamp,
-    VEC_UP,
     FaceMap,
     validate,
     arc_edge,
@@ -89,9 +88,9 @@ def create_circular_frame(bm, face, prop):
     faces = func(bm, face, sections)
 
     # -- get edges that will be used to make circle
-    mid = sort_faces(faces, VEC_UP)[1]
+    mid = sort_faces(faces, xyz[0] if width > length else xyz[1])[1]
     func = [filter_horizontal_edges, filter_vertical_edges][width > length]
-    edges = func(mid.edges, mid.normal)
+    edges = func(mid.edges)
 
     # -- move the edges towards each other
     median = mid.calc_center_median()
@@ -111,7 +110,6 @@ def create_circular_frame(bm, face, prop):
         bm, faces=[mid], use_even_offset=True, thickness=prop.frame_thickness
     )
 
-    # return None, None
     # -- add window depth
     win, frames = add_window_depth(bm, mid, prop.window_depth, xyz[2])
     add_faces_to_map(bm, [win], FaceMap.WINDOW)
