@@ -105,11 +105,9 @@ def create_fill_posts(bm, face, prop):
     # create posts
     post_size = min(prop.post_fill.size, prop.corner_post_width)
 
-    top_edge = sorted_edges[0]
-    bottom_edge = sorted_edges[-1]
+    top_edge, bottom_edge = sorted_edges[0], sorted_edges[-1]
     top_edge_vector = top_edge.verts[0].co - top_edge.verts[1].co
-    top_edge_vector.z = 0
-    n_posts = round(top_edge_vector.length * prop.post_fill.density / post_size)
+    n_posts = round(top_edge_vector.xy.length * prop.post_fill.density / post_size)
     dir = edge_vector(top_edge)
     sloped = edge_is_sloped(top_edge)
     if n_posts != 0:
