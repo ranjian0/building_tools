@@ -2,14 +2,6 @@ import bpy
 from bpy.props import FloatProperty, EnumProperty, BoolProperty, PointerProperty
 
 
-def get_density(self):
-    return self.get("density", self.get("initial_density", 0.2))
-
-
-def set_density(self, value):
-    self["density"] = value
-
-
 class PostFillProperty(bpy.types.PropertyGroup):
     size: FloatProperty(
         name="Size",
@@ -24,14 +16,10 @@ class PostFillProperty(bpy.types.PropertyGroup):
         name="Density",
         min=0.0,
         max=1.0,
+        default=0.5,
         unit="LENGTH",
-        get=get_density,
-        set=set_density,
         description="Number of posts along each edge",
     )
-
-    def init(self, initial_density):
-        self["initial_density"] = initial_density
 
     def draw(self, context, layout):
         row = layout.row(align=True)
@@ -128,14 +116,6 @@ class RailProperty(bpy.types.PropertyGroup):
     post_fill: PointerProperty(type=PostFillProperty)
     rail_fill: PointerProperty(type=RailFillProperty)
     wall_fill: PointerProperty(type=WallFillProperty)
-
-    def init(self, stair_step_width=None, step_count=None):
-        if stair_step_width and self.fill == "POSTS":
-            if step_count > 1:
-                initial_density = (self.post_fill.size * (step_count-1)) / (stair_step_width * step_count)
-            else:
-                initial_density = (self.post_fill.size - 0.001) / (2 * stair_step_width)  # just enough to have 0 post on stairs
-            self.post_fill.init(initial_density=initial_density)
 
     def draw(self, context, layout):
 

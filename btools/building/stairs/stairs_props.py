@@ -84,7 +84,6 @@ class StairsProperty(bpy.types.PropertyGroup):
             default_size=(1.0, 0.0),
             restricted=False,
         )
-        self.rail.init(self.step_width, self.step_count)
 
     def draw(self, context, layout):
         self.size_offset.draw(context, layout)
