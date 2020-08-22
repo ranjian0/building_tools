@@ -172,9 +172,12 @@ def create_object_material(obj, mat_name):
     """ Create a new material and link it to the given object
     """
     if not has_material(obj, mat_name):
-        mat = bpy.data.materials.get(
-            mat_name, bpy.data.materials.new(mat_name)
-        )
+        if bpy.data.materials.get(mat_name, None):
+            # XXX if material with this name already exists in another object
+            # append the object name to this material name
+            mat_name += ".{}".format(obj.name)
+
+        mat = bpy.data.materials.new(mat_name)
         link_material(obj, mat)
         return mat
     return obj.data.materials.get(mat_name)
