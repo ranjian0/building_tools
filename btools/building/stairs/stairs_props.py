@@ -98,15 +98,15 @@ class StairsProperty(bpy.types.PropertyGroup):
         row.prop(self, "step_height")
         row.prop(self, "step_width")
 
+        row = layout.row()
+        row.prop(self, "bottom", expand=True)
+
         col = layout.column()
         col.prop(self, "landing")
         if self.landing:
             box = layout.box()
             col = box.column()
             col.prop(self, "landing_width")
-
-        col = layout.column()
-        col.prop_menu_enum(self, "bottom", text="Bottom Type")
 
         layout.prop(self, "has_railing")
         if self.has_railing:
