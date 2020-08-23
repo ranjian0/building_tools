@@ -33,6 +33,7 @@ def create_balcony(bm, faces, prop):
         front, top = extrude_balcony(bm, f, prop.size_offset.size.y, normal)
 
         if prop.has_railing:
+            prop.rail.show_extra_props = True
             add_railing_to_balcony(bm, top, normal, prop)
         bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 

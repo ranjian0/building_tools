@@ -67,12 +67,15 @@ def make_fill(bm, face, prop):
 
     # create fill
     if prop.fill == "POSTS":
-        create_railing_bottom(bm, bot_edge, prop)
+        if prop.bottom_rail:
+            create_railing_bottom(bm, bot_edge, prop)
         fill = create_fill_posts(bm, dup_face, prop)
     elif prop.fill == "RAILS":
         fill = create_fill_rails(bm, dup_face, prop)
     elif prop.fill == "WALL":
         add_facemap_for_groups(FaceMap.RAILING_WALLS)
+        if prop.bottom_rail:
+            create_railing_bottom(bm, bot_edge, prop)
         fill = create_fill_walls(bm, dup_face, prop)
 
     return top_rail, fill
@@ -87,7 +90,12 @@ def create_railing_top(bm, top_edge, prop):
 
 @map_new_faces(FaceMap.RAILING_RAILS)
 def create_railing_bottom(bm, bot_edge, prop):
-    bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, prop.corner_post_width * 1.5))
+    initial_loc = prop.corner_post_width * 1.5
+    clamped_offset = clamp(
+        prop.bottom_rail_offset,
+        -initial_loc + prop.corner_post_width / 2,
+        prop.corner_post_height - initial_loc * 2)
+    bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, initial_loc + clamped_offset))
     create_railing_cylinder(bm, bot_edge, prop)
     bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, prop.corner_post_width/2))
 
@@ -134,15 +142,15 @@ def create_fill_posts(bm, face, prop):
             vec = edge_vector(dup_edge)
             cylinder = edge_to_cylinder(bm, dup_edge, post_size/2, up)
             if sloped:
-                rotate_faces(bm, cylinder, vec, dir)
+                rotate_faces(bm, cylinder, vec, dir, prop)
+            result.append(list({f for v in cylinder for f in v.link_faces}))
         # delete reference faces
-        dup_faces = list({f for e in inner_edges for f in e.link_faces})
-        bmesh.ops.delete(bm, geom=dup_faces, context="FACES")
-        result.append(list({f for v in cylinder for f in v.link_faces}))
+        bmesh.ops.delete(
+            bm, geom=list({f for e in inner_edges for f in e.link_faces}), context="FACES"
+        )
     else:
         # delete reference faces
         bmesh.ops.delete(bm, geom=[face], context="FACES")
-    return []
     return result
 
 
@@ -243,7 +251,7 @@ def translate_bounds(bm, verts, dir, trans):
     bmesh.ops.translate(bm, verts=vts[-mid:], vec=(-vec.x, -vec.y, 0.0))
 
 
-def rotate_faces(bm, cylinder, dir, left):
+def rotate_faces(bm, cylinder, dir, left, prop):
     """ Rotate the upper and lower faces (align posts to slanted railing)
     """
     mid = len(cylinder) // 2
@@ -254,10 +262,11 @@ def rotate_faces(bm, cylinder, dir, left):
             matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
         )
 
-    bmesh.ops.rotate(
-            bm, verts=vts[:mid], cent=calc_verts_median(vts[:mid]),
-            matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
-        )
+    if prop.bottom_rail:
+        bmesh.ops.rotate(
+                bm, verts=vts[:mid], cent=calc_verts_median(vts[:mid]),
+                matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
+            )
 
 
 def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
