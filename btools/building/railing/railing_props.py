@@ -17,7 +17,6 @@ class PostFillProperty(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
         default=0.5,
-        unit="LENGTH",
         description="Number of posts along each edge",
     )
 
@@ -41,8 +40,7 @@ class RailFillProperty(bpy.types.PropertyGroup):
         name="Rail Density",
         min=0.0,
         max=1.0,
-        default=0.3,
-        unit="LENGTH",
+        default=0.4,
         description="Number of rails over each edge",
     )
 
