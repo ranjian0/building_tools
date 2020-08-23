@@ -115,8 +115,21 @@ class RailProperty(bpy.types.PropertyGroup):
     rail_fill: PointerProperty(type=RailFillProperty)
     wall_fill: PointerProperty(type=WallFillProperty)
 
-    def draw(self, context, layout):
+    show_extra_props: BoolProperty()
+    bottom_rail: BoolProperty(
+        name="Add Bottom Rail",
+        default=True,
+    )
+    bottom_rail_offset: FloatProperty(
+        name="Rail Offset",
+        min=-1.0,
+        max=1.0,
+        default=0.0,
+        unit="LENGTH",
+        description="Offset of the bottom rail",
+    )
 
+    def draw(self, context, layout):
         row = layout.row()
         row.prop(self, "offset", text="Railing Offset")
 
@@ -128,6 +141,11 @@ class RailProperty(bpy.types.PropertyGroup):
             "RAILS" : self.rail_fill,
             "WALL"  : self.wall_fill
         }.get(self.fill).draw(context, layout)
+
+        if self.fill in ["POSTS", "WALL"] and self.show_extra_props:
+            row = layout.row(align=True)
+            row.prop(self, "bottom_rail", toggle=True)
+            row.prop(self, "bottom_rail_offset")
 
         layout.label(text="Corner Posts")
         row = layout.row(align=True)
