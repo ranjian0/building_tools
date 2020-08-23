@@ -228,7 +228,7 @@ def railing_verts(bm, verts, normal, offset, depth):
 
 def post_process_railing(bm, railing, prop):
     fill = railing.fill
-    if prop.rail.fill == "WALL":
+    if prop.rail.fill == "WALL" and not prop.rail.bottom_rail:
         for wall in fill:
 
             # XXX check if any of the wall edges are sloped
