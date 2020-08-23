@@ -209,6 +209,7 @@ def add_railing_to_stairs(bm, top_faces, normal, prop):
     bmesh.ops.translate(bm, verts=top_verts, vec=Vector((0., 0., 1.))*prop.rail.corner_post_height)
     railing_faces = filter_geom(ret["geom"], BMFace)
 
+    prop.rail.show_extra_props = (prop.rail.fill == "WALL")
     res = create_railing(bm, railing_faces, prop.rail, normal)
     post_process_railing(bm, res, prop)
 
