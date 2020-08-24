@@ -84,7 +84,7 @@ def edge_is_vertical(e):
 def edge_is_horizontal(e):
     """ Check if edge is horizontal (zero slope)
     """
-    return edge_slope(e) == 0.0
+    return round(edge_slope(e), 2) == 0.0
 
 
 def edge_is_sloped(e):
