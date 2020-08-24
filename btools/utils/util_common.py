@@ -71,7 +71,7 @@ def crash_safe(func):
         except Exception:
             popup_message("See console for errors", title="Operator Failed!")
             traceback.print_exc()
-        finally:
+
             # -- cleanup blender context
             if bpy.context.mode == "EDIT_MESH":
                 bmesh.update_edit_mesh(bpy.context.edit_object.data, True)
