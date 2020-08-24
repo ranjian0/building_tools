@@ -251,7 +251,6 @@ class TestUtilsMesh(unittest.TestCase):
         self.assertEqual(len([a for a in angles if a == 0]), 8)
         self.assertEqual(len([a for a in angles if round(a, 4) == round(math.pi / 2, 4)]), 4)
 
-
         self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_vertical(e)]), 4)
         self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_horizontal(e)]), 8)
         self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_sloped(e)]), 0)
@@ -285,7 +284,6 @@ class TestUtilsMesh(unittest.TestCase):
 
         # -- parallel
         self.assertEqual(len(btools.utils.filter_parallel_edges(self.bm.edges, Vector((1, 0, 0)))), 4)
-
 
     def test_rectangular_ngon(self):
         btools.utils.plane(self.bm)
