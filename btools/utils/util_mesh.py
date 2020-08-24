@@ -201,7 +201,7 @@ def calc_face_dimensions(face):
     vertical_edges = filter_vertical_edges(face.edges)
     width = sum(e.calc_length() for e in horizontal_edges) / 2
     height = sum(e.calc_length() for e in vertical_edges) / 2
-    return width, height
+    return round(width, 4), round(height, 4)
 
 
 def face_with_verts(bm, verts, default=None):
