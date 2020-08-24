@@ -39,5 +39,5 @@ class Window:
         # -- remove non-rectangular faces
         faces = list(filter(lambda f: is_rectangle(f), faces))
         # -- remove faces that are perpendicular to Z+
-        faces = list(filter(lambda f: round(abs(f.normal.z)) != 1.0, faces))
+        faces = list(filter(lambda f: round(abs(f.normal.z), 2) != 1.0, faces))
         return faces
