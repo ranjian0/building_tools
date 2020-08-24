@@ -13,6 +13,7 @@ from ...utils import (
     valid_ngon,
     sort_faces,
     sort_edges,
+    extrude_face,
     ngon_to_quad,
     get_top_edges,
     get_top_faces,
@@ -78,6 +79,9 @@ def create_window_frame(bm, face, prop):
 def create_circular_frame(bm, face, prop):
     """ Create extrude and inset around circular face
     """
+    if prop.frame_depth != 0.0:
+        face, _ = extrude_face(bm, face, -prop.frame_depth)
+
     xyz = local_xyz(face)
     width, length = calc_face_dimensions(face)
     prop.frame_thickness = min(prop.frame_thickness, min(length, width) / 2)
