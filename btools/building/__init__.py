@@ -10,7 +10,7 @@ from .railing import register_railing, unregister_railing
 from .roof import register_roof, unregister_roof
 from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
-from .custom import register_custom, unregister_custom
+from .customobj import register_custom, unregister_custom
 
 # -- ORDER MATTERS --
 register_funcs = (
