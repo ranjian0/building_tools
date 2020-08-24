@@ -243,7 +243,7 @@ def subdivide_face_vertically(bm, face, widths):
 def subdivide_edges(bm, edges, direction, widths):
     """ Subdivide edges in a direction, widths in the direction
     """
-    dir = direction.copy()
+    dir = direction.copy().normalized()
     cuts = len(widths) - 1
     res = bmesh.ops.subdivide_edges(bm, edges=edges, cuts=cuts)
     inner_edges = filter_geom(res.get("geom_inner"), BMEdge)
@@ -272,6 +272,7 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     )
     theta = math.pi / (len(verts) - 1)
     orient *= (1 / orient.length)
+    arc_direction.normalize()
 
     def arc_sine(verts):
         for idx, v in enumerate(verts):
