@@ -1,7 +1,7 @@
+import bpy
 import btools
 import random
 import unittest
-import bpy
 
 floorplan = btools.building.floorplan
 builder = floorplan.floorplan.Floorplan
