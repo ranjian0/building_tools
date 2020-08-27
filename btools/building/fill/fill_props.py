@@ -90,7 +90,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         name="Glass Pane Depth",
         min=0.0,
         max=0.1,
-        default=0.01,
+        default=0.03,
         step=0.1,
         unit="LENGTH",
         description="Depth of glass panes",
