@@ -25,7 +25,7 @@
 
 ## Authors
 
-Created by [ranjian0](https://github.com/ranjian0) and [luckykadam](https://github.com/luckykadam). Feel free to contact.
+Created by [ranjian0](https://github.com/ranjian0), [luckykadam](https://github.com/luckykadam) and [MCrafterzz](https://github.com/MCrafterzz). Feel free to contact.
 
 ## Support
 
