@@ -22,7 +22,6 @@ from ...utils import (
     add_faces_to_map,
     extrude_face_region,
     calc_face_dimensions,
-    add_facemap_for_groups,
     subdivide_face_vertically,
     subdivide_face_horizontally,
 )
