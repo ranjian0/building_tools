@@ -65,6 +65,7 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         row.operator("btools.add_window")
         row.operator("btools.add_door")
         col.operator("btools.add_multigroup")
+        col.operator("btools.add_fill")
 
         col = layout.column(align=True)
         col.operator("btools.add_custom")

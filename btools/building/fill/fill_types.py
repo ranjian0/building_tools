@@ -17,12 +17,24 @@ from ...utils import (
     filter_vertical_edges,
     filter_horizontal_edges,
     add_facemap_for_groups,
+    valid_ngon,
 )
 
 
 class FillUser(Enum):
     DOOR = auto()
     WINDOW = auto()
+
+
+def add_fill(bm, faces, prop):
+    """Add fills
+    """
+    for face in faces:
+        face.select = False
+        if not valid_ngon(face):
+            ngon_to_quad(bm, face)
+        fill_face(bm, face, prop, prop.comp)
+    return True
 
 
 def fill_face(bm, face, prop, dw="DOOR"):
@@ -47,16 +59,17 @@ def validate_fill_props(prop):
     if prop.fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
         fill = prop.louver_fill
-        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
         fill.louver_depth = min(fill.louver_depth, depth)
     elif prop.fill_type == "BAR":
         # XXX keep bar depth smaller than window depth
         fill = prop.bar_fill
-        fill.bar_depth = min(fill.bar_depth, prop.window_depth)
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        fill.bar_depth = min(fill.bar_depth, depth)
     elif prop.fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
         fill = prop.louver_fill
-        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
         fill.louver_depth = min(fill.louver_depth, depth)
 
 
