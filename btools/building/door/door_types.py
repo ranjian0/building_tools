@@ -5,7 +5,7 @@ from ..arch import (
     create_arch,
     add_arch_depth,
 )
-from ..fill import fill_panel, fill_glass_panes, fill_louver, FillUser
+from ..fill import fill_face
 from ..frame import add_frame_depth
 from ..generic import clamp_count
 from ...utils import (
@@ -120,24 +120,9 @@ def create_door_fill(bm, face, prop):
     if prop.double_door:
         faces = subdivide_face_horizontally(bm, face, widths=[1, 1])
         for f in faces:
-            fill_door_face(bm, f, prop)
+            fill_face(bm, face, prop, "DOOR")
     else:
-        fill_door_face(bm, face, prop)
-
-
-def fill_door_face(bm, face, prop):
-    """ Fill individual door face
-    """
-    validate_fill_props(prop)
-    if prop.fill_type == "PANELS":
-        add_facemap_for_groups(FaceMap.DOOR_PANELS)
-        fill_panel(bm, face, prop.panel_fill)
-    elif prop.fill_type == "GLASS_PANES":
-        add_facemap_for_groups(FaceMap.DOOR_PANES)
-        fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.DOOR)
-    elif prop.fill_type == "LOUVER":
-        add_facemap_for_groups(FaceMap.DOOR_LOUVERS)
-        fill_louver(bm, face, prop.louver_fill, user=FillUser.DOOR)
+        fill_face(bm, face, prop, "DOOR")
 
 
 def make_door_inset(bm, face, size, frame_thickness):
@@ -153,11 +138,3 @@ def make_door_inset(bm, face, size, frame_thickness):
     v_widths = [door_height, frame_thickness]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
     return v_faces[0], h_faces[::2] + [v_faces[1]]
-
-
-def validate_fill_props(prop):
-    if prop.fill_type == "LOUVER":
-        # XXX keep louver depth less than window depth
-        fill = prop.louver_fill
-        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
-        fill.louver_depth = min(fill.louver_depth, depth)

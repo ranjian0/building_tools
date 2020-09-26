@@ -16,12 +16,62 @@ from ...utils import (
     calc_face_dimensions,
     filter_vertical_edges,
     filter_horizontal_edges,
+    add_facemap_for_groups,
+    valid_ngon,
+    ngon_to_quad,
 )
 
 
 class FillUser(Enum):
     DOOR = auto()
     WINDOW = auto()
+
+
+def add_fill(bm, faces, prop):
+    """Add fills
+    """
+    for face in faces:
+        face.select = False
+        if not valid_ngon(face):
+            ngon_to_quad(bm, face)
+        fill_face(bm, face, prop, prop.comp)
+    return True
+
+
+def fill_face(bm, face, prop, dw="DOOR"):
+    """Fill face"""
+    validate_fill_props(prop)
+    user = FillUser.DOOR if dw=="DOOR" else FillUser.WINDOW
+    if prop.fill_type == "PANELS":
+        add_facemap_for_groups(FaceMap.DOOR_PANELS)
+        fill_panel(bm, face, prop.panel_fill)
+    elif prop.fill_type == "GLASS_PANES":
+        add_facemap_for_groups(FaceMap.DOOR_PANES if dw=="DOOR" else FaceMap.WINDOW_PANES)
+        fill_glass_panes(bm, face, prop.glass_fill, user)
+    elif prop.fill_type == "LOUVER":
+        add_facemap_for_groups(FaceMap.DOOR_LOUVERS if dw=="DOOR" else FaceMap.WINDOW_LOUVERS)
+        fill_louver(bm, face, prop.louver_fill, user)
+    elif prop.fill_type == "BAR":
+        add_facemap_for_groups(FaceMap.WINDOW_BARS)
+        fill_bar(bm, face, prop.bar_fill)
+
+
+def validate_fill_props(prop):
+    if prop.fill_type == "LOUVER":
+        # XXX keep louver depth less than window depth
+        fill = prop.louver_fill
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        fill.louver_depth = min(fill.louver_depth, depth)
+    elif prop.fill_type == "BAR":
+        # XXX keep bar depth smaller than window depth
+        fill = prop.bar_fill
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        fill.bar_depth = min(fill.bar_depth, depth)
+    elif prop.fill_type == "LOUVER":
+        # XXX keep louver depth less than window depth
+        fill = prop.louver_fill
+        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        fill.louver_depth = min(fill.louver_depth, depth)
 
 
 @map_new_faces(FaceMap.FRAME, skip=FaceMap.DOOR_PANELS)

@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import IntProperty, FloatProperty
+from bpy.props import IntProperty, FloatProperty, EnumProperty, PointerProperty
 
 
 class FillPanel(bpy.types.PropertyGroup):
@@ -199,3 +199,47 @@ class FillBars(bpy.types.PropertyGroup):
         row.prop(self, "bar_count_y")
         col.prop(self, "bar_width")
         col.prop(self, "bar_depth")
+
+
+class FillProperty(bpy.types.PropertyGroup):
+    fill_types = [
+        ("PANELS", "Panels", "", 0),
+        ("GLASS_PANES", "Glass_Panes", "", 1),
+        ("LOUVER", "Louver", "", 2),
+        ("BAR", "Bar", "", 3),
+    ]
+
+    fill_type: EnumProperty(
+        name="Fill Type",
+        items=fill_types,
+        default="PANELS",
+        description="Type of fill",
+    )
+    comp: EnumProperty(
+        name="ComponentType",
+        items=[("DOOR", "Door", "", 0), ("WINDOW", "Window", "", 1)],
+        default="DOOR",
+        description="Type of component",
+    )
+
+    panel_fill: PointerProperty(type=FillPanel)
+    glass_fill: PointerProperty(type=FillGlassPanes)
+    louver_fill: PointerProperty(type=FillLouver)
+    bar_fill: PointerProperty(type=FillBars)
+
+    def draw(self, context, layout):
+        box = layout.box()
+        col = box.column(align=True)
+        col.prop(self, "comp")
+        col = box.column(align=True)
+        col.prop(self, "fill_type")
+        # -- draw fill types
+        fill_map = {
+            "PANELS": self.panel_fill,
+            "LOUVER": self.louver_fill,
+            "GLASS_PANES": self.glass_fill,
+            "BAR": self.bar_fill,
+        }
+        fill = fill_map.get(self.fill_type)
+        if fill:
+            fill.draw(box)
