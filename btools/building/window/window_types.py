@@ -1,7 +1,7 @@
 import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
-from ..fill import fill_bar, fill_louver, fill_glass_panes, FillUser
+from ..fill import fill_face
 from ..frame import add_frame_depth
 from ..generic import clamp_count
 from ...utils import (
@@ -186,25 +186,4 @@ def make_window_inset(bm, face, size, frame_thickness):
 def fill_window_face(bm, face, prop):
     """Create extra elements on face
     """
-    validate_fill_props(prop)
-    if prop.fill_type == "GLASS_PANES":
-        add_facemap_for_groups(FaceMap.WINDOW_PANES)
-        fill_glass_panes(bm, face, prop.glass_fill, user=FillUser.WINDOW)
-    elif prop.fill_type == "BAR":
-        add_facemap_for_groups(FaceMap.WINDOW_BARS)
-        fill_bar(bm, face, prop.bar_fill)
-    elif prop.fill_type == "LOUVER":
-        add_facemap_for_groups(FaceMap.WINDOW_LOUVERS)
-        fill_louver(bm, face, prop.louver_fill, user=FillUser.WINDOW)
-
-
-def validate_fill_props(prop):
-    if prop.fill_type == "BAR":
-        # XXX keep bar depth smaller than window depth
-        fill = prop.bar_fill
-        fill.bar_depth = min(fill.bar_depth, prop.window_depth)
-    elif prop.fill_type == "LOUVER":
-        # XXX keep louver depth less than window depth
-        fill = prop.louver_fill
-        depth = getattr(prop, "door_depth", getattr(prop, "dw_depth", 1e10))
-        fill.louver_depth = min(fill.louver_depth, depth)
+    fill_face(bm, face, prop, "WINDOW")
