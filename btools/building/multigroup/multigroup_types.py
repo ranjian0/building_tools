@@ -54,7 +54,7 @@ def create_multigroup(bm, faces, prop):
             for window in windows:
                 fill_face(bm, window, prop, "WINDOW")
             if prop.add_arch:
-                fill_face(bm, arch, prop, "WINDOW")
+                fill_arch(bm, arch, prop)
     return True
 
 
