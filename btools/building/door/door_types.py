@@ -120,15 +120,9 @@ def create_door_fill(bm, face, prop):
     if prop.double_door:
         faces = subdivide_face_horizontally(bm, face, widths=[1, 1])
         for f in faces:
-            fill_door_face(bm, f, prop)
+            fill_face(bm, face, prop, "DOOR")
     else:
-        fill_door_face(bm, face, prop)
-
-
-def fill_door_face(bm, face, prop):
-    """ Fill individual door face
-    """
-    fill_face(bm, face, prop, "DOOR")
+        fill_face(bm, face, prop, "DOOR")
 
 
 def make_door_inset(bm, face, size, frame_thickness):

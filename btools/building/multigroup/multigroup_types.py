@@ -3,9 +3,9 @@ import re
 import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
-from ..door.door_types import add_door_depth, create_door_fill
+from ..door.door_types import add_door_depth
+from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
-from ..window.window_types import fill_window_face
 from ...utils import (
     clamp,
     FaceMap,
@@ -50,11 +50,11 @@ def create_multigroup(bm, faces, prop):
             face = create_multigroup_split(bm, aface, prop)
             doors, windows, arch = create_multigroup_frame(bm, face, prop)
             for door in doors:
-                create_door_fill(bm, door, prop)
+                fill_face(bm, door, prop, "DOOR")
             for window in windows:
-                fill_window_face(bm, window, prop)
+                fill_face(bm, window, prop, "WINDOW")
             if prop.add_arch:
-                fill_arch(bm, arch, prop)
+                fill_face(bm, arch, prop, "WINDOW")
     return True
 
 

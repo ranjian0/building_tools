@@ -18,6 +18,7 @@ from ...utils import (
     filter_horizontal_edges,
     add_facemap_for_groups,
     valid_ngon,
+    ngon_to_quad,
 )
 
 

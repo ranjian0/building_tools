@@ -46,7 +46,7 @@ def create_window(bm, faces, prop):
 
             window, arch = create_window_frame(bm, face, prop)
             if prop.type == "RECTANGULAR":
-                fill_window_face(bm, window, prop)
+                fill_face(bm, window, prop, "WINDOW")
                 if prop.add_arch:
                     fill_arch(bm, arch, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
@@ -181,9 +181,3 @@ def make_window_inset(bm, face, size, frame_thickness):
     v_widths = [frame_thickness, window_height, frame_thickness]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
     return v_faces[1], h_faces[::2] + v_faces[::2]
-
-
-def fill_window_face(bm, face, prop):
-    """Create extra elements on face
-    """
-    fill_face(bm, face, prop, "WINDOW")

@@ -5,7 +5,7 @@ from .fill_props import FillProperty
 
 
 class BTOOLS_OT_add_fill(bpy.types.Operator):
-    """Create a Fill from selected faces"""
+    """Add fill to selected faces"""
 
     bl_idname = "btools.add_fill"
     bl_label = "Add Fill"
