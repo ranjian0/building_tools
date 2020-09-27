@@ -1,4 +1,4 @@
-# [Building Tools](https://ranjian0.github.io/building_tool/)
+# [Building Tools](https://ranjian0.github.io/building_tools/)
 
 > ⚡️ Crazy fast way to model buildings in Blender!
 
