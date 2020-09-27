@@ -394,7 +394,7 @@ def ngon_to_quad(bm, face):
     bmesh.ops.dissolve_verts(bm, verts=diss_verts)
 
 
-def get_multi_selection_groups(bm):
+def get_selection_groups(bm):
     """ Group faces that are selected and adjacent to each other
     """
     selected_faces = [f for f in bm.faces if f.select]
