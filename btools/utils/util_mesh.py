@@ -392,3 +392,28 @@ def ngon_to_quad(bm, face):
     diss_edges = list({e for v in diss_verts for e in v.link_edges if e not in face.edges})
     bmesh.ops.dissolve_edges(bm, edges=diss_edges)
     bmesh.ops.dissolve_verts(bm, verts=diss_verts)
+
+
+def get_multi_selection_groups(bm):
+    """ Group faces that are selected and adjacent to each other
+    """
+    selected_faces = [f for f in bm.faces if f.select]
+
+    def get_adjacent_selected(faces):
+        return list({
+            fa for f in faces for e in f.edges for fa in e.link_faces if fa.select
+        })
+
+    result = []
+    while selected_faces:
+        current = selected_faces[0]
+
+        faces = [current]
+        adjacent = get_adjacent_selected(faces)
+        while len(adjacent) > len(faces):
+            faces = adjacent[:]
+            adjacent = get_adjacent_selected(faces)
+
+        list(map(selected_faces.remove, adjacent))
+        result.append(adjacent)
+    return result
