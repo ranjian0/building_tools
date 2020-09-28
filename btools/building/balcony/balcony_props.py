@@ -29,6 +29,10 @@ class BalconyProperty(bpy.types.PropertyGroup):
         name="Add Railing", default=True, description="Whether the balcony has railing"
     )
 
+    group_selection: BoolProperty(
+        name="Group Selection", default=True, description="Treat adjacent face selection as a group"
+    )
+
     rail: PointerProperty(type=RailProperty)
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
@@ -42,6 +46,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         )
 
     def draw(self, context, layout):
+        layout.prop(self, "group_selection")
         self.size_offset.draw(context, layout)
 
         col = layout.column(align=True)

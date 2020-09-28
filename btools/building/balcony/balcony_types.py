@@ -1,3 +1,4 @@
+import math
 import bmesh
 from bmesh.types import BMVert, BMFace
 from mathutils import Vector
@@ -5,7 +6,9 @@ from mathutils import Vector
 from ..railing.railing import create_railing
 from ...utils import (
     clamp,
+    select,
     FaceMap,
+    validate,
     local_xyz,
     sort_edges,
     valid_ngon,
@@ -13,13 +16,41 @@ from ...utils import (
     create_face,
     ngon_to_quad,
     get_top_faces,
+    calc_edge_median,
     add_faces_to_map,
+    get_selection_groups,
     calc_face_dimensions,
+    filter_vertical_edges,
 )
 
 
 def create_balcony(bm, faces, prop):
     """Generate balcony geometry
+    """
+    create_function = [
+        create_balcony_ungrouped, create_balcony_grouped
+    ][prop.group_selection]
+    create_function(bm, faces, prop)
+
+
+def create_balcony_grouped(bm, faces, prop):
+    """ Make a single balcony on each group of adjacent selected faces
+    """
+    selection_groups = get_selection_groups(bm)
+    if all(len(group) == 1 for group in selection_groups):
+        # -- user has no adjacent selections, do ungrouped balcony
+        create_balcony_ungrouped(bm, sum(selection_groups, []), prop)
+
+    for group in selection_groups:
+        [f.select_set(False) for f in group]
+        top_edges = list({e for f in group for e in f.edges})
+        top_edges = sorted(top_edges, key=lambda e : calc_edge_median(e).z, reverse=True)[:len(group)]
+        top_faces = extrude_balcony_grouped(bm, group, prop.size_offset.size.y)
+        top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)['region'].pop()
+
+
+def create_balcony_ungrouped(bm, faces, prop):
+    """ Make a balcony on each face selection
     """
     for f in faces:
         f.select = False
@@ -45,6 +76,33 @@ def extrude_balcony(bm, face, depth, normal):
 
     top = get_top_faces(f for e in front.edges for f in e.link_faces)[0]
     return front, top
+
+
+def extrude_balcony_grouped(bm, group, depth):
+    """ Extrude adjacent selected faces as one
+    """
+
+    def splitones(num):
+        """ Return a list of numbers that add up to num where the largest value is one
+        """
+        fract, intr = math.modf(num)
+        result = [1 for _ in range(int(intr))]
+        if fract > 0.0:
+            result.append(fract)
+        return result
+
+    result = []
+    inset_faces = group[:]
+    valid_normals = [f.normal.to_tuple(3) for f in group]
+    for num in splitones(depth):
+        res = bmesh.ops.inset_region(
+            bm, faces=inset_faces, depth=num, use_even_offset=True, use_boundary=True)["faces"]
+        bmesh.ops.dissolve_degenerate(
+            bm, dist=0.001, edges=list({e for f in inset_faces for e in f.edges}))
+        inset_faces = validate(inset_faces)
+        inset_faces.extend([f for f in res if f.normal.to_tuple(3) in valid_normals])
+        result.extend(res)
+    return [f for f in validate(result) if f.normal.z > 0]
 
 
 def add_railing_to_balcony(bm, top, balcony_normal, prop):
