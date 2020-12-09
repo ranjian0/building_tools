@@ -16,8 +16,8 @@ class RoofProperty(bpy.types.PropertyGroup):
     )
 
     gable_types = [
-        ("OPEN", "OPEN", "", 0),
-        ("BOX", "BOX", "", 1),
+        ("OPEN", "Open", "", 0),
+        ("BOX", "Box", "", 1),
     ]
     gable_type: EnumProperty(
         name="Gable Type",
