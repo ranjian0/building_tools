@@ -1,12 +1,13 @@
 """ Adapted from https://github.com/yonghah/polyskel
 """
 
-import heapq
-import itertools as it
 import math
-import operator
-from collections import namedtuple
+import heapq
+import operator as op
+import itertools as it
+
 from enum import Enum
+from collections import namedtuple
 
 
 class Vector2:
@@ -115,31 +116,31 @@ class Vector2:
 
     def __div__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.div(self.x, other), operator.div(self.y, other))
+        return Vector2(op.div(self.x, other), op.div(self.y, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.div(other, self.x), operator.div(other, self.y))
+        return Vector2(op.div(other, self.x), op.div(other, self.y))
 
     def __floordiv__(self, other):
         assert type(other) in (int, float)
         return Vector2(
-            operator.floordiv(self.x, other), operator.floordiv(self.y, other)
+            op.floordiv(self.x, other), op.floordiv(self.y, other)
         )
 
     def __rfloordiv__(self, other):
         assert type(other) in (int, float)
         return Vector2(
-            operator.floordiv(other, self.x), operator.floordiv(other, self.y)
+            op.floordiv(other, self.x), op.floordiv(other, self.y)
         )
 
     def __truediv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.truediv(self.x, other), operator.truediv(self.y, other))
+        return Vector2(op.truediv(self.x, other), op.truediv(self.y, other))
 
     def __rtruediv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.truediv(other, self.x), operator.truediv(other, self.y))
+        return Vector2(op.truediv(other, self.x), op.truediv(other, self.y))
 
     def __neg__(self):
         return Vector2(-self.x, -self.y)
@@ -518,7 +519,7 @@ class LAVertex:
 
         self._is_reflex = (cross(*direction_vectors)) < 0
         self._bisector = Ray2(
-            self.point, operator.add(*creator_vectors) * (-1 if self.is_reflex else 1)
+            self.point, op.add(*creator_vectors) * (-1 if self.is_reflex else 1)
         )
 
     @property
