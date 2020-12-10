@@ -40,15 +40,17 @@ def create_balcony_grouped(bm, faces, prop):
     if all(len(group) == 1 for group in selection_groups):
         # -- user has no adjacent selections, do ungrouped balcony
         create_balcony_ungrouped(bm, sum(selection_groups, []), prop)
+        return
 
     for faces in selection_groups:
         [f.select_set(False) for f in faces]
         group = filter_geom(bmesh.ops.duplicate(bm, geom=faces)['geom'], BMFace)
         transform_grouped_faces(bm, group, prop)
-        top_faces = extrude_balcony_grouped(bm, group, prop.size_offset.size.y)
+        top_faces = extrude_balcony_grouped(bm, group, prop.depth)
 
-        top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)['region'].pop()
-        add_railing_to_balcony_grouped(bm, top_face, prop)
+        if prop.has_railing:
+            top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)['region'].pop()
+            add_railing_to_balcony_grouped(bm, top_face, prop)
 
 
 def create_balcony_ungrouped(bm, faces, prop):
@@ -183,7 +185,8 @@ def transform_grouped_faces(bm, faces, prop):
     """ Make the height the faces target height starting from the bottom
     """
     face_height = max(map(lambda f: calc_face_dimensions(f)[1], faces))
-    target_height = clamp(prop.slab_height, 0, face_height)
+    target_height = clamp(prop.size_offset.size.y, 0.01, face_height)
+    prop.size_offset.size.y = target_height
 
     trans_offset = target_height - face_height
     verts = list({v for f in faces for v in f.verts})
