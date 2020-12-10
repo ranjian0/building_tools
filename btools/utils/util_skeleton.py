@@ -447,32 +447,6 @@ def normalize_contour(contour):
     ]
 
 
-class RoofType(Enum):
-    HIP_ROOF = 1
-    GABLE_ROOF = 2
-
-
-SkeletonRoofType = RoofType.HIP_ROOF
-
-
-def set_roof_type_hip():
-    global SkeletonRoofType
-    SkeletonRoofType = RoofType.HIP_ROOF
-
-
-def set_roof_type_gable():
-    global SkeletonRoofType
-    SkeletonRoofType = RoofType.GABLE_ROOF
-
-
-def roof_is_hip():
-    return SkeletonRoofType == RoofType.HIP_ROOF
-
-
-def roof_is_gable():
-    return SkeletonRoofType == RoofType.GABLE_ROOF
-
-
 # -- Event Type (etype) is 1
 class SplitEvent(
     namedtuple("SplitEvent", "distance intersection_point etype vertex opposite_edge")
@@ -672,7 +646,7 @@ class SLAV:
     def empty(self):
         return len(self._lavs) == 0
 
-    def handle_edge_event(self, event):
+    def handle_edge_event(self, event, zero_gradient):
         sinks = []
         events = []
 
@@ -694,7 +668,7 @@ class SLAV:
                 events.append(next_event)
 
         # -- gable roof processing
-        if roof_is_gable():
+        if zero_gradient:
             original_points = []
             for e in self._original_edges:
                 original_points.extend([e.edge.p1, e.edge.p2])
@@ -924,12 +898,13 @@ class EventQueue:
             print(item)
 
 
-def skeletonize(polygon, holes=None):
+def skeletonize(polygon, holes=None, zero_gradient=False):
     """
     Compute the straight skeleton of a polygon.
 
     The polygon should be given as a list of vertices in counter-clockwise order.
     Holes is a list of the contours of the holes, the vertices of which should be in clockwise order.
+    Zero gradient is an option to control the gradient between sinks and original_edges (produces gable roof)
 
     Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
     where source is the highest points, height is its height, and sinks are the point connected to the source.
@@ -948,7 +923,7 @@ def skeletonize(polygon, holes=None):
         if isinstance(i, EdgeEvent):
             if not i.vertex_a.is_valid or not i.vertex_b.is_valid:
                 continue
-            (arc, events) = slav.handle_edge_event(i)
+            (arc, events) = slav.handle_edge_event(i, zero_gradient)
 
         elif isinstance(i, SplitEvent):
             if not i.vertex.is_valid:
