@@ -1,12 +1,13 @@
 """ Adapted from https://github.com/yonghah/polyskel
 """
 
-import heapq
-import itertools as it
 import math
-import operator
-from collections import namedtuple
+import heapq
+import operator as op
+import itertools as it
+
 from enum import Enum
+from collections import namedtuple
 
 
 class Vector2:
@@ -115,31 +116,31 @@ class Vector2:
 
     def __div__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.div(self.x, other), operator.div(self.y, other))
+        return Vector2(op.div(self.x, other), op.div(self.y, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.div(other, self.x), operator.div(other, self.y))
+        return Vector2(op.div(other, self.x), op.div(other, self.y))
 
     def __floordiv__(self, other):
         assert type(other) in (int, float)
         return Vector2(
-            operator.floordiv(self.x, other), operator.floordiv(self.y, other)
+            op.floordiv(self.x, other), op.floordiv(self.y, other)
         )
 
     def __rfloordiv__(self, other):
         assert type(other) in (int, float)
         return Vector2(
-            operator.floordiv(other, self.x), operator.floordiv(other, self.y)
+            op.floordiv(other, self.x), op.floordiv(other, self.y)
         )
 
     def __truediv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.truediv(self.x, other), operator.truediv(self.y, other))
+        return Vector2(op.truediv(self.x, other), op.truediv(self.y, other))
 
     def __rtruediv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(operator.truediv(other, self.x), operator.truediv(other, self.y))
+        return Vector2(op.truediv(other, self.x), op.truediv(other, self.y))
 
     def __neg__(self):
         return Vector2(-self.x, -self.y)
@@ -446,32 +447,6 @@ def normalize_contour(contour):
     ]
 
 
-class RoofType(Enum):
-    HIP_ROOF = 1
-    GABLE_ROOF = 2
-
-
-SkeletonRoofType = RoofType.HIP_ROOF
-
-
-def set_roof_type_hip():
-    global SkeletonRoofType
-    SkeletonRoofType = RoofType.HIP_ROOF
-
-
-def set_roof_type_gable():
-    global SkeletonRoofType
-    SkeletonRoofType = RoofType.GABLE_ROOF
-
-
-def roof_is_hip():
-    return SkeletonRoofType == RoofType.HIP_ROOF
-
-
-def roof_is_gable():
-    return SkeletonRoofType == RoofType.GABLE_ROOF
-
-
 # -- Event Type (etype) is 1
 class SplitEvent(
     namedtuple("SplitEvent", "distance intersection_point etype vertex opposite_edge")
@@ -518,7 +493,7 @@ class LAVertex:
 
         self._is_reflex = (cross(*direction_vectors)) < 0
         self._bisector = Ray2(
-            self.point, operator.add(*creator_vectors) * (-1 if self.is_reflex else 1)
+            self.point, op.add(*creator_vectors) * (-1 if self.is_reflex else 1)
         )
 
     @property
@@ -671,7 +646,7 @@ class SLAV:
     def empty(self):
         return len(self._lavs) == 0
 
-    def handle_edge_event(self, event):
+    def handle_edge_event(self, event, zero_gradient):
         sinks = []
         events = []
 
@@ -693,7 +668,7 @@ class SLAV:
                 events.append(next_event)
 
         # -- gable roof processing
-        if roof_is_gable():
+        if zero_gradient:
             original_points = []
             for e in self._original_edges:
                 original_points.extend([e.edge.p1, e.edge.p2])
@@ -923,12 +898,13 @@ class EventQueue:
             print(item)
 
 
-def skeletonize(polygon, holes=None):
+def skeletonize(polygon, holes=None, zero_gradient=False):
     """
     Compute the straight skeleton of a polygon.
 
     The polygon should be given as a list of vertices in counter-clockwise order.
     Holes is a list of the contours of the holes, the vertices of which should be in clockwise order.
+    Zero gradient is an option to control the gradient between sinks and original_edges (produces gable roof)
 
     Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
     where source is the highest points, height is its height, and sinks are the point connected to the source.
@@ -947,7 +923,7 @@ def skeletonize(polygon, holes=None):
         if isinstance(i, EdgeEvent):
             if not i.vertex_a.is_valid or not i.vertex_b.is_valid:
                 continue
-            (arc, events) = slav.handle_edge_event(i)
+            (arc, events) = slav.handle_edge_event(i, zero_gradient)
 
         elif isinstance(i, SplitEvent):
             if not i.vertex.is_valid:

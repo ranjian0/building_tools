@@ -17,8 +17,6 @@ from ...utils import (
     edge_is_vertical,
     add_faces_to_map,
     calc_edge_median,
-    set_roof_type_hip,
-    set_roof_type_gable,
     add_facemap_for_groups,
 )
 
@@ -97,8 +95,7 @@ def create_gable_roof(bm, faces, prop):
     points = [v.co.to_tuple()[:2] for v in verts]
 
     # -- compute straight skeleton
-    set_roof_type_gable()
-    skeleton = skeletonize(points, [])
+    skeleton = skeletonize(points, [], zero_gradient=True)
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
     height_scale = prop.height / max([arc.height for arc in skeleton])
@@ -134,7 +131,6 @@ def create_hip_roof(bm, faces, prop):
     points = [v.co.to_tuple()[:2] for v in verts]
 
     # -- compute straight skeleton
-    set_roof_type_hip()
     skeleton = skeletonize(points, [])
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 

@@ -23,6 +23,10 @@
   src="https://www.youtube.com/embed/rB1fm4I_bW4"
   frameborder="0"></iframe>
 
+## Wiki
+
+For more detailed documentation, please visit our wiki [here](https://github.com/ranjian0/building_tools/wiki).
+
 ## Authors
 
 Created by [ranjian0](https://github.com/ranjian0), [luckykadam](https://github.com/luckykadam) and [MCrafterzz](https://github.com/MCrafterzz). Feel free to contact.
