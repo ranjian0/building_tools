@@ -86,12 +86,11 @@ class TestFloorplan(unittest.TestCase):
 
         self.clear_objects()
 
-        prop.cap_tris = True
         res = builder.build(context, prop)
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), prop.segments) # cap_tris False
+        self.assertEquals(len(faces), 1)
 
     def test_composite(self):
         context = bpy.context
