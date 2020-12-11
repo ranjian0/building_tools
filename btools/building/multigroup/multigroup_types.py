@@ -31,15 +31,18 @@ def create_multigroup(bm, faces, prop):
     """ Create multigroup from face selection
     """
 
-    # Prevent error when there are no components
-    if len(prop.components) == 0:
-        popup_message("No components are chosen", "No Components Error")
-        return False
+    # Convert components to lowercase (allow user to enter lower or uppercase)
+    prop.components = prop.components.lower()
 
-    # Prevent error when there are invalid chars
+    # Remove invalid chars (if any exist)
     if not re.match("^[dw]*$", prop.components):
         prop.components = re.sub("[^d|w|]", "", prop.components)
 
+    # Prevent error when there are no valid components
+    if len(prop.components) == 0:
+        popup_message("No valid components", "Components Error")
+        return False
+        
     for face in faces:
         face.select = False
         if not valid_ngon(face):
