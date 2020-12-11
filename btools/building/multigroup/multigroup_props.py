@@ -78,10 +78,6 @@ class MultigroupProperty(bpy.types.PropertyGroup):
     arch: PointerProperty(type=ArchProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
-    double_door: BoolProperty(
-        name="Double Door", default=False, description="Double door"
-    )
-
     panel_fill: PointerProperty(type=FillPanel)
     glass_fill: PointerProperty(type=FillGlassPanes)
     louver_fill: PointerProperty(type=FillLouver)
@@ -121,10 +117,6 @@ class MultigroupProperty(bpy.types.PropertyGroup):
 
         col = box.column(align=True)
         col.prop(self, "count")
-
-        if "d" in str(self.components):
-            col = box.column(align=True)
-            col.prop(self, "double_door")
 
         box = layout.box()
         col = box.column(align=True)
