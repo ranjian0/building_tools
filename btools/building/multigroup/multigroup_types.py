@@ -90,7 +90,9 @@ def create_multigroup_frame(bm, face, prop):
     """
     normal = face.normal.copy()
 
-    dws = parse_components(prop.components)
+    # XXX Reverse prop.components to solve issue #175
+    # -- the real issue is with util_mesh.subdivide_face_* functions that don't allow direction parameter
+    dws = parse_components(prop.components[::-1])
     door_faces, window_faces, frame_faces = make_multigroup_insets(bm, face, prop, dws)
     arch_face = None
 
@@ -166,10 +168,7 @@ def make_multigroup_insets(bm, face, prop, dws):
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
 
-    doors = []
-    windows = []
-    frames = []
-
+    doors, windows, frames = [], [], []
     for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
         if dw['type'] == 'door':
             ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
