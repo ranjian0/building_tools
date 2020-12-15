@@ -175,12 +175,6 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Length of floorplan segment",
     )
 
-    cap_tris: BoolProperty(
-        name="Cap Triangles",
-        default=False,
-        description="Set the fill type to triangles",
-    )
-
     def draw(self, context, layout):
         row = layout.row()
         row.prop(self, "type", text="")
@@ -205,9 +199,6 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, "radius")
             col.prop(self, "segments")
-
-            row = box.row()
-            row.prop(self, "cap_tris", toggle=True)
 
         elif self.type == "COMPOSITE":
             row = box.row(align=True)

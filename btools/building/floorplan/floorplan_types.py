@@ -28,7 +28,7 @@ def create_rectangular_floorplan(bm, prop):
 def create_circular_floorplan(bm, prop):
     """Create circle in provided bmesh
     """
-    circle(bm, prop.radius, prop.segments, prop.cap_tris)
+    circle(bm, prop.radius, prop.segments)
 
 
 def create_composite_floorplan(bm, prop):
