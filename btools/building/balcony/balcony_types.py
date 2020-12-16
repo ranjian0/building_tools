@@ -170,6 +170,7 @@ def create_balcony_split(bm, face, prop):
     """
     xyz = local_xyz(face)
     w, h = calc_face_dimensions(face)
+    # TODO(ranjian0) Take into consideration the offset of a balcony when clamping width
     width = min(w, prop.size_offset.size.x)
     height = max(0, prop.size_offset.size.y)
     f = create_face(
