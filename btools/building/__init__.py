@@ -8,6 +8,7 @@ from .generic import register_generic, unregister_generic
 from .material import register_material, unregister_material
 from .multigroup import register_multigroup, unregister_multigroup
 from .railing import register_railing, unregister_railing
+from .removeobj import register_removeobj, unregister_removeobj
 from .roof import register_roof, unregister_roof
 from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
@@ -27,6 +28,7 @@ register_funcs = (
     register_roof,
     register_multigroup,
     register_custom,
+    register_removeobj,
 )
 
 unregister_funcs = (
@@ -43,6 +45,7 @@ unregister_funcs = (
     unregister_roof,
     unregister_multigroup,
     unregister_custom,
+    unregister_removeobj,
 )
 
 
