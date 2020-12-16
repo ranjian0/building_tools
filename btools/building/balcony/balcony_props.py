@@ -30,7 +30,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
     )
 
     group_selection: BoolProperty(
-        name="Group Selection", default=True, description="Treat adjacent face selection as a group"
+        name="Group Selection", default=True, description="Treat adjacent face selections as a single group"
     )
 
     rail: PointerProperty(type=RailProperty)
