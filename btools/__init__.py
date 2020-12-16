@@ -6,7 +6,7 @@ from .building import register_building, unregister_building
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Karanja (ranjian0), Lucky Kadam (luckykadam), Marcus (MCrafterzz)",
-    "version": (1, 0, 6),
+    "version": (1, 0, 7),
     "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
@@ -67,9 +67,9 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         col.operator("btools.add_multigroup")
         col.operator("btools.add_fill")
 
-        col = layout.column(align=True)
-        col.operator("btools.add_custom")
-        col.prop(context.scene, "btools_custom_object", text="")
+        # col = layout.column(align=True)
+        # col.operator("btools.add_custom")
+        # col.prop(context.scene, "btools_custom_object", text="")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):
@@ -138,7 +138,7 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
             layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 
-classes = (BTOOLS_PT_road_tools, BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
+classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
 
 def register():

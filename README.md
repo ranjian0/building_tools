@@ -29,7 +29,7 @@ and `Building Tools` was born.
 
 ## Installation
 
-1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tools/releases/download/v1.0.6/building_tools-v1.0.6.zip).
+1. Download add-on (zipped) from this [link](https://github.com/ranjian0/building_tools/releases/download/v1.0.7/building_tools-v1.0.7.zip).
 2. In blender, go to : Edit -> Preferences -> Add-ons -> Install.
 3. Select the downloaded file and you're good to go.
 
@@ -47,7 +47,7 @@ and `Building Tools` was born.
 
 ## Status
 
-`Version` : `v1.0.6`
+`Version` : `v1.0.7`
 
 ## Inspiration
 
