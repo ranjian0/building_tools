@@ -122,6 +122,8 @@ def create_fill_posts(bm, face, prop):
     sorted_edges = sort_edges(
         [e for e in face.edges if not edge_is_vertical(e)], Vector((0.0, 0.0, -1.0))
     )
+    if not sorted_edges:
+        return result
 
     # create posts
     post_size = min(prop.post_fill.size, prop.corner_post_width)
