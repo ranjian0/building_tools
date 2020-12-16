@@ -17,6 +17,17 @@ def clamp(value, minimum, maximum):
     """
     return max(min(value, maximum), minimum)
 
+def minmax(items, key=lambda val : val):
+    """ Return the smallest and largest value in items using key
+    """
+    _min = _max = None
+    for val in items:
+        if _min is None or key(val) < key(_min):
+            _min = val
+        if _max is None or key(val) > key(_max):
+            _max = val
+    return _min, _max    
+
 
 def args_from_props(props, names):
     """ returns a tuple with the properties in props for the given names
