@@ -62,14 +62,15 @@ def create_balcony_ungrouped(bm, faces, prop):
             ngon_to_quad(bm, f)
 
         normal = f.normal.copy()
-        f = create_balcony_split(bm, f, prop)
-        add_faces_to_map(bm, [f], FaceMap.BALCONY)
-        front, top = extrude_balcony(bm, f, prop.depth, normal)
+        split_faces = create_balcony_split(bm, f, prop)
+        for f in split_faces:
+            add_faces_to_map(bm, [f], FaceMap.BALCONY)
+            front, top = extrude_balcony(bm, f, prop.depth, normal)
 
-        if prop.has_railing:
-            prop.rail.show_extra_props = True
-            add_railing_to_balcony(bm, top, normal, prop)
-        bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
+            if prop.has_railing:
+                prop.rail.show_extra_props = True
+                add_railing_to_balcony(bm, top, normal, prop)
+            bmesh.ops.delete(bm, geom=[f], context="FACES_ONLY")
 
 
 def extrude_balcony(bm, face, depth, normal):
@@ -173,13 +174,23 @@ def create_balcony_split(bm, face, prop):
     # TODO(ranjian0) Take into consideration the offset of a balcony when clamping width
     width = min(w, prop.size_offset.size.x)
     height = max(0, prop.size_offset.size.y)
-    f = create_face(
-        bm, Vector((width, height)), prop.size_offset.offset + Vector((0, -(h - height) / 2)), xyz
-    )
-    bmesh.ops.translate(
-        bm, verts=f.verts, vec=face.calc_center_bounds() - face.normal*prop.depth_offset
-    )
-    return f
+    count = min(prop.count, int(w / prop.size_offset.size.x))
+
+    result = []
+    array_dist = w / count
+    start = face.calc_center_median() + (xyz[0] * (w / 2))
+    for i in range(count):
+        f = create_face(
+            bm, Vector((width, height)), prop.size_offset.offset + Vector((0, -(h - height) / 2)), xyz
+        )
+        off = ((i * array_dist) * -xyz[0]) + ((array_dist/2) * -xyz[0])
+        bmesh.ops.translate(
+            bm, verts=f.verts, vec=start + off - face.normal*prop.depth_offset
+        )
+        result.append(f)
+
+    prop.count = count
+    return result
 
 
 def transform_grouped_faces(bm, faces, prop):

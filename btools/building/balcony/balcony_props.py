@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import BoolProperty, FloatProperty, PointerProperty
 
-from ..generic import SizeOffsetProperty
+from ..generic import SizeOffsetProperty, CountProperty
 from ..railing.railing_props import RailProperty
 
 
@@ -33,6 +33,7 @@ class BalconyProperty(bpy.types.PropertyGroup):
         name="Group Selection", default=True, description="Treat adjacent face selections as a single group"
     )
 
+    count: CountProperty
     rail: PointerProperty(type=RailProperty)
 
     size_offset: PointerProperty(type=SizeOffsetProperty)
@@ -55,6 +56,9 @@ class BalconyProperty(bpy.types.PropertyGroup):
         col = layout.column(align=True)
         col.prop(self, "depth_offset")
 
+        layout.separator()
+        layout.prop(self, "count")
+        
         layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()
