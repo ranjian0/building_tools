@@ -342,7 +342,7 @@ def get_selected_face_dimensions(context):
 def create_face(bm, size, offset, xyz):
     """ Create a face in xy plane of xyz space
     """
-    offset = offset.x * xyz[0] + offset.y * xyz[1]
+    offset = -offset.x * xyz[0] + offset.y * xyz[1]
 
     v1 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2+size.y*xyz[1]/2)["vert"][0]
     v2 = bmesh.ops.create_vert(bm, co=offset+size.x*xyz[0]/2-size.y*xyz[1]/2)["vert"][0]
