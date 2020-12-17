@@ -193,6 +193,11 @@ def calc_verts_median(verts):
     """
     return ft.reduce(operator.add, [v.co for v in verts]) / len(verts)
 
+def calc_faces_median(faces):
+    """ Determin the median position of faces
+    """
+    return ft.reduce(operator.add, [f.calc_center_median() for f in faces]) / len(faces)
+
 
 def calc_face_dimensions(face):
     """ Determine the width and height of face
