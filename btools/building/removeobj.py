@@ -2,56 +2,80 @@
 Small Operator to remove components from a set of faces
 """
 import bpy
+import math
 import bmesh
-from ..utils import get_edit_mesh, minmax, select
+from ..utils import (
+    minmax, 
+    select,
+    VEC_UP,
+    get_edit_mesh, 
+    calc_faces_median
+)
 
 def remove(context):
-    # -- get selection
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
+
+    bound_faces = get_faces_in_selection_bounds(bm)
+    cornerv, midv = get_bounding_verts(bound_faces)
+
+    bmesh.ops.delete(bm, geom=bound_faces, context="FACES")
+    bmesh.ops.dissolve_verts(bm, verts=midv)
+    bmesh.ops.contextual_create(bm, geom=cornerv)
+
+    bmesh.update_edit_mesh(me, True)
+
+def get_faces_in_selection_bounds(bm):
+    """ Determine all faces that lie within the bounds of selected faces
+    """
     faces = [f for f in bm.faces if f.select]
     verts = list({v for f in faces for v in f.verts})
 
-    # -- find bounding verts from face selection
-    min_x, max_x = minmax(verts, key=lambda v:v.co.x)
-    min_y, max_y = minmax(verts, key=lambda v:v.co.y)
+    normal = faces[0].normal.copy()
+    medianf = calc_faces_median(faces)
     min_z, max_z = minmax(verts, key=lambda v:v.co.z)
+    max_dist = max([(f.calc_center_median() - medianf).length for f in faces])
 
-    def in_range(v, _min, _max, attr="x"):
-        return getattr(_min.co, attr) <= getattr(v.co, attr) <= getattr(_max.co, attr)
+    close_faces = []
+    for f in bm.faces:
+        if f in faces:
+            continue
 
-    verts_in_x = list(filter(lambda v:in_range(v, min_x, max_x), bm.verts))
-    verts_in_y = list(filter(lambda v:in_range(v, min_y, max_y, "y"), bm.verts))
-    verts_in_z = list(filter(lambda v:in_range(v, min_z, max_z, "z"), bm.verts))
+        cm = f.calc_center_median()
+        within_median = (cm - medianf).length_squared <= max_dist**2
+        within_angle = math.radians(85.0) <= (medianf - cm).angle(normal) <= math.radians(95.0)
+        within_height = round(cm.z, 4) > round(min_z.co.z, 4) and round(cm.z, 4) < round(max_z.co.z, 4)
+        if within_angle and within_median and within_height:
+            close_faces.append(f)
 
-    bound_verts = list(set(verts_in_x) & set(verts_in_y) & set(verts_in_z))
-    # select(faces, False)
-    # select(bound_verts)
+    select(faces, False)
+    return close_faces + faces
 
-    # if (max_x.x - min_x.x) < 0.1:
-    #     print("oops x")
-    # select(faces, False)
-    # select([max_z, min_z])
-    # print(max_x, min_x)
-    # select([min_x, min_y, min_z, max_x, max_y, max_z])
-    # print("Done Selection")
-    # print(min_x, max_x)
-    # print(min_y, max_y)
-    # print(min_z, max_z) 
+def get_bounding_verts(faces):
+    """ Get the extreme edges and verts in the faces
+    """
+    verts = list({v for f in faces for v in f.verts})
+    edges = list({e for f in faces for e in f.edges})
+    min_z, max_z = minmax(verts, key=lambda v:v.co.z)
+    bound_verts = [v for v in verts if v.co.z == max_z.co.z or v.co.z == min_z.co.z]
 
-    # -- validate selection (select extra neighbouring faces that user may not have selected)
-    # for v in verts:
-    #     for f in v.link_faces:
-    #         if all(vl in verts for vl in f.verts):
-    #             # -- this face is linked to the current selection
-    #             if not f.select:
-    #                 print("FOund ", f.normal)
-    #                 f.select_set(True)
+    corner_verts, mid_verts = [], []
+    for v in bound_verts:
+        angle = vert_angle(v, edges)
+        if angle == 0:
+            mid_verts.append(v)
+            continue
+        corner_verts.append(v)
 
-    # -- selection bounds
-    # sorted
-    # print(faces)
-    bmesh.update_edit_mesh(me, True)
+    return corner_verts, mid_verts
+
+def vert_angle(v, filter_edges):
+    ve = [e for e in v.link_edges if e in filter_edges]
+    if len(ve) > 2:
+        return 0
+
+    vecs = [v.co - e.other_vert(v).co for e in ve]
+    return vecs[0].angle(vecs[1]), 4
 
 
 class BTOOLS_OT_remove_obj(bpy.types.Operator):
