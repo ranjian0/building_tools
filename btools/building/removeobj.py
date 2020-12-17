@@ -1,6 +1,3 @@
-"""
-Small Operator to remove components from a set of faces
-"""
 import bpy
 import math
 import bmesh
