@@ -55,7 +55,7 @@ def create_door_split(bm, face, prop):
     wall_w, wall_h = calc_face_dimensions(face)
     size, offset = prop.size_offset.size, prop.size_offset.offset
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     v_width = [size.y, wall_h - size.y]

@@ -59,7 +59,7 @@ def create_window_split(bm, face, size, offset):
     """
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]

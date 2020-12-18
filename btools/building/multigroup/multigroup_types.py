@@ -69,7 +69,7 @@ def create_multigroup_split(bm, face, prop):
     size, offset = prop.size_offset.size, prop.size_offset.offset
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
