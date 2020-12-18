@@ -72,7 +72,7 @@ def vert_angle(v, filter_edges):
         return 0
 
     vecs = [v.co - e.other_vert(v).co for e in ve]
-    return vecs[0].angle(vecs[1]), 4
+    return vecs[0].angle(vecs[1])
 
 
 class BTOOLS_OT_remove_obj(bpy.types.Operator):
