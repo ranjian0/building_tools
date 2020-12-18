@@ -1,11 +1,13 @@
 import bmesh
+from mathutils import Vector
 
-from ..arch import fill_arch, create_arch, add_arch_depth
 from ..fill import fill_face
 from ..frame import add_frame_depth
-from ..generic import clamp_count
+from ..array import clamp_count, array_fit_elements
+from ..arch import fill_arch, create_arch, add_arch_depth
 from ...utils import (
     clamp,
+    select,
     FaceMap,
     validate,
     arc_edge,
@@ -40,9 +42,11 @@ def create_window(bm, faces, prop):
             ngon_to_quad(bm, face)
 
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+        array_fit_elements(prop)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
+
         for aface in array_faces:
-            face = create_window_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+            face = create_window_split(bm, aface, prop.size, prop.offset)
 
             window, arch = create_window_frame(bm, face, prop)
             if prop.type == "RECTANGULAR":
@@ -129,7 +133,7 @@ def create_rectangular_frame(bm, face, prop):
     min_frame_size = min(calc_face_dimensions(face)) / 2
     prop.frame_thickness = clamp(prop.frame_thickness, 0.01, min_frame_size - 0.001)
 
-    window_face, frame_faces = make_window_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
+    window_face, frame_faces = make_window_inset(bm, face, prop.size, prop.frame_thickness)
     arch_face = None
 
     # create arch

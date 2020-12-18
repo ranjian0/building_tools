@@ -170,18 +170,18 @@ def create_balcony_split(bm, face, prop):
     """Use properties to create face
     """
     xyz = local_xyz(face)
-    w, h = calc_face_dimensions(face)
+    face_w, face_h = calc_face_dimensions(face)
     # TODO(ranjian0) Take into consideration the offset of a balcony when clamping width
-    width = min(w, prop.size_offset.size.x)
-    height = max(0, prop.size_offset.size.y)
-    count = min(prop.count, int(w / prop.size_offset.size.x))
+    width = min(face_w, prop.width)
+    height = max(0, prop.height)
+    count = min(prop.count, int(face_w / prop.width))
 
     result = []
-    array_dist = w / count
-    start = face.calc_center_median() + (xyz[0] * (w / 2))
+    array_dist = face_w / count
+    start = face.calc_center_median() + (xyz[0] * (face_w / 2))
     for i in range(count):
         f = create_face(
-            bm, Vector((width, height)), prop.size_offset.offset + Vector((0, -(h - height) / 2)), xyz
+            bm, Vector((width, height)), prop.size_offset.offset + Vector((0, -(face_h - height) / 2)), xyz
         )
         off = ((i * array_dist) * -xyz[0]) + ((array_dist/2) * -xyz[0])
         bmesh.ops.translate(
@@ -197,14 +197,14 @@ def transform_grouped_faces(bm, faces, prop):
     """ Make the height the faces target height starting from the bottom
     """
     face_height = max(map(lambda f: calc_face_dimensions(f)[1], faces))
-    target_height = clamp(prop.size_offset.size.y, 0.01, face_height)
-    prop.size_offset.size.y = target_height
+    target_height = clamp(prop.height, 0.01, face_height)
+    prop.height = target_height
 
     trans_offset = target_height - face_height
     verts = list({v for f in faces for v in f.verts})
     top_verts = sort_verts(verts, VEC_UP)[len(verts) // 2:]
     bmesh.ops.translate(bm, verts=top_verts, vec=VEC_UP * trans_offset)
-    bmesh.ops.translate(bm, verts=verts, vec=VEC_UP * prop.size_offset.offset.y)
+    bmesh.ops.translate(bm, verts=verts, vec=VEC_UP * prop.height)
 
 
 def top_face_edges(faces):

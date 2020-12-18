@@ -6,6 +6,7 @@ from ..arch import fill_arch, create_arch, add_arch_depth
 from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
+from ..array import array_fit_elements
 from ...utils import (
     clamp,
     FaceMap,
@@ -48,7 +49,8 @@ def create_multigroup(bm, faces, prop):
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+        array_fit_elements(prop)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         for aface in array_faces:
             face = create_multigroup_split(bm, aface, prop)
             doors, windows, arch = create_multigroup_frame(bm, face, prop)
@@ -66,7 +68,7 @@ def create_multigroup_split(bm, face, prop):
     """ Use properties from SizeOffset to subdivide face into regular quads
     """
 
-    size, offset = prop.size_offset.size, prop.size_offset.offset
+    size, offset = prop.size, prop.offset
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
     h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]

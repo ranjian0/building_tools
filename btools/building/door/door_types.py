@@ -7,7 +7,7 @@ from ..arch import (
 )
 from ..fill import fill_face
 from ..frame import add_frame_depth
-from ..generic import clamp_count
+from ..array import clamp_count, array_fit_elements
 from ...utils import (
     clamp,
     FaceMap,
@@ -36,9 +36,8 @@ def create_door(bm, faces, prop):
             ngon_to_quad(bm, face)
 
         clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_faces = subdivide_face_horizontally(
-            bm, face, widths=[prop.size_offset.size.x] * prop.count
-        )
+        array_fit_elements(prop)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         for aface in array_faces:
             face = create_door_split(bm, aface, prop)
             door, arch = create_door_frame(bm, face, prop)
@@ -52,8 +51,8 @@ def create_door(bm, faces, prop):
 def create_door_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads
     """
+    size, offset = prop.size, prop.offset
     wall_w, wall_h = calc_face_dimensions(face)
-    size, offset = prop.size_offset.size, prop.size_offset.offset
     # horizontal split
     h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
@@ -73,7 +72,7 @@ def create_door_frame(bm, face, prop):
     min_frame_size = min(calc_face_dimensions(face)) / 2
     prop.frame_thickness = clamp(prop.frame_thickness, 0.01, min_frame_size - 0.001)
 
-    door_face, frame_faces = make_door_inset(bm, face, prop.size_offset.size, prop.frame_thickness)
+    door_face, frame_faces = make_door_inset(bm, face, prop.size, prop.frame_thickness)
     arch_face = None
 
     # create arch

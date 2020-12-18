@@ -1,11 +1,26 @@
 import bpy
-from bpy.props import FloatProperty, EnumProperty, PointerProperty, BoolProperty
+from bpy.props import (
+    EnumProperty, 
+    BoolProperty,
+    FloatProperty, 
+    PointerProperty, 
+)
 
+from ..arch import ArchProperty
+from ..array import ArrayProperty, ArrayGetSet
 from ..fill import FillPanel, FillLouver, FillGlassPanes
-from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
+from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
 
-class DoorProperty(bpy.types.PropertyGroup):
+class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
+    arch: PointerProperty(type=ArchProperty)
+    array: PointerProperty(type=ArrayProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
+
+    panel_fill: PointerProperty(type=FillPanel)
+    louver_fill: PointerProperty(type=FillLouver)
+    glass_fill: PointerProperty(type=FillGlassPanes)
+
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.01,
@@ -52,17 +67,9 @@ class DoorProperty(bpy.types.PropertyGroup):
         description="Type of fill for door",
     )
 
-    count: CountProperty
-    arch: PointerProperty(type=ArchProperty)
-    size_offset: PointerProperty(type=SizeOffsetProperty)
-
     double_door: BoolProperty(
         name="Double Door", default=False, description="Double door"
     )
-
-    panel_fill: PointerProperty(type=FillPanel)
-    glass_fill: PointerProperty(type=FillGlassPanes)
-    louver_fill: PointerProperty(type=FillLouver)
 
     def init(self, wall_dimensions):
         self["wall_dimensions"] = wall_dimensions
@@ -85,8 +92,7 @@ class DoorProperty(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "door_depth")
 
-        col = box.column(align=True)
-        col.prop(self, "count")
+        self.array.draw(context, box)
 
         col = box.column(align=True)
         col.prop(self, "double_door")

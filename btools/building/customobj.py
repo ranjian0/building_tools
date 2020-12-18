@@ -20,11 +20,10 @@ from ..utils import (
     get_selected_face_dimensions,
 )
 from ..utils import VEC_UP, VEC_FORWARD
-from .generic import CountProperty, SizeOffsetProperty
+from .sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
 
-class CustomObjectProperty(bpy.types.PropertyGroup):
-    count: CountProperty
+class CustomObjectProperty(bpy.types.PropertyGroup, SizeOffsetGetSet):
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def init(self, wall_dimensions):
@@ -39,7 +38,7 @@ class CustomObjectProperty(bpy.types.PropertyGroup):
         box = layout.box()
         self.size_offset.draw(context, box)
 
-        layout.prop(self, "count")
+        # layout.prop(self, "count")
 
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):

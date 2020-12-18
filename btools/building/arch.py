@@ -1,5 +1,11 @@
+import bpy
 import bmesh
 from bmesh.types import BMEdge
+from bpy.props import (
+    IntProperty,
+    EnumProperty,
+    FloatProperty,
+)
 
 from ..utils import (
     FaceMap,
@@ -11,6 +17,62 @@ from ..utils import (
     extrude_face_region,
     add_facemap_for_groups,
 )
+
+
+class ArchProperty(bpy.types.PropertyGroup):
+    """ Convinience PropertyGroup to create arched features """
+
+    def get_height(self):
+        return self.get("height", min(self["parent_height"], self["default_height"]))
+
+    def set_height(self, value):
+        self["height"] = clamp(value, 0.1, self["parent_height"] - 0.0001)
+
+    resolution: IntProperty(
+        name="Arc Resolution",
+        min=1,
+        max=128,
+        default=6,
+        description="Number of segements for the arc",
+    )
+
+    depth: FloatProperty(
+        name="Arc Depth",
+        min=0.01,
+        max=1.0,
+        default=0.05,
+        unit="LENGTH",
+        description="How far arc is from top",
+    )
+
+    height: FloatProperty(
+        name="Arc Height",
+        get=get_height,
+        set=set_height,
+        unit="LENGTH",
+        description="Radius of the arc",
+    )
+
+    func_items = [("SINE", "Sine", "", 0), ("SPHERE", "Sphere", "", 1)]
+    function: EnumProperty(
+        name="Offset Function",
+        items=func_items,
+        default="SPHERE",
+        description="Type of offset for arch",
+    )
+
+    def init(self, parent_height):
+        self["parent_height"] = parent_height
+        self["default_height"] = 0.4
+
+    def draw(self, context, box):
+
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, "function", expand=True)
+        col.prop(self, "resolution")
+        col.prop(self, "depth")
+        col.prop(self, "height")
 
 
 def fill_arch(bm, face, prop):
