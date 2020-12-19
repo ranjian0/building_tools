@@ -67,14 +67,13 @@ def create_multigroup(bm, faces, prop):
 def create_multigroup_split(bm, face, prop):
     """ Use properties from SizeOffset to subdivide face into regular quads
     """
-
-    size, offset = prop.size, prop.offset
     wall_w, wall_h = calc_face_dimensions(face)
+    width, height, offset = *prop.size, prop.offset
     # horizontal split
-    h_widths = [wall_w/2 - offset.x - size.x/2, size.x, wall_w/2 + offset.x - size.x/2]
+    h_widths = [wall_w/2 - offset.x - width/2, width, wall_w/2 + offset.x - width/2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
+    size_y = min(height, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
 
     if "d" not in prop.components:
         # XXX Only windows, use the y offset
@@ -153,18 +152,19 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 
 
 def make_multigroup_insets(bm, face, prop, dws):
-    size, frame_thickness = prop.size_offset.size, prop.frame_thickness
+    face_h = calc_face_dimensions(face)[1]
+    width, height, frame_thickness = *prop.size, prop.frame_thickness
 
     # XXX Frame thickness should not exceed size of any multigroup component
-    min_frame_size = min([size.x / count(dws), calc_face_dimensions(face)[1]]) / 2
+    min_frame_size = min([width / count(dws), face_h]) / 2
     frame_thickness = clamp(frame_thickness, 0.01, min_frame_size - 0.001)
 
     dw_count = count(dws)
-    window_height = size.y
-    dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
-    door_height = calc_face_dimensions(face)[1] - frame_thickness
+    window_height = height
+    door_height = face_h - frame_thickness
+    dw_width = (width - frame_thickness * (dw_count + 1)) / dw_count
     if "d" in str(prop.components):
-        window_height = min(prop.window_height, calc_face_dimensions(face)[1] - SPLIT_EPS)
+        window_height = min(prop.window_height, face_h - SPLIT_EPS)
 
     # adjacent doors/windows clubbed
     clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
@@ -172,12 +172,13 @@ def make_multigroup_insets(bm, face, prop, dws):
 
     doors, windows, frames = [], [], []
     for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
+        first, last = i == 0, i == len(dws) - 1
         if dw['type'] == 'door':
-            ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, first, last)
             doors.extend(ds)
             frames.extend(fs)
         elif dw['type'] == 'window':
-            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, first, last)
             windows.extend(ws)
             frames.extend(fs)
     return doors, windows, frames
