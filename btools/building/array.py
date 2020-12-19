@@ -54,6 +54,8 @@ class ArrayGetSet:
 def clamp_count(face_width, frame_width, prop):
     prop.count = clamp(prop.count, 1, int(face_width / frame_width) - 1)
 
+def clamp_array_count(face, prop):
+    prop.count = clamp(prop.count, 1, calc_face_dimensions(face)[0] // prop.width)
 
 def array_fit_elements(prop):
     """ Ensure that array elements fit nicely within parent faces
