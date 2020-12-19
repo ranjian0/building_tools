@@ -3,7 +3,13 @@ from mathutils import Vector
 
 from ..fill import fill_face
 from ..frame import add_frame_depth
-from ..array import clamp_count, array_fit_elements
+from ..array import (
+    clamp_array_count, 
+    spread_array_face,
+    array_fit_elements,
+    spread_array_splits,
+)
+
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ...utils import (
     clamp,
@@ -41,12 +47,17 @@ def create_window(bm, faces, prop):
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
-        clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_fit_elements(prop)
+        clamp_array_count(face, prop)
+        
+        median = face.calc_center_median().copy()
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
+        max_width = calc_face_dimensions(array_faces[0])[0]
+        spread_array_splits(bm, array_faces, prop, max_width)
 
+        
         for aface in array_faces:
             face = create_window_split(bm, aface, prop)
+            spread_array_face(bm, face, median, prop, max_width)
 
             window, arch = create_window_frame(bm, face, prop)
             if prop.type == "RECTANGULAR":
