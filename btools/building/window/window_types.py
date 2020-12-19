@@ -6,7 +6,6 @@ from ..frame import add_frame_depth
 from ..array import (
     clamp_array_count, 
     spread_array_face,
-    array_fit_elements,
     spread_array_splits,
 )
 
@@ -48,7 +47,7 @@ def create_window(bm, faces, prop):
             ngon_to_quad(bm, face)
 
         clamp_array_count(face, prop)
-        
+
         median = face.calc_center_median().copy()
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         max_width = calc_face_dimensions(array_faces[0])[0]

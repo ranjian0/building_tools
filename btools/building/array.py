@@ -58,27 +58,11 @@ class ArrayGetSet:
     def spread(self, val):
         self.array.spread = val
 
-def clamp_count(face_width, frame_width, prop):
-    prop.count = clamp(prop.count, 1, int(face_width / frame_width) - 1)
 
 def clamp_array_count(face, prop):
-    prop.count = clamp(prop.count, 1, calc_face_dimensions(face)[0] // prop.width)
-
-def array_fit_elements(prop):
-    """ Ensure that array elements fit nicely within parent faces
+    """ Keep array count to minimum number that fits all elements in the parent face
     """
-    # -- Make each element in array fit into the parent
-    parent_width = prop["wall_dimensions"][0]
-    if prop.width > parent_width / prop.count:
-        prop.width = parent_width / prop.count
-
-    # -- keep horizontal offset within bounds of parent face
-    element_width = parent_width / prop.count
-    item_width = prop.width
-    max_offset = (element_width / 2) - (item_width / 2)
-    prop.offsetx = clamp(
-        prop.offsetx, -max_offset, max_offset
-    )
+    prop.count = clamp(prop.count, 1, calc_face_dimensions(face)[0] // prop.width)
 
 
 def spread_array_splits(bm, array_faces, prop, max_width):

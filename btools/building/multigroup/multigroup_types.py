@@ -6,7 +6,7 @@ from ..arch import fill_arch, create_arch, add_arch_depth
 from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
-from ..array import array_fit_elements
+from ..array import clamp_array_count
 from ...utils import (
     clamp,
     FaceMap,
@@ -49,7 +49,7 @@ def create_multigroup(bm, faces, prop):
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
-        array_fit_elements(prop)
+        clamp_array_count(face, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         for aface in array_faces:
             face = create_multigroup_split(bm, aface, prop)

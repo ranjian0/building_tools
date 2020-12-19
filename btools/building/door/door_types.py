@@ -7,7 +7,7 @@ from ..arch import (
 )
 from ..fill import fill_face
 from ..frame import add_frame_depth
-from ..array import clamp_count, array_fit_elements
+from ..array import clamp_array_count
 from ...utils import (
     clamp,
     FaceMap,
@@ -35,8 +35,7 @@ def create_door(bm, faces, prop):
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
-        clamp_count(calc_face_dimensions(face)[0], prop.frame_thickness * 2, prop)
-        array_fit_elements(prop)
+        clamp_array_count(face, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         for aface in array_faces:
             face = create_door_split(bm, aface, prop)
