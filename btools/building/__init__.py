@@ -1,9 +1,10 @@
+from ._register import register_generic, unregister_generic
+
 from .balcony import register_balcony, unregister_balcony
 from .door import register_door, unregister_door
 from .fill import register_fill, unregister_fill
 from .floor import register_floor, unregister_floor
 from .floorplan import register_floorplan, unregister_floorplan
-from .generic import register_generic, unregister_generic
 from .multigroup import register_multigroup, unregister_multigroup
 from .railing import register_railing, unregister_railing
 from .roof import register_roof, unregister_roof

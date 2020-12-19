@@ -7,7 +7,7 @@ from bpy.props import (
     EnumProperty,
 )
 
-from ..generic import SizeOffsetProperty
+from ..sizeoffset import SizeOffsetProperty
 from ..railing.railing_props import RailProperty
 
 
