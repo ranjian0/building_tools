@@ -1,11 +1,18 @@
-import bpy 
+import bpy
+import bmesh
 from bpy.props import (
     IntProperty,
     FloatProperty
 )
 
-from ..utils import clamp
+from ..utils import (
+    clamp, 
+    calc_edge_median,
+    calc_faces_median,
+    calc_face_dimensions,
+)
 
+from mathutils import Vector
 
 class ArrayProperty(bpy.types.PropertyGroup):
 
@@ -73,6 +80,27 @@ def array_fit_elements(prop):
         prop.offsetx, -max_offset, max_offset
     )
 
+
+def spread_array_splits(bm, array_faces, prop, max_width):
+    """ Spread edges between array faces
+    """
+    margin = max_width - prop.width
+    split_edges = get_array_edges(array_faces, prop)
+
+    median = calc_faces_median(array_faces)
+    for e in split_edges:
+        em = calc_edge_median(e)
+        diff = Vector((em - median).to_tuple(3))
+        spread_factor = (diff.xy.length / max_width) * margin
+
+        diff.normalize()
+        diff.z = 0
+        bmesh.ops.translate(
+            bm, verts=e.verts, 
+            vec=(diff * prop.spread * spread_factor) + Vector((prop.offsetx, 0, 0))
+        )
+
+
 def get_array_edges(afaces, prop):
     """ Get the edges between array faces
     """
@@ -87,19 +115,11 @@ def get_array_edges(afaces, prop):
     return result
 
 
-def spread_array_edges(bm, edges, median, prop):
-    """ Move an array split edge nearer/away from center
-    """
-    for e in edges:
-        em = calc_edge_median(e)
-        diff = Vector((em - median).to_tuple(3)).normalized()
-        diff.z = 0
-        bmesh.ops.translate(bm, verts=e.verts, vec=diff*prop.spread)
-
-
-def spread_array_face(bm, f, median, prop):
+def spread_array_face(bm, f, median, prop, max_width):
     """ Move split face nearer/away from center
     """
+    margin = max_width - prop.width
+
     fm = f.calc_center_median()
     corner_verts = list(f.verts)
     split_verts = []
@@ -108,6 +128,9 @@ def spread_array_face(bm, f, median, prop):
         split_verts.append(split_edge.other_vert(v))
     
     vts = corner_verts + split_verts
-    diff = Vector((fm - median).to_tuple(3)).normalized()
+    diff = Vector((fm - median).to_tuple(3))
+    spread_factor = (diff.xy.length / max_width) * margin
+    
+    diff.normalize()
     diff.z = 0
-    bmesh.ops.translate(bm, verts=vts, vec=diff*prop.spread)
+    bmesh.ops.translate(bm, verts=vts, vec=diff * prop.spread * spread_factor)
