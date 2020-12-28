@@ -81,7 +81,7 @@ def spread_array_splits(bm, array_faces, prop, max_width):
         diff.z = 0
         bmesh.ops.translate(
             bm, verts=e.verts, 
-            vec=(diff * prop.spread * spread_factor) + Vector((prop.offsetx, 0, 0))
+            vec=(diff * prop.spread * spread_factor) + Vector((prop.offsetx if prop.spread != 0.0 else 0, 0, 0))
         )
 
 
