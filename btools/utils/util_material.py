@@ -123,7 +123,8 @@ def add_facemap_for_groups(groups):
 
 
 def verify_facemaps_for_object(obj):
-    """ Ensure object has a facemap layer """
+    """ Ensure object has a facemap layer 
+    """
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     bm.faces.layers.face_map.verify()
@@ -131,6 +132,8 @@ def verify_facemaps_for_object(obj):
 
 
 def set_material_for_active_facemap(material, context):
+    """ Set `material` on all the faces for the current/active facemap
+    """
     obj = context.object
     index = obj.face_maps.active_index
     active_facemap = obj.face_maps[index]
@@ -149,6 +152,8 @@ def set_material_for_active_facemap(material, context):
 
 
 def face_map_index_from_name(name):
+    """ Get the index of a facemap from its name
+    """
     for _, fmap in bpy.context.object.face_maps.items():
         if fmap.name == name:
             return fmap.index
@@ -184,6 +189,8 @@ def create_object_material(obj, mat_name):
 
 
 def uv_map_active_editmesh_selection(faces, method):
+    """ perform uv mapping on `faces` using the provided `method`
+    """
     # -- ensure we are in editmode
     if not bpy.context.object.mode == "EDIT":
         return
