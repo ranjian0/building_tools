@@ -22,6 +22,16 @@ class TestUtilsCommon(unittest.TestCase):
         self.assertEqual(btools.utils.clamp(2, 0.2, 1), 1)
         self.assertEqual(btools.utils.clamp(0.1, 0.2, 1), 0.2)
 
+    def test_minmax(self):
+        self.assertEqual(btools.utils.minmax(range(10)), (0, 9))
+        self.assertEqual(btools.utils.minmax([-1, 0]), (-1, 0))
+
+        # -- test with keyfunction
+        vecs = [Vector(tup) for tup in zip(range(10), range(10, 0, -1))]
+        res = btools.utils.minmax(vecs, key=lambda v: v.y)
+        self.assertEqual(res[0], Vector((9.0, 1.0)))
+        self.assertEqual(res[1], Vector((0.0, 10.0)))
+
     def test_crashsafe(self):
 
         @btools.utils.crash_safe
@@ -209,6 +219,21 @@ class TestUtilsMesh(unittest.TestCase):
     def clean_bmesh(self):
         [self.bm.verts.remove(v) for v in self.bm.verts]
 
+    def test_create_mesh(self):
+        me = btools.utils.create_mesh("test_mesh")
+        self.assertIsNotNone(me)
+        self.assertEqual(me.name, "test_mesh")
+
+    def test_validate(self):
+        btools.utils.cube(self.bm) 
+        faces = btools.utils.validate(self.bm.faces)
+        self.assertEqual(len(faces), 6)
+
+        bmesh.ops.delete(self.bm, geom=[faces[0]], context="FACES_ONLY")
+
+        self.assertEqual(len(faces), 6)
+        self.assertEqual(len(btools.utils.validate(faces)), 5)
+
     def test_filtergeom(self):
         btools.utils.plane(self.bm)
         fg = btools.utils.filter_geom
@@ -307,3 +332,7 @@ class TestUtilsMesh(unittest.TestCase):
         f = list(self.bm.faces).pop()
         self.assertEqual(btools.utils.calc_face_dimensions(f), (4, 4))
         self.assertEqual(btools.utils.calc_verts_median(f.verts), Vector())
+
+        self.clean_bmesh()
+        btools.utils.cube(self.bm) 
+        self.assertEqual(btools.utils.calc_faces_median(self.bm.faces), Vector())
