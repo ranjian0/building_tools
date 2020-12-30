@@ -1,7 +1,6 @@
 import bpy
 
-from .road import register_road, unregister_road
-from .building import register_building, unregister_building
+from .building.register import register_building, unregister_building
 
 bl_info = {
     "name": "Building Tools",
@@ -145,14 +144,12 @@ classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
 
 def register():
-    register_road()
     register_building()
     for cls in classes:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    unregister_road()
     unregister_building()
     for cls in classes:
         bpy.utils.unregister_class(cls)
