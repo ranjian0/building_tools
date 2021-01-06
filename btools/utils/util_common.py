@@ -42,8 +42,15 @@ def popup_message(message, title="Error", icon="ERROR"):
     bpy.context.window_manager.popup_menu(oops, title=title, icon=icon)
 
 
-def kwargs_from_props(props):
-    """ Converts all properties in a props{bpy.types.PropertyGroup} into dict
+def prop_from_dict(prop, dictprop):
+    """ Set all values in prop from dictprop
+    """
+    for k,v in dictprop.items():
+        if hasattr(prop, k):
+            setattr(prop, k, v)
+
+def dict_from_prop(prop):
+    """ Converts all properties in a prop{bpy.types.PropertyGroup} into dict
     """
     valid_types = (
         int,
@@ -57,18 +64,18 @@ def kwargs_from_props(props):
     )
 
     result = {}
-    for p in dir(props):
+    for p in dir(prop):
         if p.startswith("__") or p in ["rna_type", "bl_rna"]:
             continue
 
-        prop = getattr(props, p)
+        prop = getattr(prop, p)
         if isinstance(prop, valid_types):
             result[p] = prop
         elif isinstance(prop, bpy.types.PropertyGroup) and not isinstance(
-            prop, type(props)
+            prop, type(prop)
         ):
             # property group within this property
-            result.update(kwargs_from_props(prop))
+            result.update(dict_from_prop(prop))
     return result
 
 
