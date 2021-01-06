@@ -68,14 +68,14 @@ def dict_from_prop(prop):
         if p.startswith("__") or p in ["rna_type", "bl_rna"]:
             continue
 
-        prop = getattr(prop, p)
-        if isinstance(prop, valid_types):
-            result[p] = prop
-        elif isinstance(prop, bpy.types.PropertyGroup) and not isinstance(
-            prop, type(prop)
+        pn = getattr(prop, p)
+        if isinstance(pn, valid_types):
+            result[p] = pn
+        elif isinstance(pn, bpy.types.PropertyGroup) and not isinstance(
+            pn, type(prop)
         ):
             # property group within this property
-            result.update(dict_from_prop(prop))
+            result.update(dict_from_prop(pn))
     return result
 
 
