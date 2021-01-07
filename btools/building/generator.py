@@ -84,3 +84,66 @@ class FloorplanGenerator:
                 )
                 
         return self.build_from_props(properties)
+
+
+class FloorGenerator:
+    _props = None
+    _builder = btools.building.floor.floor.Floor
+    _prop_class = btools.building.floor.FloorProperty
+
+    def __init__(self,floorplan=None):
+        self.context = bpy.context 
+        self.scene = bpy.context.scene
+        self._register()
+        
+        if floorplan and isinstance(floorplan, bpy.types.Object):
+            bpy.context.view_layer.objects.active = floorplan
+
+        if self.context.mode != "EDIT":
+            bpy.ops.object.mode_set(mode="EDIT")
+
+    def __del__(self):
+        self._unregister()
+
+    @staticmethod
+    def _unregister():
+        del bpy.types.Scene.prop_floor
+
+    def _register(self):
+        """ Register Property
+        """
+        try:
+            bpy.utils.register_class(self._prop_class)
+        except ValueError:
+            pass # XXX Already registered
+        bpy.types.Scene.prop_floor = bpy.props.PointerProperty(type=self._prop_class)
+        self._props = btools.utils.dict_from_prop(self.scene.prop_floor)
+
+    def build_from_props(self, pdict):
+        """ Build floors from given pdict args
+        see floor.FloorProperty 
+        
+        `pdict` should be a dict with any of the following keys:
+        {
+            "floor_count" -> int[0, 10000],
+            "floor_height" -> float,
+
+            "slab_thickness" -> float,
+            "slab_outset" -> float
+
+            "add_slab" -> bool,
+            "add_columns" -> bool,
+        }
+        """
+        self._props.update(pdict)
+        btools.utils.prop_from_dict(self.scene.prop_floor, pdict)
+        return self._builder.build(self.context, self.scene.prop_floor)
+
+    def build_random(self):
+        properties = btools.utils.dict_from_prop(self._prop_class)
+
+        properties['add_columns'] = False 
+        properties['add_slabs'] = True
+
+        properties['floor_count'] = random.choice(range(10))
+        return self.build_from_props(properties)
