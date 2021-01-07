@@ -2,7 +2,28 @@ import bpy
 import btools
 import random
 
+
+class BuildingGenerator:
+    _props = None
+
+    @staticmethod
+    def build_random():
+        floorplan = FloorplanGenerator().build_random()
+
+        # Switch Context
+        old_mode = bpy.context.mode
+        if  old_mode != "EDIT":
+            bpy.ops.object.mode_set(mode="EDIT")
+
+        FloorGenerator(floorplan=floorplan).build_random()
+
+        # Reset Context
+        bpy.ops.object.mode_set(mode=old_mode)
+        return floorplan
+
+
 class FloorplanGenerator:
+    _props = None
     _builder = btools.building.floorplan.floorplan.Floorplan
     _prop_class = btools.building.floorplan.FloorplanProperty
 
@@ -26,9 +47,10 @@ class FloorplanGenerator:
         except ValueError:
             pass # XXX Already registered
         bpy.types.Scene.prop_floorplan = bpy.props.PointerProperty(type=self._prop_class)
+        self._props = btools.utils.dict_from_prop(self.scene.prop_floorplan)
 
     def build_from_props(self, pdict):
-        """ Build floorplan from given pdict (kwargs)
+        """ Build floorplan from given pdict args
         see floorplan.FloorplanProperty 
         
         `pdict` should be a dict with any of the following keys:
@@ -45,15 +67,16 @@ class FloorplanGenerator:
             "segments" -> int[3, 100],
         }
         """
+        self._props.update(pdict)
         btools.utils.prop_from_dict(self.scene.prop_floorplan, pdict)
         return self._builder.build(self.context, self.scene.prop_floorplan)
 
     def build_random(self):
         properties = btools.utils.dict_from_prop(self._prop_class)
-        properties['type'] = random.choice([
-            # "RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE", "CIRCULAR"
-            "H-SHAPED"
-        ])
+        properties['type'] = random.choices(
+            ["RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE"] # Circular not very usefull, "CIRCULAR"],
+            weights=[0.8, 0.5, 0.8, 0.7], k=1
+        )[-1]
 
         # Main Sizing
         if properties['type'] in ["RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE"]:
