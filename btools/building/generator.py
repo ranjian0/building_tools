@@ -32,7 +32,7 @@ class BuildingGenerator:
         if  old_mode != "EDIT":
             bpy.ops.object.mode_set(mode="EDIT")
 
-        FloorGenerator(floorplan=self.obj).build_random()
+        FloorGenerator().build_random()
         with self.select_top_faces():
             RoofGenerator().build_random()
 
@@ -133,14 +133,11 @@ class FloorGenerator:
     _builder = btools.building.floor.floor.Floor
     _prop_class = btools.building.floor.FloorProperty
 
-    def __init__(self,floorplan=None):
+    def __init__(self):
         self.context = bpy.context 
         self.scene = bpy.context.scene
         self._register()
         
-        if floorplan and isinstance(floorplan, bpy.types.Object):
-            bpy.context.view_layer.objects.active = floorplan
-
         if self.context.mode != "EDIT":
             bpy.ops.object.mode_set(mode="EDIT")
 
