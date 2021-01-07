@@ -5,7 +5,7 @@ from .sizeoffset import SizeOffsetProperty
 
 from .customobj import register_custom, unregister_custom
 from .material import register_material, unregister_material
-from .removeobj import register_removeobj, unregister_removeobj
+from .removegeom import register_removegeom, unregister_removegeom
 
 from .balcony import register_balcony, unregister_balcony
 from .door import register_door, unregister_door
@@ -29,7 +29,7 @@ classes = (
 register_funcs = (
     register_custom,
     register_material,
-    register_removeobj,
+    register_removegeom,
 
     register_railing,
     register_balcony,
@@ -46,7 +46,7 @@ register_funcs = (
 unregister_funcs = (
     unregister_custom,
     unregister_material,
-    unregister_removeobj,
+    unregister_removegeom,
 
     unregister_railing,
     unregister_balcony,

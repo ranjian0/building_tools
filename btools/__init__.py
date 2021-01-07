@@ -71,7 +71,7 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         # col.prop(context.scene, "btools_custom_object", text="")
 
         layout.separator()
-        layout.operator("btools.remove_obj")
+        layout.operator("btools.remove_geom")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):

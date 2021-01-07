@@ -75,10 +75,10 @@ def vert_angle(v, filter_edges):
     return vecs[0].angle(vecs[1])
 
 
-class BTOOLS_OT_remove_obj(bpy.types.Operator):
+class BTOOLS_OT_remove_geom(bpy.types.Operator):
     """Remove building tools geometry from selected faces"""
 
-    bl_idname = "btools.remove_obj"
+    bl_idname = "btools.remove_geom"
     bl_label = "Clear Geometry"
     bl_options = {"REGISTER"}
 
@@ -90,13 +90,13 @@ class BTOOLS_OT_remove_obj(bpy.types.Operator):
         remove(context)
         return {"FINISHED"}
 
-classes = (BTOOLS_OT_remove_obj, )
+classes = (BTOOLS_OT_remove_geom, )
 
-def register_removeobj():
+def register_removegeom():
     for cls in classes:
         bpy.utils.register_class(cls)
 
 
-def unregister_removeobj():
+def unregister_removegeom():
     for cls in classes:
         bpy.utils.unregister_class(cls)
