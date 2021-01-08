@@ -35,7 +35,10 @@ class ArrayProperty(bpy.types.PropertyGroup):
     def draw(self, context, layout):
         col = layout.column(align=True)
         col.prop(self, "count")
-        col.prop(self, "spread", slider=True)
+
+        rl = col.row(align=True)
+        rl.enabled = self.count > 1
+        rl.prop(self, "spread", slider=True)
 
 
 class ArrayGetSet:
