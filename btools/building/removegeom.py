@@ -5,8 +5,10 @@ from ..utils import (
     minmax, 
     select,
     VEC_UP,
+    VEC_DOWN,
+    sort_faces,
+    sort_verts,
     get_edit_mesh, 
-    calc_faces_median
 )
 
 def remove(context):
@@ -26,27 +28,33 @@ def get_faces_in_selection_bounds(bm):
     """ Determine all faces that lie within the bounds of selected faces
     """
     faces = [f for f in bm.faces if f.select]
-    verts = list({v for f in faces for v in f.verts})
 
     normal = faces[0].normal.copy()
-    medianf = calc_faces_median(faces)
-    min_z, max_z = minmax(verts, key=lambda v:v.co.z)
-    max_dist = max([(f.calc_center_median() - medianf).length for f in faces])
+    L, R = normal.cross(VEC_UP), normal.cross(VEC_DOWN)
+    faces = sort_faces(faces, R) 
+    start, finish = faces[0].calc_center_median(), faces[-1].calc_center_median()
 
-    close_faces = []
-    for f in bm.faces:
-        if f in faces:
-            continue
+    faces_left = filter(lambda f: L.dot(f.calc_center_median()) < L.dot(start), bm.faces)
+    faces_mid = filter(lambda f: R.dot(f.calc_center_median()) < R.dot(finish), faces_left)
+    valid_normals = [
+        normal.to_tuple(2), L.to_tuple(2), R.to_tuple(2), 
+        VEC_UP.to_tuple(2), VEC_DOWN.to_tuple(2)
+    ]
+    faces_correct_normal = filter(lambda f: f.normal.to_tuple(2) in valid_normals, faces_mid)
 
-        cm = f.calc_center_median()
-        within_median = (cm - medianf).length_squared <= max_dist**2
-        within_angle = math.radians(85.0) <= (medianf - cm).angle(normal) <= math.radians(95.0)
-        within_height = round(cm.z, 4) > round(min_z.co.z, 4) and round(cm.z, 4) < round(max_z.co.z, 4)
-        if within_angle and within_median and within_height:
-            close_faces.append(f)
+    def calc_face_bounds_dist(f):
+        vts = sort_verts(f.verts, R)
+        return (vts[0].co - vts[-1].co).length
+
+    bounds_distance = (start - finish).length
+    faces_within_distance = filter(
+        lambda f: calc_face_bounds_dist(f) < bounds_distance,
+        faces_correct_normal
+    )
 
     select(faces, False)
-    return close_faces + faces
+    return list(faces_within_distance) + faces
+
 
 def get_bounding_verts(faces):
     """ Get the extreme edges and verts in the faces
