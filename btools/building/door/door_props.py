@@ -50,7 +50,7 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
     )
 
     add_arch: BoolProperty(
-        name="Add Arch", default=False, description="Add arch over door/window"
+        name="Add Arch", default=False, description="Add arch over door"
     )
 
     fill_types = [
