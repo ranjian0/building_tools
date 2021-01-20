@@ -6,7 +6,7 @@ from .building import register_building, unregister_building
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Karanja (ranjian0), Lucky Kadam (luckykadam), Marcus (MCrafterzz)",
-    "version": (1, 0, 7),
+    "version": (1, 0, 8),
     "blender": (2, 80, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
