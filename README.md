@@ -36,14 +36,14 @@ and `Building Tools` was born.
 
 ## Features
 
-* Floorplans
-* Floors (slabs and walls)
-* Doors
-* Windows
-* Multigroup (door-window combinations)
-* Roof
-* Stairs
-* Balcony
+* [Floorplans](https://github.com/ranjian0/building_tools/wiki/Floorplan)
+* [Floors](https://github.com/ranjian0/building_tools/wiki/Floor)
+* [Doors](https://github.com/ranjian0/building_tools/wiki/Door)
+* [Windows](https://github.com/ranjian0/building_tools/wiki/Window)
+* [Multigroup](https://github.com/ranjian0/building_tools/wiki/Multigroup) (door-window combinations)
+* [Roof](https://github.com/ranjian0/building_tools/wiki/Roof)
+* [Stairs](https://github.com/ranjian0/building_tools/wiki/Stairs)
+* [Balcony](https://github.com/ranjian0/building_tools/wiki/Balcony)
 
 ## Status
 
