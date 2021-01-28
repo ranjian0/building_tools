@@ -65,7 +65,7 @@ def create_balcony_ungrouped(bm, faces, prop):
         split_faces = create_balcony_split(bm, f, prop)
         for f in split_faces:
             add_faces_to_map(bm, [f], FaceMap.BALCONY)
-            front, top = extrude_balcony(bm, f, prop.depth, normal)
+            _, top = extrude_balcony(bm, f, prop.depth, normal)
 
             if prop.has_railing:
                 prop.rail.show_extra_props = True
@@ -174,7 +174,7 @@ def create_balcony_split(bm, face, prop):
     # TODO(ranjian0) Take into consideration the offset of a balcony when clamping width
     width = min(face_w, prop.width)
     height = max(0, prop.height)
-    count = min(prop.count, int(face_w / prop.width))
+    count = clamp(prop.count, 1, int(face_w / prop.width))
 
     result = []
     array_dist = face_w / count
