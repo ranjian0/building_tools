@@ -6,7 +6,11 @@ from ..arch import fill_arch, create_arch, add_arch_depth
 from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
-from ..array import clamp_array_count
+from ..array import (
+    spread_array,
+    clamp_array_count,
+    get_array_split_edges
+)
 from ...utils import (
     clamp,
     FaceMap,
@@ -51,8 +55,13 @@ def create_multigroup(bm, faces, prop):
 
         clamp_array_count(face, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
-        for aface in array_faces:
-            face = create_multigroup_split(bm, aface, prop)
+        max_width = calc_face_dimensions(array_faces[0])[0]
+
+        split_edges = get_array_split_edges(array_faces)
+        split_faces = [create_multigroup_split(bm, aface, prop) for aface in array_faces]
+        spread_array(bm, split_edges, split_faces, max_width, prop)
+
+        for face in split_faces:
             doors, windows, arch = create_multigroup_frame(bm, face, prop)
             for door in doors:
                 fill_face(bm, door, prop, "DOOR")

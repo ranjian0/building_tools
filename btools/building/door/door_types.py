@@ -7,9 +7,14 @@ from ..arch import (
 )
 from ..fill import fill_face
 from ..frame import add_frame_depth
-from ..array import clamp_array_count
+from ..array import (
+    spread_array,
+    clamp_array_count,
+    get_array_split_edges
+)
 from ...utils import (
     clamp,
+    select,
     FaceMap,
     validate,
     local_xyz,
@@ -37,8 +42,13 @@ def create_door(bm, faces, prop):
 
         clamp_array_count(face, prop)
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
-        for aface in array_faces:
-            face = create_door_split(bm, aface, prop)
+        max_width = calc_face_dimensions(array_faces[0])[0]
+
+        split_edges = get_array_split_edges(array_faces)
+        split_faces = [create_door_split(bm, aface, prop) for aface in array_faces]
+        spread_array(bm, split_edges, split_faces, max_width, prop)
+
+        for face in split_faces:
             door, arch = create_door_frame(bm, face, prop)
             create_door_fill(bm, door, prop)
             if prop.add_arch:

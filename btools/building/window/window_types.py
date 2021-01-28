@@ -4,9 +4,9 @@ from mathutils import Vector
 from ..fill import fill_face
 from ..frame import add_frame_depth
 from ..array import (
-    clamp_array_count, 
-    spread_array_face,
-    spread_array_splits,
+    spread_array, 
+    clamp_array_count,
+    get_array_split_edges
 )
 
 from ..arch import fill_arch, create_arch, add_arch_depth
@@ -47,17 +47,14 @@ def create_window(bm, faces, prop):
             ngon_to_quad(bm, face)
 
         clamp_array_count(face, prop)
-
-        median = face.calc_center_median().copy()
         array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
         max_width = calc_face_dimensions(array_faces[0])[0]
-        spread_array_splits(bm, array_faces, prop, max_width)
 
-        
-        for aface in array_faces:
-            face = create_window_split(bm, aface, prop)
-            spread_array_face(bm, face, median, prop, max_width)
+        split_edges = get_array_split_edges(array_faces)
+        split_faces = [create_window_split(bm, aface, prop) for aface in array_faces]
+        spread_array(bm, split_edges, split_faces, max_width, prop)
 
+        for face in split_faces:
             window, arch = create_window_frame(bm, face, prop)
             if prop.type == "RECTANGULAR":
                 fill_face(bm, window, prop, "WINDOW")
