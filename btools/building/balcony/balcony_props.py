@@ -55,8 +55,9 @@ class BalconyProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         col = layout.column(align=True)
         col.prop(self, "depth_offset")
 
-        layout.separator()
-        layout.prop(self.array, "count")
+        if not self.group_selection:
+            layout.separator()
+            layout.prop(self.array, "count")
         
         layout.prop(self, "has_railing")
         if self.has_railing:
