@@ -117,7 +117,7 @@ def create_door_fill(bm, face, prop):
     if prop.double_door:
         faces = subdivide_face_horizontally(bm, face, widths=[1, 1])
         for f in faces:
-            fill_face(bm, face, prop, "DOOR")
+            fill_face(bm, f, prop, "DOOR")
     else:
         fill_face(bm, face, prop, "DOOR")
 

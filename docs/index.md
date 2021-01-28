@@ -33,6 +33,11 @@ Created by [ranjian0](https://github.com/ranjian0), [luckykadam](https://github.
 
 ## Support
 
-If you would like to support our work you can do so on our patreon page.
+If you would like to support our work you can do so through Paypal,
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate?hosted_button_id=EX6AB8P8M9VZG)
+
+or on our Patreon Page.
 
 [![Patreon](https://i.imgur.com/FOii5wr.png)](https://www.patreon.com/ranjian0)
+

@@ -1,11 +1,11 @@
 theme: jekyll-theme-cayman
 
 title: [Building Tools]
-description: [v1.0.7]
+description: [v1.0.8]
 
 show_downloads: true
 
 github:
-    zip_url: https://github.com/ranjian0/building_tools/releases/download/v1.0.7/building_tools-v1.0.7.zip
+    zip_url: https://github.com/ranjian0/building_tools/releases/download/v1.0.8/building_tools-v1.0.8.zip
 
 google_analytics: UA-154906120-2
