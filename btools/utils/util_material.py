@@ -52,11 +52,11 @@ class FaceMap(AutoIndex):
 
 
 def map_new_faces(group, skip=None):
-    """ Finds all newly created faces in a function and adds them to a face_map
-        called group.name.lower()
+    """Finds all newly created faces in a function and adds them to a face_map
+    called group.name.lower()
 
-        if skip is provided, then all faces in the face_map called skip.name
-        will not be added to the face_map
+    if skip is provided, then all faces in the face_map called skip.name
+    will not be added to the face_map
     """
 
     def outer(func):
@@ -77,10 +77,10 @@ def map_new_faces(group, skip=None):
 
 
 def add_faces_to_map(bm, faces, group, skip=None):
-    """ Sets the face_map index of faces to the index of the face_map called
-        group.name.lower()
+    """Sets the face_map index of faces to the index of the face_map called
+    group.name.lower()
 
-        see map_new_faces for the option *skip*
+    see map_new_faces for the option *skip*
     """
     face_map = bm.faces.layers.face_map.active
     group_index = face_map_index_from_name(group.name.lower())
@@ -110,8 +110,8 @@ def add_faces_to_map(bm, faces, group, skip=None):
 
 
 def add_facemap_for_groups(groups):
-    """ Creates a face_map called group.name.lower if none exists
-        in the active object
+    """Creates a face_map called group.name.lower if none exists
+    in the active object
     """
     obj = bpy.context.object
     groups = groups if isinstance(groups, (list, tuple)) else [groups]
@@ -123,8 +123,7 @@ def add_facemap_for_groups(groups):
 
 
 def verify_facemaps_for_object(obj):
-    """ Ensure object has a facemap layer 
-    """
+    """Ensure object has a facemap layer"""
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     bm.faces.layers.face_map.verify()
@@ -132,16 +131,13 @@ def verify_facemaps_for_object(obj):
 
 
 def set_material_for_active_facemap(material, context):
-    """ Set `material` on all the faces for the current/active facemap
-    """
+    """Set `material` on all the faces for the current/active facemap"""
     obj = context.object
     index = obj.face_maps.active_index
     active_facemap = obj.face_maps[index]
 
     link_material(obj, material)
-    mat_id = [
-        idx for idx, mat in enumerate(obj.data.materials) if mat == material
-    ].pop()
+    mat_id = [idx for idx, mat in enumerate(obj.data.materials) if mat == material].pop()
 
     with bmesh_from_active_object(context) as bm:
 
@@ -152,8 +148,7 @@ def set_material_for_active_facemap(material, context):
 
 
 def face_map_index_from_name(name):
-    """ Get the index of a facemap from its name
-    """
+    """Get the index of a facemap from its name"""
     for _, fmap in bpy.context.object.face_maps.items():
         if fmap.name == name:
             return fmap.index
@@ -161,21 +156,18 @@ def face_map_index_from_name(name):
 
 
 def link_material(obj, mat):
-    """ link material mat to obj
-    """
+    """link material mat to obj"""
     if not has_material(obj, mat.name):
         obj.data.materials.append(mat)
 
 
 def has_material(obj, name):
-    """ check if obj has a material with name
-    """
+    """check if obj has a material with name"""
     return name in obj.data.materials.keys()
 
 
 def create_object_material(obj, mat_name):
-    """ Create a new material and link it to the given object
-    """
+    """Create a new material and link it to the given object"""
     if not has_material(obj, mat_name):
         if bpy.data.materials.get(mat_name, None):
             # XXX if material with this name already exists in another object
@@ -189,8 +181,7 @@ def create_object_material(obj, mat_name):
 
 
 def uv_map_active_editmesh_selection(faces, method):
-    """ perform uv mapping on `faces` using the provided `method`
-    """
+    """perform uv mapping on `faces` using the provided `method`"""
     # -- ensure we are in editmode
     if not bpy.context.object.mode == "EDIT":
         return

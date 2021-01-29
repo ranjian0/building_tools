@@ -2,14 +2,15 @@ import bpy
 import math
 import bmesh
 from ..utils import (
-    minmax, 
+    minmax,
     select,
     VEC_UP,
     VEC_DOWN,
     sort_faces,
     sort_verts,
-    get_edit_mesh, 
+    get_edit_mesh,
 )
+
 
 def remove(context):
     me = get_edit_mesh()
@@ -24,22 +25,19 @@ def remove(context):
 
     bmesh.update_edit_mesh(me, True)
 
+
 def get_faces_in_selection_bounds(bm):
-    """ Determine all faces that lie within the bounds of selected faces
-    """
+    """Determine all faces that lie within the bounds of selected faces"""
     faces = [f for f in bm.faces if f.select]
 
     normal = faces[0].normal.copy()
     L, R = normal.cross(VEC_UP), normal.cross(VEC_DOWN)
-    faces = sort_faces(faces, R) 
+    faces = sort_faces(faces, R)
     start, finish = faces[0].calc_center_median(), faces[-1].calc_center_median()
 
     faces_left = filter(lambda f: L.dot(f.calc_center_median()) < L.dot(start), bm.faces)
     faces_mid = filter(lambda f: R.dot(f.calc_center_median()) < R.dot(finish), faces_left)
-    valid_normals = [
-        normal.to_tuple(2), L.to_tuple(2), R.to_tuple(2), 
-        VEC_UP.to_tuple(2), VEC_DOWN.to_tuple(2)
-    ]
+    valid_normals = [normal.to_tuple(2), L.to_tuple(2), R.to_tuple(2), VEC_UP.to_tuple(2), VEC_DOWN.to_tuple(2)]
     faces_correct_normal = filter(lambda f: f.normal.to_tuple(2) in valid_normals, faces_mid)
 
     def calc_face_bounds_dist(f):
@@ -57,11 +55,10 @@ def get_faces_in_selection_bounds(bm):
 
 
 def get_bounding_verts(faces):
-    """ Get the extreme edges and verts in the faces
-    """
+    """Get the extreme edges and verts in the faces"""
     verts = list({v for f in faces for v in f.verts})
     edges = list({e for f in faces for e in f.edges})
-    min_z, max_z = minmax(verts, key=lambda v:v.co.z)
+    min_z, max_z = minmax(verts, key=lambda v: v.co.z)
     bound_verts = [v for v in verts if v.co.z == max_z.co.z or v.co.z == min_z.co.z]
 
     corner_verts, mid_verts = [], []
@@ -73,6 +70,7 @@ def get_bounding_verts(faces):
         corner_verts.append(v)
 
     return corner_verts, mid_verts
+
 
 def vert_angle(v, filter_edges):
     ve = [e for e in v.link_edges if e in filter_edges]
@@ -98,7 +96,9 @@ class BTOOLS_OT_remove_geom(bpy.types.Operator):
         remove(context)
         return {"FINISHED"}
 
-classes = (BTOOLS_OT_remove_geom, )
+
+classes = (BTOOLS_OT_remove_geom,)
+
 
 def register_removegeom():
     for cls in classes:

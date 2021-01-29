@@ -24,8 +24,7 @@ class BTOOLS_UL_fmaps(bpy.types.UIList):
 
 
 def clear_empty_facemaps(context):
-    """ Remove all facemaps that don't have any faces assigned
-    """
+    """Remove all facemaps that don't have any faces assigned"""
     obj = context.object
     with bmesh_from_active_object(context) as bm:
 
@@ -82,7 +81,7 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
         # -- create new material
         mat = create_object_material(obj, "mat_" + active_facemap.name)
         mat_id = [idx for idx, m in enumerate(obj.data.materials) if m == mat].pop()
-        obj.active_material_index = mat_id # make the new material active
+        obj.active_material_index = mat_id  # make the new material active
 
         # -- assign to active facemap
         set_material_for_active_facemap(mat, context)
@@ -91,22 +90,19 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
 
 
 def update_facemap_material(self, context):
-    """ Assign the updated material to all faces belonging to active facemap
-    """
+    """Assign the updated material to all faces belonging to active facemap"""
     set_material_for_active_facemap(self.material, context)
     return None
 
 
 class FaceMapMaterial(bpy.types.PropertyGroup):
-    """ Tracks materials for each facemap created for an object
-    """
+    """Tracks materials for each facemap created for an object"""
 
     material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
     auto_map: BoolProperty(
-        name="Auto UV Mapping",
-        default=True,
-        description="Automatically UV Map faces belonging to active facemap.")
+        name="Auto UV Mapping", default=True, description="Automatically UV Map faces belonging to active facemap."
+    )
 
     mapping_methods = [
         ("UNWRAP", "Unwrap", "", 0),
@@ -117,7 +113,7 @@ class FaceMapMaterial(bpy.types.PropertyGroup):
         name="UV Mapping Method",
         items=mapping_methods,
         default="CUBE_PROJECTION",
-        description="How to perform UV Mapping"
+        description="How to perform UV Mapping",
     )
 
 

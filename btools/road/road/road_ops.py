@@ -5,8 +5,7 @@ from .road_props import RoadProperty
 
 
 class BTOOLS_OT_add_road(bpy.types.Operator):
-    """Create road
-    """
+    """Create road"""
 
     bl_idname = "btools.add_road"
     bl_label = "Add Road"
@@ -27,8 +26,7 @@ class BTOOLS_OT_add_road(bpy.types.Operator):
 
 
 class BTOOLS_OT_finalize_road(bpy.types.Operator):
-    """Apply modifiers, remove curve, set uvs etc
-    """
+    """Apply modifiers, remove curve, set uvs etc"""
 
     bl_idname = "btools.finalize_road"
     bl_label = "Finalize Road"

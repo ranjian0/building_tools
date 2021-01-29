@@ -85,7 +85,7 @@ def place_custom_object(context, prop, custom_obj):
 
             face.select = False
             # XXX subdivide horizontally for array
-            array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+            array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x] * prop.count)
 
             for aface in array_faces:
                 # XXX Create split for size offset
@@ -98,8 +98,7 @@ def place_custom_object(context, prop, custom_obj):
 
 
 def transfer_materials(from_object, to_obj):
-    """ Transfer materials from 'from_object' to 'to_object'
-    """
+    """Transfer materials from 'from_object' to 'to_object'"""
     materials = from_object.data.materials
     if not materials:
         return
@@ -132,7 +131,7 @@ def transfer_materials(from_object, to_obj):
 
 
 def duplicate_into_bm(bm, obj):
-    """ Copy all the mesh data in obj to the bm
+    """Copy all the mesh data in obj to the bm
     Return the newly inserted faces
     """
     initial_faces = {f.index for f in bm.faces}
@@ -142,22 +141,20 @@ def duplicate_into_bm(bm, obj):
 
 # TODO(ranjian0) refactor function (duplicated from create_window_split)
 def create_split(bm, face, size, offset):
-    """Use properties from SplitOffset to subdivide face into regular quads
-    """
+    """Use properties from SplitOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w / 2 + offset.x - size.x / 2, size.x, wall_w / 2 - offset.x - size.x / 2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
+    v_width = [wall_h / 2 + offset.y - size.y / 2, size.y, wall_h / 2 - offset.y - size.y / 2]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[1]
 
 
 def place_object_on_face(bm, face, custom_obj, prop):
-    """ Place the custom_object mesh flush on the face
-    """
+    """Place the custom_object mesh flush on the face"""
     # XXX get mesh from custom_obj into bm
     verts = face.verts
 
@@ -179,17 +176,14 @@ def place_object_on_face(bm, face, custom_obj, prop):
     transform_parallel_to_face(bm, custom_verts, face)
 
     # -- scale to size
-    scale_to_size(
-        bm, custom_verts,
-        current_size, prop.size_offset.size, local_xyz(face)
-    )
+    scale_to_size(bm, custom_verts, current_size, prop.size_offset.size, local_xyz(face))
 
     # cleanup
     bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
 
 
 def calc_verts_bounds(verts):
-    """ Determine the bounds size of the verts
+    """Determine the bounds size of the verts
     (assumes verts(mesh) is facing forward(y+))
     """
     sort_x = sorted([v.co.x for v in verts])
@@ -202,7 +196,7 @@ def calc_verts_bounds(verts):
 
 
 def transform_parallel_to_face(bm, verts, face):
-    """ Move and rotate verts(mesh) so that it lies with it's
+    """Move and rotate verts(mesh) so that it lies with it's
     forward-extreme faces parallel to `face`
     """
     normal = face.normal.copy()
@@ -217,13 +211,12 @@ def transform_parallel_to_face(bm, verts, face):
     # -- calculate margin to make custom objes flush with this face
     # TODO(ranjian0) investigate this (current theory is order of scale, rotate, translate)
     diff = max(normal.dot(v.co) for v in verts)
-    diff_norm = diff * normal           # distance between face median and object median along normal
+    diff_norm = diff * normal  # distance between face median and object median along normal
     bmesh.ops.translate(bm, verts=verts, vec=median - diff_norm)
 
 
 def scale_to_size(bm, verts, current_size, target_size, local_dir):
-    """ Scale verts to target size along local direction (x and y)
-    """
+    """Scale verts to target size along local direction (x and y)"""
     x_dir, y_dir, z_dir = local_dir
     target_width, target_height = target_size
     current_width, current_height = current_size
@@ -254,7 +247,8 @@ classes = (CustomObjectProperty, BTOOLS_OT_add_custom)
 
 def register_custom():
     bpy.types.Scene.btools_custom_object = PointerProperty(
-        type=bpy.types.Object, description="Object to use for custom placement")
+        type=bpy.types.Object, description="Object to use for custom placement"
+    )
 
     for cls in classes:
         bpy.utils.register_class(cls)

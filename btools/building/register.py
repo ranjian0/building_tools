@@ -64,7 +64,7 @@ unregister_funcs = (
 def register_building():
     for cls in classes:
         bpy.utils.register_class(cls)
-    
+
     for func in register_funcs:
         func()
 
@@ -75,4 +75,3 @@ def unregister_building():
 
     for cls in classes:
         bpy.utils.unregister_class(cls)
-

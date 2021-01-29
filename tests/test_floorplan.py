@@ -8,7 +8,6 @@ builder = floorplan.floorplan.Floorplan
 
 
 class TestFloorplan(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         bpy.utils.register_class(floorplan.FloorplanProperty)
@@ -74,7 +73,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), 1) # cap_tris False
+        self.assertEquals(len(faces), 1)  # cap_tris False
 
         # -- check default size
         verts = context.object.data.vertices
@@ -168,5 +167,5 @@ class TestFloorplan(unittest.TestCase):
             self.assertIsNotNone(res)
 
             faces = context.object.data.polygons
-            self.assertEquals(len(faces), i+1)
+            self.assertEquals(len(faces), i + 1)
             self.clear_objects()

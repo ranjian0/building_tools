@@ -22,8 +22,7 @@ from ...utils import (
 
 
 def create_roof(bm, faces, prop):
-    """Create roof types
-    """
+    """Create roof types"""
     select(faces, False)
     if prop.type == "FLAT":
         create_flat_roof(bm, faces, prop)
@@ -37,29 +36,23 @@ def create_roof(bm, faces, prop):
 
 @map_new_faces(FaceMap.ROOF)
 def create_flat_roof(bm, faces, prop):
-    """Create a flat roof
-    """
+    """Create a flat roof"""
     # -- extrude up and outset
     top_face = extrude_and_outset(bm, faces, prop.thickness, prop.outset)
 
     # -- add border
     if prop.add_border:
         # -- inset top face
-        bmesh.ops.inset_region(
-            bm, faces=top_face, thickness=prop.border, use_even_offset=True
-        )
+        bmesh.ops.inset_region(bm, faces=top_face, thickness=prop.border, use_even_offset=True)
 
         # -- extrude downwards
         ret = bmesh.ops.extrude_face_region(bm, geom=top_face).get("geom")
-        bmesh.ops.translate(
-            bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert)
-        )
+        bmesh.ops.translate(bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert))
         bmesh.ops.delete(bm, geom=top_face, context="FACES")
 
 
 def create_gable_roof(bm, faces, prop):
-    """ Create gable roof
-    """
+    """Create gable roof"""
     # -- create initial outset for box gable roof
     if prop.gable_type == "BOX":
         faces = extrude_and_outset(bm, faces, prop.thickness, prop.outset)
@@ -74,9 +67,7 @@ def create_gable_roof(bm, faces, prop):
         # -- Open GABLE
         #  XXX prevent dissolve_lone_verts from destroying lower geometry
         ret = bmesh.ops.extrude_face_region(bm, geom=faces).get("geom")
-        bmesh.ops.translate(
-            bm, vec=(0, 0, 0.0011), verts=filter_geom(ret, BMVert)
-        )
+        bmesh.ops.translate(bm, vec=(0, 0, 0.0011), verts=filter_geom(ret, BMVert))
         bmesh.ops.delete(bm, geom=faces, context="FACES")
         faces = filter_geom(ret, BMFace)
 
@@ -114,8 +105,7 @@ def create_gable_roof(bm, faces, prop):
 
 
 def create_hip_roof(bm, faces, prop):
-    """Create a hip roof
-    """
+    """Create a hip roof"""
     # -- create base for hip roof
     roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(extrude_and_outset)
     faces = roof_hang(bm, faces, prop.thickness, prop.outset)
@@ -146,8 +136,7 @@ def create_hip_roof(bm, faces, prop):
 
 
 def sort_verts_by_loops(face):
-    """ sort verts in face clockwise using loops
-    """
+    """sort verts in face clockwise using loops"""
     start_loop = max(face.loops, key=lambda loop: loop.vert.co.to_tuple()[:2])
 
     verts = []
@@ -160,8 +149,7 @@ def sort_verts_by_loops(face):
 
 
 def vert_at_loc(loc, verts, loc_z=None):
-    """ Find all verts at loc(x,y), return the one with highest z coord
-    """
+    """Find all verts at loc(x,y), return the one with highest z coord"""
     results = []
     for vert in verts:
         co = vert.co
@@ -178,8 +166,7 @@ def vert_at_loc(loc, verts, loc_z=None):
 
 
 def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height_scale):
-    """ Create the vertices and edges from output of straight skeleton
-    """
+    """Create the vertices and edges from output of straight skeleton"""
     skeleton_edges = []
     skeleton_verts = []
     O_verts = list({v for e in original_edges for v in e.verts})
@@ -212,11 +199,10 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
 
 @map_new_faces(FaceMap.ROOF)
 def create_skeleton_faces(bm, original_edges, skeleton_edges):
-    """ Create faces formed from hiproof verts and edges
-    """
+    """Create faces formed from hiproof verts and edges"""
 
     def interior_angle(vert, e1, e2):
-        """ Determine anti-clockwise interior angle between edges
+        """Determine anti-clockwise interior angle between edges
         https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python
         """
         # XXX Order of vector creation is really important
@@ -225,8 +211,7 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         return np.math.atan2(np.linalg.det([v1.xy, v2.xy]), np.dot(v1.xy, v2.xy))
 
     def boundary_walk(e, reverse=False):
-        """ Perform boundary walk using least interior angle
-        """
+        """Perform boundary walk using least interior angle"""
         v, last = e.verts
         if reverse:
             last, v = e.verts
@@ -234,9 +219,7 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         previous = e
         found_edges = [e]
         while v != last:
-            linked = [
-                e for e in v.link_edges if e in skeleton_edges and e not in found_edges
-            ]
+            linked = [e for e in v.link_edges if e in skeleton_edges and e not in found_edges]
             if not linked:
                 common_edge = set(v.link_edges) & set(last.link_edges)
                 if common_edge:
@@ -269,14 +252,13 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
 
 
 def make_vert(bm, location):
-    """ Create a vertex at location
-    """
+    """Create a vertex at location"""
     return bmesh.ops.create_vert(bm, co=location).get("vert").pop()
 
 
 def join_intersecting_verts_and_edges(bm, edges, verts):
-    """ Find all vertices that intersect/ lie at an edge and merge
-        them to that edge
+    """Find all vertices that intersect/ lie at an edge and merge
+    them to that edge
     """
     eps = 0.0001
     new_verts = []
@@ -300,15 +282,13 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
 
 
 def get_linked_edges(verts, filter_edges):
-    """ Find all the edges linked to verts that are also in filter edges
-    """
+    """Find all the edges linked to verts that are also in filter edges"""
     linked_edges = [e for v in verts for e in v.link_edges]
     return list(filter(lambda e: e in filter_edges, linked_edges))
 
 
 def find_closest_pair_edges(edges_a, edges_b):
-    """ Find the edges in edges_a and edges_b that are closest to each other
-    """
+    """Find the edges in edges_a and edges_b that are closest to each other"""
 
     def length_func(pair):
         e1, e2 = pair
@@ -319,8 +299,7 @@ def find_closest_pair_edges(edges_a, edges_b):
 
 
 def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges):
-    """ Join intersecting edges and verts and return all edges that are in skeleton_edges
-    """
+    """Join intersecting edges and verts and return all edges that are in skeleton_edges"""
     new_verts = join_intersecting_verts_and_edges(bm, skeleton_edges, skeleton_verts)
     skeleton_verts = validate(skeleton_verts) + new_verts
     bmesh.ops.remove_doubles(bm, verts=skeleton_verts, dist=0.0001)
@@ -328,45 +307,35 @@ def join_intersections_and_get_skeleton_edges(bm, skeleton_verts, skeleton_edges
 
 
 def dissolve_lone_verts(bm, face, original_edges):
-    """ Find all verts only connected to two edges and dissolve them
-    """
+    """Find all verts only connected to two edges and dissolve them"""
     loops = {loop for v in face.verts for loop in v.link_loops if loop.face == face}
 
     def is_parallel(loop):
         return round(loop.calc_angle(), 2) == 3.14
 
     parallel_verts = [loop.vert for loop in loops if is_parallel(loop)]
-    lone_edges = [
-        e for v in parallel_verts for e in v.link_edges if e not in original_edges
-    ]
+    lone_edges = [e for v in parallel_verts for e in v.link_edges if e not in original_edges]
     bmesh.ops.dissolve_edges(bm, edges=lone_edges, use_verts=True)
 
 
 def gable_process_box(bm, roof_faces, prop):
-    """ Finalize box gable roof type
-    """
+    """Finalize box gable roof type"""
     # -- extrude upward faces
     top_faces = [f for f in roof_faces if f.normal.z]
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
 
     # -- move abit upwards (by amount roof thickness)
-    bmesh.ops.translate(
-        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
-    )
+    bmesh.ops.translate(bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- face maps
-    link_faces = {
-        f for fc in filter_geom(result, BMFace) for e in fc.edges
-        for f in e.link_faces if not f.normal.z
-    }
+    link_faces = {f for fc in filter_geom(result, BMFace) for e in fc.edges for f in e.link_faces if not f.normal.z}
     link_faces.update(set(validate(roof_faces)))
     add_faces_to_map(bm, list(link_faces), FaceMap.ROOF_HANGS)
 
 
 def gable_process_open(bm, roof_faces, prop):
-    """ Finalize open gable roof type
-    """
+    """Finalize open gable roof type"""
     add_faces_to_map(bm, roof_faces, FaceMap.WALLS)
 
     # -- find only the upward facing faces
@@ -374,9 +343,7 @@ def gable_process_open(bm, roof_faces, prop):
 
     # -- extrude and move up
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
-    bmesh.ops.translate(
-        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
-    )
+    bmesh.ops.translate(bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- find newly created side faces
@@ -399,9 +366,7 @@ def gable_process_open(bm, roof_faces, prop):
         dissolve_edges.append(max_edge)
 
     # -- outset side faces
-    bmesh.ops.inset_region(
-        bm, use_even_offset=True, faces=side_faces, depth=prop.outset
-    )
+    bmesh.ops.inset_region(bm, use_even_offset=True, faces=side_faces, depth=prop.outset)
 
     # -- move lower vertical edges abit down (inorder to maintain roof slope)
     v_edges = []
@@ -426,28 +391,21 @@ def gable_process_open(bm, roof_faces, prop):
 
 
 def extrude_and_outset(bm, faces, thickness, outset):
-    """ Extrude the given faces upwards and outset resulting side faces
-    """
+    """Extrude the given faces upwards and outset resulting side faces"""
     # -- extrude faces upwards
     ret = bmesh.ops.extrude_face_region(bm, geom=faces)
-    bmesh.ops.translate(
-        bm, vec=(0, 0, thickness), verts=filter_geom(ret["geom"], BMVert)
-    )
+    bmesh.ops.translate(bm, vec=(0, 0, thickness), verts=filter_geom(ret["geom"], BMVert))
 
     # -- dissolve top faces if they are more than one
     top_face = filter_geom(ret["geom"], BMFace)
     if len(top_face) > 1:
-        top_face = bmesh.ops.dissolve_faces(
-            bm, faces=top_face, use_verts=True).get("region").pop()
+        top_face = bmesh.ops.dissolve_faces(bm, faces=top_face, use_verts=True).get("region").pop()
     else:
         top_face = top_face.pop()
 
     # -- outset the side faces from earlier extrusion
     link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
-
-    bmesh.ops.inset_region(
-        bm, faces=link_faces, depth=outset, use_even_offset=True
-    )
+    bmesh.ops.inset_region(bm, faces=link_faces, depth=outset, use_even_offset=True)
 
     # -- cleanup hidden faces
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)

@@ -2,8 +2,7 @@ from ..utils import extrude_face_region
 
 
 def add_frame_depth(bm, door_faces, window_faces, arch_faces, frame_faces, depth, normal):
-    """ Add depth to frame
-    """
+    """Add depth to frame"""
     if depth != 0.0:
         n_doors = len(door_faces)
         n_windows = len(window_faces)

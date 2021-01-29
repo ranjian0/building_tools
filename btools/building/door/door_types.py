@@ -5,13 +5,13 @@ from ..arch import (
     create_arch,
     add_arch_depth,
 )
-from ..fill import fill_face
-from ..frame import add_frame_depth
 from ..array import (
     spread_array,
     clamp_array_count,
     get_array_split_edges
 )
+from ..fill import fill_face
+from ..frame import add_frame_depth
 from ...utils import (
     clamp,
     select,
@@ -33,8 +33,7 @@ from ...utils import (
 
 
 def create_door(bm, faces, prop):
-    """Create door from face selection
-    """
+    """Create door from face selection"""
     for face in faces:
         face.select = False
         if not valid_ngon(face):
@@ -58,12 +57,11 @@ def create_door(bm, faces, prop):
 
 @map_new_faces(FaceMap.WALLS)
 def create_door_split(bm, face, prop):
-    """Use properties from SizeOffset to subdivide face into regular quads
-    """
+    """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
     width, height, offset = *prop.size, prop.offset
     # horizontal split
-    h_widths = [wall_w/2 - offset.x - width/2, width, wall_w/2 + offset.x - width/2]
+    h_widths = [wall_w / 2 - offset.x - width / 2, width, wall_w / 2 + offset.x - width / 2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
     v_width = [height, wall_h - height]
@@ -73,8 +71,7 @@ def create_door_split(bm, face, prop):
 
 
 def create_door_frame(bm, face, prop):
-    """Extrude and inset face to make door frame
-    """
+    """Extrude and inset face to make door frame"""
     normal = face.normal.copy()
 
     # XXX Frame thickness should not exceed size of door
@@ -86,16 +83,20 @@ def create_door_frame(bm, face, prop):
 
     # create arch
     if prop.add_arch:
-        frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
+        frame_faces.remove(get_top_faces(frame_faces).pop())  # remove top face from frame_faces
         top_edges = get_top_edges({e for f in get_bottom_faces(frame_faces, n=2) for e in f.edges}, n=2)
-        arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
+        arch_face, arch_frame_faces = create_arch(
+            bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face)
+        )
         frame_faces += arch_frame_faces
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
     if prop.add_arch:
-        [door_face], _, [arch_face], frame_faces = add_frame_depth(bm, [door_face], [], [arch_face], frame_faces, prop.frame_depth, normal)
+        [door_face], _, [arch_face], frame_faces = add_frame_depth(
+            bm, [door_face], [], [arch_face], frame_faces, prop.frame_depth, normal
+        )
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
         frame_faces += new_frame_faces
     else:
@@ -122,8 +123,7 @@ def add_door_depth(bm, door, depth, normal):
 
 
 def create_door_fill(bm, face, prop):
-    """Add decorative elements on door face
-    """
+    """Add decorative elements on door face"""
     if prop.double_door:
         faces = subdivide_face_horizontally(bm, face, widths=[1, 1])
         for f in faces:
@@ -133,8 +133,7 @@ def create_door_fill(bm, face, prop):
 
 
 def make_door_inset(bm, face, prop):
-    """ Make one horizontal cut and two vertical cuts on face
-    """
+    """Make one horizontal cut and two vertical cuts on face"""
     width, frame_thickness = prop.width, prop.frame_thickness
 
     door_width = width - frame_thickness * 2

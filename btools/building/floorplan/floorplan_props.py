@@ -44,9 +44,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
     )
 
     random_extension_amount: BoolProperty(
-        name="Random Extension Amount",
-        default=True,
-        description="Randomize the amount of extensions"
+        name="Random Extension Amount", default=True, description="Randomize the amount of extensions"
     )
 
     extension_amount: IntProperty(
@@ -87,12 +85,12 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
         # -- calculate offsets of adjacent segments
         adjacent_prop = {
-            "tw1" : "tw2",
-            "tw2" : "tw1",
-            "tw3" : "tw4",
-            "tw4" : "tw3",
+            "tw1": "tw2",
+            "tw2": "tw1",
+            "tw3": "tw4",
+            "tw4": "tw3",
         }.get(propname)
-        maximum_width += (default_width - self.get(adjacent_prop, 1.0))
+        maximum_width += default_width - self.get(adjacent_prop, 1.0)
 
         if self.type == "H-SHAPED":
             self[propname] = clamp(value, 0.0, maximum_width)

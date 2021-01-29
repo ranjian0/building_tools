@@ -11,7 +11,6 @@ floorplan_builder = floorplan.floorplan.Floorplan
 
 
 class TestFloor(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         bpy.utils.register_class(floorplan.FloorplanProperty)

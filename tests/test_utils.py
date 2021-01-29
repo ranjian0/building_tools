@@ -9,7 +9,6 @@ from mathutils import Vector
 
 
 class TestUtilsCommon(unittest.TestCase):
-
     def test_equal(self):
         # -- default eps(0.001)
         self.assertTrue(btools.utils.equal(0.005, 0.006))
@@ -33,7 +32,6 @@ class TestUtilsCommon(unittest.TestCase):
         self.assertEqual(res[1], Vector((0.0, 10.0)))
 
     def test_crashsafe(self):
-
         @btools.utils.crash_safe
         def run_failed():
             raise IndexError
@@ -73,29 +71,23 @@ class TestUtilsCommon(unittest.TestCase):
     def test_restricted_sizeoffset(self):
         # XXX OFFSET
         # -- restrict sane
-        self.assertEqual(
-            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [0, 0]), (0, 0))
+        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [0, 0]), (0, 0))
 
         # -- restrict min
-        self.assertEqual(
-            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [-1, -1]), (-0.25, -0.25))
+        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [-1, -1]), (-0.25, -0.25))
 
         # -- restrict max
-        self.assertEqual(
-            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [1, 1]), (0.25, 0.25))
+        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [1, 1]), (0.25, 0.25))
 
         # XXX SIZE
         # -- restrict sane
-        self.assertEqual(
-            btools.utils.restricted_size([1, 1], [0, 0], [0, 0], [0.5, 0.5]), (0.5, 0.5))
+        self.assertEqual(btools.utils.restricted_size([1, 1], [0, 0], [0, 0], [0.5, 0.5]), (0.5, 0.5))
 
         # -- restrict min
-        self.assertEqual(
-            btools.utils.restricted_size([1, 1], [0, 0], [1, 1], [0.5, 0.5]), (1, 1))
+        self.assertEqual(btools.utils.restricted_size([1, 1], [0, 0], [1, 1], [0.5, 0.5]), (1, 1))
 
         # -- restrict with offset
-        self.assertEqual(
-            btools.utils.restricted_size([1, 1], [0.5, 0.5], [0.5, 0.5], [0.75, 0.75]), (0.5, 0.5))
+        self.assertEqual(btools.utils.restricted_size([1, 1], [0.5, 0.5], [0.5, 0.5], [0.75, 0.75]), (0.5, 0.5))
 
     def test_local_to_global(self):
         X = Vector((1, 0, 0))
@@ -124,7 +116,7 @@ class TestUtilsCommon(unittest.TestCase):
         dummy = Face()
         dummy.normal = Vector()
 
-        self.assertEqual(btools.utils.local_xyz(dummy), (Vector(),)*3)
+        self.assertEqual(btools.utils.local_xyz(dummy), (Vector(),) * 3)
 
         dummy.normal = Vector((1, 0, 0))
         x, y, z = btools.utils.local_xyz(dummy)
@@ -146,7 +138,6 @@ class TestUtilsCommon(unittest.TestCase):
 
 
 class TestUtilsGeometry(unittest.TestCase):
-
     def setUp(self):
         self.bm = bmesh.new()
 
@@ -188,23 +179,21 @@ class TestUtilsGeometry(unittest.TestCase):
         self.assertEquals(len(self.bm.verts), 20)
 
     def test_cube_without_faces(self):
-        btools.utils.create_cube_without_faces(
-            self.bm, Vector((1, 1, 1)))
+        btools.utils.create_cube_without_faces(self.bm, Vector((1, 1, 1)))
         self.assertEquals(len(self.bm.faces), 6)
         self.assertEquals(len(self.bm.verts), 8)
 
         self.clean_bmesh()
 
-        btools.utils.create_cube_without_faces(
-            self.bm, Vector((1, 1, 1)), top=True, bottom=True)
+        btools.utils.create_cube_without_faces(self.bm, Vector((1, 1, 1)), top=True, bottom=True)
         self.assertEquals(len(self.bm.faces), 4)
         self.assertEquals(len(self.bm.verts), 8)
 
         self.clean_bmesh()
 
         btools.utils.create_cube_without_faces(
-            self.bm, Vector((1, 1, 1)), top=True, bottom=True,
-            left=True, right=True, front=True, back=True)
+            self.bm, Vector((1, 1, 1)), top=True, bottom=True, left=True, right=True, front=True, back=True
+        )
         self.assertEquals(len(self.bm.faces), 0)
         self.assertEquals(len(self.bm.verts), 8)
 
@@ -225,7 +214,7 @@ class TestUtilsMesh(unittest.TestCase):
         self.assertEqual(me.name, "test_mesh")
 
     def test_validate(self):
-        btools.utils.cube(self.bm) 
+        btools.utils.cube(self.bm)
         faces = btools.utils.validate(self.bm.faces)
         self.assertEqual(len(faces), 6)
 
@@ -249,17 +238,12 @@ class TestUtilsMesh(unittest.TestCase):
 
         for edge in self.bm.edges:
             em = btools.utils.calc_edge_median(edge)
-            self.assertEqual(
-                et(edge).to_tuple(1),
-                (fm-em).normalized().to_tuple(1)
-            )
+            self.assertEqual(et(edge).to_tuple(1), (fm - em).normalized().to_tuple(1))
 
     def test_edgevector(self):
         btools.utils.plane(self.bm)
         ev = btools.utils.edge_vector
-        self.assertEqual(
-            sum([ev(e) for e in self.bm.edges], Vector()), Vector()
-        )
+        self.assertEqual(sum([ev(e) for e in self.bm.edges], Vector()), Vector())
 
     def test_edgeslope(self):
         btools.utils.plane(self.bm)
@@ -285,8 +269,8 @@ class TestUtilsMesh(unittest.TestCase):
         RIGHT = Vector((1, 0, 0))
 
         self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT))
-        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT*1.0001))
-        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT*0.0009))
+        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT * 1.0001))
+        self.assertTrue(btools.utils.vec_equal(RIGHT, RIGHT * 0.0009))
 
         self.assertTrue(btools.utils.vec_opposite(RIGHT, LEFT))
 
@@ -334,5 +318,5 @@ class TestUtilsMesh(unittest.TestCase):
         self.assertEqual(btools.utils.calc_verts_median(f.verts), Vector())
 
         self.clean_bmesh()
-        btools.utils.cube(self.bm) 
+        btools.utils.cube(self.bm)
         self.assertEqual(btools.utils.calc_faces_median(self.bm.faces), Vector())

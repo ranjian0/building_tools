@@ -17,8 +17,7 @@ class Array:
     @classmethod
     @crash_safe
     def build(cls, context):
-        """ Setup curved array
-        """
+        """Setup curved array"""
 
         # Can't array nothing
         if context.active_object is None:
@@ -118,8 +117,7 @@ class Array:
 
 
 class BTOOLS_OT_add_array(bpy.types.Operator):
-    """Setup array
-    """
+    """Setup array"""
 
     bl_idname = "btools.add_array"
     bl_label = "Add Array"
@@ -135,8 +133,7 @@ class BTOOLS_OT_add_array(bpy.types.Operator):
 
 
 class BTOOLS_OT_finalize_array(bpy.types.Operator):
-    """Apply modifiers, remove curve and remove plane
-    """
+    """Apply modifiers, remove curve and remove plane"""
 
     bl_idname = "btools.finalize_array"
     bl_label = "Finalize Array"

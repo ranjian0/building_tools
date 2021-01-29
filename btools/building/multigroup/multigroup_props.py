@@ -22,7 +22,6 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     louver_fill: PointerProperty(type=FillLouver)
     glass_fill: PointerProperty(type=FillGlassPanes)
 
-
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=0.01,
@@ -94,9 +93,7 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
             default_offset=(0.0, 0.0),
         )
         if "d" not in str(self.components):
-            self.arch.init(
-                wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2
-            )
+            self.arch.init(wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2)
         else:
             self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 

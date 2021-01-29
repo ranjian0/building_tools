@@ -7,8 +7,7 @@ from .util_mesh import face_with_verts
 
 
 def cube(bm, width=2, length=2, height=2):
-    """ Create a cube in the given bmesh
-    """
+    """Create a cube in the given bmesh"""
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
     sc_z = Matrix.Scale(height, 4, (0, 0, 1))
@@ -17,8 +16,7 @@ def cube(bm, width=2, length=2, height=2):
 
 
 def plane(bm, width=2, length=2):
-    """ Create a plane in the given bmesh
-    """
+    """Create a plane in the given bmesh"""
     sc_x = Matrix.Scale(width, 4, (1, 0, 0))
     sc_y = Matrix.Scale(length, 4, (0, 1, 0))
     mat = sc_x @ sc_y
@@ -26,16 +24,12 @@ def plane(bm, width=2, length=2):
 
 
 def circle(bm, radius=1, segs=10, cap_tris=False):
-    """ Create circle in the bmesh
-    """
-    return bmesh.ops.create_circle(
-        bm, cap_ends=True, cap_tris=cap_tris, segments=segs, radius=radius
-    )
+    """Create circle in the bmesh"""
+    return bmesh.ops.create_circle(bm, cap_ends=True, cap_tris=cap_tris, segments=segs, radius=radius)
 
 
 def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
-    """ Create a cone in the bmesh
-    """
+    """Create a cone in the bmesh"""
     return bmesh.ops.create_cone(
         bm,
         diameter1=r1 * 2,
@@ -48,11 +42,8 @@ def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
 
 
 def cylinder(bm, radius=1, height=2, segs=10):
-    """ Create cylinder in bmesh
-    """
-    circle = bmesh.ops.create_circle(
-        bm, cap_ends=True, cap_tris=False, segments=segs, radius=radius
-    )
+    """Create cylinder in bmesh"""
+    circle = bmesh.ops.create_circle(bm, cap_ends=True, cap_tris=False, segments=segs, radius=radius)
 
     verts = circle["verts"]
     face = list(verts[0].link_faces)
@@ -71,24 +62,21 @@ Convinience functions
 
 
 def create_cube(bm, size, position=Vector((0, 0, 0))):
-    """ Create cube with size and at position
-    """
+    """Create cube with size and at position"""
     geom = cube(bm, *size)
     bmesh.ops.translate(bm, verts=geom["verts"], vec=position)
     return geom
 
 
 def create_cylinder(bm, radius, height, segs, position=Vector((0, 0, 0))):
-    """ Create cylinder at position
-    """
+    """Create cylinder at position"""
     cy = cylinder(bm, radius, height, segs)
     bmesh.ops.translate(bm, verts=cy["verts"], vec=position)
     return cy
 
 
 def create_cube_without_faces(bm, size, position=Vector((0, 0, 0)), **directions):
-    """ Create cube without faces in the given directions
-    """
+    """Create cube without faces in the given directions"""
     cube = create_cube(bm, size, position)
 
     def D(direction):

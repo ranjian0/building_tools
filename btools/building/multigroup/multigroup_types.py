@@ -33,8 +33,7 @@ SPLIT_EPS = 0.0011
 
 
 def create_multigroup(bm, faces, prop):
-    """ Create multigroup from face selection
-    """
+    """Create multigroup from face selection"""
 
     # Convert components to lowercase (allow user to enter lower or uppercase)
     prop.components = prop.components.lower()
@@ -47,7 +46,7 @@ def create_multigroup(bm, faces, prop):
     if len(prop.components) == 0:
         popup_message("No valid components", "Components Error")
         return False
-        
+
     for face in faces:
         face.select = False
         if not valid_ngon(face):
@@ -74,19 +73,18 @@ def create_multigroup(bm, faces, prop):
 
 @map_new_faces(FaceMap.WALLS)
 def create_multigroup_split(bm, face, prop):
-    """ Use properties from SizeOffset to subdivide face into regular quads
-    """
+    """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
     width, height, offset = *prop.size, prop.offset
     # horizontal split
-    h_widths = [wall_w/2 - offset.x - width/2, width, wall_w/2 + offset.x - width/2]
+    h_widths = [wall_w / 2 - offset.x - width / 2, width, wall_w / 2 + offset.x - width / 2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    size_y = min(height, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
+    size_y = min(height, wall_h - SPLIT_EPS)  # prevent door frame from collapsing when maximized
 
     if "d" not in prop.components:
         # XXX Only windows, use the y offset
-        v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
+        v_width = [wall_h / 2 + offset.y + size_y / 2, wall_h / 2 - offset.y - size_y / 2]
     else:
         # XXX A door exists, split starts from bottom, no need for y offset
         v_width = [size_y, wall_h - size_y]
@@ -96,8 +94,7 @@ def create_multigroup_split(bm, face, prop):
 
 
 def create_multigroup_frame(bm, face, prop):
-    """ Extrude and inset face to make multigroup frame
-    """
+    """Extrude and inset face to make multigroup frame"""
     normal = face.normal.copy()
 
     # XXX Reverse prop.components to solve issue #175
@@ -109,21 +106,30 @@ def create_multigroup_frame(bm, face, prop):
     # create arch
     if prop.add_arch:
         dw_count = count(dws)
-        top_edges = get_top_edges({e for f in get_top_faces(frame_faces, n=2*dw_count+1)[-dw_count-1:] for e in f.edges}, n=dw_count+1)
+        top_edges = get_top_edges(
+            {e for f in get_top_faces(frame_faces, n=2 * dw_count + 1)[-dw_count - 1 :] for e in f.edges},
+            n=dw_count + 1,
+        )
         if dw_count == 1:
-            frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
-        arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
+            frame_faces.remove(get_top_faces(frame_faces).pop())  # remove top face from frame_faces
+        arch_face, arch_frame_faces = create_arch(
+            bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face)
+        )
         frame_faces += arch_frame_faces
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
     if prop.add_arch:
-        door_faces, window_faces, [arch_face], frame_faces = add_frame_depth(bm, door_faces, window_faces, [arch_face], frame_faces, prop.frame_depth, normal)
+        door_faces, window_faces, [arch_face], frame_faces = add_frame_depth(
+            bm, door_faces, window_faces, [arch_face], frame_faces, prop.frame_depth, normal
+        )
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
         frame_faces += new_frame_faces
     else:
-        door_faces, window_faces, _, frame_faces = add_frame_depth(bm, door_faces, window_faces, [], frame_faces, prop.frame_depth, normal)
+        door_faces, window_faces, _, frame_faces = add_frame_depth(
+            bm, door_faces, window_faces, [], frame_faces, prop.frame_depth, normal
+        )
 
     door_faces, new_frame_faces = add_multi_door_depth(bm, door_faces, prop.dw_depth, normal)
     frame_faces += new_frame_faces
@@ -176,7 +182,10 @@ def make_multigroup_insets(bm, face, prop, dws):
         window_height = min(prop.window_height, face_h - SPLIT_EPS)
 
     # adjacent doors/windows clubbed
-    clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
+    clubbed_widths = [
+        clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws) - 1)
+        for i, dw in enumerate(dws)
+    ]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
 
     doors, windows, frames = [], [], []

@@ -1,4 +1,4 @@
-import bpy 
+import bpy
 from bpy.props import (
     BoolProperty,
     FloatProperty,
@@ -13,15 +13,14 @@ from ..utils import (
 
 from mathutils import Vector
 
+
 class SizeOffsetProperty(bpy.types.PropertyGroup):
     """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
     def clamp_size(self):
         if self["restricted"]:
             value = (clamp(self.size[0], 0.1, self["parent_dimensions"][0] - 0.0001), self.size[1])
-            self.size = restricted_size(
-                self["parent_dimensions"], self.offset, (0.1, 0.1), value
-            )
+            self.size = restricted_size(self["parent_dimensions"], self.offset, (0.1, 0.1), value)
 
     def set_size_width(self, value):
         self.size[0] = value
@@ -148,54 +147,54 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
 
 class SizeOffsetGetSet:
-    """ Provide getset redirection in classes that use SizeOffsetProperty
+    """Provide getset redirection in classes that use SizeOffsetProperty
     i.e allow for Parent.width instead of Parent.size_offset.size.x
     """
 
     @property
     def width(self):
-        return self.size_offset.size.x 
+        return self.size_offset.size.x
 
-    @width.setter 
+    @width.setter
     def width(self, val):
         self.size_offset.size.x = val
 
-    @property 
+    @property
     def height(self):
-        return self.size_offset.size.y 
+        return self.size_offset.size.y
 
     @height.setter
     def height(self, val):
-        self.size_offset.size.y = val 
+        self.size_offset.size.y = val
 
-    @property 
+    @property
     def size(self):
-        return self.size_offset.size 
+        return self.size_offset.size
 
-    @size.setter 
+    @size.setter
     def size(self, val):
         self.size_offset.size = val
 
-    @property 
+    @property
     def offsetx(self):
         return self.size_offset.offset.x
-    
-    @offsetx.setter 
-    def offsetx(self, val):
-        self.size_offset.offset.x = val 
 
-    @property 
+    @offsetx.setter
+    def offsetx(self, val):
+        self.size_offset.offset.x = val
+
+    @property
     def offsety(self):
         return self.size_offset.offset.y
-    
-    @offsety.setter 
-    def offsety(self, val):
-        self.size_offset.offset.y = val 
 
-    @property 
+    @offsety.setter
+    def offsety(self, val):
+        self.size_offset.offset.y = val
+
+    @property
     def offset(self):
         return self.size_offset.offset
-    
-    @offset.setter 
+
+    @offset.setter
     def offset(self, val):
-        self.size_offset.offset = val 
+        self.size_offset.offset = val
