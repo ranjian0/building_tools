@@ -24,7 +24,7 @@ class ArrayProperty(bpy.types.PropertyGroup):
         name="Count",
         min=1,
         max=100,
-        default=3,
+        default=1,
         description="Number of elements",
     )
 
