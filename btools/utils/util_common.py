@@ -124,3 +124,8 @@ def local_xyz(face):
     x = z.cross(VEC_RIGHT if z.to_tuple(1) == VEC_UP.to_tuple(1) else VEC_UP)
     y = x.cross(z)
     return x, y, z
+
+def XYDir(vec):
+    """Remove the z component from a vector and normalize"""
+    vec.z = 0
+    return vec.normalized() 

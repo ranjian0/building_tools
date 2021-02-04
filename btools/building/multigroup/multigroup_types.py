@@ -1,5 +1,5 @@
 import re
-
+import math
 import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
@@ -13,9 +13,14 @@ from ..array import (
 )
 from ...utils import (
     clamp,
+    XYDir,
+    VEC_UP,
     FaceMap,
+    VEC_DOWN,
     validate,
     local_xyz,
+    sort_faces,
+    sort_verts,
     valid_ngon,
     ngon_to_quad,
     get_top_faces,
@@ -24,6 +29,7 @@ from ...utils import (
     map_new_faces,
     add_faces_to_map,
     calc_face_dimensions,
+    filter_horizontal_edges,
     subdivide_face_horizontally,
     subdivide_face_vertically,
 )
@@ -68,6 +74,7 @@ def create_multigroup(bm, faces, prop):
                 fill_face(bm, window, prop, "WINDOW")
             if prop.add_arch:
                 fill_arch(bm, arch, prop)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return True
 
 
@@ -116,6 +123,14 @@ def create_multigroup_frame(bm, face, prop):
             bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face)
         )
         frame_faces += arch_frame_faces
+
+    else:
+        # -- postprocess merge loose split verts
+        right = normal.cross(VEC_DOWN)
+        merge_loose_split_verts(bm, 
+            sort_faces(window_faces, right), 
+            sort_faces(door_faces, right), prop
+        )
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
@@ -276,3 +291,77 @@ def parse_components(components):
             else:
                 raise Exception("Unsupported component: {}".format(c))
     return dws
+
+
+def merge_loose_split_verts(bm, window_faces, door_faces, prop):
+    """ Merge the split verts to the corners of the window/door frames"""
+
+    components = prop.components
+    num_components = len(components)    
+    
+    for idx, wf in enumerate(window_faces):
+        window_face_verts = [v for v in wf.verts]
+
+        # -- determine if this window is on the extreme left or right
+        is_extreme_left, is_extreme_right = (
+            idx == 0 and components[0] == 'w', 
+            idx == len(window_faces) - 1 and components[num_components - 1] == 'w'
+        )
+
+        normal = wf.normal.copy()
+        median = wf.calc_center_median()
+        face_left, face_right = (
+            normal.cross(VEC_UP).to_tuple(2),
+            normal.cross(VEC_DOWN).to_tuple(2)
+        )
+
+        for vert in window_face_verts:
+            extent_edge = [e for e in vert.link_edges if e not in wf.edges].pop()
+            corner_vert = extent_edge.other_vert(vert)
+
+            if len(filter_horizontal_edges(corner_vert.link_edges)) < 2:
+                # for bottom verts next to door frame, skip
+                continue
+
+            # if we are in an extreme left/right window, the extreme verts of the window
+            # need to be moved the full length of the frame_thickness
+            move_factor = 0.5
+            vert_dir = XYDir(vert.co - median).to_tuple(2)
+            if (is_extreme_right and vert_dir == face_right) or (is_extreme_left and vert_dir == face_left):
+                move_factor = 1.0
+                
+            move_mag = prop.frame_thickness * move_factor
+            move_dir = XYDir(corner_vert.co - median)
+            bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)
+
+
+    for idx, df in enumerate(door_faces):
+        door_face_verts = sort_verts(df.verts, VEC_UP)[2:]
+
+        # -- determine if this door is on the extreme left or right
+        is_extreme_left, is_extreme_right = (
+            idx == 0 and components[0] == 'd', 
+            idx == len(door_faces) - 1 and components[num_components - 1] == 'd'
+        )
+
+        normal = df.normal.copy()
+        median = df.calc_center_median()
+        face_left, face_right = (
+            normal.cross(VEC_UP).to_tuple(2),
+            normal.cross(VEC_DOWN).to_tuple(2)
+        )
+        for vert in door_face_verts:
+            extent_edge = [e for e in vert.link_edges if e not in df.edges].pop()
+            corner_vert = extent_edge.other_vert(vert)
+
+            # if we are in an extreme left/right door, the extreme verts of the door
+            # need to be moved the full length of the frame_thickness
+            move_factor = 0.5
+            vert_dir = XYDir(vert.co - median).to_tuple(2)
+            if (is_extreme_right and vert_dir == face_right) or (is_extreme_left and vert_dir == face_left):
+                move_factor = 1.0
+                corner_vert.select = True
+                
+            move_mag = prop.frame_thickness * move_factor
+            move_dir = XYDir(corner_vert.co - median)
+            bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)

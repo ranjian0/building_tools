@@ -1,3 +1,4 @@
+import math
 import bmesh
 from mathutils import Vector
 
@@ -12,6 +13,7 @@ from ..array import (
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ...utils import (
     clamp,
+    XYDir,
     select,
     FaceMap,
     validate,
@@ -55,6 +57,7 @@ def create_window(bm, faces, prop):
 
         for face in split_faces:
             window, arch = create_window_frame(bm, face, prop)
+            continue
             if prop.type == "RECTANGULAR":
                 fill_face(bm, window, prop, "WINDOW")
                 if prop.add_arch:
@@ -146,6 +149,10 @@ def create_rectangular_frame(bm, face, prop):
         )
         frame_faces += arch_frame_faces
 
+    else:
+        # -- postprocess merge loose split verts
+        merge_loose_split_verts(bm, window_face, prop)
+
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
@@ -193,3 +200,16 @@ def make_window_inset(bm, face, prop):
     v_widths = [frame_thickness, window_height, frame_thickness]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
     return v_faces[1], h_faces[::2] + v_faces[::2]
+
+
+def merge_loose_split_verts(bm, window_face, prop):
+    """ Merge the split verts to the corners of the window frame"""
+    median = window_face.calc_center_median()
+    window_face_verts = [v for v in window_face.verts]
+    for vert in window_face_verts:
+        extent_edge = [e for e in vert.link_edges if e not in window_face.edges].pop()
+        corner_vert = extent_edge.other_vert(vert)
+
+        move_mag = prop.frame_thickness
+        move_dir = XYDir(corner_vert.co - median)
+        bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)

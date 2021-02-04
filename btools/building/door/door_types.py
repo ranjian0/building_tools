@@ -14,10 +14,13 @@ from ..fill import fill_face
 from ..frame import add_frame_depth
 from ...utils import (
     clamp,
+    XYDir,
     select,
+    VEC_UP,
     FaceMap,
     validate,
     local_xyz,
+    sort_verts,
     valid_ngon,
     ngon_to_quad,
     map_new_faces,
@@ -52,6 +55,7 @@ def create_door(bm, faces, prop):
             create_door_fill(bm, door, prop)
             if prop.add_arch:
                 fill_arch(bm, arch, prop)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
     return True
 
 
@@ -89,6 +93,9 @@ def create_door_frame(bm, face, prop):
             bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face)
         )
         frame_faces += arch_frame_faces
+    else:
+        # -- postprocess merge loose split verts
+        merge_loose_split_verts(bm, door_face, prop)
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
@@ -146,3 +153,16 @@ def make_door_inset(bm, face, prop):
     v_widths = [door_height, frame_thickness]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_widths)
     return v_faces[0], h_faces[::2] + [v_faces[1]]
+
+
+def merge_loose_split_verts(bm, door_face, prop):
+    """ Merge the split verts to the corners of the window frame"""
+    median = door_face.calc_center_median()
+    door_face_verts = sort_verts(door_face.verts, VEC_UP)[2:]
+    for vert in door_face_verts:
+        extent_edge = [e for e in vert.link_edges if e not in door_face.edges].pop()
+        corner_vert = extent_edge.other_vert(vert)
+
+        move_mag = prop.frame_thickness
+        move_dir = XYDir(corner_vert.co - median)
+        bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)
