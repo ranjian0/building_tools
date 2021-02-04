@@ -57,7 +57,6 @@ def create_window(bm, faces, prop):
 
         for face in split_faces:
             window, arch = create_window_frame(bm, face, prop)
-            continue
             if prop.type == "RECTANGULAR":
                 fill_face(bm, window, prop, "WINDOW")
                 if prop.add_arch:

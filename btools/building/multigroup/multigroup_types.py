@@ -1,5 +1,4 @@
 import re
-import math
 import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
