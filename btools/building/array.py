@@ -84,6 +84,9 @@ def get_array_split_edges(afaces):
 
 def spread_array(bm, split_edges, split_faces, max_width, prop):
     """perform spreading for array faces"""
+    if prop.count == 1:
+        return
+        
     normal = split_faces[0].normal.copy()
     median = calc_faces_median(split_faces)
 
