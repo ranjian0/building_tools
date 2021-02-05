@@ -359,7 +359,6 @@ def merge_loose_split_verts(bm, window_faces, door_faces, prop):
             vert_dir = XYDir(vert.co - median).to_tuple(2)
             if (is_extreme_right and vert_dir == face_right) or (is_extreme_left and vert_dir == face_left):
                 move_factor = 1.0
-                corner_vert.select = True
                 
             move_mag = prop.frame_thickness * move_factor
             move_dir = XYDir(corner_vert.co - median)
