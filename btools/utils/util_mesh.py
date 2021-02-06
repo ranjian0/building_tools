@@ -1,13 +1,14 @@
 import functools as ft
 import math
 import operator
+import collections
 
 import bmesh
 import bpy
 from bmesh.types import BMVert, BMEdge, BMFace
 
-from .util_common import local_xyz, equal
 from .util_constants import VEC_UP, VEC_DOWN
+from .util_common import local_xyz, equal, minmax
 
 
 def get_edit_mesh():
@@ -184,16 +185,10 @@ def calc_faces_median(faces):
 def calc_faces_normal(faces):
     """Determine the general normal direction for a group of faces"""
     face_verts = list({v for f in faces for v in f.verts})
-    # -- find the extent verts
-    sorted_z = sort_verts(face_verts, VEC_UP)
-    top_verts, bot_verts = sorted_z[-2:], sorted_z[:2]
 
-    topleft, topright = sorted(top_verts, key=lambda v: v.co.xy)
-    botleft, botright = sorted(bot_verts, key=lambda v: v.co.xy)
-
-    A = topleft.co - botright.co
-    B = topright.co - botleft.co
-
+    bounds = get_bounding_verts(face_verts)
+    A = bounds.topleft.co - bounds.botright.co
+    B = bounds.topright.co - bounds.botleft.co
     return (A.cross(B)).normalized()
 
 
@@ -353,6 +348,19 @@ def get_top_faces(faces, n=1):
 
 def get_bottom_faces(faces, n=1):
     return sort_faces(faces, VEC_UP)[:n]
+
+
+def get_bounding_verts(verts):
+    """Determine the bounding verts (topleft, topright, bottomleft, bottomright)"""
+    min_z, max_z = minmax(verts, key=lambda v:v.co.z)
+    top_verts = [v for v in verts if v.co.z == max_z.co.z]
+    bot_verts = [v for v in verts if v.co.z == min_z.co.z]
+
+    topleft, *_, topright = sorted(top_verts, key=lambda v: v.co.xy.to_tuple(3))
+    botleft, *_, botright = sorted(bot_verts, key=lambda v: v.co.xy.to_tuple(3))
+
+    Bounds = collections.namedtuple("_Bounds", "topleft topright botleft botright")
+    return Bounds(topleft, topright, botleft, botright)
 
 
 def sort_faces(faces, direction):
