@@ -8,6 +8,7 @@ from bpy.props import PointerProperty
 
 from ..utils import (
     select,
+    minmax,
     local_xyz,
     bm_to_obj,
     crash_safe,
@@ -15,7 +16,9 @@ from ..utils import (
     bm_from_obj,
     popup_message,
     calc_faces_median,
+    calc_faces_normal,
     calc_verts_median,
+    get_bounding_verts,
     calc_face_dimensions,
     create_object_material,
     bmesh_from_active_object,
@@ -62,8 +65,7 @@ def add_custom_execute(self, context):
     return {'FINISHED'}
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):
-    """Place custom meshes on the selected faces
-    Mesh must be forward facing(Y+ axis)"""
+    """Place custom meshes on the selected faces"""
 
     bl_idname = "btools.add_custom"
     bl_label = "Add Custom Geometry"
@@ -190,10 +192,11 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
     # (preprocess)calculate bounds of the object
     # NOTE: bounds are calculated before any transform is made
-    *current_size, _ = calc_verts_bounds(custom_verts)
+    current_size = calc_verts_bounds(custom_verts)
+    print(current_size)
 
     # -- move the custom faces into proper position on this face
-    transform_parallel_to_face(bm, custom_verts, face)
+    transform_parallel_to_face(bm, custom_faces, face)
     scale_to_size(bm, custom_verts, current_size, prop.size_offset.size, local_xyz(face))
 
     # cleanup
@@ -202,44 +205,48 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
 def calc_verts_bounds(verts):
     """Determine the bounds size of the verts
-    (assumes verts(mesh) is facing forward(y+))
     """
-    sort_x = sorted([v.co.x for v in verts])
-    sort_y = sorted([v.co.y for v in verts])
-    sort_z = sorted([v.co.z for v in verts])
-    width = sort_x[-1] - sort_x[0]
-    height = sort_z[-1] - sort_z[1]
-    depth = sort_y[-1] - sort_y[1]
-    return width, height, depth
+    bounds = get_bounding_verts(verts)
+    width = (bounds.topleft.co - bounds.topright.co).xy.length
+    height = (bounds.topleft.co - bounds.botleft.co).z
+    return width, height
+
+
+def get_coplanar_faces(face_verts):
+    """ Determine extent faces that should be coplanar to walls"""
+    bounds = get_bounding_verts(face_verts)
+    coplanar_faces = (
+        list(bounds.topleft.link_faces)    + 
+        list(bounds.topright.link_faces)   +
+        list(bounds.botleft.link_faces)    + 
+        list(bounds.botright.link_faces)
+    )
+    return set(coplanar_faces)
 
 
 def calc_coplanar_median(face_verts):
     """ Determine the median point for coplanar faces"""
-
-    # -- find the extent verts
-    sorted_z = sort_verts(face_verts, VEC_UP)
-    top_verts, bot_verts = sorted_z[-2:], sorted_z[:2]
-
-    topleft, topright = sorted(top_verts, key=lambda v: v.co.xy)
-    botleft, botright = sorted(bot_verts, key=lambda v: v.co.xy)
-
-    coplanar_faces = (
-        list(topleft.link_faces)    + 
-        list(topright.link_faces)   +
-        list(botleft.link_faces)    + 
-        list(botright.link_faces)
-    )
-    return calc_faces_median(set(coplanar_faces))
+    return calc_faces_median(get_coplanar_faces(face_verts))
 
 
-def transform_parallel_to_face(bm, verts, face):
+def calc_coplanar_normal(faces):
+    face_verts = list({v for f in faces for v in f.verts})
+    coplanar_faces = get_coplanar_faces(face_verts)
+    normals = {f.normal.copy().to_tuple(3) for f in coplanar_faces}
+    return Vector(normals.pop())
+
+
+def transform_parallel_to_face(bm, custom_faces, target_face):
     """Move and rotate verts(mesh) so that it lies with it's
     forward-extreme faces parallel to `face`
     """
-    normal = face.normal.copy()
-    median = face.calc_center_median()
+    target_normal = target_face.normal.copy()
+    target_median = target_face.calc_center_median()
+
+    verts = list({v for f in custom_faces for v in f.verts})
     verts_median = calc_verts_median(verts)
-    angle = normal.xy.angle_signed(VEC_FORWARD.xy)
+    custom_normal = calc_coplanar_normal(custom_faces)
+    angle = target_normal.xy.angle_signed(custom_normal.xy)
     bmesh.ops.rotate(
         bm, verts=verts,
         cent=verts_median,
@@ -251,7 +258,7 @@ def transform_parallel_to_face(bm, verts, face):
     coplanar_median.z = verts_median.z # Compensate on Z axis for any coplanar faces not considered in calculations
 
     # -- move the custom faces to the target face based on coplanar median
-    transform_diff = median - coplanar_median
+    transform_diff = target_median - coplanar_median
     bmesh.ops.translate(bm, verts=verts, vec=transform_diff)
 
 
