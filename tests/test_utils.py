@@ -136,6 +136,13 @@ class TestUtilsCommon(unittest.TestCase):
         self.assertEqual(y.to_tuple(1), Vector((1, 0, 0)).to_tuple(1))
         self.assertEqual(z.to_tuple(1), Vector((0, 0, 1)).to_tuple(1))
 
+    def test_xydir(self):
+        self.assertEqual(btools.utils.XYDir(Vector((1, 0, 0))), Vector((1, 0, 0)))
+        self.assertEqual(btools.utils.XYDir(Vector((0, 1, 0))), Vector((0, 1, 0)))
+        self.assertEqual(btools.utils.XYDir(Vector((0, 0, 1))), Vector((0, 0, 0)))
+
+        self.assertEqual(btools.utils.XYDir(Vector((1, 1, 1))).to_tuple(2), Vector((0.71, 0.71, 0)).to_tuple(2))
+
 
 class TestUtilsGeometry(unittest.TestCase):
     def setUp(self):
