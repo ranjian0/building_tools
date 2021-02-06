@@ -193,7 +193,6 @@ def place_object_on_face(bm, face, custom_obj, prop):
     # (preprocess)calculate bounds of the object
     # NOTE: bounds are calculated before any transform is made
     current_size = calc_verts_bounds(custom_verts)
-    print(current_size)
 
     # -- move the custom faces into proper position on this face
     transform_parallel_to_face(bm, custom_faces, face)
