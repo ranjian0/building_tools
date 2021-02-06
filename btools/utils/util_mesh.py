@@ -177,8 +177,24 @@ def calc_verts_median(verts):
 
 
 def calc_faces_median(faces):
-    """Determin the median position of faces"""
+    """Determine the median position of faces"""
     return ft.reduce(operator.add, [f.calc_center_median() for f in faces]) / len(faces)
+
+
+def calc_faces_normal(faces):
+    """Determine the general normal direction for a group of faces"""
+    face_verts = list({v for f in faces for v in f.verts})
+    # -- find the extent verts
+    sorted_z = sort_verts(face_verts, VEC_UP)
+    top_verts, bot_verts = sorted_z[-2:], sorted_z[:2]
+
+    topleft, topright = sorted(top_verts, key=lambda v: v.co.xy)
+    botleft, botright = sorted(bot_verts, key=lambda v: v.co.xy)
+
+    A = topleft.co - botright.co
+    B = topright.co - botleft.co
+
+    return (A.cross(B)).normalized()
 
 
 def calc_face_dimensions(face):
