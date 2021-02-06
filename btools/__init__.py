@@ -66,9 +66,9 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         col.operator("btools.add_multigroup")
         col.operator("btools.add_fill")
 
-        # col = layout.column(align=True)
-        # col.operator("btools.add_custom")
-        # col.prop(context.scene, "btools_custom_object", text="")
+        col = layout.column(align=True)
+        col.operator("btools.add_custom")
+        col.prop(context.scene, "btools_custom_object", text="")
 
         layout.separator()
         layout.operator("btools.remove_geom")
