@@ -5,9 +5,10 @@ from bmesh.types import BMFace, BMEdge
 from mathutils import Vector, Quaternion
 
 from ..railing.railing import create_railing
+
+from ..facemap import FaceMap, add_faces_to_map
 from ...utils import (
     VEC_UP,
-    FaceMap,
     VEC_DOWN,
     vec_equal,
     local_xyz,
@@ -21,7 +22,6 @@ from ...utils import (
     popup_message,
     edge_is_sloped,
     subdivide_edges,
-    add_faces_to_map,
     calc_face_dimensions,
     filter_parallel_edges,
     subdivide_face_vertically,

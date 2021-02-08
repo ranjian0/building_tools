@@ -1,13 +1,17 @@
 import bmesh
 
 from .multigroup_types import create_multigroup
-from ...utils import (
+
+from ..facemap import (
     FaceMap,
+    add_facemap_for_groups,
+    verify_facemaps_for_object
+)
+
+from ...utils import (
     crash_safe,
     is_rectangle,
     get_edit_mesh,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
 )
 
 

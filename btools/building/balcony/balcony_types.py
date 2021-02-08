@@ -4,10 +4,10 @@ from bmesh.types import BMVert, BMFace, BMEdge
 from mathutils import Vector
 
 from ..railing.railing import create_railing
+from ..facemap import FaceMap, add_faces_to_map
 from ...utils import (
     clamp,
     VEC_UP,
-    FaceMap,
     validate,
     local_xyz,
     sort_verts,
@@ -18,7 +18,6 @@ from ...utils import (
     ngon_to_quad,
     get_top_faces,
     calc_edge_median,
-    add_faces_to_map,
     get_selection_groups,
     calc_face_dimensions,
 )

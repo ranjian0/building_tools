@@ -4,21 +4,24 @@ import bmesh
 from bmesh.types import BMEdge, BMVert
 from mathutils import Vector, Matrix
 
+from ..facemap import (
+    FaceMap, 
+    map_new_faces, 
+    add_faces_to_map,
+    add_facemap_for_groups
+)
+
 from ...utils import (
     VEC_UP,
-    FaceMap,
     validate,
     local_xyz,
+    valid_ngon,
     filter_geom,
-    map_new_faces,
-    add_faces_to_map,
+    ngon_to_quad,
     calc_edge_median,
     calc_face_dimensions,
     filter_vertical_edges,
     filter_horizontal_edges,
-    add_facemap_for_groups,
-    valid_ngon,
-    ngon_to_quad,
 )
 
 

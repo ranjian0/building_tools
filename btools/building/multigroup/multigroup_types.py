@@ -10,11 +10,15 @@ from ..array import (
     clamp_array_count,
     get_array_split_edges
 )
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_faces_to_map
+)
 from ...utils import (
     clamp,
     XYDir,
     VEC_UP,
-    FaceMap,
     VEC_DOWN,
     validate,
     local_xyz,
@@ -25,8 +29,6 @@ from ...utils import (
     get_top_faces,
     get_top_edges,
     popup_message,
-    map_new_faces,
-    add_faces_to_map,
     calc_face_dimensions,
     filter_horizontal_edges,
     subdivide_face_horizontally,

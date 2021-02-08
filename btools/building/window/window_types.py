@@ -11,11 +11,17 @@ from ..array import (
 )
 
 from ..arch import fill_arch, create_arch, add_arch_depth
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_faces_to_map,
+    add_facemap_for_groups
+)
+
 from ...utils import (
     clamp,
     XYDir,
     select,
-    FaceMap,
     validate,
     arc_edge,
     local_xyz,
@@ -26,14 +32,11 @@ from ...utils import (
     ngon_to_quad,
     get_top_edges,
     get_top_faces,
-    map_new_faces,
     calc_edge_median,
     get_bottom_faces,
-    add_faces_to_map,
     extrude_face_region,
     calc_face_dimensions,
     filter_vertical_edges,
-    add_facemap_for_groups,
     filter_horizontal_edges,
     subdivide_face_vertically,
     subdivide_face_horizontally,

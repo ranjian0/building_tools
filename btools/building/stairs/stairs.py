@@ -1,10 +1,9 @@
 import bmesh
 
 from .stairs_types import create_stairs
-from ...utils import (
+from ...utils import crash_safe, get_edit_mesh
+from ..facemap import (
     FaceMap,
-    crash_safe,
-    get_edit_mesh,
     add_facemap_for_groups,
     verify_facemaps_for_object,
 )

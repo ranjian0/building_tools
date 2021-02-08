@@ -6,16 +6,18 @@ from bpy.props import (
     EnumProperty,
     FloatProperty,
 )
+from .facemap import (
+    FaceMap, 
+    map_new_faces,
+    add_facemap_for_groups
+)
 
 from ..utils import (
-    FaceMap,
     arc_edge,
     sort_verts,
     filter_geom,
-    map_new_faces,
     get_bottom_faces,
     extrude_face_region,
-    add_facemap_for_groups,
 )
 
 

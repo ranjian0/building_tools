@@ -2,12 +2,11 @@ import bmesh
 from bmesh.types import BMFace
 from mathutils import Vector
 
+from ..facemap import FaceMap, add_faces_to_map
 from ...utils import (
     equal,
-    FaceMap,
     filter_geom,
     closest_faces,
-    add_faces_to_map,
     extrude_face_region,
     filter_vertical_edges,
     create_cube_without_faces,

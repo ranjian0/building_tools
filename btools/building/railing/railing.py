@@ -5,21 +5,24 @@ import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Matrix, Quaternion
 
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_facemap_for_groups
+)
+
 from ...utils import (
     clamp,
-    FaceMap,
     VEC_DOWN,
     validate,
     sort_edges,
     sort_verts,
     edge_vector,
     filter_geom,
-    map_new_faces,
     edge_is_sloped,
     edge_is_vertical,
     subdivide_edges,
     calc_verts_median,
-    add_facemap_for_groups,
 )
 
 RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")

@@ -4,20 +4,22 @@ import numpy as np
 from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_faces_to_map,
+    add_facemap_for_groups
+)
 from ...utils import (
     equal,
     select,
-    FaceMap,
     validate,
     edge_vector,
     skeletonize,
     filter_geom,
-    map_new_faces,
     popup_message,
     edge_is_vertical,
-    add_faces_to_map,
     calc_edge_median,
-    add_facemap_for_groups,
 )
 
 

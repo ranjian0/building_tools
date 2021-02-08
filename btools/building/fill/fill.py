@@ -5,8 +5,8 @@ from ...utils import (
     crash_safe,
     is_rectangle,
     get_edit_mesh,
-    verify_facemaps_for_object,
 )
+from ..facemap import verify_facemaps_for_object
 
 
 class Fill:

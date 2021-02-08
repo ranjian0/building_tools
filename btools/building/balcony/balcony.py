@@ -1,10 +1,9 @@
 import bmesh
 
 from .balcony_types import create_balcony
-from ...utils import (
+from ...utils import get_edit_mesh, crash_safe
+from ..facemap import (
     FaceMap,
-    crash_safe,
-    get_edit_mesh,
     add_facemap_for_groups,
     verify_facemaps_for_object,
 )

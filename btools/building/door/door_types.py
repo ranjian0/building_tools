@@ -12,22 +12,20 @@ from ..array import (
 )
 from ..fill import fill_face
 from ..frame import add_frame_depth
+from ..facemap import FaceMap, map_new_faces, add_faces_to_map
 from ...utils import (
     clamp,
     XYDir,
     select,
     VEC_UP,
-    FaceMap,
     validate,
     local_xyz,
     sort_verts,
     valid_ngon,
     ngon_to_quad,
-    map_new_faces,
     get_top_edges,
     get_top_faces,
     get_bottom_faces,
-    add_faces_to_map,
     extrude_face_region,
     calc_face_dimensions,
     subdivide_face_vertically,

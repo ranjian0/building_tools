@@ -1,14 +1,17 @@
 import bmesh
 
 from .floor_types import create_floors
-from ..material import clear_empty_facemaps
+from ..facemap import (
+    FaceMap, 
+    clear_empty_facemaps,
+    add_facemap_for_groups,
+    verify_facemaps_for_object
+)
+
 from ...utils import (
     select,
-    FaceMap,
     crash_safe,
     get_edit_mesh,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
 )
 
 

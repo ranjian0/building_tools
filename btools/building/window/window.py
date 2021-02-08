@@ -1,11 +1,9 @@
 import bmesh
 
 from .window_types import create_window
-from ...utils import (
+from ...utils import crash_safe, get_edit_mesh, is_rectangle
+from ..facemap import (
     FaceMap,
-    crash_safe,
-    is_rectangle,
-    get_edit_mesh,
     add_facemap_for_groups,
     verify_facemaps_for_object,
 )
