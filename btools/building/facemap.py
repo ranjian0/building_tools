@@ -47,6 +47,8 @@ class FaceMap(AutoIndex):
     ROOF = auto()
     ROOF_HANGS = auto()
 
+    CUSTOM = auto()
+
     # Roads
     ROAD = auto()
     SHOULDER = auto()

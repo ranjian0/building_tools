@@ -6,6 +6,12 @@ import bmesh
 from mathutils import Matrix, Vector
 from bpy.props import PointerProperty
 
+from .facemap import (
+    FaceMap, 
+    add_faces_to_map,
+    add_facemap_for_groups
+)
+
 from ..utils import (
     select,
     minmax,
@@ -78,6 +84,7 @@ class BTOOLS_OT_add_custom(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
+        add_facemap_for_groups([FaceMap.CUSTOM])
         return add_custom_execute(self, context)
 
     def draw(self, context):
@@ -164,9 +171,9 @@ def duplicate_into_bm(bm, obj):
     """Copy all the mesh data in obj to the bm
     Return the newly inserted faces
     """
-    initial_faces = {f.index for f in bm.faces}
+    max_index = len(bm.faces)
     bm.from_mesh(obj.data.copy())
-    return [f for f in bm.faces if f.index not in initial_faces]
+    return [f for f in bm.faces if f.index >= max_index]
 
 
 # TODO(ranjian0) refactor function (duplicated from create_window_split)
@@ -186,7 +193,10 @@ def create_split(bm, face, size, offset):
 def place_object_on_face(bm, face, custom_obj, prop):
     """Place the custom_object mesh flush on the face"""
     # XXX get mesh from custom_obj into bm
+    face_idx = face.index
     custom_faces = duplicate_into_bm(bm, custom_obj)
+    face = [f for f in bm.faces if f.index == face_idx].pop() # restore reference
+    add_faces_to_map(bm, custom_faces, FaceMap.CUSTOM)
     custom_verts = list({v for f in custom_faces for v in f.verts})
 
     # (preprocess)calculate bounds of the object
