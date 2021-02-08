@@ -135,7 +135,9 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
             row.prop(face_map_material, "uv_mapping_method", text="")
 
             layout.label(text="Material")
-            layout.operator("btools.create_facemap_material")
+            sp = layout.split(factor=0.8, align=True)
+            sp.operator("btools.create_facemap_material")
+            sp.operator("btools.remove_facemap_material", icon="PANEL_CLOSE", text="")
             layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 

@@ -152,6 +152,19 @@ def set_material_for_active_facemap(material, context):
             if face[face_map] == active_facemap.index:
                 face.material_index = mat_id
 
+def clear_material_for_active_facemap(context):
+    """Remove the material on all faces for the current/active facemap"""
+    obj = context.object
+    index = obj.face_maps.active_index
+    active_facemap = obj.face_maps[index]
+
+    with bmesh_from_active_object(context) as bm:
+
+        face_map = bm.faces.layers.face_map.active
+        for face in bm.faces:
+            if face[face_map] == active_facemap.index:
+                face.material_index = 0
+
 
 def face_map_index_from_name(name):
     """Get the index of a facemap from its name"""

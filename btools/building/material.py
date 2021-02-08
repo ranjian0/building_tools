@@ -7,7 +7,11 @@ from bpy.props import (
 )
 
 from ..utils import create_object_material, bmesh_from_active_object
-from .facemap import clear_empty_facemaps, set_material_for_active_facemap
+from .facemap import (
+    clear_empty_facemaps, 
+    set_material_for_active_facemap,
+    clear_material_for_active_facemap
+)
 
 
 class BTOOLS_UL_fmaps(bpy.types.UIList):
@@ -65,6 +69,28 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
         obj.facemap_materials[active_facemap.index].material = mat
         return {"FINISHED"}
 
+class BTOOLS_OT_remove_facemap_material(bpy.types.Operator):
+    """Remove the material from the active facemap"""
+
+    bl_idname = "btools.remove_facemap_material"
+    bl_label = "Remove Material"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+        mat = obj.facemap_materials[active_facemap.index].material
+        return obj and obj.type == "MESH" and mat
+
+    def execute(self, context):
+        obj = context.object
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+
+        clear_material_for_active_facemap(context)
+        obj.facemap_materials[active_facemap.index].material = None
+        return {"FINISHED"}
+
 
 def update_facemap_material(self, context):
     """Assign the updated material to all faces belonging to active facemap"""
@@ -99,6 +125,7 @@ classes = (
     BTOOLS_UL_fmaps,
     BTOOLS_OT_fmaps_clear,
     BTOOLS_OT_create_facemap_material,
+    BTOOLS_OT_remove_facemap_material
 )
 
 
