@@ -132,7 +132,7 @@ dmypy.json
 *.blend
 *.blend1
 
-
+*.txt
 *.zip
 .idea
 /docs/_site
