@@ -1,6 +1,7 @@
 import bpy
 import math
 import bmesh
+from .facemap import FaceMap, add_faces_to_map
 from ..utils import (
     minmax,
     select,
@@ -21,7 +22,8 @@ def remove(context):
 
     bmesh.ops.delete(bm, geom=bound_faces, context="FACES")
     bmesh.ops.dissolve_verts(bm, verts=midv)
-    bmesh.ops.contextual_create(bm, geom=cornerv)
+    newfaces = bmesh.ops.contextual_create(bm, geom=cornerv).get('faces')
+    add_faces_to_map(bm, newfaces, FaceMap.WALLS)
 
     bmesh.update_edit_mesh(me, True)
 
