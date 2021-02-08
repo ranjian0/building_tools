@@ -15,7 +15,8 @@ from ..facemap import (
     FaceMap,
     map_new_faces,
     add_faces_to_map,
-    add_facemap_for_groups
+    add_facemap_for_groups,
+    find_faces_without_facemap
 )
 
 from ...utils import (
@@ -65,6 +66,9 @@ def create_window(bm, faces, prop):
                 if prop.add_arch:
                     fill_arch(bm, arch, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+
+    nulfaces = find_faces_without_facemap(bm)
+    add_faces_to_map(bm, nulfaces, FaceMap.WALLS)
     return True
 
 

@@ -176,3 +176,12 @@ def clear_empty_facemaps(context):
         # -- remove facemap materials:
         for idx in reversed(list(tag_remove_indices)):
             obj.facemap_materials.remove(idx)
+
+def find_faces_without_facemap(bm):
+    """Find all the faces in bm that don't belong to any facemap"""
+    result = []
+    face_map = bm.faces.layers.face_map.active
+    for f in bm.faces:
+        if f[face_map] < 0:
+            result.append(f)
+    return result
