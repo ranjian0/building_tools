@@ -8,10 +8,21 @@ from bpy.props import (
 )
 
 from ..fill import FillBars, FillLouver, FillGlassPanes
-from ..generic import ArchProperty, SizeOffsetProperty, CountProperty
+
+from ..arch import ArchProperty
+from ..array import ArrayProperty, ArrayGetSet
+from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 
-class WindowProperty(bpy.types.PropertyGroup):
+class WindowProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
+    arch: PointerProperty(type=ArchProperty)
+    array: PointerProperty(type=ArrayProperty)
+    size_offset: PointerProperty(type=SizeOffsetProperty)
+
+    bar_fill: PointerProperty(type=FillBars)
+    louver_fill: PointerProperty(type=FillLouver)
+    glass_fill: PointerProperty(type=FillGlassPanes)
+
     win_types = [
         ("CIRCULAR", "Circular", "", 0),
         ("RECTANGULAR", "Rectangular", "", 1),
@@ -60,12 +71,8 @@ class WindowProperty(bpy.types.PropertyGroup):
     )
 
     add_arch: BoolProperty(
-        name="Add Arch", default=False, description="Add arch over door/window"
+        name="Add Arch", default=False, description="Add arch over window"
     )
-
-    count: CountProperty
-    arch: PointerProperty(type=ArchProperty)
-    size_offset: PointerProperty(type=SizeOffsetProperty)
 
     fill_types = [
         ("NONE", "None", "", 0),
@@ -79,10 +86,6 @@ class WindowProperty(bpy.types.PropertyGroup):
         default="NONE",
         description="Type of fill for window",
     )
-
-    bar_fill: PointerProperty(type=FillBars)
-    louver_fill: PointerProperty(type=FillLouver)
-    glass_fill: PointerProperty(type=FillGlassPanes)
 
     def init(self, wall_dimensions):
         self["wall_dimensions"] = wall_dimensions
@@ -110,8 +113,7 @@ class WindowProperty(bpy.types.PropertyGroup):
         row = col.row(align=True)
         row.prop(self, "window_depth")
 
-        col = box.column(align=True)
-        col.prop(self, "count")
+        self.array.draw(context, box)
 
         if self.type == "RECTANGULAR":
             box = layout.box()

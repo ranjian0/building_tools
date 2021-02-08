@@ -5,21 +5,24 @@ import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Matrix, Quaternion
 
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_facemap_for_groups
+)
+
 from ...utils import (
     clamp,
-    FaceMap,
     VEC_DOWN,
     validate,
     sort_edges,
     sort_verts,
     edge_vector,
     filter_geom,
-    map_new_faces,
     edge_is_sloped,
     edge_is_vertical,
     subdivide_edges,
     calc_verts_median,
-    add_facemap_for_groups,
 )
 
 RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")
@@ -54,12 +57,12 @@ def make_fill(bm, face, prop):
     ret = bmesh.ops.duplicate(bm, geom=[face])
     dup_face = filter_geom(ret["geom"], BMFace)[0]
     non_vertical = [e for e in dup_face.edges if not edge_is_vertical(e)]
-    top_edge = sort_edges(non_vertical, Vector((0., 0., -1.)))[0]
-    bot_edge = sort_edges(non_vertical, Vector((0., 0., -1.)))[-1]
-    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0., 0., -1.))*prop.corner_post_width/2)
+    top_edge = sort_edges(non_vertical, Vector((0.0, 0.0, -1.0)))[0]
+    bot_edge = sort_edges(non_vertical, Vector((0.0, 0.0, -1.0)))[-1]
+    bmesh.ops.translate(bm, verts=top_edge.verts, vec=Vector((0.0, 0.0, -1.0)) * prop.corner_post_width / 2)
 
     # make dupface fit flush between corner posts
-    translate_bounds(bm, dup_face.verts, edge_vector(top_edge), prop.corner_post_width/2)
+    translate_bounds(bm, dup_face.verts, edge_vector(top_edge), prop.corner_post_width / 2)
 
     # create railing top
     add_facemap_for_groups(FaceMap.RAILING_RAILS)
@@ -84,7 +87,7 @@ def make_fill(bm, face, prop):
 @map_new_faces(FaceMap.RAILING_RAILS)
 def create_railing_top(bm, top_edge, prop):
     cylinder = create_railing_cylinder(bm, top_edge, prop)
-    bmesh.ops.translate(bm, verts=top_edge.verts, vec=(0., 0., -prop.corner_post_width/2))
+    bmesh.ops.translate(bm, verts=top_edge.verts, vec=(0.0, 0.0, -prop.corner_post_width / 2))
     return list({f for v in cylinder for f in v.link_faces})
 
 
@@ -92,12 +95,11 @@ def create_railing_top(bm, top_edge, prop):
 def create_railing_bottom(bm, bot_edge, prop):
     initial_loc = prop.corner_post_width * 1.5
     clamped_offset = clamp(
-        prop.bottom_rail_offset,
-        -initial_loc + prop.corner_post_width / 2,
-        prop.corner_post_height - initial_loc * 2)
+        prop.bottom_rail_offset, -initial_loc + prop.corner_post_width / 2, prop.corner_post_height - initial_loc * 2
+    )
     bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, initial_loc + clamped_offset))
     create_railing_cylinder(bm, bot_edge, prop)
-    bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, prop.corner_post_width/2))
+    bmesh.ops.translate(bm, verts=bot_edge.verts, vec=(0, 0, prop.corner_post_width / 2))
 
 
 def create_railing_cylinder(bm, edge, prop):
@@ -106,11 +108,11 @@ def create_railing_cylinder(bm, edge, prop):
     vec = edge_vector(top_dup_edge)
 
     up = vec.copy()
-    horizon = vec.cross(Vector((0., 0., 1.)))
-    up.rotate(Quaternion(horizon, math.pi/2).to_euler())
+    horizon = vec.cross(Vector((0.0, 0.0, 1.0)))
+    up.rotate(Quaternion(horizon, math.pi / 2).to_euler())
 
     sloped = edge_is_sloped(top_dup_edge)
-    cylinder = edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width/2, up)
+    cylinder = edge_to_cylinder(bm, top_dup_edge, prop.corner_post_width / 2, up)
     if sloped:
         rotate_sloped_rail_bounds(bm, cylinder, vec)
     return cylinder
@@ -119,9 +121,9 @@ def create_railing_cylinder(bm, edge, prop):
 @map_new_faces(FaceMap.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
     result = []
-    sorted_edges = sort_edges(
-        [e for e in face.edges if not edge_is_vertical(e)], Vector((0.0, 0.0, -1.0))
-    )
+    sorted_edges = sort_edges([e for e in face.edges if not edge_is_vertical(e)], Vector((0.0, 0.0, -1.0)))
+    if not sorted_edges:
+        return result
 
     # create posts
     post_size = min(prop.post_fill.size, prop.corner_post_width)
@@ -132,22 +134,18 @@ def create_fill_posts(bm, face, prop):
     dir = edge_vector(top_edge)
     sloped = edge_is_sloped(top_edge)
     if n_posts != 0:
-        inner_edges = subdivide_edges(
-            bm, [top_edge, bottom_edge], dir, widths=[1.0] * (n_posts + 1)
-        )
+        inner_edges = subdivide_edges(bm, [top_edge, bottom_edge], dir, widths=[1.0] * (n_posts + 1))
         for edge in inner_edges:
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
             up = face.normal
             vec = edge_vector(dup_edge)
-            cylinder = edge_to_cylinder(bm, dup_edge, post_size/2, up)
+            cylinder = edge_to_cylinder(bm, dup_edge, post_size / 2, up)
             if sloped:
                 rotate_faces(bm, cylinder, vec, dir, prop)
             result.append(list({f for v in cylinder for f in v.link_faces}))
         # delete reference faces
-        bmesh.ops.delete(
-            bm, geom=list({f for e in inner_edges for f in e.link_faces}), context="FACES"
-        )
+        bmesh.ops.delete(bm, geom=list({f for e in inner_edges for f in e.link_faces}), context="FACES")
     else:
         # delete reference faces
         bmesh.ops.delete(bm, geom=[face], context="FACES")
@@ -161,13 +159,9 @@ def create_fill_rails(bm, face, prop):
     rail_size = min(prop.rail_fill.size, prop.corner_post_width)
 
     vertical_edges = [e for e in face.edges if edge_is_vertical(e)]
-    n_rails = math.floor(
-        vertical_edges[0].calc_length() * prop.rail_fill.density / rail_size
-    )
+    n_rails = math.floor(vertical_edges[0].calc_length() * prop.rail_fill.density / rail_size)
     if n_rails != 0:
-        inner_edges = subdivide_edges(
-            bm, vertical_edges, Vector((0.0, 0.0, 1.0)), widths=[1.0] * (n_rails + 1)
-        )
+        inner_edges = subdivide_edges(bm, vertical_edges, Vector((0.0, 0.0, 1.0)), widths=[1.0] * (n_rails + 1))
         for edge in inner_edges:
             ret = bmesh.ops.duplicate(bm, geom=[edge])
             dup_edge = filter_geom(ret["geom"], BMEdge)[0]
@@ -238,13 +232,12 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
 
 
 def translate_bounds(bm, verts, dir, trans):
-    """ Translate the end verts inwards
-    """
-    if dir.z: # if rail is sloping, make vector horizontal
+    """Translate the end verts inwards"""
+    if dir.z:  # if rail is sloping, make vector horizontal
         left = dir.cross(VEC_DOWN)
         dir.rotate(Quaternion(left, math.atan(dir.z / dir.xy.length)).to_euler())
 
-    vec = dir.xy*trans
+    vec = dir.xy * trans
     mid = len(verts) // 2
     vts = sort_verts(verts, dir)
     bmesh.ops.translate(bm, verts=vts[:mid], vec=(vec.x, vec.y, 0.0))
@@ -252,31 +245,26 @@ def translate_bounds(bm, verts, dir, trans):
 
 
 def rotate_faces(bm, cylinder, dir, left, prop):
-    """ Rotate the upper and lower faces (align posts to slanted railing)
-    """
+    """Rotate the upper and lower faces (align posts to slanted railing)"""
     mid = len(cylinder) // 2
     vts = sort_verts(cylinder, dir)
     angle = math.atan(left.z / left.xy.length)
     bmesh.ops.rotate(
-            bm, verts=vts[-mid:], cent=calc_verts_median(vts[-mid:]),
-            matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
-        )
+        bm, verts=vts[-mid:], cent=calc_verts_median(vts[-mid:]), matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
+    )
 
     if prop.bottom_rail:
         bmesh.ops.rotate(
-                bm, verts=vts[:mid], cent=calc_verts_median(vts[:mid]),
-                matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
-            )
+            bm, verts=vts[:mid], cent=calc_verts_median(vts[:mid]), matrix=Matrix.Rotation(angle, 4, dir.cross(-left))
+        )
 
 
 def rotate_sloped_rail_bounds(bm, cylinder_verts, dir):
-    """ Rotate the end faces of sloping cylinder rail to be vertically aligned
-    """
+    """Rotate the end faces of sloping cylinder rail to be vertically aligned"""
     mid = len(cylinder_verts) // 2
     vts = sort_verts(cylinder_verts, dir)
     angle = math.atan(dir.z / dir.xy.length)
     for bunch in [vts[:mid], vts[-mid:]]:
         bmesh.ops.rotate(
-            bm, verts=bunch, cent=calc_verts_median(bunch),
-            matrix=Matrix.Rotation(angle, 4, dir.cross(VEC_DOWN))
+            bm, verts=bunch, cent=calc_verts_median(bunch), matrix=Matrix.Rotation(angle, 4, dir.cross(VEC_DOWN))
         )

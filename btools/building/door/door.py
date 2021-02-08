@@ -2,10 +2,13 @@ import bmesh
 
 from .door_types import create_door
 from ...utils import (
-    FaceMap,
     crash_safe,
     is_rectangle,
     get_edit_mesh,
+)
+
+from ..facemap import (
+    FaceMap,
     add_facemap_for_groups,
     verify_facemaps_for_object,
 )

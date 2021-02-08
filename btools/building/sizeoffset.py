@@ -1,12 +1,9 @@
 import bpy
 from bpy.props import (
-    IntProperty,
-    EnumProperty,
     BoolProperty,
     FloatProperty,
     FloatVectorProperty,
 )
-from mathutils import Vector
 
 from ..utils import (
     clamp,
@@ -14,45 +11,7 @@ from ..utils import (
     restricted_offset,
 )
 
-
-def get_count(self):
-    """ Return count value with a default of 1
-    """
-    return self.get("count", 1)
-
-
-def set_count(self, value):
-    """ Set count value ensuring that element fit nicely in parent
-    """
-    # -- Make each element in array fit into the parent
-    parent_width = self["wall_dimensions"][0]
-    if self.size_offset.size.x > parent_width / value:
-        self.size_offset.size.x = parent_width / value
-
-    # -- keep horizontal offset within bounds of parent face
-    element_width = parent_width / value
-    item_width = self.size_offset.size.x
-    max_offset = (element_width / 2) - (item_width / 2)
-    self.size_offset.offset.x = clamp(
-        self.size_offset.offset.x, -max_offset, max_offset
-    )
-
-    # -- set count
-    self["count"] = value
-
-
-def clamp_count(face_width, frame_width, prop):
-    prop.count = clamp(prop.count, 1, int(face_width / frame_width) - 1)
-
-
-CountProperty = IntProperty(
-    name="Count",
-    min=1,
-    max=100,
-    set=set_count,
-    get=get_count,
-    description="Number of elements",
-)
+from mathutils import Vector
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
@@ -61,9 +20,7 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
     def clamp_size(self):
         if self["restricted"]:
             value = (clamp(self.size[0], 0.1, self["parent_dimensions"][0] - 0.0001), self.size[1])
-            self.size = restricted_size(
-                self["parent_dimensions"], self.offset, (0.1, 0.1), value
-            )
+            self.size = restricted_size(self["parent_dimensions"], self.offset, (0.1, 0.1), value)
 
     def set_size_width(self, value):
         self.size[0] = value
@@ -189,73 +146,55 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         col.prop(self, "offset_vertical")
 
 
-class ArchProperty(bpy.types.PropertyGroup):
-    """ Convinience PropertyGroup to create arched features """
+class SizeOffsetGetSet:
+    """Provide getset redirection in classes that use SizeOffsetProperty
+    i.e allow for Parent.width instead of Parent.size_offset.size.x
+    """
 
-    def get_height(self):
-        return self.get("height", min(self["parent_height"], self["default_height"]))
+    @property
+    def width(self):
+        return self.size_offset.size.x
 
-    def set_height(self, value):
-        self["height"] = clamp(value, 0.1, self["parent_height"] - 0.0001)
+    @width.setter
+    def width(self, val):
+        self.size_offset.size.x = val
 
-    resolution: IntProperty(
-        name="Arc Resolution",
-        min=1,
-        max=128,
-        default=6,
-        description="Number of segements for the arc",
-    )
+    @property
+    def height(self):
+        return self.size_offset.size.y
 
-    depth: FloatProperty(
-        name="Arc Depth",
-        min=0.01,
-        max=1.0,
-        default=0.05,
-        unit="LENGTH",
-        description="How far arc is from top",
-    )
+    @height.setter
+    def height(self, val):
+        self.size_offset.size.y = val
 
-    height: FloatProperty(
-        name="Arc Height",
-        get=get_height,
-        set=set_height,
-        unit="LENGTH",
-        description="Radius of the arc",
-    )
+    @property
+    def size(self):
+        return self.size_offset.size
 
-    func_items = [("SINE", "Sine", "", 0), ("SPHERE", "Sphere", "", 1)]
-    function: EnumProperty(
-        name="Offset Function",
-        items=func_items,
-        default="SPHERE",
-        description="Type of offset for arch",
-    )
+    @size.setter
+    def size(self, val):
+        self.size_offset.size = val
 
-    def init(self, parent_height):
-        self["parent_height"] = parent_height
-        self["default_height"] = 0.4
+    @property
+    def offsetx(self):
+        return self.size_offset.offset.x
 
-    def draw(self, context, box):
+    @offsetx.setter
+    def offsetx(self, val):
+        self.size_offset.offset.x = val
 
-        col = box.column(align=True)
-        row = col.row(align=True)
-        row.prop(self, "function", expand=True)
-        col.prop(self, "resolution")
-        col.prop(self, "depth")
-        col.prop(self, "height")
+    @property
+    def offsety(self):
+        return self.size_offset.offset.y
 
+    @offsety.setter
+    def offsety(self, val):
+        self.size_offset.offset.y = val
 
-classes = (
-    ArchProperty,
-    SizeOffsetProperty,
-)
+    @property
+    def offset(self):
+        return self.size_offset.offset
 
-
-def register_generic():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_generic():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+    @offset.setter
+    def offset(self, val):
+        self.size_offset.offset = val

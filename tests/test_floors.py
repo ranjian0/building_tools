@@ -11,7 +11,6 @@ floorplan_builder = floorplan.floorplan.Floorplan
 
 
 class TestFloor(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         bpy.utils.register_class(floorplan.FloorplanProperty)
@@ -30,7 +29,7 @@ class TestFloor(unittest.TestCase):
 
     def setUp(self):
         self.clear_objects()
-        self.defaults = btools.utils.kwargs_from_props(bpy.context.scene.floor_prop)
+        self.defaults = btools.utils.dict_from_prop(bpy.context.scene.floor_prop)
 
     def tearDown(self):
         # -- restore test_prop to previous state

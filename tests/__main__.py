@@ -18,6 +18,7 @@ except Exception:
     # XXX Error importing test modules.
     # Print Traceback and close blender process
     import traceback
+
     traceback.print_exc()
     sys.exit()
 
@@ -25,7 +26,7 @@ except Exception:
 def main():
     # Load the addon module
     tools.LoadModule(os.path.join(addon_dir, "btools", "__init__.py"))
-    print('-'*70, end="\n\n")
+    print('-' * 70, end="\n\n")
 
     # initialize the test suite
     loader = unittest.TestLoader()

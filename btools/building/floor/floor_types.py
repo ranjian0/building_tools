@@ -2,12 +2,11 @@ import bmesh
 from bmesh.types import BMFace
 from mathutils import Vector
 
+from ..facemap import FaceMap, add_faces_to_map
 from ...utils import (
     equal,
-    FaceMap,
     filter_geom,
     closest_faces,
-    add_faces_to_map,
     extrude_face_region,
     filter_vertical_edges,
     create_cube_without_faces,
@@ -15,8 +14,7 @@ from ...utils import (
 
 
 def create_floors(bm, faces, prop):
-    """Create extrusions of floor geometry from a floorplan
-    """
+    """Create extrusions of floor geometry from a floorplan"""
     slabs, walls, roof = extrude_slabs_and_floors(bm, faces, prop)
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -27,8 +25,7 @@ def create_floors(bm, faces, prop):
 
 
 def extrude_slabs_and_floors(bm, faces, prop):
-    """extrude edges alternating between slab and floor heights
-    """
+    """extrude edges alternating between slab and floor heights"""
     slabs = []
     walls = []
     normal = faces[0].normal.copy()
@@ -45,8 +42,10 @@ def extrude_slabs_and_floors(bm, faces, prop):
                 flat_faces = get_flat_faces(faces, {})
                 flat_faces, surrounding_faces = extrude_face_region(bm, flat_faces, offset, normal)
                 dissolve_flat_edges(bm, surrounding_faces)
-                surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)["geom"], BMFace)
-                faces = closest_faces(flat_faces, [l+Vector((0., 0., offset)) for l in orig_locs])
+                surrounding_faces = filter_geom(
+                    bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)["geom"], BMFace
+                )
+                faces = closest_faces(flat_faces, [l + Vector((0.0, 0.0, offset)) for l in orig_locs])
             else:
                 faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
             if i % 2:
@@ -56,7 +55,8 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
         # extrude slabs horizontally
         slabs += bmesh.ops.inset_region(
-            bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True)["faces"]
+            bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True
+        )["faces"]
 
     else:
         offsets = [prop.floor_height] * prop.floor_count
@@ -71,10 +71,14 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
 
 def dissolve_flat_edges(bm, faces):
-    flat_edges = list({
-        e for f in faces for e in filter_vertical_edges(f.edges)
-        if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
-    })
+    flat_edges = list(
+        {
+            e
+            for f in faces
+            for e in filter_vertical_edges(f.edges)
+            if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
+        }
+    )
     bmesh.ops.dissolve_edges(bm, edges=flat_edges, use_verts=True)
 
 
@@ -102,8 +106,11 @@ def create_columns(bm, face, prop):
     for v in face.verts:
         for i in range(prop.floor_count):
             cube = create_cube_without_faces(
-                bm, (col_w, col_w, prop.floor_height),
-                (v.co.x, v.co.y, v.co.z + (pos_h * (i+1)) + ((prop.floor_height / 2) * i)), bottom=True)
+                bm,
+                (col_w, col_w, prop.floor_height),
+                (v.co.x, v.co.y, v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i)),
+                bottom=True,
+            )
             res.extend(cube.get("verts"))
 
     columns = list({f for v in res for f in v.link_faces})

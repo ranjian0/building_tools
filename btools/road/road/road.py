@@ -15,7 +15,7 @@ from ...utils import (
     add_faces_to_map,
     FaceMap,
     add_facemap_for_groups,
-    filter_geom
+    filter_geom,
 )
 
 
@@ -23,8 +23,7 @@ class Road:
     @classmethod
     @crash_safe
     def build(cls, context, prop):
-        """ Create road object
-        """
+        """Create road object"""
         name = "road_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
         obj = create_object(name, create_mesh(name + "_mesh"))
         link_obj(obj)
@@ -48,8 +47,7 @@ class Road:
 
     @classmethod
     def create_vertex_outline(cls, bm, prop):
-        """Creates the original vertices
-        """
+        """Creates the original vertices"""
 
         shoulder_width = sin(prop.shoulder_angle) * prop.shoulder_height
         shoulder_height = cos(prop.shoulder_angle) * prop.shoulder_height
@@ -140,8 +138,7 @@ class Road:
         geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
         verts = filter_geom(geom["geom"], bmesh.types.BMVert)
 
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)),
-                            verts=verts)
+        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), verts=verts)
 
         # Set facemaps
         # Face order is totally random, vertex and edge order is not so get the faces from the edges
@@ -277,7 +274,9 @@ class Road:
 
         # Calculate uvs for all vertices
         for i in range(sections):
-            current_position = (bm.verts[i * count].co + bm.verts[(i + 1) * count - 1].co) / 2  # Calculate center of road
+            current_position = (
+                bm.verts[i * count].co + bm.verts[(i + 1) * count - 1].co
+            ) / 2  # Calculate center of road
             total_distance += (last_position - current_position).length
 
             for j in range(count):

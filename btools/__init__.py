@@ -1,7 +1,6 @@
 import bpy
 
-from .road import register_road, unregister_road
-from .building import register_building, unregister_building
+from .building.register import register_building, unregister_building
 
 bl_info = {
     "name": "Building Tools",
@@ -67,9 +66,11 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         col.operator("btools.add_multigroup")
         col.operator("btools.add_fill")
 
-        # col = layout.column(align=True)
-        # col.operator("btools.add_custom")
-        # col.prop(context.scene, "btools_custom_object", text="")
+        col = layout.column(align=True)
+        col.operator("btools.add_custom")
+        col.prop(context.scene, "btools_custom_object", text="")
+
+        layout.operator("btools.remove_geom")
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):
@@ -134,7 +135,9 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
             row.prop(face_map_material, "uv_mapping_method", text="")
 
             layout.label(text="Material")
-            layout.operator("btools.create_facemap_material")
+            sp = layout.split(factor=0.8, align=True)
+            sp.operator("btools.create_facemap_material")
+            sp.operator("btools.remove_facemap_material", icon="PANEL_CLOSE", text="")
             layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
 
 
@@ -142,14 +145,12 @@ classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
 
 def register():
-    register_road()
     register_building()
     for cls in classes:
         bpy.utils.register_class(cls)
 
 
 def unregister():
-    unregister_road()
     unregister_building()
     for cls in classes:
         bpy.utils.unregister_class(cls)

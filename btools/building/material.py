@@ -6,10 +6,11 @@ from bpy.props import (
     CollectionProperty,
 )
 
-from ..utils import (
-    create_object_material,
-    bmesh_from_active_object,
+from ..utils import create_object_material, bmesh_from_active_object
+from .facemap import (
+    clear_empty_facemaps, 
     set_material_for_active_facemap,
+    clear_material_for_active_facemap
 )
 
 
@@ -21,27 +22,6 @@ class BTOOLS_UL_fmaps(bpy.types.UIList):
         elif self.layout_type == "GRID":
             layout.alignment = "CENTER"
             layout.label(text="", icon_value=icon)
-
-
-def clear_empty_facemaps(context):
-    """ Remove all facemaps that don't have any faces assigned
-    """
-    obj = context.object
-    with bmesh_from_active_object(context) as bm:
-
-        face_map = bm.faces.layers.face_map.active
-        used_indices = {f[face_map] for f in bm.faces}
-        all_indices = {f.index for f in obj.face_maps}
-        tag_remove_indices = all_indices - used_indices
-
-        # -- remove face maps
-        tag_remove_maps = [obj.face_maps[idx] for idx in tag_remove_indices]
-        for fmap in tag_remove_maps:
-            obj.face_maps.remove(fmap)
-
-        # -- remove facemap materials:
-        for idx in reversed(list(tag_remove_indices)):
-            obj.facemap_materials.remove(idx)
 
 
 class BTOOLS_OT_fmaps_clear(bpy.types.Operator):
@@ -82,31 +62,50 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
         # -- create new material
         mat = create_object_material(obj, "mat_" + active_facemap.name)
         mat_id = [idx for idx, m in enumerate(obj.data.materials) if m == mat].pop()
-        obj.active_material_index = mat_id # make the new material active
+        obj.active_material_index = mat_id  # make the new material active
 
         # -- assign to active facemap
         set_material_for_active_facemap(mat, context)
         obj.facemap_materials[active_facemap.index].material = mat
         return {"FINISHED"}
 
+class BTOOLS_OT_remove_facemap_material(bpy.types.Operator):
+    """Remove the material from the active facemap"""
+
+    bl_idname = "btools.remove_facemap_material"
+    bl_label = "Remove Material"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.object
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+        mat = obj.facemap_materials[active_facemap.index].material
+        return obj and obj.type == "MESH" and mat
+
+    def execute(self, context):
+        obj = context.object
+        active_facemap = obj.face_maps[obj.face_maps.active_index]
+
+        clear_material_for_active_facemap(context)
+        obj.facemap_materials[active_facemap.index].material = None
+        return {"FINISHED"}
+
 
 def update_facemap_material(self, context):
-    """ Assign the updated material to all faces belonging to active facemap
-    """
+    """Assign the updated material to all faces belonging to active facemap"""
     set_material_for_active_facemap(self.material, context)
     return None
 
 
 class FaceMapMaterial(bpy.types.PropertyGroup):
-    """ Tracks materials for each facemap created for an object
-    """
+    """Tracks materials for each facemap created for an object"""
 
     material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
     auto_map: BoolProperty(
-        name="Auto UV Mapping",
-        default=True,
-        description="Automatically UV Map faces belonging to active facemap.")
+        name="Auto UV Mapping", default=True, description="Automatically UV Map faces belonging to active facemap."
+    )
 
     mapping_methods = [
         ("UNWRAP", "Unwrap", "", 0),
@@ -117,7 +116,7 @@ class FaceMapMaterial(bpy.types.PropertyGroup):
         name="UV Mapping Method",
         items=mapping_methods,
         default="CUBE_PROJECTION",
-        description="How to perform UV Mapping"
+        description="How to perform UV Mapping",
     )
 
 
@@ -126,6 +125,7 @@ classes = (
     BTOOLS_UL_fmaps,
     BTOOLS_OT_fmaps_clear,
     BTOOLS_OT_create_facemap_material,
+    BTOOLS_OT_remove_facemap_material
 )
 
 

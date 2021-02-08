@@ -6,12 +6,25 @@ import bmesh
 from mathutils import Matrix, Vector
 from bpy.props import PointerProperty
 
+from .facemap import (
+    FaceMap, 
+    add_faces_to_map,
+    add_facemap_for_groups
+)
+
 from ..utils import (
     select,
+    minmax,
     local_xyz,
     bm_to_obj,
+    crash_safe,
+    sort_verts,
     bm_from_obj,
+    popup_message,
+    calc_faces_median,
+    calc_faces_normal,
     calc_verts_median,
+    get_bounding_verts,
     calc_face_dimensions,
     create_object_material,
     bmesh_from_active_object,
@@ -20,11 +33,12 @@ from ..utils import (
     get_selected_face_dimensions,
 )
 from ..utils import VEC_UP, VEC_FORWARD
-from .generic import CountProperty, SizeOffsetProperty
+from .array import ArrayProperty, ArrayGetSet
+from .sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
 
-class CustomObjectProperty(bpy.types.PropertyGroup):
-    count: CountProperty
+class CustomObjectProperty(bpy.types.PropertyGroup, SizeOffsetGetSet, ArrayGetSet):
+    array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
     def init(self, wall_dimensions):
@@ -39,15 +53,28 @@ class CustomObjectProperty(bpy.types.PropertyGroup):
         box = layout.box()
         self.size_offset.draw(context, box)
 
-        layout.prop(self, "count")
+        layout.prop(self.array, "count")
 
+@crash_safe
+def add_custom_execute(self, context):
+    custom_obj = context.scene.btools_custom_object
+    if not custom_obj:
+        # XXX Custom object has not been assigned
+        self.report({'INFO'}, "No Object Selected!")
+        return {"CANCELLED"}
+
+    self.props.init(get_selected_face_dimensions(context))
+
+    apply_transforms(context, custom_obj)
+    place_custom_object(context, self.props, custom_obj)
+    transfer_materials(custom_obj, context.object)
+    return {'FINISHED'}
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):
-    """Place custom meshes on the selected faces
-    Mesh must be forward facing(Y+ axis)"""
+    """Place custom meshes on the selected faces"""
 
     bl_idname = "btools.add_custom"
-    bl_label = "Add Custom"
+    bl_label = "Add Custom Geometry"
     bl_options = {"REGISTER", "UNDO", "PRESET"}
 
     props: PointerProperty(type=CustomObjectProperty)
@@ -57,50 +84,59 @@ class BTOOLS_OT_add_custom(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        custom_obj = context.scene.btools_custom_object
-        if not custom_obj:
-            # XXX Custom object has not been assigned
-            self.report({'INFO'}, "No Object Selected!")
-            return {"CANCELLED"}
-
-        self.props.init(get_selected_face_dimensions(context))
-
-        transfer_materials(custom_obj, context.object)
-        place_custom_object(context, self.props, custom_obj)
-        return {'FINISHED'}
+        add_facemap_for_groups([FaceMap.CUSTOM])
+        return add_custom_execute(self, context)
 
     def draw(self, context):
         self.props.draw(context, self.layout)
 
 
+def apply_transforms(context, obj):
+    # -- store the current active object
+    mode_previous = context.mode
+    active_previous = context.active_object
+
+    # -- switch to object mode, if we are not already there
+    if context.mode != "OBJECT":
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+    # -- make obj the active object and select it
+    bpy.context.view_layer.objects.active = obj
+    select(bpy.context.view_layer.objects, False)
+    obj.select_set(True)
+
+    # -- apply transform
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+    # -- resume the previous state
+    bpy.context.view_layer.objects.active = active_previous
+    select(bpy.context.view_layer.objects, False)
+    active_previous.select_set(True)
+    bpy.ops.object.mode_set(mode=mode_previous.replace('_MESH', ""))
+
+
 def place_custom_object(context, prop, custom_obj):
     with bmesh_from_active_object(context) as bm:
-        # -- get all selected faces
         faces = [face for face in bm.faces if face.select]
-        face_data = [f.verts for f in faces]
 
-        for idx, face in enumerate(faces):
-            # XXX TODO(ranjian0) investigate why reference was lost here
-            if not face.is_valid:
-                face = bm.faces.get(face_data[idx])
-
+        for face in faces:
             face.select = False
-            # XXX subdivide horizontally for array
-            array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
+            # No support for upward/downward facing
+            if face.normal.z:
+                popup_message("Faces with Z+/Z- normals not supported!", title="Invalid Face Selection")
+                continue
 
+            array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x] * prop.count)
             for aface in array_faces:
-                # XXX Create split for size offset
+                # -- Create split and place obj
                 split_face = create_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
-                # Place custom object mesh
                 place_object_on_face(bm, split_face, custom_obj, prop)
 
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
-    return {"FINISHED"}
 
 
 def transfer_materials(from_object, to_obj):
-    """ Transfer materials from 'from_object' to 'to_object'
-    """
+    """Transfer materials from 'from_object' to 'to_object'"""
     materials = from_object.data.materials
     if not materials:
         return
@@ -109,7 +145,6 @@ def transfer_materials(from_object, to_obj):
     to_mats = to_obj.data.materials
     if not to_mats:
         # -- to_obj has no materials
-        create_object_material(to_obj, "default_mat")
         list(map(to_mats.append, materials))
     else:
         # -- to_obj has some materials, ensure we are not duplicating
@@ -133,98 +168,110 @@ def transfer_materials(from_object, to_obj):
 
 
 def duplicate_into_bm(bm, obj):
-    """ Copy all the mesh data in obj to the bm
+    """Copy all the mesh data in obj to the bm
     Return the newly inserted faces
     """
-    initial_faces = {f.index for f in bm.faces}
+    max_index = len(bm.faces)
     bm.from_mesh(obj.data.copy())
-    return [f for f in bm.faces if f.index not in initial_faces]
+    return [f for f in bm.faces if f.index >= max_index]
 
 
 # TODO(ranjian0) refactor function (duplicated from create_window_split)
 def create_split(bm, face, size, offset):
-    """Use properties from SplitOffset to subdivide face into regular quads
-    """
+    """Use properties from SplitOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w / 2 + offset.x - size.x / 2, size.x, wall_w / 2 - offset.x - size.x / 2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h/2 + offset.y - size.y/2, size.y, wall_h/2 - offset.y - size.y/2]
+    v_width = [wall_h / 2 + offset.y - size.y / 2, size.y, wall_h / 2 - offset.y - size.y / 2]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[1]
 
 
 def place_object_on_face(bm, face, custom_obj, prop):
-    """ Place the custom_object mesh flush on the face
-    """
+    """Place the custom_object mesh flush on the face"""
     # XXX get mesh from custom_obj into bm
-    verts = face.verts
-
+    face_idx = face.index
     custom_faces = duplicate_into_bm(bm, custom_obj)
-    select(custom_faces, False)
-    set_face_materials(bm, custom_faces)
-
-    # XXX TODO(ranjian0) reference to face changes here, why?
-    if not face.is_valid:
-        face = bm.faces.get(verts)
-
+    face = [f for f in bm.faces if f.index == face_idx].pop() # restore reference
+    add_faces_to_map(bm, custom_faces, FaceMap.CUSTOM)
     custom_verts = list({v for f in custom_faces for v in f.verts})
 
     # (preprocess)calculate bounds of the object
     # NOTE: bounds are calculated before any transform is made
-    *current_size, _ = calc_verts_bounds(custom_verts)
+    current_size = calc_verts_bounds(custom_verts)
 
     # -- move the custom faces into proper position on this face
-    transform_parallel_to_face(bm, custom_verts, face)
-
-    # -- scale to size
-    scale_to_size(
-        bm, custom_verts,
-        current_size, prop.size_offset.size, local_xyz(face)
-    )
+    transform_parallel_to_face(bm, custom_faces, face)
+    scale_to_size(bm, custom_verts, current_size, prop.size_offset.size, local_xyz(face))
 
     # cleanup
     bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
 
 
 def calc_verts_bounds(verts):
-    """ Determine the bounds size of the verts
-    (assumes verts(mesh) is facing forward(y+))
+    """Determine the bounds size of the verts
     """
-    sort_x = sorted([v.co.x for v in verts])
-    sort_y = sorted([v.co.y for v in verts])
-    sort_z = sorted([v.co.z for v in verts])
-    width = sort_x[-1] - sort_x[0]
-    height = sort_z[-1] - sort_z[1]
-    depth = sort_y[-1] - sort_y[1]
-    return width, height, depth
+    bounds = get_bounding_verts(verts)
+    width = (bounds.topleft.co - bounds.topright.co).xy.length
+    height = (bounds.topleft.co - bounds.botleft.co).z
+    return width, height
 
 
-def transform_parallel_to_face(bm, verts, face):
-    """ Move and rotate verts(mesh) so that it lies with it's
+def get_coplanar_faces(face_verts):
+    """ Determine extent faces that should be coplanar to walls"""
+    bounds = get_bounding_verts(face_verts)
+    coplanar_faces = (
+        list(bounds.topleft.link_faces)    + 
+        list(bounds.topright.link_faces)   +
+        list(bounds.botleft.link_faces)    + 
+        list(bounds.botright.link_faces)
+    )
+    return set(coplanar_faces)
+
+
+def calc_coplanar_median(face_verts):
+    """ Determine the median point for coplanar faces"""
+    return calc_faces_median(get_coplanar_faces(face_verts))
+
+
+def calc_coplanar_normal(faces):
+    face_verts = list({v for f in faces for v in f.verts})
+    coplanar_faces = get_coplanar_faces(face_verts)
+    normals = {f.normal.copy().to_tuple(3) for f in coplanar_faces}
+    return Vector(normals.pop())
+
+
+def transform_parallel_to_face(bm, custom_faces, target_face):
+    """Move and rotate verts(mesh) so that it lies with it's
     forward-extreme faces parallel to `face`
     """
-    normal = face.normal.copy()
-    median = face.calc_center_median()
-    angle = normal.xy.angle_signed(VEC_FORWARD.xy)
+    target_normal = target_face.normal.copy()
+    target_median = target_face.calc_center_median()
+
+    verts = list({v for f in custom_faces for v in f.verts})
+    verts_median = calc_verts_median(verts)
+    custom_normal = calc_coplanar_normal(custom_faces)
+    angle = target_normal.xy.angle_signed(custom_normal.xy)
     bmesh.ops.rotate(
         bm, verts=verts,
-        cent=calc_verts_median(verts),
+        cent=verts_median,
         matrix=Matrix.Rotation(angle, 4, VEC_UP)
     )
 
-    # -- calculate margin to make custom objes flush with this face
-    # TODO(ranjian0) investigate this (current theory is order of scale, rotate, translate)
-    diff = max(normal.dot(v.co) for v in verts)
-    diff_norm = diff * normal           # distance between face median and object median along normal
-    bmesh.ops.translate(bm, verts=verts, vec=median - diff_norm)
+    # -- determine the median of the faces that should be coplanar to the walls
+    coplanar_median = calc_coplanar_median(verts)
+    coplanar_median.z = verts_median.z # Compensate on Z axis for any coplanar faces not considered in calculations
+
+    # -- move the custom faces to the target face based on coplanar median
+    transform_diff = target_median - coplanar_median
+    bmesh.ops.translate(bm, verts=verts, vec=transform_diff)
 
 
 def scale_to_size(bm, verts, current_size, target_size, local_dir):
-    """ Scale verts to target size along local direction (x and y)
-    """
+    """Scale verts to target size along local direction (x and y)"""
     x_dir, y_dir, z_dir = local_dir
     target_width, target_height = target_size
     current_width, current_height = current_size
@@ -255,7 +302,8 @@ classes = (CustomObjectProperty, BTOOLS_OT_add_custom)
 
 def register_custom():
     bpy.types.Scene.btools_custom_object = PointerProperty(
-        type=bpy.types.Object, description="Object to use for custom placement")
+        type=bpy.types.Object, description="Object to use for custom placement"
+    )
 
     for cls in classes:
         bpy.utils.register_class(cls)

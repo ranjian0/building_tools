@@ -1,24 +1,37 @@
 import re
-
 import bmesh
 
 from ..arch import fill_arch, create_arch, add_arch_depth
 from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
+from ..array import (
+    spread_array,
+    clamp_array_count,
+    get_array_split_edges
+)
+from ..facemap import (
+    FaceMap,
+    map_new_faces,
+    add_faces_to_map,
+    find_faces_without_facemap
+)
 from ...utils import (
     clamp,
-    FaceMap,
+    XYDir,
+    VEC_UP,
+    VEC_DOWN,
     validate,
     local_xyz,
+    sort_faces,
+    sort_verts,
     valid_ngon,
     ngon_to_quad,
     get_top_faces,
     get_top_edges,
     popup_message,
-    map_new_faces,
-    add_faces_to_map,
     calc_face_dimensions,
+    filter_horizontal_edges,
     subdivide_face_horizontally,
     subdivide_face_vertically,
 )
@@ -28,8 +41,7 @@ SPLIT_EPS = 0.0011
 
 
 def create_multigroup(bm, faces, prop):
-    """ Create multigroup from face selection
-    """
+    """Create multigroup from face selection"""
 
     # Convert components to lowercase (allow user to enter lower or uppercase)
     prop.components = prop.components.lower()
@@ -42,15 +54,21 @@ def create_multigroup(bm, faces, prop):
     if len(prop.components) == 0:
         popup_message("No valid components", "Components Error")
         return False
-        
+
     for face in faces:
         face.select = False
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
-        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x]*prop.count)
-        for aface in array_faces:
-            face = create_multigroup_split(bm, aface, prop)
+        clamp_array_count(face, prop)
+        array_faces = subdivide_face_horizontally(bm, face, widths=[prop.width] * prop.count)
+        max_width = calc_face_dimensions(array_faces[0])[0]
+
+        split_edges = get_array_split_edges(array_faces)
+        split_faces = [create_multigroup_split(bm, aface, prop) for aface in array_faces]
+        spread_array(bm, split_edges, split_faces, max_width, prop)
+
+        for face in split_faces:
             doors, windows, arch = create_multigroup_frame(bm, face, prop)
             for door in doors:
                 fill_face(bm, door, prop, "DOOR")
@@ -58,25 +76,27 @@ def create_multigroup(bm, faces, prop):
                 fill_face(bm, window, prop, "WINDOW")
             if prop.add_arch:
                 fill_arch(bm, arch, prop)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+
+    nulfaces = find_faces_without_facemap(bm)
+    add_faces_to_map(bm, nulfaces, FaceMap.WALLS)
     return True
 
 
 @map_new_faces(FaceMap.WALLS)
 def create_multigroup_split(bm, face, prop):
-    """ Use properties from SizeOffset to subdivide face into regular quads
-    """
-
-    size, offset = prop.size_offset.size, prop.size_offset.offset
+    """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
+    width, height, offset = *prop.size, prop.offset
     # horizontal split
-    h_widths = [wall_w/2 + offset.x - size.x/2, size.x, wall_w/2 - offset.x - size.x/2]
+    h_widths = [wall_w / 2 - offset.x - width / 2, width, wall_w / 2 + offset.x - width / 2]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    size_y = min(size.y, wall_h - SPLIT_EPS) # prevent door frame from collapsing when maximized
+    size_y = min(height, wall_h - SPLIT_EPS)  # prevent door frame from collapsing when maximized
 
     if "d" not in prop.components:
         # XXX Only windows, use the y offset
-        v_width = [wall_h/2 + offset.y + size_y/2, wall_h/2 - offset.y - size_y/2]
+        v_width = [wall_h / 2 + offset.y + size_y / 2, wall_h / 2 - offset.y - size_y / 2]
     else:
         # XXX A door exists, split starts from bottom, no need for y offset
         v_width = [size_y, wall_h - size_y]
@@ -86,8 +106,7 @@ def create_multigroup_split(bm, face, prop):
 
 
 def create_multigroup_frame(bm, face, prop):
-    """ Extrude and inset face to make multigroup frame
-    """
+    """Extrude and inset face to make multigroup frame"""
     normal = face.normal.copy()
 
     # XXX Reverse prop.components to solve issue #175
@@ -99,21 +118,38 @@ def create_multigroup_frame(bm, face, prop):
     # create arch
     if prop.add_arch:
         dw_count = count(dws)
-        top_edges = get_top_edges({e for f in get_top_faces(frame_faces, n=2*dw_count+1)[-dw_count-1:] for e in f.edges}, n=dw_count+1)
+        top_edges = get_top_edges(
+            {e for f in get_top_faces(frame_faces, n=2 * dw_count + 1)[-dw_count - 1 :] for e in f.edges},
+            n=dw_count + 1,
+        )
         if dw_count == 1:
-            frame_faces.remove(get_top_faces(frame_faces).pop()) # remove top face from frame_faces
-        arch_face, arch_frame_faces = create_arch(bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face))
+            frame_faces.remove(get_top_faces(frame_faces).pop())  # remove top face from frame_faces
+        arch_face, arch_frame_faces = create_arch(
+            bm, top_edges, frame_faces, prop.arch, prop.frame_thickness, local_xyz(face)
+        )
         frame_faces += arch_frame_faces
+
+    else:
+        # -- postprocess merge loose split verts
+        right = normal.cross(VEC_DOWN)
+        merge_loose_split_verts(bm, 
+            sort_faces(window_faces, right), 
+            sort_faces(door_faces, right), prop
+        )
 
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
 
     # add depths
     if prop.add_arch:
-        door_faces, window_faces, [arch_face], frame_faces = add_frame_depth(bm, door_faces, window_faces, [arch_face], frame_faces, prop.frame_depth, normal)
+        door_faces, window_faces, [arch_face], frame_faces = add_frame_depth(
+            bm, door_faces, window_faces, [arch_face], frame_faces, prop.frame_depth, normal
+        )
         arch_face, new_frame_faces = add_arch_depth(bm, arch_face, prop.arch.depth, normal)
         frame_faces += new_frame_faces
     else:
-        door_faces, window_faces, _, frame_faces = add_frame_depth(bm, door_faces, window_faces, [], frame_faces, prop.frame_depth, normal)
+        door_faces, window_faces, _, frame_faces = add_frame_depth(
+            bm, door_faces, window_faces, [], frame_faces, prop.frame_depth, normal
+        )
 
     door_faces, new_frame_faces = add_multi_door_depth(bm, door_faces, prop.dw_depth, normal)
     frame_faces += new_frame_faces
@@ -151,31 +187,36 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 
 
 def make_multigroup_insets(bm, face, prop, dws):
-    size, frame_thickness = prop.size_offset.size, prop.frame_thickness
+    face_h = calc_face_dimensions(face)[1]
+    width, height, frame_thickness = *prop.size, prop.frame_thickness
 
     # XXX Frame thickness should not exceed size of any multigroup component
-    min_frame_size = min([size.x / count(dws), calc_face_dimensions(face)[1]]) / 2
+    min_frame_size = min([width / count(dws), face_h]) / 2
     frame_thickness = clamp(frame_thickness, 0.01, min_frame_size - 0.001)
 
     dw_count = count(dws)
-    window_height = size.y
-    dw_width = (size.x - frame_thickness * (dw_count + 1)) / dw_count
-    door_height = calc_face_dimensions(face)[1] - frame_thickness
+    window_height = height
+    door_height = face_h - frame_thickness
+    dw_width = (width - frame_thickness * (dw_count + 1)) / dw_count
     if "d" in str(prop.components):
-        window_height = min(prop.window_height, calc_face_dimensions(face)[1] - SPLIT_EPS)
+        window_height = min(prop.window_height, face_h - SPLIT_EPS)
 
     # adjacent doors/windows clubbed
-    clubbed_widths = [clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws)-1) for i, dw in enumerate(dws)]
+    clubbed_widths = [
+        clubbed_width(dw_width, frame_thickness, dw['type'], dw['count'], i == 0, i == len(dws) - 1)
+        for i, dw in enumerate(dws)
+    ]
     clubbed_faces = subdivide_face_horizontally(bm, face, clubbed_widths)
 
     doors, windows, frames = [], [], []
     for i, (dw, f) in enumerate(zip(dws, clubbed_faces)):
+        first, last = i == 0, i == len(dws) - 1
         if dw['type'] == 'door':
-            ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ds, fs = make_door_insets(bm, f, dw['count'], door_height, dw_width, frame_thickness, first, last)
             doors.extend(ds)
             frames.extend(fs)
         elif dw['type'] == 'window':
-            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, i == 0, i == len(dws)-1)
+            ws, fs = make_window_insets(bm, f, dw['count'], window_height, dw_width, frame_thickness, first, last)
             windows.extend(ws)
             frames.extend(fs)
     return doors, windows, frames
@@ -255,3 +296,76 @@ def parse_components(components):
             else:
                 raise Exception("Unsupported component: {}".format(c))
     return dws
+
+
+def merge_loose_split_verts(bm, window_faces, door_faces, prop):
+    """ Merge the split verts to the corners of the window/door frames"""
+
+    components = prop.components
+    num_components = len(components)    
+    
+    for idx, wf in enumerate(window_faces):
+        window_face_verts = [v for v in wf.verts]
+
+        # -- determine if this window is on the extreme left or right
+        is_extreme_left, is_extreme_right = (
+            idx == 0 and components[0] == 'w', 
+            idx == len(window_faces) - 1 and components[num_components - 1] == 'w'
+        )
+
+        normal = wf.normal.copy()
+        median = wf.calc_center_median()
+        face_left, face_right = (
+            normal.cross(VEC_UP).to_tuple(2),
+            normal.cross(VEC_DOWN).to_tuple(2)
+        )
+
+        for vert in window_face_verts:
+            extent_edge = [e for e in vert.link_edges if e not in wf.edges].pop()
+            corner_vert = extent_edge.other_vert(vert)
+
+            if len(filter_horizontal_edges(corner_vert.link_edges)) < 2:
+                # for bottom verts next to door frame, skip
+                continue
+
+            # if we are in an extreme left/right window, the extreme verts of the window
+            # need to be moved the full length of the frame_thickness
+            move_factor = 0.5
+            vert_dir = XYDir(vert.co - median).to_tuple(2)
+            if (is_extreme_right and vert_dir == face_right) or (is_extreme_left and vert_dir == face_left):
+                move_factor = 1.0
+                
+            move_mag = prop.frame_thickness * move_factor
+            move_dir = XYDir(corner_vert.co - median)
+            bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)
+
+
+    for idx, df in enumerate(door_faces):
+        door_face_verts = sort_verts(df.verts, VEC_UP)[2:]
+
+        # -- determine if this door is on the extreme left or right
+        is_extreme_left, is_extreme_right = (
+            idx == 0 and components[0] == 'd', 
+            idx == len(door_faces) - 1 and components[num_components - 1] == 'd'
+        )
+
+        normal = df.normal.copy()
+        median = df.calc_center_median()
+        face_left, face_right = (
+            normal.cross(VEC_UP).to_tuple(2),
+            normal.cross(VEC_DOWN).to_tuple(2)
+        )
+        for vert in door_face_verts:
+            extent_edge = [e for e in vert.link_edges if e not in df.edges].pop()
+            corner_vert = extent_edge.other_vert(vert)
+
+            # if we are in an extreme left/right door, the extreme verts of the door
+            # need to be moved the full length of the frame_thickness
+            move_factor = 0.5
+            vert_dir = XYDir(vert.co - median).to_tuple(2)
+            if (is_extreme_right and vert_dir == face_right) or (is_extreme_left and vert_dir == face_left):
+                move_factor = 1.0
+                
+            move_mag = prop.frame_thickness * move_factor
+            move_dir = XYDir(corner_vert.co - median)
+            bmesh.ops.translate(bm, verts=[corner_vert], vec=move_dir * move_mag)

@@ -5,8 +5,8 @@ import types
 
 
 class LoadModule:
-    """ Adapted from Script Watcher Addon
-        https://github.com/wisaac407/blender-script-watcher
+    """Adapted from Script Watcher Addon
+    https://github.com/wisaac407/blender-script-watcher
     """
 
     def __init__(self, filepath):
@@ -51,7 +51,7 @@ class LoadModule:
                 for f in files:
                     filepaths.append(os.path.join(root, f))
             else:
-                dirs[:] = [] # No __init__ so we stop walking this dir.
+                dirs[:] = []  # No __init__ so we stop walking this dir.
 
         # If we just have one (non __init__) file then return just that file.
         return paths, filepaths or [self.filepath]
