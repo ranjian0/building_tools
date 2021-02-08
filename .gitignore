@@ -134,6 +134,7 @@ dmypy.json
 
 *.txt
 *.zip
+.vscode
 .idea
 /docs/_site
 /docs/Gemfile.lock
