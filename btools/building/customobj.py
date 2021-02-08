@@ -61,7 +61,7 @@ def add_custom_execute(self, context):
 
     apply_transforms(context, custom_obj)
     place_custom_object(context, self.props, custom_obj)
-    # transfer_materials(custom_obj, context.object)
+    transfer_materials(custom_obj, context.object)
     return {'FINISHED'}
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):
@@ -138,7 +138,6 @@ def transfer_materials(from_object, to_obj):
     to_mats = to_obj.data.materials
     if not to_mats:
         # -- to_obj has no materials
-        create_object_material(to_obj, "default_mat")
         list(map(to_mats.append, materials))
     else:
         # -- to_obj has some materials, ensure we are not duplicating
