@@ -21,6 +21,7 @@ import zipfile
 
 REPO_FILES = (
     "btools/",
+    "__init__.py",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
@@ -59,7 +60,7 @@ for item in REPO_FILES:
 
         if info != b"":
             item = zipfile.ZipInfo()
-            item.filename = os.path.join(basename, filename.replace("btools/", ""))
+            item.filename = os.path.join(basename, filename)
             item.external_attr = 0o100644 << 16
             item.compress_type = zipfile.ZIP_DEFLATED
             timestamp, commit_hash = info.split(b":")

@@ -1,6 +1,6 @@
 import bpy
 
-from .building.register import register_building, unregister_building
+from .btools.building.register import register_building, unregister_building
 
 bl_info = {
     "name": "Building Tools",
