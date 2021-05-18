@@ -152,6 +152,7 @@ def set_material_for_active_facemap(material, context):
             if face[face_map] == active_facemap.index:
                 face.material_index = mat_id
 
+
 def clear_material_for_active_facemap(context):
     """Remove the material on all faces for the current/active facemap"""
     obj = context.object
@@ -173,6 +174,7 @@ def face_map_index_from_name(name):
             return fmap.index
     return -1
 
+
 def clear_empty_facemaps(context):
     """Remove all facemaps that don't have any faces assigned"""
     obj = context.object
@@ -191,6 +193,7 @@ def clear_empty_facemaps(context):
         # -- remove facemap materials:
         for idx in reversed(list(tag_remove_indices)):
             obj.facemap_materials.remove(idx)
+
 
 def find_faces_without_facemap(bm):
     """Find all the faces in bm that don't belong to any facemap"""
