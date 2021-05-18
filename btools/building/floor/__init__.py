@@ -5,12 +5,4 @@ from .floor_props import FloorProperty
 
 classes = (FloorProperty, BTOOLS_OT_add_floors)
 
-
-def register_floor():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_floor():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_floor, unregister_floor = bpy.utils.register_classes_factory(classes)

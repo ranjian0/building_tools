@@ -7,11 +7,4 @@ from .fill_types import fill_face
 classes = (FillBars, FillPanel, FillLouver, FillGlassPanes, FillProperty, BTOOLS_OT_add_fill)
 
 
-def register_fill():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_fill():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_fill, unregister_fill = bpy.utils.register_classes_factory(classes)

@@ -5,12 +5,4 @@ from .multigroup_props import MultigroupProperty
 
 classes = (MultigroupProperty, BTOOLS_OT_add_multigroup)
 
-
-def register_multigroup():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_multigroup():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_multigroup, unregister_multigroup = bpy.utils.register_classes_factory(classes)

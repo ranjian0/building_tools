@@ -9,12 +9,4 @@ classes = (
     RailProperty,
 )
 
-
-def register_railing():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_railing():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_railing, unregister_railing = bpy.utils.register_classes_factory(classes)

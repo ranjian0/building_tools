@@ -6,12 +6,4 @@ from .stairs_props import StairsProperty
 
 classes = (StairsProperty, BTOOLS_OT_add_stairs)
 
-
-def register_stairs():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_stairs():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_stairs, unregister_stairs = bpy.utils.register_classes_factory(classes)

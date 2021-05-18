@@ -143,18 +143,16 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
 
 classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
+register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 
 def register():
     register_building()
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    register_ui()
 
 
 def unregister():
     unregister_building()
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
-
+    register_ui()
 
 if __name__ == "__main__":
     import os

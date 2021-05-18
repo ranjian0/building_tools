@@ -5,12 +5,4 @@ from .door_props import DoorProperty
 
 classes = (DoorProperty, BTOOLS_OT_add_door)
 
-
-def register_door():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_door():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_door, unregister_door = bpy.utils.register_classes_factory(classes)

@@ -5,12 +5,4 @@ from .window_props import WindowProperty
 
 classes = (WindowProperty, BTOOLS_OT_add_window)
 
-
-def register_window():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
-
-def unregister_window():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+register_window, unregister_window = bpy.utils.register_classes_factory(classes)
