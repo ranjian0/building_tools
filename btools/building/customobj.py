@@ -63,7 +63,7 @@ def add_custom_execute(self, context):
         self.report({'INFO'}, "No Object Selected!")
         return {"CANCELLED"}
 
-    if custom_obj.users == 0:
+    if custom_obj.users == 0 or custom_obj.name not in context.view_layer.objects:
         # Object was already deleted
         self.report({'INFO'}, "Object has been deleted!")
         return {"CANCELLED"}
@@ -206,7 +206,8 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
     # (preprocess)calculate bounds of the object
     # NOTE: bounds are calculated before any transform is made
-    current_size = calc_verts_bounds(custom_verts)
+    dims = custom_obj.dimensions
+    current_size = [max(dims.x, dims.y), dims.z]
 
     # -- move the custom faces into proper position on this face
     transform_parallel_to_face(bm, custom_faces, face)
@@ -214,15 +215,6 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
     # cleanup
     bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
-
-
-def calc_verts_bounds(verts):
-    """Determine the bounds size of the verts
-    """
-    bounds = get_bounding_verts(verts)
-    width = (bounds.topleft.co - bounds.topright.co).xy.length
-    height = (bounds.topleft.co - bounds.botleft.co).z
-    return width, height
 
 
 def get_coplanar_faces(face_verts):
