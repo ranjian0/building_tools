@@ -76,7 +76,7 @@ def dict_from_prop(prop):
 def crash_safe(func):
     """Decorator to handle exceptions in bpy Operators safely"""
 
-    def inner(*args, **kwargs):
+    def crash_handler(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception:
@@ -90,7 +90,7 @@ def crash_safe(func):
             # -- exit operator
             return {"CANCELLED"}
 
-    return inner
+    return crash_handler
 
 
 def restricted_size(parent_dimensions, offset, size_min, size):
