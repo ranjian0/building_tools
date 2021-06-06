@@ -6,7 +6,7 @@ class Events:
         self.subscribers = {e:list() for e in events}
 
     def get_subscribers(self, event):
-        return self.subscribers[event]
+        return self.subscribers.get(event, None)
 
     def on(self, event):
         def wrapper(callback):
@@ -23,6 +23,6 @@ class Events:
     def unregister(self, event, callback):
         self.get_subscribers(event).remove(callback)
 
-    def dispatch(self, event, message):
+    def dispatch(self, event, *args, **kwargs):
         for callback in self.get_subscribers(event):
-            callback(message)
+            callback(*args, **kwargs)
