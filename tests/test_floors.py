@@ -3,11 +3,11 @@ import btools
 import random
 import unittest
 
-floor = btools.building.floor
-floor_builder = floor.floor.Floor
+from btools.building import floor 
+from btools.building.floor.floor import Floor as floor_builder
 
-floorplan = btools.building.floorplan
-floorplan_builder = floorplan.floorplan.Floorplan
+from btools.building import floorplan
+from btools.building.floorplan.floorplan import Floorplan as floorplan_builder
 
 
 class TestFloor(unittest.TestCase):

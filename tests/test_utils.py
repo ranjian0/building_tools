@@ -327,3 +327,55 @@ class TestUtilsMesh(unittest.TestCase):
         self.clean_bmesh()
         btools.utils.cube(self.bm)
         self.assertEqual(btools.utils.calc_faces_median(self.bm.faces), Vector())
+
+
+class TestUtilsEvent(unittest.TestCase):
+
+    def setUp(self):
+        self.event_manager = btools.utils.Events([
+            "updated",
+            "resized"
+        ])
+
+        self.update_callback = lambda : None
+        self.resized_callback = lambda : None
+        self.common_callback = lambda : None
+        
+    def tearDown(self):
+        del self.event_manager
+        
+    def test_get_subscribers(self):
+        self.assertEqual(self.event_manager.get_subscribers(""), None)
+        self.assertEqual(self.event_manager.get_subscribers("updated"), [])
+
+    def test_register(self):
+        self.event_manager.register("updated", self.update_callback)
+        self.event_manager.register("resized", self.resized_callback)
+
+        self.assertEqual(len(self.event_manager.subscribers["updated"]), 1)
+        self.assertEqual(len(self.event_manager.subscribers["resized"]), 1)
+
+
+    def test_unregister(self):
+        self.event_manager.register_all(self.common_callback)
+        self.event_manager.unregister("updated", self.common_callback)
+
+        self.assertEqual(len(self.event_manager.subscribers["updated"]), 0)
+        self.assertEqual(len(self.event_manager.subscribers["resized"]), 1)
+
+    def test_dispatch(self):
+        class ResizeProp:
+            def __init__(self):
+                self.resized = False 
+
+            def on_resized(self):
+                self.resized = not self.resized
+
+        prop = ResizeProp()
+        self.event_manager.register("resized", prop.on_resized)
+
+        self.event_manager.dispatch("resized")
+        self.assertEqual(prop.resized, True)
+
+        self.event_manager.dispatch("resized")
+        self.assertEqual(prop.resized, False)
