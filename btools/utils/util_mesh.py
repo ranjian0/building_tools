@@ -356,8 +356,17 @@ def get_bounding_verts(verts):
     top_verts = [v for v in verts if v.co.z == max_z.co.z]
     bot_verts = [v for v in verts if v.co.z == min_z.co.z]
 
-    topleft, *_, topright = sorted(top_verts, key=lambda v: v.co.xy.to_tuple(3))
-    botleft, *_, botright = sorted(bot_verts, key=lambda v: v.co.xy.to_tuple(3))
+    if len(top_verts) > 1:
+        topleft, *_, topright = sorted(top_verts, key=lambda v: v.co.xy.to_tuple(3))
+    else:
+        topvert = top_verts.pop()
+        topleft, topright = topvert, topvert
+
+    if len(bot_verts) > 1:
+        botleft, *_, botright = sorted(bot_verts, key=lambda v: v.co.xy.to_tuple(3))
+    else:
+        botvert = bot_verts.pop()
+        botleft, botright = botvert, botvert
 
     Bounds = collections.namedtuple("_Bounds", "topleft topright botleft botright")
     return Bounds(topleft, topright, botleft, botright)
