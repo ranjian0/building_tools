@@ -1,6 +1,5 @@
 from functools import wraps
 
-
 class Events:
 
     def __init__(self, events):
@@ -27,27 +26,3 @@ class Events:
     def dispatch(self, event, message):
         for callback in self.get_subscribers(event):
             callback(message)
-
-
-if __name__ == "__main__":
-    Events = Publisher([
-        "size_changed",
-        "offset_changed",
-        "array_count_changed",
-        "array_spread_changed"
-    ])
-
-
-    @Events.on("size_changed")
-    def sch(v):
-        print("received .. ", v)
-
-
-    class Dog:
-        def foo(self, w):
-            print("Dog received", w)
-
-    d = Dog()
-    Events.register("size_changed", d.foo)
-
-    Events.dispatch("size_changed", 10)
