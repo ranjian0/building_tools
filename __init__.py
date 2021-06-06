@@ -1,6 +1,4 @@
 import bpy
-
-from . import addon_updater_ops
 from .btools.building.register import register_building, unregister_building
 
 bl_info = {
@@ -181,6 +179,7 @@ class BTOOLS_PT_PrefPanel(bpy.types.AddonPreferences):
 
 
     def draw(self, context):
+        from . import addon_updater_ops
         addon_updater_ops.update_settings_ui(self, context)
 
 
@@ -189,14 +188,22 @@ classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools, BTOOLS_PT_PrefPan
 register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 
 def register():
-    addon_updater_ops.register(bl_info)
+    try:
+        from . import addon_updater_ops
+        addon_updater_ops.register(bl_info)
+    except ImportError:
+        pass # XXX script_watcher dev environment
 
     register_building()
     register_ui()
 
 
 def unregister():
-    addon_updater_ops.unregister()
+    try:
+        from . import addon_updater_ops
+        addon_updater_ops.unregister()
+    except ImportError:
+        pass # XXX script_watcher dev environment
 
     unregister_building()
     unregister_ui()
