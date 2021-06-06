@@ -59,8 +59,13 @@ class CustomObjectProperty(bpy.types.PropertyGroup, SizeOffsetGetSet, ArrayGetSe
 def add_custom_execute(self, context):
     custom_obj = context.scene.btools_custom_object
     if not custom_obj:
-        # XXX Custom object has not been assigned
+        # Custom object has not been assigned
         self.report({'INFO'}, "No Object Selected!")
+        return {"CANCELLED"}
+
+    if custom_obj.users == 0:
+        # Object was already deleted
+        self.report({'INFO'}, "Object has been deleted!")
         return {"CANCELLED"}
 
     self.props.init(get_selected_face_dimensions(context))
