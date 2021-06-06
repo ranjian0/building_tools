@@ -13,6 +13,7 @@ from .facemap import (
 )
 
 from ..utils import (
+    clamp,
     arc_edge,
     sort_verts,
     filter_geom,
