@@ -86,7 +86,7 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
 
     def init(self, wall_dimensions):
         self["wall_dimensions"] = wall_dimensions
-        def_h = 1.5 if "d" in str(self.components) else 1.0
+        def_h = 1.8 if "d" in str(self.components) else 1.0
         self.size_offset.init(
             (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
             default_size=(2.0, def_h),
