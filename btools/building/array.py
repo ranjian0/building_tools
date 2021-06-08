@@ -77,6 +77,9 @@ def get_array_split_edges(afaces):
     result = []
     edges = list({e for f in afaces for e in f.edges})
     for e in edges:
+        if len(e.link_faces) != 2:
+            continue
+
         if all(f in afaces for f in e.link_faces):
             result.append(e)
     return result

@@ -47,7 +47,7 @@ from ...utils import (
 def create_window(bm, faces, prop):
     """Generate a window"""
     for face in faces:
-        face.select = False
+        face.select_set(False)
         if not valid_ngon(face):
             ngon_to_quad(bm, face)
 
