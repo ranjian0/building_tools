@@ -40,38 +40,63 @@ def add_fill(bm, faces, prop):
     return True
 
 
+def get_fill_type(prop, dw):
+    """Get the fill type property for window/door/multigroup
+    """
+    if hasattr(prop, "fill_type"):
+        # Window/Door 
+        return prop.fill_type
+    # Multigroup
+    return prop.fill_type_door if dw == "DOOR" else prop.fill_type_window
+
+
+def get_fill(prop, fill_name, dw):
+    """Get the fill property for window/door/multigroup with the name 'fill_name'
+    """
+    if hasattr(prop, fill_name):
+        # Window/Door 
+        return getattr(prop, fill_name)
+    # Multigroup
+    return getattr(prop, f"{fill_name}_door") if dw == "DOOR" else getattr(prop, f"{fill_name}_window")
+    
+
+
 def fill_face(bm, face, prop, dw="DOOR"):
     """Fill face"""
-    validate_fill_props(prop)
+    validate_fill_props(prop, dw)
     user = FillUser.DOOR if dw == "DOOR" else FillUser.WINDOW
-    if prop.fill_type == "PANELS":
+
+    fill_type = get_fill_type(prop, dw)
+    if fill_type == "PANELS":
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
-        fill_panel(bm, face, prop.panel_fill)
-    elif prop.fill_type == "GLASS_PANES":
+        fill_panel(bm, face, get_fill(prop, "panel_fill", dw))
+    elif fill_type == "GLASS_PANES":
         add_facemap_for_groups(FaceMap.DOOR_PANES if dw == "DOOR" else FaceMap.WINDOW_PANES)
-        fill_glass_panes(bm, face, prop.glass_fill, user)
-    elif prop.fill_type == "LOUVER":
+        fill_glass_panes(bm, face, get_fill(prop, "glass_fill", dw), user)
+    elif fill_type == "LOUVER":
         add_facemap_for_groups(FaceMap.DOOR_LOUVERS if dw == "DOOR" else FaceMap.WINDOW_LOUVERS)
-        fill_louver(bm, face, prop.louver_fill, user)
-    elif prop.fill_type == "BAR":
+        fill_louver(bm, face, get_fill(prop, "louver_fill", dw), user)
+    elif fill_type == "BAR":
         add_facemap_for_groups(FaceMap.WINDOW_BARS)
-        fill_bar(bm, face, prop.bar_fill)
+        fill_bar(bm, face, get_fill(prop, "bar_fill", dw))
 
 
-def validate_fill_props(prop):
-    if prop.fill_type == "LOUVER":
+def validate_fill_props(prop, dw):
+    fill_type = get_fill_type(prop, dw)
+
+    if fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
-        fill = prop.louver_fill
+        fill = get_fill(prop, "louver_fill", dw)
         depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
         fill.louver_depth = min(fill.louver_depth, depth)
-    elif prop.fill_type == "BAR":
+    elif fill_type == "BAR":
         # XXX keep bar depth smaller than window depth
-        fill = prop.bar_fill
+        fill = get_fill(prop, "bar_fill", dw)
         depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
         fill.bar_depth = min(fill.bar_depth, depth)
-    elif prop.fill_type == "LOUVER":
+    elif fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
-        fill = prop.louver_fill
+        fill = get_fill(prop, "louver_fill", dw)
         depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
         fill.louver_depth = min(fill.louver_depth, depth)
 

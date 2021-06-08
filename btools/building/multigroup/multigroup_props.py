@@ -9,7 +9,7 @@ from bpy.props import (
 
 from ..arch import ArchProperty
 from ..array import ArrayGetSet, ArrayProperty
-from ..fill import FillPanel, FillLouver, FillGlassPanes
+from ..fill import FillPanel, FillLouver, FillGlassPanes, FillBars
 from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
 
@@ -18,9 +18,14 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     array: PointerProperty(type=ArrayProperty)
     size_offset: PointerProperty(type=SizeOffsetProperty)
 
-    panel_fill: PointerProperty(type=FillPanel)
-    louver_fill: PointerProperty(type=FillLouver)
-    glass_fill: PointerProperty(type=FillGlassPanes)
+    panel_fill_door: PointerProperty(type=FillPanel)
+    louver_fill_door: PointerProperty(type=FillLouver)
+    glass_fill_door: PointerProperty(type=FillGlassPanes)
+
+    bar_fill_window: PointerProperty(type=FillBars)
+    panel_fill_window: PointerProperty(type=FillPanel)
+    louver_fill_window: PointerProperty(type=FillLouver)
+    glass_fill_window: PointerProperty(type=FillGlassPanes)
 
     frame_thickness: FloatProperty(
         name="Frame Thickness",
@@ -70,18 +75,41 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
         description="Components (Door and Windows): example: 'wdw' for a door surrounded by windows",
     )
 
-    fill_types = [
+    fill_types_door = [
         ("NONE", "None", "", 0),
         ("PANELS", "Panels", "", 1),
         ("GLASS_PANES", "Glass_Panes", "", 2),
         ("LOUVER", "Louver", "", 3),
     ]
 
-    fill_type: EnumProperty(
-        name="Fill Type",
-        items=fill_types,
+    show_door_fill: BoolProperty(
+        name="Show Door Fill", default=True, description="Show fill type properties for door"
+    )
+
+    fill_type_door: EnumProperty(
+        name="Fill Type Door",
+        items=fill_types_door,
         default="NONE",
-        description="Type of fill for door/window",
+        description="Type of fill for door",
+    )
+
+    fill_types_window = [
+        ("NONE", "None", "", 0),
+        ("PANELS", "Panels", "", 1),
+        ("GLASS_PANES", "Glass_Panes", "", 2),
+        ("LOUVER", "Louver", "", 3),
+        ("BAR", "Bar", "", 4),
+    ]
+
+    show_window_fill: BoolProperty(
+        name="Show Window Fill", default=True, description="Show fill type properties for window"
+    )
+
+    fill_type_window: EnumProperty(
+        name="Fill Type Window",
+        items=fill_types_window,
+        default="NONE",
+        description="Type of fill for window",
     )
 
     def init(self, wall_dimensions):
@@ -124,16 +152,34 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
         if self.add_arch:
             self.arch.draw(context, box)
 
+        # -- draw fill types door
         box = layout.box()
-        col = box.column(align=True)
-        col.prop_menu_enum(self, "fill_type")
+        sp = box.split(factor=0.05, align=True)
+        sp.prop(self, "show_door_fill", text="")
+        sp.prop_menu_enum(self, "fill_type_door")
 
-        # -- draw fill types
         fill_map = {
-            "PANELS": self.panel_fill,
-            "LOUVER": self.louver_fill,
-            "GLASS_PANES": self.glass_fill,
+            "PANELS": self.panel_fill_door,
+            "LOUVER": self.louver_fill_door,
+            "GLASS_PANES": self.glass_fill_door,
         }
-        fill = fill_map.get(self.fill_type)
-        if fill:
+        fill = fill_map.get(self.fill_type_door)
+        if fill and self.show_door_fill:
+            fill.draw(box)
+
+
+        # # -- draw fill types window
+        box = layout.box()
+        sp = box.split(factor=0.05, align=True)
+        sp.prop(self, "show_window_fill", text="")
+        sp.prop_menu_enum(self, "fill_type_window")
+
+        fill_map = {
+            "BAR": self.bar_fill_window,
+            "PANELS": self.panel_fill_window,
+            "LOUVER": self.louver_fill_window,
+            "GLASS_PANES": self.glass_fill_window,
+        }
+        fill = fill_map.get(self.fill_type_window)
+        if fill and self.show_window_fill:
             fill.draw(box)
