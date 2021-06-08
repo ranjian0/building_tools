@@ -1,5 +1,4 @@
 import bpy
-import bmesh
 
 
 def link_material(obj, mat):
