@@ -1,11 +1,9 @@
 import bpy
-import math
 import bmesh
 from bpy.props import IntProperty, FloatProperty
 
 from ..utils import (
     clamp,
-    select,
     VEC_DOWN,
     sort_edges,
     sort_faces,
@@ -89,7 +87,7 @@ def spread_array(bm, split_edges, split_faces, max_width, prop):
     """perform spreading for array faces"""
     if prop.count == 1:
         return
-        
+
     normal = split_faces[0].normal.copy()
     median = calc_faces_median(split_faces)
 
