@@ -2,17 +2,19 @@ import math
 import random
 
 import bmesh
-from bmesh.types import BMVert
+from bmesh.types import BMEdge, BMVert
 from mathutils import Vector, Matrix
 
 from ...utils import (
     clamp,
     plane,
     circle,
+    VEC_UP,
     VEC_RIGHT,
     VEC_FORWARD,
     filter_geom,
     calc_edge_median,
+    calc_verts_median,
     sort_edges_clockwise,
     filter_vertical_edges,
     filter_horizontal_edges,
@@ -46,6 +48,7 @@ def create_composite_floorplan(bm, prop):
     plane(bm, prop.width / 2, prop.length / 2)
     median_reference = list(bm.faces).pop().calc_center_median()
 
+    tail_edges = []
     edges = sort_edges_clockwise(bm.edges)
     extrusion_lengths = [prop.tl1, prop.tl2, prop.tl3, prop.tl4]
     for idx, e in enumerate(edges):
@@ -55,7 +58,14 @@ def create_composite_floorplan(bm, prop):
 
             direction = (calc_edge_median(e) - median_reference).normalized()
             bmesh.ops.translate(bm, verts=verts, vec=direction * extrusion_lengths[idx])
+            tail_edges.extend(filter_geom(res['geom'], BMEdge))
 
+    tail_verts = list({v for e in tail_edges for v in e.verts})
+    bmesh.ops.rotate(
+        bm, verts=tail_verts, 
+        cent=calc_verts_median(tail_verts),
+        matrix=Matrix.Rotation(prop.tail_angle, 4, VEC_UP)
+    )
 
 def create_hshaped_floorplan(bm, prop):
     """Create H_shaped geometry from a rectangle

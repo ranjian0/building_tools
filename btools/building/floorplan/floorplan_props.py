@@ -173,6 +173,15 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         description="Length of floorplan segment",
     )
 
+    tail_angle: FloatProperty(
+        name="Tail Angle",
+        min=-50.0,
+        max=50.0,
+        default=0.0,
+        unit="ROTATION",
+        description="Angle of the tail/fan fron the floorplan center axis"
+    )
+
     def draw(self, context, layout):
         row = layout.row()
         row.prop(self, "type", text="")
@@ -199,9 +208,12 @@ class FloorplanProperty(bpy.types.PropertyGroup):
             col.prop(self, "segments")
 
         elif self.type == "COMPOSITE":
-            row = box.row(align=True)
+            col = box.column(align=True)
+
+            row = col.row(align=True)
             row.prop(self, "width")
             row.prop(self, "length")
+            col.prop(self, "tail_angle", text="Fan Angle")
 
             col = box.column(align=True)
             col.prop(self, "tl1", text="Fan Length 1")
