@@ -250,9 +250,9 @@ def transform_parallel_to_face(bm, custom_faces, target_face):
     try:
         angle = target_normal.xy.angle_signed(custom_normal.xy)
     except ValueError:
-        # -- unsupported mesh type,
         # TODO(ranjian0) Support all mesh shapes when placing along face
         angle = 0
+    
     bmesh.ops.rotate(
         bm, verts=verts,
         cent=verts_median,
