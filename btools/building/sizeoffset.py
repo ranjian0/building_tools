@@ -78,7 +78,11 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     def set_offset_horizontal(self, value):
         self.offset[0] = value
-        self.clamp_offset()
+        # TODO(ranjian0)
+        # Clamping horizontal offset with spread applied is incorrect
+        # For now we disble the clamping
+        if self["spread"] == 0:
+            self.clamp_offset()
 
     def set_offset_vertical(self, value):
         self.offset[1] = value
@@ -122,11 +126,12 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     show_props: BoolProperty(default=False)
 
-    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=True):
+    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=True, spread=None):
         self["parent_dimensions"] = parent_dimensions
         self["default_size"] = default_size
         self["default_offset"] = default_offset
         self["restricted"] = restricted
+        self["spread"] = spread
 
         if self.size == Vector((0, 0)):
             self.size = default_size

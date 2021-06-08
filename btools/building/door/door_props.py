@@ -77,6 +77,7 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
             (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
             default_size=(1.0, 1.8),
             default_offset=(0.0, 0.0),
+            spread=self.array.spread
         )
         self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 
