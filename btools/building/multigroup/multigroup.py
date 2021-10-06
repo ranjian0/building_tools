@@ -26,10 +26,10 @@ class Multigroup:
         if faces:
             cls.add_multigroup_facemaps()
             if create_multigroup(bm, faces, props):
-                bmesh.update_edit_mesh(me, True)
+                bmesh.update_edit_mesh(me, loop_triangles=True)
                 return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod

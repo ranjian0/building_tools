@@ -133,7 +133,7 @@ def verify_facemaps_for_object(obj):
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     bm.faces.layers.face_map.verify()
-    bmesh.update_edit_mesh(me, True)
+    bmesh.update_edit_mesh(me, loop_triangles=True)
 
 
 def set_material_for_active_facemap(material, context):

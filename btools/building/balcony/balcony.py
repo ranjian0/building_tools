@@ -21,10 +21,10 @@ class Balcony:
         if cls.validate(faces):
             cls.add_balcony_facemaps()
             create_balcony(bm, faces, prop)
-            bmesh.update_edit_mesh(me, True)
+            bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod

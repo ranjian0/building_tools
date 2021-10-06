@@ -25,7 +25,7 @@ def remove(context):
     newfaces = bmesh.ops.contextual_create(bm, geom=cornerv).get('faces')
     add_faces_to_map(bm, newfaces, FaceMap.WALLS)
 
-    bmesh.update_edit_mesh(me, True)
+    bmesh.update_edit_mesh(me, loop_triangles=True)
 
 
 def get_faces_in_selection_bounds(bm):

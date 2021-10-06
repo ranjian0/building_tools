@@ -19,10 +19,10 @@ class Fill:
         faces = cls.validate([face for face in bm.faces if face.select])
         if faces:
             if add_fill(bm, faces, props):
-                bmesh.update_edit_mesh(me, True)
+                bmesh.update_edit_mesh(me, loop_triangles=True)
                 return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod

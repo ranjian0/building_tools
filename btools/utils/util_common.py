@@ -85,7 +85,7 @@ def crash_safe(func):
 
             # -- cleanup blender context
             if bpy.context.mode == "EDIT_MESH":
-                bmesh.update_edit_mesh(bpy.context.edit_object.data, True)
+                bmesh.update_edit_mesh(bpy.context.edit_object.data, loop_triangles=True)
 
             # -- exit operator
             return {"CANCELLED"}

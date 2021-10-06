@@ -53,6 +53,6 @@ def bmesh_from_active_object(context=None):
     yield bm
 
     if context.mode == "EDIT_MESH":
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
     elif context.mode == "OBJECT":
         bm_to_obj(bm, context.object)

@@ -20,10 +20,10 @@ class Window:
         if faces:
             cls.add_window_facemaps()
             if create_window(bm, faces, prop):
-                bmesh.update_edit_mesh(me, True)
+                bmesh.update_edit_mesh(me, loop_triangles=True)
                 return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod

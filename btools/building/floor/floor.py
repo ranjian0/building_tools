@@ -38,10 +38,10 @@ class Floor:
             else:
                 all_faces = [f for f in bm.faces]
                 create_floors(bm, all_faces, prop)
-            bmesh.update_edit_mesh(me, True)
+            bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod

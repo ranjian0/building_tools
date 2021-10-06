@@ -25,10 +25,10 @@ class Door:
         if faces:
             cls.add_door_facemaps()
             if create_door(bm, faces, props):
-                bmesh.update_edit_mesh(me, True)
+                bmesh.update_edit_mesh(me, loop_triangles=True)
                 return {"FINISHED"}
 
-        bmesh.update_edit_mesh(me, True)
+        bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"CANCELLED"}
 
     @classmethod
