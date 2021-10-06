@@ -30,7 +30,8 @@ def extrude_slabs_and_floors(bm, faces, prop):
     walls = []
     normal = faces[0].normal.copy()
 
-    faces = bmesh.ops.dissolve_faces(bm, faces=faces)["region"]
+    if len(faces) > 1:
+        faces = bmesh.ops.dissolve_faces(bm, faces=faces)["region"]
     create_columns(bm, faces[-1], prop)
 
     # extrude vertically
