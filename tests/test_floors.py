@@ -91,7 +91,3 @@ class TestFloor(unittest.TestCase):
                 floor_res = floor_builder.build(context, prop)
                 self.assertEqual(floor_res, {"FINISHED"})
                 self.assertEqual(len(bm.faces), (floorplan_edges_count * 4) + 1)
-
-    def test_floors_multi_visual(self):
-        # --run some floor tests and save the blend file for visual confirmation
-        pass

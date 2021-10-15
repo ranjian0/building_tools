@@ -25,7 +25,7 @@ except Exception:
 
 def main():
     # Load the addon module
-    tools.LoadModule(os.path.join(addon_dir, "btools", "__init__.py"))
+    tools.LoadModule(os.path.join(addon_dir, "__init__.py"))
     print('-' * 70, end="\n\n")
 
     # initialize the test suite
