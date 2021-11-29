@@ -1,29 +1,27 @@
 import bpy
-import bmesh
 import btools
 import random
 
 from contextlib import contextmanager
 
 
+@contextmanager
+def select_top_faces():
+    with btools.utils.bmesh_from_active_object(bpy.context) as bm:
+        max_z = max([f.calc_center_median().z for f in bm.faces])
+        top_faces = [f for f in bm.faces if f.calc_center_median().z == max_z]
+        btools.utils.select(top_faces)
+
+        yield
+
+        top_faces = btools.utils.validate(top_faces)
+        btools.utils.select(top_faces, False)
+
 class BuildingGenerator:
     _props = None
 
     def __init__(self):
         self.obj = None
-
-    @staticmethod
-    @contextmanager
-    def select_top_faces():
-        with btools.utils.bmesh_from_active_object(bpy.context) as bm:
-            max_z = max([f.calc_center_median().z for f in bm.faces])
-            top_faces = [f for f in bm.faces if f.calc_center_median().z == max_z]
-            btools.utils.select(top_faces)
-
-            yield
-
-            top_faces = btools.utils.validate(top_faces)
-            btools.utils.select(top_faces, False)
 
     def build_random(self):
         self.obj = FloorplanGenerator().build_random()
@@ -34,7 +32,7 @@ class BuildingGenerator:
             bpy.ops.object.mode_set(mode="EDIT")
 
         FloorGenerator().build_random()
-        with self.select_top_faces():
+        with select_top_faces():
             RoofGenerator().build_random()
 
         # Reset Context
