@@ -21,7 +21,6 @@ from ..facemap import (
 from ...utils import (
     clamp,
     XYDir,
-    select,
     VEC_UP,
     validate,
     local_xyz,
