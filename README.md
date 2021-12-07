@@ -47,7 +47,9 @@ and `Building Tools` was born.
 
 ## Status
 
-`Version` : `v1.0.8`
+`Version` : `v1.0.9`
+
+**Blender 3.0 Compatible** 
 
 ## Inspiration
 
