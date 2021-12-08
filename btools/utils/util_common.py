@@ -64,6 +64,9 @@ def dict_from_prop(prop):
         if p.startswith("__") or p in ["rna_type", "bl_rna"]:
             continue
 
+        if not hasattr(prop, p):
+            continue
+
         pn = getattr(prop, p)
         if isinstance(pn, valid_types):
             result[p] = pn
