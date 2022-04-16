@@ -1,5 +1,5 @@
 import traceback
-
+import enum
 import bpy
 import bmesh
 from mathutils import Vector
@@ -43,7 +43,14 @@ def prop_from_dict(prop, dictprop):
     """Set all values in prop from dictprop"""
     for k, v in dictprop.items():
         if hasattr(prop, k):
-            setattr(prop, k, v)
+            if isinstance(v, enum.Enum):
+                v = v.value
+            try:
+                setattr(prop, k, v)
+            except AttributeError:
+                # inner pointer prop
+                inner_prop = getattr(prop, k)
+                prop_from_dict(inner_prop, v)
 
 
 def dict_from_prop(prop):
