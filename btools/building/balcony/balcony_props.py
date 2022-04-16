@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import BoolProperty, FloatProperty, PointerProperty
 
+from ...utils import get_scaled_unit
 from ..array import ArrayProperty, ArrayGetSet
 from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 from ..railing.railing_props import RailProperty
@@ -13,18 +14,18 @@ class BalconyProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
 
     depth: FloatProperty(
         name="Depth",
-        min=0.01,
-        max=100.0,
-        default=1.0,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(1.0),
         unit="LENGTH",
         description="How much the balcony extends outwards",
     )
 
     depth_offset: FloatProperty(
         name="Depth Offset",
-        min=0.0,
-        max=100.0,
-        default=0.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(0.0),
         unit="LENGTH",
         description="How much the balcony should be moved backwards",
     )
