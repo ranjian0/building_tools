@@ -139,3 +139,9 @@ def XYDir(vec):
     """Remove the z component from a vector and normalize"""
     vec.z = 0
     return vec.normalized() 
+
+def get_scaled_unit(value):
+    """Mostly to scale prop values to current scene unit scale
+    """
+    scale = bpy.context.scene.unit_settings.scale_length
+    return value / scale

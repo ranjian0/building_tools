@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
 
-from ...utils import clamp
+from ...utils import clamp, get_scaled_unit
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):
@@ -27,18 +27,18 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     width: FloatProperty(
         name="Width",
-        min=0.01,
-        max=100.0,
-        default=4,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(4),
         unit="LENGTH",
         description="Base Width of floorplan",
     )
 
     length: FloatProperty(
         name="Length",
-        min=0.01,
-        max=100.0,
-        default=4,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(4),
         unit="LENGTH",
         description="Base Length of floorplan",
     )
