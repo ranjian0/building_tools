@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
 
-from ...utils import clamp
+from ...utils import clamp, get_scaled_unit
 
 
 class FloorplanProperty(bpy.types.PropertyGroup):
@@ -27,18 +27,18 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     width: FloatProperty(
         name="Width",
-        min=0.01,
-        max=100.0,
-        default=4,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(4),
         unit="LENGTH",
         description="Base Width of floorplan",
     )
 
     length: FloatProperty(
         name="Length",
-        min=0.01,
-        max=100.0,
-        default=4,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(4),
         unit="LENGTH",
         description="Base Length of floorplan",
     )
@@ -57,9 +57,9 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     radius: FloatProperty(
         name="Radius",
-        min=0.1,
-        max=100.0,
-        default=1.0,
+        min=get_scaled_unit(0.1),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(1.0),
         unit="LENGTH",
         description="Radius of circle"
     )
@@ -99,8 +99,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tw1: FloatProperty(
         name="Tail Width 1",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw1"),
@@ -109,8 +109,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tl1: FloatProperty(
         name="Tail Length 1",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         default=1,
         unit="LENGTH",
         description="Length of floorplan segment",
@@ -118,8 +118,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tw2: FloatProperty(
         name="Tail Width 2",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw2"),
@@ -128,8 +128,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tl2: FloatProperty(
         name="Tail Length 2",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         default=1,
         unit="LENGTH",
         description="Length of floorplan segment",
@@ -137,8 +137,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tw3: FloatProperty(
         name="Tail Width 3",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw3"),
@@ -147,8 +147,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tl3: FloatProperty(
         name="Tail Length 3",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         default=1,
         unit="LENGTH",
         description="Length of floorplan segment",
@@ -156,8 +156,8 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tw4: FloatProperty(
         name="Tail Width 4",
-        min=0.0,
-        max=100.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
         unit="LENGTH",
         description="Width of floorplan segment",
         get=lambda self: self.get_segment_width("tw4"),
@@ -166,18 +166,18 @@ class FloorplanProperty(bpy.types.PropertyGroup):
 
     tl4: FloatProperty(
         name="Tail Length 4",
-        min=0.0,
-        max=100.0,
-        default=1,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(1),
         unit="LENGTH",
         description="Length of floorplan segment",
     )
 
     tail_angle: FloatProperty(
         name="Tail Angle",
-        min=-50.0,
-        max=50.0,
-        default=0.0,
+        min=get_scaled_unit(-50.0),
+        max=get_scaled_unit(50.0),
+        default=get_scaled_unit(0.0),
         unit="ROTATION",
         description="Angle of the tail/fan fron the floorplan center axis"
     )

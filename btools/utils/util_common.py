@@ -1,5 +1,5 @@
 import traceback
-
+import enum
 import bpy
 import bmesh
 from mathutils import Vector
@@ -43,7 +43,14 @@ def prop_from_dict(prop, dictprop):
     """Set all values in prop from dictprop"""
     for k, v in dictprop.items():
         if hasattr(prop, k):
-            setattr(prop, k, v)
+            if isinstance(v, enum.Enum):
+                v = v.value
+            try:
+                setattr(prop, k, v)
+            except AttributeError:
+                # inner pointer prop
+                inner_prop = getattr(prop, k)
+                prop_from_dict(inner_prop, v)
 
 
 def dict_from_prop(prop):
@@ -62,6 +69,9 @@ def dict_from_prop(prop):
     result = {}
     for p in dir(prop):
         if p.startswith("__") or p in ["rna_type", "bl_rna"]:
+            continue
+
+        if not hasattr(prop, p):
             continue
 
         pn = getattr(prop, p)
@@ -129,3 +139,9 @@ def XYDir(vec):
     """Remove the z component from a vector and normalize"""
     vec.z = 0
     return vec.normalized() 
+
+def get_scaled_unit(value):
+    """Mostly to scale prop values to current scene unit scale
+    """
+    scale = bpy.context.scene.unit_settings.scale_length
+    return value / scale

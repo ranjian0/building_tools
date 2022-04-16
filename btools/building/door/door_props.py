@@ -7,6 +7,7 @@ from bpy.props import (
 )
 
 from ..arch import ArchProperty
+from ...utils import get_scaled_unit
 from ..array import ArrayProperty, ArrayGetSet
 from ..fill import FillPanel, FillLouver, FillGlassPanes
 from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
@@ -23,28 +24,28 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
 
     frame_thickness: FloatProperty(
         name="Frame Thickness",
-        min=0.01,
-        max=1.0,
-        default=0.1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.1),
         unit="LENGTH",
         description="Thickness of door Frame",
     )
 
     frame_depth: FloatProperty(
         name="Frame Depth",
-        min=-1.0,
-        max=1.0,
+        min=get_scaled_unit(-1.0),
+        max=get_scaled_unit(1.0),
         step=1,
-        default=0.0,
+        default=get_scaled_unit(0.0),
         unit="LENGTH",
         description="Depth of door Frame",
     )
 
     door_depth: FloatProperty(
         name="Door Depth",
-        min=0.0,
-        max=1.0,
-        default=0.05,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.05),
         unit="LENGTH",
         description="Depth of door",
     )

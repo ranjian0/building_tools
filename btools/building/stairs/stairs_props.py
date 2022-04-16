@@ -7,16 +7,16 @@ from bpy.props import (
     EnumProperty,
 )
 
+from ...utils import get_scaled_unit
 from ..sizeoffset import SizeOffsetProperty
 from ..railing.railing_props import RailProperty
-
 
 class StairsProperty(bpy.types.PropertyGroup):
     depth_offset: FloatProperty(
         name="Depth Offset",
-        min=0.0,
-        max=100.0,
-        default=0.0,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(0.0),
         unit="LENGTH",
         description="Depth offset of stairs",
     )
@@ -27,27 +27,27 @@ class StairsProperty(bpy.types.PropertyGroup):
 
     step_width: FloatProperty(
         name="Step Width",
-        min=0.01,
-        max=100.0,
-        default=0.2,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(0.2),
         unit="LENGTH",
         description="Width of each step",
     )
 
     step_height: FloatProperty(
         name="Step Height",
-        min=0.01,
-        max=100.0,
-        default=0.12,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(0.12),
         unit="LENGTH",
         description="Height of each step",
     )
 
     landing_width: FloatProperty(
         name="Landing Width",
-        min=0.01,
-        max=100.0,
-        default=1.0,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(100.0),
+        default=get_scaled_unit(1.0),
         unit="LENGTH",
         description="Width of each stairs landing",
     )

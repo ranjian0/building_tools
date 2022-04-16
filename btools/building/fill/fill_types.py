@@ -279,7 +279,6 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 def subdivide_face_into_vertical_segments(bm, face, segments):
     """Cut a face(quad) vertically into multiple faces"""
     res = bmesh.ops.subdivide_edges(bm, edges=filter_vertical_edges(face.edges), cuts=segments).get("geom_inner")
-
     return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
 
 

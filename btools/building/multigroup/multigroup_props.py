@@ -8,6 +8,7 @@ from bpy.props import (
 )
 
 from ..arch import ArchProperty
+from ...utils import get_scaled_unit
 from ..array import ArrayGetSet, ArrayProperty
 from ..fill import FillPanel, FillLouver, FillGlassPanes, FillBars
 from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
@@ -29,9 +30,9 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
 
     frame_thickness: FloatProperty(
         name="Frame Thickness",
-        min=0.01,
-        max=1.0,
-        default=0.1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.1),
         unit="LENGTH",
         description="Thickness of door/window Frame",
     )
@@ -39,9 +40,9 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     frame_depth: FloatProperty(
         name="Frame Depth",
         step=1,
-        min=-1.0,
-        max=1.0,
-        default=0.0,
+        min=get_scaled_unit(-1.0),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.0),
         unit="LENGTH",
         description="Depth of door/window Frame",
     )
@@ -49,18 +50,18 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     window_height: FloatProperty(
         name="Window Height",
         step=1,
-        min=0.1,
-        max=1000.0,
-        default=1.0,
+        min=get_scaled_unit(0.1),
+        max=get_scaled_unit(1000.0),
+        default=get_scaled_unit(1.0),
         unit="LENGTH",
         description="Height of windows",
     )
 
     dw_depth: FloatProperty(
         name="Door/Window Depth",
-        min=0.0,
-        max=1.0,
-        default=0.05,
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.05),
         unit="LENGTH",
         description="Depth of door/window",
     )

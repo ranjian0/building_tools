@@ -17,6 +17,7 @@ from ..utils import (
     arc_edge,
     sort_verts,
     filter_geom,
+    get_scaled_unit,
     get_bottom_faces,
     extrude_face_region,
 )
@@ -29,7 +30,7 @@ class ArchProperty(bpy.types.PropertyGroup):
         return self.get("height", min(self["parent_height"], self["default_height"]))
 
     def set_height(self, value):
-        self["height"] = clamp(value, 0.1, self["parent_height"] - 0.0001)
+        self["height"] = get_scaled_unit(clamp(value, 0.1, self["parent_height"] - 0.0001))
 
     resolution: IntProperty(
         name="Arc Resolution",
@@ -41,9 +42,9 @@ class ArchProperty(bpy.types.PropertyGroup):
 
     depth: FloatProperty(
         name="Arc Depth",
-        min=0.01,
-        max=1.0,
-        default=0.05,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.05),
         unit="LENGTH",
         description="How far arc is from top",
     )

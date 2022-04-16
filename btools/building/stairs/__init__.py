@@ -1,6 +1,5 @@
 import bpy
 
-from .stairs import Stairs
 from .stairs_ops import BTOOLS_OT_add_stairs
 from .stairs_props import StairsProperty
 

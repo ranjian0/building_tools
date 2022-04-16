@@ -1,8 +1,14 @@
 import bpy
 import btools
 import random
-
 from contextlib import contextmanager
+
+from btools.building.roof import RoofProperty
+from btools.building.floor import FloorProperty
+from btools.building.floorplan import FloorplanProperty
+from btools.building.roof.roof_ops import build as roof_builder
+from btools.building.floor.floor_ops import build as floor_builder
+from btools.building.floorplan.floorplan_ops import build as floorplan_builder
 
 
 @contextmanager
@@ -42,8 +48,6 @@ class BuildingGenerator:
 
 class FloorplanGenerator:
     _props = None
-    _builder = btools.building.floorplan.floorplan.Floorplan
-    _prop_class = btools.building.floorplan.FloorplanProperty
 
     def __init__(self):
         self.context = bpy.context
@@ -60,10 +64,10 @@ class FloorplanGenerator:
     def _register(self):
         """Register Property"""
         try:
-            bpy.utils.register_class(self._prop_class)
+            bpy.utils.register_class(FloorplanProperty)
         except ValueError:
             pass  # XXX Already registered
-        bpy.types.Scene.prop_floorplan = bpy.props.PointerProperty(type=self._prop_class)
+        bpy.types.Scene.prop_floorplan = bpy.props.PointerProperty(type=FloorplanProperty)
         self._props = btools.utils.dict_from_prop(self.scene.prop_floorplan)
 
     def build_from_props(self, pdict):
@@ -86,7 +90,7 @@ class FloorplanGenerator:
         """
         self._props.update(pdict)
         btools.utils.prop_from_dict(self.scene.prop_floorplan, pdict)
-        return self._builder.build(self.context, self.scene.prop_floorplan)
+        return floorplan_builder(self.context, self.scene.prop_floorplan)
 
     def build_random(self):
         properties = btools.utils.dict_from_prop(self._prop_class)
@@ -128,8 +132,6 @@ class FloorplanGenerator:
 
 class FloorGenerator:
     _props = None
-    _builder = btools.building.floor.floor.Floor
-    _prop_class = btools.building.floor.FloorProperty
 
     def __init__(self):
         self.context = bpy.context
@@ -149,10 +151,10 @@ class FloorGenerator:
     def _register(self):
         """Register Property"""
         try:
-            bpy.utils.register_class(self._prop_class)
+            bpy.utils.register_class(FloorProperty)
         except ValueError:
             pass  # XXX Already registered
-        bpy.types.Scene.prop_floor = bpy.props.PointerProperty(type=self._prop_class)
+        bpy.types.Scene.prop_floor = bpy.props.PointerProperty(type=FloorProperty)
         self._props = btools.utils.dict_from_prop(self.scene.prop_floor)
 
     def build_from_props(self, pdict):
@@ -173,10 +175,10 @@ class FloorGenerator:
         """
         self._props.update(pdict)
         btools.utils.prop_from_dict(self.scene.prop_floor, pdict)
-        return self._builder.build(self.context, self.scene.prop_floor)
+        return floor_builder(self.context, self.scene.prop_floor)
 
     def build_random(self):
-        properties = btools.utils.dict_from_prop(self._prop_class)
+        properties = btools.utils.dict_from_prop(FloorProperty)
 
         properties['add_columns'] = False
         properties['add_slabs'] = True
@@ -187,8 +189,6 @@ class FloorGenerator:
 
 class RoofGenerator:
     _props = None
-    _builder = btools.building.roof.roof.Roof
-    _prop_class = btools.building.roof.RoofProperty
 
     def __init__(self):
         self.context = bpy.context
@@ -205,10 +205,10 @@ class RoofGenerator:
     def _register(self):
         """Register Property"""
         try:
-            bpy.utils.register_class(self._prop_class)
+            bpy.utils.register_class(RoofProperty)
         except ValueError:
             pass  # XXX Already registered
-        bpy.types.Scene.prop_roof = bpy.props.PointerProperty(type=self._prop_class)
+        bpy.types.Scene.prop_roof = bpy.props.PointerProperty(type=RoofProperty)
         self._props = btools.utils.dict_from_prop(self.scene.prop_roof)
 
     def build_from_props(self, pdict):
@@ -230,10 +230,10 @@ class RoofGenerator:
         """
         self._props.update(pdict)
         btools.utils.prop_from_dict(self.scene.prop_roof, pdict)
-        return self._builder.build(self.context, self.scene.prop_roof)
+        return roof_builder(self.context, self.scene.prop_roof)
 
     def build_random(self):
-        properties = btools.utils.dict_from_prop(self._prop_class)
+        properties = btools.utils.dict_from_prop(RoofProperty)
         properties['type'] = random.choices(
             ["FLAT", "GABLE", "HIP"],
             weights=[0.5, 0.5, 0.9], k=1

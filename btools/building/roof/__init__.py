@@ -1,6 +1,5 @@
 import bpy
 
-from .roof import Roof
 from .roof_ops import BTOOLS_OT_add_roof
 from .roof_props import RoofProperty
 

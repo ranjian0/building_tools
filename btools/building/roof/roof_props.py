@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import EnumProperty, FloatProperty, BoolProperty
-
+from ...utils import get_scaled_unit
 
 class RoofProperty(bpy.types.PropertyGroup):
     roof_types = [
@@ -28,27 +28,27 @@ class RoofProperty(bpy.types.PropertyGroup):
 
     thickness: FloatProperty(
         name="Thickness",
-        min=0.01,
-        max=1.0,
-        default=0.1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.1),
         unit="LENGTH",
         description="Thickness of roof hangs",
     )
 
     outset: FloatProperty(
         name="Outset",
-        min=0.01,
-        max=1.0,
-        default=0.1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.1),
         unit="LENGTH",
         description="Outset of roof hangs",
     )
 
     height: FloatProperty(
         name="Height",
-        min=0.01,
-        max=10.0,
-        default=1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(10.0),
+        default=get_scaled_unit(1),
         unit="LENGTH",
         description="Height of entire roof",
     )
@@ -61,9 +61,9 @@ class RoofProperty(bpy.types.PropertyGroup):
 
     border: FloatProperty(
         name="Border",
-        min=0.01,
-        max=1.0,
-        default=0.1,
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.1),
         unit="LENGTH",
         description="Width of extruded border",
     )

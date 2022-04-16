@@ -7,6 +7,7 @@ from ..utils import (
     VEC_DOWN,
     sort_edges,
     sort_faces,
+    get_scaled_unit,
     edge_is_vertical,
     calc_edge_median,
     calc_faces_median,
@@ -28,9 +29,9 @@ class ArrayProperty(bpy.types.PropertyGroup):
 
     spread: FloatProperty(
         name="Spread",
-        min=-1.0,
-        max=1.0,
-        default=0.0,
+        min=get_scaled_unit(-1.0),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.0),
         description="Relative distance between elements",
     )
 
