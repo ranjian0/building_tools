@@ -163,3 +163,23 @@ class MultigroupOptions:
     fill_type_door: DoorFillType = DoorFillType.NONE
     show_window_fill: bool = False 
     fill_type_window: WindowFillType = WindowFillType.NONE 
+
+class RoofType(Enum):
+    FLAT = 'FLAT'
+    GABLE = 'GABLE'
+    HIP = 'HIP'
+
+class GableRoofType(Enum):
+    OPEN = 'OPEN'
+    BOX = 'BOX'
+
+@dataclass
+class RoofOptions:
+    type: RoofType = RoofType.HIP
+    gable_type: GableRoofType = GableRoofType.OPEN
+    thickness: float = 0.1
+    outset: float = 0.1
+    height: float = 1.0
+    add_border: bool = True 
+    border: float = 0.1
+    

@@ -2,6 +2,7 @@ import bpy
 from dataclasses import asdict
 from .options import (
     DoorOptions,
+    RoofOptions,
     FloorOptions,
     WindowOptions,
     FloorplanOptions,
@@ -153,7 +154,7 @@ def create_multigroup(options: MultigroupOptions):
     del bpy.types.Scene.multigroup_prop
 
 
-def create_roof(**kwargs):
+def create_roof(options: RoofOptions):
     from ...btools.building.roof import RoofProperty
     from ...btools.building.roof.roof_ops import build
     register_property(RoofProperty)
@@ -162,7 +163,7 @@ def create_roof(**kwargs):
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
-    props_dict.update(kwargs)
+    props_dict.update(asdict(options))
     prop_from_dict(prop, props_dict)
     # -- create floorplan
     result = build(bpy.context, prop)
