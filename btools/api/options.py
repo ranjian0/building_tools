@@ -139,3 +139,27 @@ class WindowOptions:
     resolution: int = 20 
     add_arch: bool = False 
 
+@dataclass
+class MultigroupOptions:
+    arch: ArchOptions = ArchOptions()
+    array: ArrayOptions = ArrayOptions()
+    size_offset: SizeOffsetOptions = SizeOffsetOptions()
+
+    bar_fill_window: FillBarOptions = FillBarOptions()
+    panel_fill_window: FillPanelOptions = FillPanelOptions()
+    louver_fill_window: FillLouverOptions = FillLouverOptions()
+    glass_fill_window: FillGlassPaneOptions = FillGlassPaneOptions()
+
+    panel_fill_door: FillPanelOptions = FillPanelOptions()
+    louver_fill_door: FillLouverOptions = FillLouverOptions()
+    glass_fill_door: FillGlassPaneOptions = FillGlassPaneOptions()
+
+    frame_thickness: float = 0.1
+    frame_depth: float = 0.1
+    dw_depth: float = 0.05 
+    add_arch: bool = False
+    components: str = 'dw'
+    show_door_fill: bool = False 
+    fill_type_door: DoorFillType = DoorFillType.NONE
+    show_window_fill: bool = False 
+    fill_type_window: WindowFillType = WindowFillType.NONE 

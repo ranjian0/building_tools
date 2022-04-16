@@ -1,10 +1,11 @@
 import bpy
 from dataclasses import asdict
 from .options import (
-    FloorplanOptions,
-    FloorOptions,
     DoorOptions,
-    WindowOptions
+    FloorOptions,
+    WindowOptions,
+    FloorplanOptions,
+    MultigroupOptions,
 )
 from ...btools.utils import (
     dict_from_prop, 
@@ -120,7 +121,7 @@ def create_window(options: WindowOptions):
     del bpy.types.Scene.window_prop
 
 
-def create_multigroup(**kwargs):
+def create_multigroup(options: MultigroupOptions):
     from ...btools.building.arch import ArchProperty
     from ...btools.building.array import ArrayProperty
     from ...btools.building.sizeoffset import SizeOffsetProperty
@@ -140,13 +141,13 @@ def create_multigroup(**kwargs):
 
     bpy.types.Scene.multigroup_prop = bpy.props.PointerProperty(type=MultigroupProperty)
     prop = bpy.context.scene.multigroup_prop 
+    prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
-    props_dict.update(kwargs)
+    props_dict.update(asdict(options))
     prop_from_dict(prop, props_dict)
-    # -- create floorplan
-    prop.init(get_selected_face_dimensions(bpy.context))
+    # -- create multigroup
     result = build(bpy.context, prop)
     # -- unregister prop
     del bpy.types.Scene.multigroup_prop
