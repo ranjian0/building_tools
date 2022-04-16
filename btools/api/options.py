@@ -182,4 +182,52 @@ class RoofOptions:
     height: float = 1.0
     add_border: bool = True 
     border: float = 0.1
-    
+
+
+@dataclass
+class PostFillOptions:
+    size: float = 0.05
+    density: float = 0.5
+
+@dataclass
+class RailFillOptions:
+    size: float = 0.05
+    density: float = 0.4
+
+
+@dataclass
+class WallFillOptions:
+    width: float = 0.075
+
+
+class RailFillType(Enum):
+    POSTS = 'POSTS'
+    RAILS = 'RAILS'
+    WALL = 'WALL'
+@dataclass
+class RailOptions:
+    fill: RailFillType = RailFillType.POSTS
+    corner_post_width: float = 0.1
+    corner_post_height: float = 0.7
+    has_corner_post: bool = True
+    offset: float = 0.05
+
+    post_fill: PostFillOptions = PostFillOptions()
+    rail_fill: RailFillOptions = RailFillOptions()
+    wall_fill: WallFillOptions = WallFillOptions()
+
+    bottom_rail: bool = True 
+    bottom_rail_offset: float = 0.0
+
+
+
+@dataclass
+class BalconyOptions:
+    rail: RailOptions = RailOptions()
+    array: ArrayOptions = ArrayOptions()
+    size_offset: SizeOffsetOptions = SizeOffsetOptions()
+
+    depth: float = 1.0
+    depth_offset: float = 0.0
+    has_railing: bool = True 
+    group_selection: bool = True

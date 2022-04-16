@@ -1,6 +1,7 @@
 import bpy
 from dataclasses import asdict
 from .options import (
+    BalconyOptions,
     DoorOptions,
     RoofOptions,
     FloorOptions,
@@ -173,7 +174,7 @@ def create_roof(options: RoofOptions):
     return result
 
 
-def create_balcony(**kwargs):
+def create_balcony(options: BalconyOptions):
     from ...btools.building.array import ArrayProperty
     from ...btools.building.sizeoffset import SizeOffsetProperty
     from ...btools.building.railing import RailProperty, RailFillProperty, PostFillProperty, WallFillProperty
@@ -193,7 +194,7 @@ def create_balcony(**kwargs):
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
-    props_dict.update(kwargs)
+    props_dict.update(asdict(options))
     prop_from_dict(prop, props_dict)
     # -- create floorplan
     result = build(bpy.context, prop)
