@@ -187,13 +187,13 @@ def create_balcony(**kwargs):
     register_property(BalconyProperty)
     bpy.types.Scene.balcony_prop = bpy.props.PointerProperty(type=BalconyProperty)
     prop = bpy.context.scene.balcony_prop 
+    prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
     props_dict.update(kwargs)
     prop_from_dict(prop, props_dict)
     # -- create floorplan
-    prop.init(get_selected_face_dimensions(bpy.context))
     result = build(bpy.context, prop)
     # -- unregister prop
     del bpy.types.Scene.balcony_prop
