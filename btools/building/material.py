@@ -6,7 +6,7 @@ from bpy.props import (
     CollectionProperty,
 )
 
-from ..utils import create_object_material, bmesh_from_active_object
+from ..utils import create_object_material
 from .facemap import (
     clear_empty_facemaps, 
     set_material_for_active_facemap,
