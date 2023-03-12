@@ -136,6 +136,8 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         if self.size == Vector((0, 0)):
             self.size = default_size
             self.offset = default_offset
+        self.clamp_size()
+        self.clamp_offset()
 
     def draw(self, context, box):
 
