@@ -7,10 +7,10 @@ from bpy.props import (
     PointerProperty
 )
 
-from ..fill import FillBars, FillLouver, FillGlassPanes
-from ...utils import get_scaled_unit
 from ..arch import ArchProperty
+from ...utils import get_scaled_unit 
 from ..array import ArrayProperty, ArrayGetSet
+from ..fill import FillBars, FillLouver, FillGlassPanes
 from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 

@@ -212,7 +212,6 @@ def unregister():
 
 if __name__ == "__main__":
     import os
-
     os.system("clear")
 
     # -- custom unregister for script watcher
