@@ -143,5 +143,9 @@ def XYDir(vec):
 def get_scaled_unit(value):
     """Mostly to scale prop values to current scene unit scale
     """
-    scale = bpy.context.scene.unit_settings.scale_length
+    try:
+        scale = bpy.context.scene.unit_settings.scale_length
+    except AttributeError:
+        # Addon Registration, context.scene is not available
+        scale = 1.0
     return value / scale
