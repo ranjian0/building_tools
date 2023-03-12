@@ -68,7 +68,7 @@ class ArrayGetSet:
 
 def clamp_array_count(face, prop):
     """Keep array count to minimum number that fits all elements in the parent face"""
-    prop.count = clamp(prop.count, 1, calc_face_dimensions(face)[0] // prop.width)
+    prop.count = clamp(prop.count, 1, int(calc_face_dimensions(face)[0] // prop.width))
 
 
 def get_array_split_edges(afaces):
