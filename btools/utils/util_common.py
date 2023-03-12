@@ -1,8 +1,9 @@
-import traceback
-import enum
 import bpy
+import enum
 import bmesh
+import traceback
 from mathutils import Vector
+from bpy.props import PointerProperty
 from .util_constants import VEC_UP, VEC_RIGHT
 
 
@@ -135,10 +136,12 @@ def local_xyz(face):
     y = x.cross(z)
     return x, y, z
 
+
 def XYDir(vec):
     """Remove the z component from a vector and normalize"""
     vec.z = 0
     return vec.normalized() 
+
 
 def get_scaled_unit(value):
     """Mostly to scale prop values to current scene unit scale
@@ -149,3 +152,26 @@ def get_scaled_unit(value):
         # Addon Registration, context.scene is not available
         scale = 1.0
     return value / scale
+
+
+def get_defaults(prop):
+    defaults = dict()
+    for name, data in prop.__annotations__.items():
+        if data.function == PointerProperty:
+            defaults[name] = get_defaults(getattr(prop, name))
+        else:
+            defaults[name] = data.keywords.get('default')
+
+    for name in list(defaults.keys()):
+        data = defaults[name] 
+        if isinstance(data, dict):
+            for k, v in data.items():
+                defaults[f'{name}.{k}'] = v
+            del defaults[name]
+    return defaults
+
+
+def set_defaults(prop):
+    defaults = get_defaults(prop)
+    for name, value in defaults.items():
+        setattr(prop, name, value)

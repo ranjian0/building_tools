@@ -1,5 +1,4 @@
 import bpy
-import math
 import bmesh
 from .facemap import FaceMap, add_faces_to_map
 from ..utils import (

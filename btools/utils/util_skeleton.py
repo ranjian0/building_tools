@@ -5,8 +5,6 @@ import math
 import heapq
 import operator as op
 import itertools as it
-
-from enum import Enum
 from collections import namedtuple
 
 
