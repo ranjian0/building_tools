@@ -32,8 +32,8 @@ def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
     """Create a cone in the bmesh"""
     return bmesh.ops.create_cone(
         bm,
-        diameter1=r1 * 2,
-        diameter2=r2 * 2,
+        radius1=r1,
+        radius2=r2,
         depth=height,
         cap_ends=True,
         cap_tris=True,
