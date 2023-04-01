@@ -101,6 +101,11 @@ def add_faces_to_map(bm, faces, group, skip=None):
         face[face_map] = group_index
 
     obj = bpy.context.object
+    if group_index >= len(obj.facemap_materials):
+        # Layout of the material facemaps was destroyed eg through an operation like object join.
+        # User on their own for now.
+        # TODO(ranjian0) possible solution would be to rebuild the facemap every time this branch is reached.
+        return
 
     # -- if auto uv map is set, perform UV Mapping for given faces
     if obj.facemap_materials[group_index].auto_map:

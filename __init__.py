@@ -125,21 +125,24 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
 
         if ob.face_maps:
             face_map_index = ob.face_maps.active_index
-            face_map_material = ob.facemap_materials[face_map_index]
+            if face_map_index < len(ob.facemap_materials):
+                face_map_material = ob.facemap_materials[face_map_index]
 
-            layout.label(text="UV Mapping")
+                layout.label(text="UV Mapping")
 
-            col = layout.column()
-            row = col.row(align=True)
-            row.alignment = "LEFT"
-            row.prop(face_map_material, "auto_map", text="Auto")
-            row.prop(face_map_material, "uv_mapping_method", text="")
+                col = layout.column()
+                row = col.row(align=True)
+                row.alignment = "LEFT"
+                row.prop(face_map_material, "auto_map", text="Auto")
+                row.prop(face_map_material, "uv_mapping_method", text="")
 
-            layout.label(text="Material")
-            sp = layout.split(factor=0.8, align=True)
-            sp.operator("btools.create_facemap_material")
-            sp.operator("btools.remove_facemap_material", icon="PANEL_CLOSE", text="")
-            layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
+                layout.label(text="Material")
+                sp = layout.split(factor=0.8, align=True)
+                sp.operator("btools.create_facemap_material")
+                sp.operator("btools.remove_facemap_material", icon="PANEL_CLOSE", text="")
+                layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
+            else:
+                layout.label(text=("This facemap was corrupted by a destructive operation on the object."), icon="ERROR")
 
 
 class BTOOLS_PT_PrefPanel(bpy.types.AddonPreferences):
