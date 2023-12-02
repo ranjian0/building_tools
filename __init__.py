@@ -9,8 +9,7 @@ bl_info = {
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
     "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
+    "doc_url": "https://github.com/ranjian0/building_tools/wiki",
     "category": "Mesh",
 }
 
