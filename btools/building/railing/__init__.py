@@ -1,6 +1,11 @@
 import bpy
 
-from .railing_props import PostFillProperty, RailFillProperty, WallFillProperty, RailProperty
+from .railing_props import (
+    PostFillProperty,
+    RailFillProperty,
+    WallFillProperty,
+    RailProperty,
+)
 
 classes = (
     PostFillProperty,

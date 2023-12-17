@@ -1,11 +1,11 @@
 import bpy
 import bmesh
 
-from ..facemap import (
-    FaceMap, 
-    clear_empty_facemaps,
-    add_facemap_for_groups,
-    verify_facemaps_for_object
+from ..materialgroup import (
+    MaterialGroup,
+    clear_empty_matgroups,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
 )
 
 from ...utils import (
@@ -40,7 +40,7 @@ class BTOOLS_OT_add_floors(bpy.types.Operator):
 
 @crash_safe
 def build(context, prop):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
 
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
@@ -51,7 +51,7 @@ def build(context, prop):
             f.normal_flip()
 
     if validate_floor_faces(bm):
-        add_floor_facemaps(context, prop)
+        add_floor_matgroups(context, prop)
         selected_faces = [f for f in bm.faces if f.select]
         if selected_faces:
             create_floors(bm, selected_faces, prop)
@@ -66,14 +66,14 @@ def build(context, prop):
     return {"CANCELLED"}
 
 
-def add_floor_facemaps(context, prop):
-    clear_empty_facemaps(context)
-    groups = FaceMap.WALLS, FaceMap.ROOF
+def add_floor_matgroups(context, prop):
+    clear_empty_matgroups(context)
+    groups = MaterialGroup.WALLS, MaterialGroup.ROOF
     if prop.add_slab:
-        groups += (FaceMap.SLABS,)
+        groups += (MaterialGroup.SLABS,)
     if prop.add_columns:
-        groups += (FaceMap.COLUMNS,)
-    add_facemap_for_groups(groups)
+        groups += (MaterialGroup.COLUMNS,)
+    add_material_group(groups)
 
 
 def validate_floor_faces(bm):

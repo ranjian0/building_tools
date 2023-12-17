@@ -18,7 +18,6 @@ from mathutils import Vector
 
 
 class ArrayProperty(bpy.types.PropertyGroup):
-
     count: IntProperty(
         name="Count",
         min=1,
@@ -98,7 +97,7 @@ def spread_array(bm, split_edges, split_faces, max_width, prop):
 
     # -- map each split edge to its neighbouring faces
     edge_neighbour_face_map = {
-        edge:[split_faces[idx], split_faces[idx+1]]
+        edge: [split_faces[idx], split_faces[idx + 1]]
         for idx, edge in enumerate(split_edges)
     }
 
@@ -124,7 +123,9 @@ def spread_array(bm, split_edges, split_faces, max_width, prop):
         spread_factor = (max_width - prop.width) * (diff.length / max_width)
         if prop.spread > 0:
             spread_factor /= prop.count - 1
-        bmesh.ops.translate(bm, verts=vts, vec=diff.normalized() * prop.spread * spread_factor)
+        bmesh.ops.translate(
+            bm, verts=vts, vec=diff.normalized() * prop.spread * spread_factor
+        )
 
     # -- move the split edges to the middle of their neighbour faces
     for edge in split_edges:

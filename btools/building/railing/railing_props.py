@@ -2,6 +2,7 @@ import bpy
 from bpy.props import FloatProperty, EnumProperty, BoolProperty, PointerProperty
 from ...utils import get_scaled_unit
 
+
 class PostFillProperty(bpy.types.PropertyGroup):
     size: FloatProperty(
         name="Size",
@@ -66,7 +67,6 @@ class WallFillProperty(bpy.types.PropertyGroup):
 
 
 class RailProperty(bpy.types.PropertyGroup):
-
     fill_types = [
         ("POSTS", "Posts", "", 0),
         ("RAILS", "Rails", "", 1),
@@ -136,11 +136,9 @@ class RailProperty(bpy.types.PropertyGroup):
         row = layout.row()
         row.prop_menu_enum(self, "fill", text=self.fill.title())
 
-        {
-            "POSTS" : self.post_fill,
-            "RAILS" : self.rail_fill,
-            "WALL"  : self.wall_fill
-        }.get(self.fill).draw(context, layout)
+        {"POSTS": self.post_fill, "RAILS": self.rail_fill, "WALL": self.wall_fill}.get(
+            self.fill
+        ).draw(context, layout)
 
         if self.fill in ["POSTS", "WALL"] and self.show_extra_props:
             row = layout.row(align=True)

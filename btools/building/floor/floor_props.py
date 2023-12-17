@@ -2,6 +2,7 @@ import bpy
 from bpy.props import IntProperty, FloatProperty, BoolProperty
 from ...utils import get_scaled_unit
 
+
 class FloorProperty(bpy.types.PropertyGroup):
     floor_count: IntProperty(
         name="Floor Count", min=1, max=1000, default=1, description="Number of floors"

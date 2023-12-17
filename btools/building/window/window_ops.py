@@ -1,10 +1,10 @@
 import bpy
 import bmesh
 
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
 )
 
 from .window_types import create_window
@@ -34,15 +34,14 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
         self.props.draw(context, self.layout)
 
 
-
 @crash_safe
 def build(context, prop):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_window_faces([face for face in bm.faces if face.select])
     if faces:
-        add_window_facemaps()
+        add_window_matgroups()
         if create_window(bm, faces, prop):
             bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
@@ -51,13 +50,13 @@ def build(context, prop):
     return {"CANCELLED"}
 
 
-def add_window_facemaps():
-    groups = FaceMap.WINDOW, FaceMap.FRAME
-    add_facemap_for_groups(groups)
+def add_window_matgroups():
+    groups = MaterialGroup.WINDOW, MaterialGroup.FRAME
+    add_material_group(groups)
 
 
 def validate_window_faces(faces):
-    """ Filter out invalid faces """
+    """Filter out invalid faces"""
     # -- remove non-rectangular faces
     faces = list(filter(lambda f: is_rectangle(f), faces))
     # -- remove faces that are perpendicular to Z+

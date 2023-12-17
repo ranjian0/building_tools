@@ -7,10 +7,10 @@ from ...utils import (
     get_edit_mesh,
 )
 
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
 )
 
 from .door_types import create_door
@@ -38,14 +38,15 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
     def draw(self, context):
         self.props.draw(context, self.layout)
 
+
 @crash_safe
 def build(context, props):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_door_faces([face for face in bm.faces if face.select])
     if faces:
-        add_door_facemaps()
+        add_door_matgroups()
         if create_door(bm, faces, props):
             bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
@@ -54,13 +55,13 @@ def build(context, props):
     return {"CANCELLED"}
 
 
-def add_door_facemaps():
-    groups = FaceMap.DOOR, FaceMap.FRAME
-    add_facemap_for_groups(groups)
+def add_door_matgroups():
+    groups = MaterialGroup.DOOR, MaterialGroup.FRAME
+    add_material_group(groups)
 
 
 def validate_door_faces(faces):
-    """ Filter out invalid faces """
+    """Filter out invalid faces"""
     # -- remove upward facing faces
     faces = list(filter(lambda f: abs(round(f.normal.z, 3)) == 0.0, faces))
     # -- remove non-rectangular faces

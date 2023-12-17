@@ -122,15 +122,11 @@ class Vector2:
 
     def __floordiv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(
-            op.floordiv(self.x, other), op.floordiv(self.y, other)
-        )
+        return Vector2(op.floordiv(self.x, other), op.floordiv(self.y, other))
 
     def __rfloordiv__(self, other):
         assert type(other) in (int, float)
-        return Vector2(
-            op.floordiv(other, self.x), op.floordiv(other, self.y)
-        )
+        return Vector2(op.floordiv(other, self.x), op.floordiv(other, self.y))
 
     def __truediv__(self, other):
         assert type(other) in (int, float)
@@ -146,12 +142,12 @@ class Vector2:
     __pos__ = __copy__
 
     def __abs__(self):
-        return math.sqrt(self.x ** 2 + self.y ** 2)
+        return math.sqrt(self.x**2 + self.y**2)
 
     magnitude = __abs__
 
     def magnitude_squared(self):
-        return self.x ** 2 + self.y ** 2
+        return self.x**2 + self.y**2
 
     def normalize(self):
         d = self.magnitude()

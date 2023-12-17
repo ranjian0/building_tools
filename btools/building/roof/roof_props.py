@@ -2,6 +2,7 @@ import bpy
 from bpy.props import EnumProperty, FloatProperty, BoolProperty
 from ...utils import get_scaled_unit
 
+
 class RoofProperty(bpy.types.PropertyGroup):
     roof_types = [
         ("FLAT", "Flat", "", 0),
@@ -56,7 +57,7 @@ class RoofProperty(bpy.types.PropertyGroup):
     add_border: BoolProperty(
         name="Add Border",
         default=True,
-        description="Whether to add extruded border around flat roof"
+        description="Whether to add extruded border around flat roof",
     )
 
     border: FloatProperty(

@@ -12,10 +12,13 @@ from ...utils import (
     bm_from_obj,
     create_mesh,
     create_object,
-    add_faces_to_map,
-    FaceMap,
-    add_facemap_for_groups,
     filter_geom,
+)
+
+from ...building.materialgroup import (
+    add_faces_to_group,
+    MaterialGroup,
+    add_material_group,    
 )
 
 
@@ -65,7 +68,9 @@ class Road:
         # Left to right
         # Left shoulder down
         if not prop.generate_left_sidewalk:
-            bm.verts.new(Vector((-total_width_left - shoulder_width, 0, -shoulder_height)))
+            bm.verts.new(
+                Vector((-total_width_left - shoulder_width, 0, -shoulder_height))
+            )
 
         # Left sidewalk top
         if prop.generate_left_sidewalk:
@@ -74,7 +79,11 @@ class Road:
         # Left shoulder
         if prop.generate_shoulders:
             if prop.generate_left_sidewalk:
-                bm.verts.new(Vector((-prop.width / 2 - prop.shoulder_width, 0, prop.sidewalk_height)))
+                bm.verts.new(
+                    Vector(
+                        (-prop.width / 2 - prop.shoulder_width, 0, prop.sidewalk_height)
+                    )
+                )
 
             bm.verts.new(Vector((-prop.width / 2 - prop.shoulder_width, 0, 0)))
         else:
@@ -90,7 +99,11 @@ class Road:
             bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, 0)))
 
             if prop.generate_right_sidewalk:
-                bm.verts.new(Vector((prop.width / 2 + prop.shoulder_width, 0, prop.sidewalk_height)))
+                bm.verts.new(
+                    Vector(
+                        (prop.width / 2 + prop.shoulder_width, 0, prop.sidewalk_height)
+                    )
+                )
         else:
             if prop.generate_right_sidewalk:
                 bm.verts.new(Vector((prop.width / 2, 0, prop.sidewalk_height)))
@@ -101,7 +114,9 @@ class Road:
 
         # Left shoulder down
         if not prop.generate_right_sidewalk:
-            bm.verts.new(Vector((total_width_right + shoulder_width, 0, -shoulder_height)))
+            bm.verts.new(
+                Vector((total_width_right + shoulder_width, 0, -shoulder_height))
+            )
 
         # Generate edges
         bm.verts.ensure_lookup_table()
@@ -115,16 +130,20 @@ class Road:
     def create_curve(cls, context):
         # Create curve
         name = "curve_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
-        curve_data = bpy.data.curves.new(name=name, type='CURVE')
-        curve_data.dimensions = '3D'
+        curve_data = bpy.data.curves.new(name=name, type="CURVE")
+        curve_data.dimensions = "3D"
         curve_data.resolution_u = 500
-        spline = curve_data.splines.new(type='BEZIER')
+        spline = curve_data.splines.new(type="BEZIER")
 
         # Add point
         spline.bezier_points.add(1)
         spline.bezier_points[1].co = (0, 10, 0)
-        spline.bezier_points[0].handle_left_type = spline.bezier_points[0].handle_right_type = "AUTO"
-        spline.bezier_points[1].handle_left_type = spline.bezier_points[1].handle_right_type = "AUTO"
+        spline.bezier_points[0].handle_left_type = spline.bezier_points[
+            0
+        ].handle_right_type = "AUTO"
+        spline.bezier_points[1].handle_left_type = spline.bezier_points[
+            1
+        ].handle_right_type = "AUTO"
 
         # Add to scene
         curve_obj = bpy.data.objects.new(name=name, object_data=curve_data)
@@ -138,58 +157,70 @@ class Road:
         geom = bmesh.ops.extrude_face_region(bm, geom=bm.edges)
         verts = filter_geom(geom["geom"], bmesh.types.BMVert)
 
-        bmesh.ops.transform(bm, matrix=Matrix.Translation((0, prop.interval, 0)), verts=verts)
+        bmesh.ops.transform(
+            bm, matrix=Matrix.Translation((0, prop.interval, 0)), verts=verts
+        )
 
-        # Set facemaps
+        # Set materialgroup
         # Face order is totally random, vertex and edge order is not so get the faces from the edges
-        bm.faces.layers.face_map.verify()
+        # bm.faces.layers.face_map.verify()
 
-        groups = [FaceMap.ROAD]
+        groups = [MaterialGroup.ROAD]
 
         if prop.generate_left_sidewalk or prop.generate_right_sidewalk:
-            groups.append(FaceMap.SIDEWALK)
-            groups.append(FaceMap.SIDEWALK_SIDE)
+            groups.append(MaterialGroup.SIDEWALK)
+            groups.append(MaterialGroup.SIDEWALK_SIDE)
 
         if not prop.generate_left_sidewalk or not prop.generate_right_sidewalk:
-            groups.append(FaceMap.SHOULDER_EXTENSION)
+            groups.append(MaterialGroup.SHOULDER_EXTENSION)
 
         if prop.generate_shoulders:
-            groups.append(FaceMap.SHOULDER)
+            groups.append(MaterialGroup.SHOULDER)
 
-        add_facemap_for_groups(groups)
+        add_material_group(groups)
         bm.edges.ensure_lookup_table()
 
         # Left side of road
         if not prop.generate_left_sidewalk:
-            add_faces_to_map(bm, (bm.edges[0].link_faces[0],), FaceMap.SHOULDER_EXTENSION)
+            add_faces_to_group(
+                bm, (bm.edges[0].link_faces[0],), MaterialGroup.SHOULDER_EXTENSION
+            )
             face_count = 1
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SHOULDER)
+                add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SHOULDER)
                 face_count += 1
         else:
-            add_faces_to_map(bm, (bm.edges[0].link_faces[0],), FaceMap.SIDEWALK)
-            add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SIDEWALK_SIDE)
+            add_faces_to_group(bm, (bm.edges[0].link_faces[0],), MaterialGroup.SIDEWALK)
+            add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SIDEWALK_SIDE)
             face_count = 2
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.edges[2].link_faces[0],), FaceMap.SHOULDER)
+                add_faces_to_group(bm, (bm.edges[2].link_faces[0],), MaterialGroup.SHOULDER)
                 face_count += 1
 
         # Central road
-        add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.ROAD)
+        add_faces_to_group(bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.ROAD)
         face_count += 1
 
         # Right side of road
         if prop.generate_shoulders:
-            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER)
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SHOULDER
+            )
             face_count += 1
 
         if prop.generate_right_sidewalk:
-            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SIDEWALK_SIDE)
-            add_faces_to_map(bm, (bm.edges[face_count + 1].link_faces[0],), FaceMap.SIDEWALK)
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SIDEWALK_SIDE
+            )
+            add_faces_to_group(
+                bm, (bm.edges[face_count + 1].link_faces[0],), MaterialGroup.SIDEWALK
+            )
         else:
-            add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER_EXTENSION)
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SHOULDER_EXTENSION
+            )
 
         # Continue to extrude
         if prop.extrusion_type == "STRAIGHT":
@@ -222,7 +253,9 @@ class Road:
         curve = context.object.children[0]
 
         # Rotate vertices
-        bmesh.ops.rotate(bm, matrix=Matrix.Rotation(math.radians(90.0), 3, 'Y'), verts=bm.verts)
+        bmesh.ops.rotate(
+            bm, matrix=Matrix.Rotation(math.radians(90.0), 3, "Y"), verts=bm.verts
+        )
 
         # Add modifiers
         if not context.object.modifiers:
@@ -255,7 +288,10 @@ class Road:
         bpy.ops.object.modifier_apply(modifier="Curve")
 
         # Remove curve
-        if len(context.active_object.children) > 0 and context.active_object.children[0].type == "CURVE":
+        if (
+            len(context.active_object.children) > 0
+            and context.active_object.children[0].type == "CURVE"
+        ):
             bpy.data.objects.remove(context.active_object.children[0])
 
         # Uv calculations
@@ -269,7 +305,9 @@ class Road:
 
         bm.verts.ensure_lookup_table()
         bm.verts.index_update()
-        last_position = (bm.verts[0].co + bm.verts[count].co) / 2  # Calculate center of road
+        last_position = (
+            bm.verts[0].co + bm.verts[count].co
+        ) / 2  # Calculate center of road
         texture_scale = 0.1
 
         # Calculate uvs for all vertices

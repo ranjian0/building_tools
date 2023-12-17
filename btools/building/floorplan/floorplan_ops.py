@@ -41,8 +41,6 @@ class BTOOLS_OT_add_floorplan(bpy.types.Operator):
         self.props.draw(context, self.layout)
 
 
-
-
 @crash_safe
 def build(context, prop):
     name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))

@@ -1,9 +1,11 @@
 from enum import Enum
 from dataclasses import dataclass
 
+
 class ArchFunctionType(Enum):
-    SINE = 'SINE'
-    SPHERE = 'SPHERE'
+    SINE = "SINE"
+    SPHERE = "SPHERE"
+
 
 @dataclass
 class ArchOptions:
@@ -16,12 +18,14 @@ class ArchOptions:
 @dataclass
 class ArrayOptions:
     count: int = 1
-    spread: float = 0.0 
+    spread: float = 0.0
+
 
 @dataclass
 class SizeOffsetOptions:
     size: tuple[float, float] = (0.5, 0.5)
-    offset: tuple[float, float] = (0.0, 0.0) 
+    offset: tuple[float, float] = (0.0, 0.0)
+
 
 @dataclass
 class FillPanelOptions:
@@ -31,12 +35,14 @@ class FillPanelOptions:
     panel_margin: float = 0.05
     panel_depth: float = 0.01
 
+
 @dataclass
 class FillBarOptions:
     bar_count_x: int = 1
     bar_count_y: int = 1
     bar_width: float = 0.1
     bar_depth: float = 0.04
+
 
 @dataclass
 class FillLouverOptions:
@@ -53,23 +59,25 @@ class FillGlassPaneOptions:
     pane_margin: float = 0.1
     pane_depth: float = 0.1
 
+
 class FloorPlanType(Enum):
-    RECTANGULAR = 'RECTANGULAR'
-    CIRCULAR = 'CIRCULAR'
-    COMPOSITE = 'COMPOSITE'
-    H_SHAPED = 'H-SHAPED'
-    RANDOM = 'RANDOM'
+    RECTANGULAR = "RECTANGULAR"
+    CIRCULAR = "CIRCULAR"
+    COMPOSITE = "COMPOSITE"
+    H_SHAPED = "H-SHAPED"
+    RANDOM = "RANDOM"
+
 
 @dataclass
 class FloorplanOptions:
     tw1: float = 1.0
-    tw2: float = 1.0 
+    tw2: float = 1.0
     tw3: float = 1.0
-    tw4: float = 1.0 
+    tw4: float = 1.0
     tl1: float = 1.0
-    tl2: float = 1.0 
+    tl2: float = 1.0
     tl3: float = 1.0
-    tl4: float = 1.0 
+    tl4: float = 1.0
     type: FloorPlanType = FloorPlanType.RECTANGULAR
     seed: int = 1
     width: float = 4.0
@@ -85,16 +93,18 @@ class FloorplanOptions:
 class FloorOptions:
     floor_count: int = 1
     floor_height: float = 2.0
-    add_slab: bool = True 
-    add_columns: bool = False 
-    slab_thickness: float = 0.2 
+    add_slab: bool = True
+    add_columns: bool = False
+    slab_thickness: float = 0.2
     slab_outsset: float = 0.1
 
+
 class DoorFillType(Enum):
-    NONE = 'NONE' 
-    PANELS = 'PANELS'
-    GLASS_PANES = 'GLASS_PANES'
-    LOUVER = 'LOUVER'
+    NONE = "NONE"
+    PANELS = "PANELS"
+    GLASS_PANES = "GLASS_PANES"
+    LOUVER = "LOUVER"
+
 
 @dataclass
 class DoorOptions:
@@ -114,14 +124,16 @@ class DoorOptions:
 
 
 class WindowType(Enum):
-    CIRCULAR = 'CIRCULAR'
-    RECTANGULAR = 'RECTANGULAR'
+    CIRCULAR = "CIRCULAR"
+    RECTANGULAR = "RECTANGULAR"
+
 
 class WindowFillType(Enum):
-    NONE = 'NONE' 
-    BAR = 'BAR'
-    GLASS_PANES = 'GLASS_PANES'
-    LOUVER = 'LOUVER'
+    NONE = "NONE"
+    BAR = "BAR"
+    GLASS_PANES = "GLASS_PANES"
+    LOUVER = "LOUVER"
+
 
 @dataclass
 class WindowOptions:
@@ -136,8 +148,9 @@ class WindowOptions:
     frame_thickness: float = 0.1
     frame_depth: float = 0.1
     window_depth: float = 0.05
-    resolution: int = 20 
-    add_arch: bool = False 
+    resolution: int = 20
+    add_arch: bool = False
+
 
 @dataclass
 class MultigroupOptions:
@@ -156,22 +169,25 @@ class MultigroupOptions:
 
     frame_thickness: float = 0.1
     frame_depth: float = 0.1
-    dw_depth: float = 0.05 
+    dw_depth: float = 0.05
     add_arch: bool = False
-    components: str = 'dw'
-    show_door_fill: bool = False 
+    components: str = "dw"
+    show_door_fill: bool = False
     fill_type_door: DoorFillType = DoorFillType.NONE
-    show_window_fill: bool = False 
-    fill_type_window: WindowFillType = WindowFillType.NONE 
+    show_window_fill: bool = False
+    fill_type_window: WindowFillType = WindowFillType.NONE
+
 
 class RoofType(Enum):
-    FLAT = 'FLAT'
-    GABLE = 'GABLE'
-    HIP = 'HIP'
+    FLAT = "FLAT"
+    GABLE = "GABLE"
+    HIP = "HIP"
+
 
 class GableRoofType(Enum):
-    OPEN = 'OPEN'
-    BOX = 'BOX'
+    OPEN = "OPEN"
+    BOX = "BOX"
+
 
 @dataclass
 class RoofOptions:
@@ -180,7 +196,7 @@ class RoofOptions:
     thickness: float = 0.1
     outset: float = 0.1
     height: float = 1.0
-    add_border: bool = True 
+    add_border: bool = True
     border: float = 0.1
 
 
@@ -188,6 +204,7 @@ class RoofOptions:
 class PostFillOptions:
     size: float = 0.05
     density: float = 0.5
+
 
 @dataclass
 class RailFillOptions:
@@ -201,9 +218,11 @@ class WallFillOptions:
 
 
 class RailFillType(Enum):
-    POSTS = 'POSTS'
-    RAILS = 'RAILS'
-    WALL = 'WALL'
+    POSTS = "POSTS"
+    RAILS = "RAILS"
+    WALL = "WALL"
+
+
 @dataclass
 class RailOptions:
     fill: RailFillType = RailFillType.POSTS
@@ -216,9 +235,8 @@ class RailOptions:
     rail_fill: RailFillOptions = RailFillOptions()
     wall_fill: WallFillOptions = WallFillOptions()
 
-    bottom_rail: bool = True 
+    bottom_rail: bool = True
     bottom_rail_offset: float = 0.0
-
 
 
 @dataclass
@@ -229,5 +247,5 @@ class BalconyOptions:
 
     depth: float = 1.0
     depth_offset: float = 0.0
-    has_railing: bool = True 
+    has_railing: bool = True
     group_selection: bool = True

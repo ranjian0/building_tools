@@ -4,11 +4,11 @@ from bpy.props import (
     BoolProperty,
     EnumProperty,
     FloatProperty,
-    PointerProperty
+    PointerProperty,
 )
 
 from ..arch import ArchProperty
-from ...utils import get_scaled_unit 
+from ...utils import get_scaled_unit
 from ..array import ArrayProperty, ArrayGetSet
 from ..fill import FillBars, FillLouver, FillGlassPanes
 from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
@@ -93,9 +93,13 @@ class WindowProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
             (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
             default_size=(1.0, 1.0),
             default_offset=(0.0, 0.0),
-            spread=self.array.spread
+            spread=self.array.spread,
         )
-        self.arch.init(wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2)
+        self.arch.init(
+            wall_dimensions[1] / 2
+            - self.size_offset.offset.y
+            - self.size_offset.size.y / 2
+        )
 
     def draw(self, context, layout):
         box = layout.box()

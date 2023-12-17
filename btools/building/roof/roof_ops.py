@@ -2,11 +2,7 @@ import bpy
 import bmesh
 
 from ...utils import crash_safe, get_edit_mesh
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object
-)
+from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
 
 from .roof_types import create_roof
 from .roof_props import RoofProperty
@@ -34,7 +30,7 @@ class BTOOLS_OT_add_roof(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = [f for f in bm.faces if f.select]
@@ -45,7 +41,7 @@ def build(context, props):
             f.normal_flip()
 
     if validate_roof_faces(bm):
-        add_roof_facemaps()
+        add_roof_matgroups()
         create_roof(bm, faces, props)
         bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"FINISHED"}
@@ -54,8 +50,8 @@ def build(context, props):
     return {"CANCELLED"}
 
 
-def add_roof_facemaps():
-    add_facemap_for_groups(FaceMap.ROOF)
+def add_roof_matgroups():
+    add_material_group(MaterialGroup.ROOF)
 
 
 def validate_roof_faces(bm):

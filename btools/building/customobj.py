@@ -6,11 +6,7 @@ import bmesh
 from mathutils import Matrix, Vector
 from bpy.props import PointerProperty
 
-from .facemap import (
-    FaceMap, 
-    add_faces_to_map,
-    add_facemap_for_groups
-)
+from .materialgroup import MaterialGroup, add_faces_to_group, add_material_group
 
 from ..utils import (
     select,
@@ -28,7 +24,7 @@ from ..utils import (
     subdivide_face_horizontally,
     get_selected_face_dimensions,
 )
-from ..utils import VEC_UP, VEC_FORWARD
+from ..utils import VEC_UP
 from .array import ArrayProperty, ArrayGetSet
 from .sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
@@ -51,17 +47,18 @@ class CustomObjectProperty(bpy.types.PropertyGroup, SizeOffsetGetSet, ArrayGetSe
 
         layout.prop(self.array, "count")
 
+
 @crash_safe
 def add_custom_execute(self, context):
     custom_obj = context.scene.btools_custom_object
     if not custom_obj:
         # Custom object has not been assigned
-        self.report({'INFO'}, "No Object Selected!")
+        self.report({"INFO"}, "No Object Selected!")
         return {"CANCELLED"}
 
     if custom_obj.users == 0 or custom_obj.name not in context.view_layer.objects:
         # Object was already deleted
-        self.report({'INFO'}, "Object has been deleted!")
+        self.report({"INFO"}, "Object has been deleted!")
         return {"CANCELLED"}
 
     self.props.init(get_selected_face_dimensions(context))
@@ -69,7 +66,8 @@ def add_custom_execute(self, context):
     apply_transforms(context, custom_obj)
     place_custom_object(context, self.props, custom_obj)
     transfer_materials(custom_obj, context.object)
-    return {'FINISHED'}
+    return {"FINISHED"}
+
 
 class BTOOLS_OT_add_custom(bpy.types.Operator):
     """Place custom meshes on the selected faces"""
@@ -85,7 +83,7 @@ class BTOOLS_OT_add_custom(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        add_facemap_for_groups([FaceMap.CUSTOM])
+        add_material_group([MaterialGroup.CUSTOM])
         return add_custom_execute(self, context)
 
     def draw(self, context):
@@ -99,7 +97,7 @@ def apply_transforms(context, obj):
 
     # -- switch to object mode, if we are not already there
     if context.mode != "OBJECT":
-        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode="OBJECT")
 
     # -- make obj the active object and select it
     bpy.context.view_layer.objects.active = obj
@@ -113,7 +111,7 @@ def apply_transforms(context, obj):
     bpy.context.view_layer.objects.active = active_previous
     select(bpy.context.view_layer.objects, False)
     active_previous.select_set(True)
-    bpy.ops.object.mode_set(mode=mode_previous.replace('_MESH', ""))
+    bpy.ops.object.mode_set(mode=mode_previous.replace("_MESH", ""))
 
 
 def place_custom_object(context, prop, custom_obj):
@@ -124,13 +122,20 @@ def place_custom_object(context, prop, custom_obj):
             face.select = False
             # No support for upward/downward facing
             if face.normal.z:
-                popup_message("Faces with Z+/Z- normals not supported!", title="Invalid Face Selection")
+                popup_message(
+                    "Faces with Z+/Z- normals not supported!",
+                    title="Invalid Face Selection",
+                )
                 continue
 
-            array_faces = subdivide_face_horizontally(bm, face, widths=[prop.size_offset.size.x] * prop.count)
+            array_faces = subdivide_face_horizontally(
+                bm, face, widths=[prop.size_offset.size.x] * prop.count
+            )
             for aface in array_faces:
                 # -- Create split and place obj
-                split_face = create_split(bm, aface, prop.size_offset.size, prop.size_offset.offset)
+                split_face = create_split(
+                    bm, aface, prop.size_offset.size, prop.size_offset.offset
+                )
                 place_object_on_face(bm, split_face, custom_obj, prop)
 
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
@@ -182,10 +187,18 @@ def create_split(bm, face, size, offset):
     """Use properties from SplitOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
     # horizontal split
-    h_widths = [wall_w / 2 + offset.x - size.x / 2, size.x, wall_w / 2 - offset.x - size.x / 2]
+    h_widths = [
+        wall_w / 2 + offset.x - size.x / 2,
+        size.x,
+        wall_w / 2 - offset.x - size.x / 2,
+    ]
     h_faces = subdivide_face_horizontally(bm, face, h_widths)
     # vertical split
-    v_width = [wall_h / 2 + offset.y - size.y / 2, size.y, wall_h / 2 - offset.y - size.y / 2]
+    v_width = [
+        wall_h / 2 + offset.y - size.y / 2,
+        size.y,
+        wall_h / 2 - offset.y - size.y / 2,
+    ]
     v_faces = subdivide_face_vertically(bm, h_faces[1], v_width)
 
     return v_faces[1]
@@ -196,8 +209,8 @@ def place_object_on_face(bm, face, custom_obj, prop):
     # XXX get mesh from custom_obj into bm
     face_idx = face.index
     custom_faces = duplicate_into_bm(bm, custom_obj)
-    face = [f for f in bm.faces if f.index == face_idx].pop() # restore reference
-    add_faces_to_map(bm, custom_faces, FaceMap.CUSTOM)
+    face = [f for f in bm.faces if f.index == face_idx].pop()  # restore reference
+    add_faces_to_group(bm, custom_faces, MaterialGroup.CUSTOM)
     custom_verts = list({v for f in custom_faces for v in f.verts})
 
     # (preprocess)calculate bounds of the object
@@ -207,26 +220,28 @@ def place_object_on_face(bm, face, custom_obj, prop):
 
     # -- move the custom faces into proper position on this face
     transform_parallel_to_face(bm, custom_faces, face)
-    scale_to_size(bm, custom_verts, current_size, prop.size_offset.size, local_xyz(face))
+    scale_to_size(
+        bm, custom_verts, current_size, prop.size_offset.size, local_xyz(face)
+    )
 
     # cleanup
     bmesh.ops.delete(bm, geom=[face], context="FACES_ONLY")
 
 
 def get_coplanar_faces(face_verts):
-    """ Determine extent faces that should be coplanar to walls"""
+    """Determine extent faces that should be coplanar to walls"""
     bounds = get_bounding_verts(face_verts)
     coplanar_faces = (
-        list(bounds.topleft.link_faces)    + 
-        list(bounds.topright.link_faces)   +
-        list(bounds.botleft.link_faces)    + 
-        list(bounds.botright.link_faces)
+        list(bounds.topleft.link_faces)
+        + list(bounds.topright.link_faces)
+        + list(bounds.botleft.link_faces)
+        + list(bounds.botright.link_faces)
     )
     return set(coplanar_faces)
 
 
 def calc_coplanar_median(face_verts):
-    """ Determine the median point for coplanar faces"""
+    """Determine the median point for coplanar faces"""
     return calc_faces_median(get_coplanar_faces(face_verts))
 
 
@@ -252,16 +267,16 @@ def transform_parallel_to_face(bm, custom_faces, target_face):
     except ValueError:
         # TODO(ranjian0) Support all mesh shapes when placing along face
         angle = 0
-    
+
     bmesh.ops.rotate(
-        bm, verts=verts,
-        cent=verts_median,
-        matrix=Matrix.Rotation(angle, 4, VEC_UP)
+        bm, verts=verts, cent=verts_median, matrix=Matrix.Rotation(angle, 4, VEC_UP)
     )
 
     # -- determine the median of the faces that should be coplanar to the walls
     coplanar_median = calc_coplanar_median(verts)
-    coplanar_median.z = verts_median.z # Compensate on Z axis for any coplanar faces not considered in calculations
+    coplanar_median.z = (
+        verts_median.z
+    )  # Compensate on Z axis for any coplanar faces not considered in calculations
 
     # -- move the custom faces to the target face based on coplanar median
     transform_diff = target_median - coplanar_median
@@ -279,8 +294,10 @@ def scale_to_size(bm, verts, current_size, target_size, local_dir):
     scale_y = y_dir * (target_height / current_height)
     scale_z = Vector(map(abs, z_dir))
     bmesh.ops.scale(
-        bm, verts=verts, vec=scale_x + scale_y + scale_z,
-        space=Matrix.Translation(-calc_verts_median(verts))
+        bm,
+        verts=verts,
+        vec=scale_x + scale_y + scale_z,
+        space=Matrix.Translation(-calc_verts_median(verts)),
     )
 
 

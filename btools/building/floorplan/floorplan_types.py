@@ -58,14 +58,16 @@ def create_composite_floorplan(bm, prop):
 
             direction = (calc_edge_median(e) - median_reference).normalized()
             bmesh.ops.translate(bm, verts=verts, vec=direction * extrusion_lengths[idx])
-            tail_edges.extend(filter_geom(res['geom'], BMEdge))
+            tail_edges.extend(filter_geom(res["geom"], BMEdge))
 
     tail_verts = list({v for e in tail_edges for v in e.verts})
     bmesh.ops.rotate(
-        bm, verts=tail_verts, 
+        bm,
+        verts=tail_verts,
         cent=calc_verts_median(tail_verts),
-        matrix=Matrix.Rotation(prop.tail_angle, 4, VEC_UP)
+        matrix=Matrix.Rotation(prop.tail_angle, 4, VEC_UP),
     )
+
 
 def create_hshaped_floorplan(bm, prop):
     """Create H_shaped geometry from a rectangle
@@ -97,7 +99,9 @@ def create_hshaped_floorplan(bm, prop):
             res = bmesh.ops.extrude_edge_only(bm, edges=[edge])
             verts = filter_geom(res["geom"], BMVert)
             v = (calc_edge_median(edge) - median_reference).normalized()
-            bmesh.ops.translate(bm, verts=verts, vec=Vector((0, math.copysign(1.0, v.y), 0)) * length)
+            bmesh.ops.translate(
+                bm, verts=verts, vec=Vector((0, math.copysign(1.0, v.y), 0)) * length
+            )
 
             filter_function = min if v.x > 0 else max
             mv1 = filter_function(list(edge.verts), key=lambda v: v.co.x)
@@ -115,7 +119,9 @@ def create_random_floorplan(bm, prop):
     random.seed(prop.seed)
     scale_x = Matrix.Scale(prop.width / 2, 4, (1, 0, 0))
     scale_y = Matrix.Scale(prop.length / 2, 4, (0, 1, 0))
-    bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=1, matrix=scale_x @ scale_y)
+    bmesh.ops.create_grid(
+        bm, x_segments=1, y_segments=1, size=1, matrix=scale_x @ scale_y
+    )
 
     amount = prop.extension_amount
     if prop.random_extension_amount:
@@ -167,7 +173,9 @@ def random_scale_and_translate(bm, middle_edge):
 
     axis = VEC_RIGHT if verts[0].co.y == verts[1].co.y else VEC_FORWARD
     scale_factor = clamp(random.random() * 3, 1, 2.95)
-    bmesh.ops.scale(bm, verts=verts, vec=axis * scale_factor, space=Matrix.Translation(-median))
+    bmesh.ops.scale(
+        bm, verts=verts, vec=axis * scale_factor, space=Matrix.Translation(-median)
+    )
 
     if random.choice([0, 1]):
         rand_offset = random.random() * length
@@ -178,4 +186,6 @@ def random_extrude(bm, middle_edge, direction):
     """extrude an edge to a random size to make a plane"""
     res = bmesh.ops.extrude_edge_only(bm, edges=[middle_edge])
     extrude_length = (random.random() * middle_edge.calc_length()) + 1.0
-    bmesh.ops.translate(bm, verts=filter_geom(res["geom"], BMVert), vec=direction * extrude_length)
+    bmesh.ops.translate(
+        bm, verts=filter_geom(res["geom"], BMVert), vec=direction * extrude_length
+    )

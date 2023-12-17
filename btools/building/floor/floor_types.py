@@ -2,7 +2,7 @@ import bmesh
 from bmesh.types import BMFace
 from mathutils import Vector
 
-from ..facemap import FaceMap, add_faces_to_map
+from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
     equal,
     filter_geom,
@@ -19,9 +19,9 @@ def create_floors(bm, faces, prop):
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
-    add_faces_to_map(bm, slabs, FaceMap.SLABS)
-    add_faces_to_map(bm, walls, FaceMap.WALLS)
-    add_faces_to_map(bm, roof, FaceMap.ROOF)
+    add_faces_to_group(bm, slabs, MaterialGroup.SLABS)
+    add_faces_to_group(bm, walls, MaterialGroup.WALLS)
+    add_faces_to_group(bm, roof, MaterialGroup.ROOF)
 
 
 def extrude_slabs_and_floors(bm, faces, prop):
@@ -41,14 +41,23 @@ def extrude_slabs_and_floors(bm, faces, prop):
             if i == 0:
                 orig_locs = [f.calc_center_bounds() for f in faces]
                 flat_faces = get_flat_faces(faces, {})
-                flat_faces, surrounding_faces = extrude_face_region(bm, flat_faces, offset, normal)
+                flat_faces, surrounding_faces = extrude_face_region(
+                    bm, flat_faces, offset, normal
+                )
                 dissolve_flat_edges(bm, surrounding_faces)
                 surrounding_faces = filter_geom(
-                    bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)["geom"], BMFace
+                    bmesh.ops.region_extend(bm, geom=flat_faces, use_faces=True)[
+                        "geom"
+                    ],
+                    BMFace,
                 )
-                faces = closest_faces(flat_faces, [l + Vector((0.0, 0.0, offset)) for l in orig_locs])
+                faces = closest_faces(
+                    flat_faces, [l + Vector((0.0, 0.0, offset)) for l in orig_locs]
+                )
             else:
-                faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
+                faces, surrounding_faces = extrude_face_region(
+                    bm, faces, offset, normal
+                )
             if i % 2:
                 walls += surrounding_faces
             else:
@@ -56,7 +65,11 @@ def extrude_slabs_and_floors(bm, faces, prop):
 
         # extrude slabs horizontally
         slabs += bmesh.ops.inset_region(
-            bm, faces=slabs, depth=prop.slab_outset, use_even_offset=True, use_boundary=True
+            bm,
+            faces=slabs,
+            depth=prop.slab_outset,
+            use_even_offset=True,
+            use_boundary=True,
         )["faces"]
 
     else:
@@ -65,7 +78,10 @@ def extrude_slabs_and_floors(bm, faces, prop):
             faces, surrounding_faces = extrude_face_region(bm, faces, offset, normal)
             if i == 0:
                 dissolve_flat_edges(bm, surrounding_faces)
-                surrounding_faces = filter_geom(bmesh.ops.region_extend(bm, geom=faces, use_faces=True)["geom"], BMFace)
+                surrounding_faces = filter_geom(
+                    bmesh.ops.region_extend(bm, geom=faces, use_faces=True)["geom"],
+                    BMFace,
+                )
             walls += surrounding_faces
 
     return slabs, walls, faces
@@ -84,10 +100,14 @@ def dissolve_flat_edges(bm, faces):
 
 
 def get_flat_faces(faces, visited):
-    flat_edges = list({
-        e for f in faces for e in f.edges
-        if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
-    })
+    flat_edges = list(
+        {
+            e
+            for f in faces
+            for e in f.edges
+            if len(e.link_faces) > 1 and equal(e.calc_face_angle(), 0)
+        }
+    )
     flat_faces = []
     for e in flat_edges:
         for f in e.link_faces:
@@ -109,10 +129,14 @@ def create_columns(bm, face, prop):
             cube = create_cube_without_faces(
                 bm,
                 (col_w, col_w, prop.floor_height),
-                (v.co.x, v.co.y, v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i)),
+                (
+                    v.co.x,
+                    v.co.y,
+                    v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i),
+                ),
                 bottom=True,
             )
             res.extend(cube.get("verts"))
 
     columns = list({f for v in res for f in v.link_faces})
-    add_faces_to_map(bm, columns, FaceMap.COLUMNS)
+    add_faces_to_group(bm, columns, MaterialGroup.COLUMNS)

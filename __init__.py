@@ -4,13 +4,12 @@ from .btools.building.register import register_building, unregister_building
 bl_info = {
     "name": "Building Tools",
     "author": "Ian Karanja (ranjian0), Lucky Kadam (luckykadam), Marcus (MCrafterzz)",
-    "version": (1, 0, 10),
-    "blender": (2, 80, 0),
+    "version": (1, 0, 11),
+    "blender": (3, 3, 0),
     "location": "View3D > Toolshelf > Building Tools",
     "description": "Building Creation Tools",
     "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
+    "doc_url": "https://github.com/ranjian0/building_tools/wiki",
     "category": "Mesh",
 }
 
@@ -91,101 +90,60 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
         layout = self.layout
 
         ob = context.object
-        facemap = ob.face_maps.active
+        active_index = ob.bt_materials_active_index
 
         rows = 2
-        if facemap:
+        if active_index > 0:
             rows = 4
 
-        if not len(ob.face_maps):
+        if not len(ob.bt_materials):
             return
 
-        layout.label(text="Face Maps")
+        layout.label(text="Groups")
 
         row = layout.row()
-        args = ob, "face_maps", ob.face_maps, "active_index"
-        row.template_list("BTOOLS_UL_fmaps", "", *args, rows=rows)
+        row.template_list("BTOOLS_UL_materials", "", ob, "bt_materials", ob, "bt_materials_active_index", rows=rows)
 
         col = row.column(align=True)
-        col.operator("object.face_map_add", icon="ADD", text="")
-        col.operator("object.face_map_remove", icon="REMOVE", text="")
+        col.operator("btools.material_group_add", icon="ADD", text="")
+        col.operator("btools.material_group_remove", icon="REMOVE", text="")
         col.separator()
-        col.operator("btools.face_map_clear", icon="TRASH", text="")
+        col.operator("btools.materials_clear", icon="TRASH", text="")
 
-        if ob.face_maps and (ob.mode == "EDIT" and ob.type == "MESH"):
+        if ob.bt_materials and (ob.mode == "EDIT" and ob.type == "MESH"):
             row = layout.row()
 
             sub = row.row(align=True)
-            sub.operator("object.face_map_assign", text="Assign")
-            sub.operator("object.face_map_remove_from", text="Remove")
+            sub.operator("btools.material_group_assign", text="Assign")
+            sub.operator("btools.material_group_remove_from", text="Remove")
 
             sub = row.row(align=True)
-            sub.operator("object.face_map_select", text="Select")
-            sub.operator("object.face_map_deselect", text="Deselect")
+            sub.operator("btools.material_group_select", text="Select")
+            sub.operator("btools.material_group_deselect", text="Deselect")
 
-        if ob.face_maps:
-            face_map_index = ob.face_maps.active_index
-            face_map_material = ob.facemap_materials[face_map_index]
+        if ob.bt_materials:
+            mat_index = ob.bt_materials_active_index
+            if mat_index < len(ob.bt_materials):
+                face_map_material = ob.bt_materials[mat_index]
 
-            layout.label(text="UV Mapping")
+                layout.label(text="UV Mapping")
 
-            col = layout.column()
-            row = col.row(align=True)
-            row.alignment = "LEFT"
-            row.prop(face_map_material, "auto_map", text="Auto")
-            row.prop(face_map_material, "uv_mapping_method", text="")
+                col = layout.column()
+                row = col.row(align=True)
+                row.alignment = "LEFT"
+                row.prop(face_map_material, "auto_map", text="Auto")
+                row.prop(face_map_material, "uv_mapping_method", text="")
 
-            layout.label(text="Material")
-            sp = layout.split(factor=0.8, align=True)
-            sp.operator("btools.create_facemap_material")
-            sp.operator("btools.remove_facemap_material", icon="PANEL_CLOSE", text="")
-            layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
-
-
-class BTOOLS_PT_PrefPanel(bpy.types.AddonPreferences):
-    bl_idname = __name__
-
-    # addon updater preferences
-    auto_check_update : bpy.props.BoolProperty(
-        name="Auto-check for Update",
-        description="If enabled, auto-check for updates using an interval",
-        default=False,
-    )
-
-    updater_intrval_months : bpy.props.IntProperty(
-        name='Months',
-        description="Number of months between checking for updates",
-        default=0,
-        min=0
-    )
-    updater_intrval_days : bpy.props.IntProperty(
-        name='Days',
-        description="Number of days between checking for updates",
-        default=7,
-        min=0,
-    )
-    updater_intrval_hours : bpy.props.IntProperty(
-        name='Hours',
-        description="Number of hours between checking for updates",
-        default=0,
-        min=0,
-        max=23
-    )
-    updater_intrval_minutes : bpy.props.IntProperty(
-        name='Minutes',
-        description="Number of minutes between checking for updates",
-        default=0,
-        min=0,
-        max=59
-    )
+                layout.label(text="Material")
+                sp = layout.split(factor=0.8, align=True)
+                sp.operator("btools.create_material")
+                sp.operator("btools.remove_material", icon="PANEL_CLOSE", text="")
+                layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
+            else:
+                layout.label(text=("This matgroup was corrupted by a destructive operation on the object."), icon="ERROR")
 
 
-    def draw(self, context):
-        from . import addon_updater_ops
-        addon_updater_ops.update_settings_ui(self, context)
-
-
-classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools, BTOOLS_PT_PrefPanel)
+classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
 
 register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 

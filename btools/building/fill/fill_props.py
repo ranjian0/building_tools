@@ -2,8 +2,8 @@ import bpy
 from bpy.props import IntProperty, FloatProperty, EnumProperty, PointerProperty
 from ...utils import get_scaled_unit
 
-class FillPanel(bpy.types.PropertyGroup):
 
+class FillPanel(bpy.types.PropertyGroup):
     panel_count_x: IntProperty(
         name="Horizontal Panels",
         min=0,
@@ -97,7 +97,6 @@ class FillGlassPanes(bpy.types.PropertyGroup):
     )
 
     def draw(self, box):
-
         col = box.column(align=True)
         row = col.row(align=True)
         row.prop(self, "pane_count_x")
@@ -146,7 +145,6 @@ class FillLouver(bpy.types.PropertyGroup):
     )
 
     def draw(self, box):
-
         box.prop(self, "louver_margin")
 
         col = box.column(align=True)
@@ -178,7 +176,7 @@ class FillBars(bpy.types.PropertyGroup):
         max=get_scaled_unit(100.0),
         default=get_scaled_unit(0.1),
         unit="LENGTH",
-        description="Width of bars"
+        description="Width of bars",
     )
 
     bar_depth: FloatProperty(
@@ -192,7 +190,6 @@ class FillBars(bpy.types.PropertyGroup):
     )
 
     def draw(self, box):
-
         col = box.column(align=True)
         row = col.row(align=True)
         row.prop(self, "bar_count_x")

@@ -84,7 +84,9 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     ]
 
     show_door_fill: BoolProperty(
-        name="Show Door Fill", default=True, description="Show fill type properties for door"
+        name="Show Door Fill",
+        default=True,
+        description="Show fill type properties for door",
     )
 
     fill_type_door: EnumProperty(
@@ -103,7 +105,9 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
     ]
 
     show_window_fill: BoolProperty(
-        name="Show Window Fill", default=True, description="Show fill type properties for window"
+        name="Show Window Fill",
+        default=True,
+        description="Show fill type properties for window",
     )
 
     fill_type_window: EnumProperty(
@@ -120,10 +124,14 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
             (self["wall_dimensions"][0] / self.count, self["wall_dimensions"][1]),
             default_size=(2.0, def_h),
             default_offset=(0.0, 0.0),
-            spread=self.array.spread
+            spread=self.array.spread,
         )
         if "d" not in str(self.components):
-            self.arch.init(wall_dimensions[1] / 2 - self.size_offset.offset.y - self.size_offset.size.y / 2)
+            self.arch.init(
+                wall_dimensions[1] / 2
+                - self.size_offset.offset.y
+                - self.size_offset.size.y / 2
+            )
         else:
             self.arch.init(wall_dimensions[1] - self.size_offset.size.y)
 
@@ -167,7 +175,6 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
         fill = fill_map.get(self.fill_type_door)
         if fill and self.show_door_fill:
             fill.draw(box)
-
 
         # # -- draw fill types window
         box = layout.box()
