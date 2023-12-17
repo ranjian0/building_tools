@@ -138,3 +138,7 @@ dmypy.json
 .idea
 /docs/_site
 /docs/Gemfile.lock
+
+.pdm.toml
+.pdm-python
+.pdm-build/
