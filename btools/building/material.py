@@ -8,9 +8,9 @@ from bpy.props import (
 
 from ..utils import create_object_material
 from .facemap import (
-    clear_empty_facemaps, 
+    clear_empty_facemaps,
     set_material_for_active_facemap,
-    clear_material_for_active_facemap
+    clear_material_for_active_facemap,
 )
 
 
@@ -69,6 +69,7 @@ class BTOOLS_OT_create_facemap_material(bpy.types.Operator):
         obj.facemap_materials[active_facemap.index].material = mat
         return {"FINISHED"}
 
+
 class BTOOLS_OT_remove_facemap_material(bpy.types.Operator):
     """Remove the material from the active facemap"""
 
@@ -104,7 +105,9 @@ class FaceMapMaterial(bpy.types.PropertyGroup):
     material: PointerProperty(type=bpy.types.Material, update=update_facemap_material)
 
     auto_map: BoolProperty(
-        name="Auto UV Mapping", default=True, description="Automatically UV Map faces belonging to active facemap."
+        name="Auto UV Mapping",
+        default=True,
+        description="Automatically UV Map faces belonging to active facemap.",
     )
 
     mapping_methods = [
@@ -125,7 +128,7 @@ classes = (
     BTOOLS_UL_fmaps,
     BTOOLS_OT_fmaps_clear,
     BTOOLS_OT_create_facemap_material,
-    BTOOLS_OT_remove_facemap_material
+    BTOOLS_OT_remove_facemap_material,
 )
 
 

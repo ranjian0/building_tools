@@ -21,7 +21,7 @@ def remove(context):
 
     bmesh.ops.delete(bm, geom=bound_faces, context="FACES")
     bmesh.ops.dissolve_verts(bm, verts=midv)
-    newfaces = bmesh.ops.contextual_create(bm, geom=cornerv).get('faces')
+    newfaces = bmesh.ops.contextual_create(bm, geom=cornerv).get("faces")
     add_faces_to_map(bm, newfaces, FaceMap.WALLS)
 
     bmesh.update_edit_mesh(me, loop_triangles=True)
@@ -36,10 +36,22 @@ def get_faces_in_selection_bounds(bm):
     faces = sort_faces(faces, R)
     start, finish = faces[0].calc_center_median(), faces[-1].calc_center_median()
 
-    faces_left = filter(lambda f: L.dot(f.calc_center_median()) < L.dot(start), bm.faces)
-    faces_mid = filter(lambda f: R.dot(f.calc_center_median()) < R.dot(finish), faces_left)
-    valid_normals = [normal.to_tuple(2), L.to_tuple(2), R.to_tuple(2), VEC_UP.to_tuple(2), VEC_DOWN.to_tuple(2)]
-    faces_correct_normal = filter(lambda f: f.normal.to_tuple(2) in valid_normals, faces_mid)
+    faces_left = filter(
+        lambda f: L.dot(f.calc_center_median()) < L.dot(start), bm.faces
+    )
+    faces_mid = filter(
+        lambda f: R.dot(f.calc_center_median()) < R.dot(finish), faces_left
+    )
+    valid_normals = [
+        normal.to_tuple(2),
+        L.to_tuple(2),
+        R.to_tuple(2),
+        VEC_UP.to_tuple(2),
+        VEC_DOWN.to_tuple(2),
+    ]
+    faces_correct_normal = filter(
+        lambda f: f.normal.to_tuple(2) in valid_normals, faces_mid
+    )
 
     def calc_face_bounds_dist(f):
         vts = sort_verts(f.verts, R)
@@ -47,8 +59,7 @@ def get_faces_in_selection_bounds(bm):
 
     bounds_distance = (start - finish).length
     faces_within_distance = filter(
-        lambda f: calc_face_bounds_dist(f) < bounds_distance,
-        faces_correct_normal
+        lambda f: calc_face_bounds_dist(f) < bounds_distance, faces_correct_normal
     )
 
     select(faces, False)

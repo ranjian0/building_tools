@@ -15,12 +15,17 @@ from mathutils import Vector
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):
-    """ Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
+    """Convinience PropertyGroup used for regular Quad Inset (see window and door)"""
 
     def clamp_size(self):
         if self["restricted"]:
-            value = (clamp(self.size[0], 0.1, self["parent_dimensions"][0] - 0.0001), self.size[1])
-            self.size = restricted_size(self["parent_dimensions"], self.offset, (0.1, 0.1), value)
+            value = (
+                clamp(self.size[0], 0.1, self["parent_dimensions"][0] - 0.0001),
+                self.size[1],
+            )
+            self.size = restricted_size(
+                self["parent_dimensions"], self.offset, (0.1, 0.1), value
+            )
 
     def set_size_width(self, value):
         self.size[0] = value
@@ -32,9 +37,15 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     def get_size(self):
         if self["restricted"]:
-            size = self.get("size", restricted_size(
-                self["parent_dimensions"], self.offset, (0.1, 0.1), self["default_size"]
-            ))
+            size = self.get(
+                "size",
+                restricted_size(
+                    self["parent_dimensions"],
+                    self.offset,
+                    (0.1, 0.1),
+                    self["default_size"],
+                ),
+            )
         else:
             size = self.get("size", self["default_size"])
         self.size = size
@@ -73,7 +84,9 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     def clamp_offset(self):
         self.offset = (
-            restricted_offset(self["parent_dimensions"], self.size, self.offset) if self["restricted"] else self.offset
+            restricted_offset(self["parent_dimensions"], self.size, self.offset)
+            if self["restricted"]
+            else self.offset
         )
 
     def set_offset_horizontal(self, value):
@@ -126,7 +139,14 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
 
     show_props: BoolProperty(default=False)
 
-    def init(self, parent_dimensions, default_size=(1.0, 1.0), default_offset=(0.0, 0.0), restricted=True, spread=None):
+    def init(
+        self,
+        parent_dimensions,
+        default_size=(1.0, 1.0),
+        default_offset=(0.0, 0.0),
+        restricted=True,
+        spread=None,
+    ):
         self["parent_dimensions"] = parent_dimensions
         self["default_size"] = default_size
         self["default_offset"] = default_offset
@@ -140,7 +160,6 @@ class SizeOffsetProperty(bpy.types.PropertyGroup):
         self.clamp_offset()
 
     def draw(self, context, box):
-
         row = box.row(align=False)
         col = row.column(align=True)
         col.label(text="Size:")

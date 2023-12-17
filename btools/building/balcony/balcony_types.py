@@ -24,11 +24,10 @@ from ...utils import (
 
 
 def create_balcony(bm, faces, prop):
-    """Generate balcony geometry
-    """
-    create_function = [
-        create_balcony_ungrouped, create_balcony_grouped
-    ][prop.group_selection]
+    """Generate balcony geometry"""
+    create_function = [create_balcony_ungrouped, create_balcony_grouped][
+        prop.group_selection
+    ]
     create_function(bm, faces, prop)
 
 
@@ -42,12 +41,12 @@ def create_balcony_grouped(bm, faces, prop):
 
     for faces in selection_groups:
         [f.select_set(False) for f in faces]
-        group = filter_geom(bmesh.ops.duplicate(bm, geom=faces)['geom'], BMFace)
+        group = filter_geom(bmesh.ops.duplicate(bm, geom=faces)["geom"], BMFace)
         transform_grouped_faces(bm, group, prop)
         top_faces = extrude_balcony_grouped(bm, group, prop.depth)
 
         if prop.has_railing:
-            top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)['region'].pop()
+            top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)["region"].pop()
             add_railing_to_balcony_grouped(bm, top_face, prop)
 
 
@@ -71,7 +70,9 @@ def create_balcony_ungrouped(bm, faces, prop):
 
 
 def extrude_balcony(bm, face, depth, normal):
-    front = filter_geom(bmesh.ops.extrude_face_region(bm, geom=[face])["geom"], BMFace)[0]
+    front = filter_geom(bmesh.ops.extrude_face_region(bm, geom=[face])["geom"], BMFace)[
+        0
+    ]
     map_balcony_faces(bm, front)
     bmesh.ops.translate(bm, verts=front.verts, vec=normal * depth)
 
@@ -95,9 +96,11 @@ def extrude_balcony_grouped(bm, group, depth):
     valid_normals = [f.normal.to_tuple(3) for f in group]
     for num in splitones(depth):
         res = bmesh.ops.inset_region(
-            bm, faces=inset_faces, depth=num, use_even_offset=True, use_boundary=True)["faces"]
+            bm, faces=inset_faces, depth=num, use_even_offset=True, use_boundary=True
+        )["faces"]
         bmesh.ops.dissolve_degenerate(
-            bm, dist=0.001, edges=list({e for f in inset_faces for e in f.edges}))
+            bm, dist=0.001, edges=list({e for f in inset_faces for e in f.edges})
+        )
         inset_faces = validate(inset_faces)
         inset_faces.extend([f for f in res if f.normal.to_tuple(3) in valid_normals])
         result.extend(res)
@@ -119,7 +122,9 @@ def add_railing_to_balcony(bm, top, balcony_normal, prop):
     edges = sort_edges(dup_top.edges, balcony_normal)[1:]
     railing_geom = bmesh.ops.extrude_edge_only(bm, edges=edges)["geom"]
     bmesh.ops.translate(
-        bm, verts=filter_geom(railing_geom, BMVert), vec=(0., 0., prop.rail.corner_post_height)
+        bm,
+        verts=filter_geom(railing_geom, BMVert),
+        vec=(0.0, 0.0, prop.rail.corner_post_height),
     )
 
     bmesh.ops.delete(bm, geom=[dup_top], context="FACES")
@@ -133,24 +138,32 @@ def add_railing_to_balcony_grouped(bm, top, prop):
     old_boundary_edges = [e for e in top.edges if len(e.link_faces) > 1]
 
     ret = bmesh.ops.duplicate(bm, geom=[top])
-    boundary_edges = [ret['edge_map'][obe] for obe in old_boundary_edges]
+    boundary_edges = [ret["edge_map"][obe] for obe in old_boundary_edges]
     dup_top = filter_geom(ret["geom"], BMFace)[0]
 
     max_offset = min([*calc_face_dimensions(dup_top)]) / 2
     prop.rail.offset = clamp(prop.rail.offset, 0.0, max_offset - 0.001)
-    ret = bmesh.ops.inset_individual(bm, faces=[dup_top], thickness=prop.rail.offset, use_even_offset=True)
+    ret = bmesh.ops.inset_individual(
+        bm, faces=[dup_top], thickness=prop.rail.offset, use_even_offset=True
+    )
     bmesh.ops.delete(bm, geom=ret["faces"], context="FACES")
-    dup_edges = filter_geom(bmesh.ops.duplicate(bm, geom=boundary_edges)['geom'], BMEdge)
+    dup_edges = filter_geom(
+        bmesh.ops.duplicate(bm, geom=boundary_edges)["geom"], BMEdge
+    )
 
     railing_geom = bmesh.ops.extrude_edge_only(bm, edges=dup_edges)["geom"]
-    bmesh.ops.translate(bm, verts=filter_geom(railing_geom, BMVert), vec=(0.0, 0.0, prop.rail.corner_post_height))
+    bmesh.ops.translate(
+        bm,
+        verts=filter_geom(railing_geom, BMVert),
+        vec=(0.0, 0.0, prop.rail.corner_post_height),
+    )
     bmesh.ops.delete(bm, geom=[dup_top], context="FACES")
     railing_faces = filter_geom(railing_geom, BMFace)
     create_railing(bm, railing_faces, prop.rail, Vector())
 
 
 def map_balcony_faces(bm, face):
-    """ Add balcony faces to their facemap """
+    """Add balcony faces to their facemap"""
     new_faces = {f for e in face.edges for f in e.link_faces}
     add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
 
@@ -168,9 +181,16 @@ def create_balcony_split(bm, face, prop):
     array_dist = face_w / count
     start = face.calc_center_median() + (xyz[0] * (face_w / 2))
     for i in range(count):
-        f = create_face(bm, Vector((width, height)), prop.size_offset.offset + Vector((0, -(face_h - height) / 2)), xyz)
+        f = create_face(
+            bm,
+            Vector((width, height)),
+            prop.size_offset.offset + Vector((0, -(face_h - height) / 2)),
+            xyz,
+        )
         off = ((i * array_dist) * -xyz[0]) + ((array_dist / 2) * -xyz[0])
-        bmesh.ops.translate(bm, verts=f.verts, vec=start + off - face.normal * prop.depth_offset)
+        bmesh.ops.translate(
+            bm, verts=f.verts, vec=start + off - face.normal * prop.depth_offset
+        )
         result.append(f)
 
     prop.count = count
@@ -193,4 +213,6 @@ def transform_grouped_faces(bm, faces, prop):
 def top_face_edges(faces):
     """Return all the upper edges in faces"""
     top_edges = list({e for f in faces for e in f.edges})
-    return sorted(top_edges, key=lambda e: calc_edge_median(e).z, reverse=True)[: len(faces)]
+    return sorted(top_edges, key=lambda e: calc_edge_median(e).z, reverse=True)[
+        : len(faces)
+    ]

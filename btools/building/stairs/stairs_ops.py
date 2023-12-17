@@ -33,6 +33,7 @@ class BTOOLS_OT_add_stairs(bpy.types.Operator):
     def draw(self, context):
         self.props.draw(context, self.layout)
 
+
 @crash_safe
 def build(context, prop):
     verify_facemaps_for_object(context.object)

@@ -44,7 +44,9 @@ class FloorplanProperty(bpy.types.PropertyGroup):
     )
 
     random_extension_amount: BoolProperty(
-        name="Random Extension Amount", default=True, description="Randomize the amount of extensions"
+        name="Random Extension Amount",
+        default=True,
+        description="Randomize the amount of extensions",
     )
 
     extension_amount: IntProperty(
@@ -61,7 +63,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         max=get_scaled_unit(100.0),
         default=get_scaled_unit(1.0),
         unit="LENGTH",
-        description="Radius of circle"
+        description="Radius of circle",
     )
 
     segments: IntProperty(
@@ -179,7 +181,7 @@ class FloorplanProperty(bpy.types.PropertyGroup):
         max=get_scaled_unit(50.0),
         default=get_scaled_unit(0.0),
         unit="ROTATION",
-        description="Angle of the tail/fan fron the floorplan center axis"
+        description="Angle of the tail/fan fron the floorplan center axis",
     )
 
     def draw(self, context, layout):

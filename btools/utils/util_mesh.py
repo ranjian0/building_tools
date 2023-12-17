@@ -92,7 +92,9 @@ def valid_ngon(face):
 def is_rectangle(face):
     """check if face is rectangular"""
     angles = [math.pi - l.calc_angle() for l in face.loops]
-    right_angles = len([a for a in angles if math.pi / 2 - 0.001 < a < math.pi / 2 + 0.001])
+    right_angles = len(
+        [a for a in angles if math.pi / 2 - 0.001 < a < math.pi / 2 + 0.001]
+    )
     straight_angles = len([a for a in angles if -0.001 < a < 0.001])
     return right_angles == 4 and straight_angles == len(angles) - 4
 
@@ -113,7 +115,9 @@ def is_parallel(a, b):
 
 def sort_edges_clockwise(edges):
     """sort edges clockwise based on angle from their median center"""
-    median_reference = ft.reduce(operator.add, map(calc_edge_median, edges)) / len(edges)
+    median_reference = ft.reduce(operator.add, map(calc_edge_median, edges)) / len(
+        edges
+    )
 
     def sort_function(edge):
         vector_difference = median_reference - calc_edge_median(edge)
@@ -258,7 +262,16 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
     arc_direction = xyz[1] if edge_is_horizontal(edge) else xyz[0]
     ret = bmesh.ops.subdivide_edges(bm, edges=[edge], cuts=resolution)
 
-    verts = sort_verts(list({v for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge) for v in e.verts}), orient)
+    verts = sort_verts(
+        list(
+            {
+                v
+                for e in filter_geom(ret["geom_split"], bmesh.types.BMEdge)
+                for v in e.verts
+            }
+        ),
+        orient,
+    )
     theta = math.pi / (len(verts) - 1)
     orient *= 1 / orient.length
     arc_direction.normalize()
@@ -280,8 +293,17 @@ def arc_edge(bm, edge, resolution, height, xyz, function="SPHERE"):
 def extrude_face(bm, face, extrude_depth):
     """extrude a face"""
     extruded_face = bmesh.ops.extrude_discrete_faces(bm, faces=[face]).get("faces")[0]
-    bmesh.ops.translate(bm, verts=extruded_face.verts, vec=extruded_face.normal * extrude_depth)
-    surrounding_faces = list({f for edge in extruded_face.edges for f in edge.link_faces if f not in [extruded_face]})
+    bmesh.ops.translate(
+        bm, verts=extruded_face.verts, vec=extruded_face.normal * extrude_depth
+    )
+    surrounding_faces = list(
+        {
+            f
+            for edge in extruded_face.edges
+            for f in edge.link_faces
+            if f not in [extruded_face]
+        }
+    )
     return extruded_face, surrounding_faces
 
 
@@ -299,7 +321,12 @@ def extrude_face_region(bm, faces, depth, normal):
     final_locations = [loc + depth * normal for loc in initial_locations]
     extruded_faces = closest_faces(extruded_faces, final_locations)
     surrounding_faces = list(
-        {f for edge in filter_geom(geom, BMEdge) for f in edge.link_faces if f not in extruded_faces}
+        {
+            f
+            for edge in filter_geom(geom, BMEdge)
+            for f in edge.link_faces
+            if f not in extruded_faces
+        }
     )
     return extruded_faces, surrounding_faces
 
@@ -326,10 +353,18 @@ def create_face(bm, size, offset, xyz):
     """Create a face in xy plane of xyz space"""
     offset = -offset.x * xyz[0] + offset.y * xyz[1]
 
-    v1 = bmesh.ops.create_vert(bm, co=offset + size.x * xyz[0] / 2 + size.y * xyz[1] / 2)["vert"][0]
-    v2 = bmesh.ops.create_vert(bm, co=offset + size.x * xyz[0] / 2 - size.y * xyz[1] / 2)["vert"][0]
-    v3 = bmesh.ops.create_vert(bm, co=offset - size.x * xyz[0] / 2 + size.y * xyz[1] / 2)["vert"][0]
-    v4 = bmesh.ops.create_vert(bm, co=offset - size.x * xyz[0] / 2 - size.y * xyz[1] / 2)["vert"][0]
+    v1 = bmesh.ops.create_vert(
+        bm, co=offset + size.x * xyz[0] / 2 + size.y * xyz[1] / 2
+    )["vert"][0]
+    v2 = bmesh.ops.create_vert(
+        bm, co=offset + size.x * xyz[0] / 2 - size.y * xyz[1] / 2
+    )["vert"][0]
+    v3 = bmesh.ops.create_vert(
+        bm, co=offset - size.x * xyz[0] / 2 + size.y * xyz[1] / 2
+    )["vert"][0]
+    v4 = bmesh.ops.create_vert(
+        bm, co=offset - size.x * xyz[0] / 2 - size.y * xyz[1] / 2
+    )["vert"][0]
 
     return bmesh.ops.contextual_create(bm, geom=[v1, v2, v3, v4])["faces"][0]
 
@@ -352,7 +387,7 @@ def get_bottom_faces(faces, n=1):
 
 def get_bounding_verts(verts):
     """Determine the bounding verts (topleft, topright, bottomleft, bottomright)"""
-    min_z, max_z = minmax(verts, key=lambda v:v.co.z)
+    min_z, max_z = minmax(verts, key=lambda v: v.co.z)
     top_verts = [v for v in verts if v.co.z == max_z.co.z]
     bot_verts = [v for v in verts if v.co.z == min_z.co.z]
 
@@ -393,10 +428,16 @@ def ngon_to_quad(bm, face):
     """
 
     INSET_EPS = 0.0011
-    bmesh.ops.inset_individual(bm, faces=[face], thickness=INSET_EPS, use_even_offset=True)
+    bmesh.ops.inset_individual(
+        bm, faces=[face], thickness=INSET_EPS, use_even_offset=True
+    )
 
-    diss_verts = list({loop.vert for loop in face.loops if equal(loop.calc_angle(), math.pi)})
-    diss_edges = list({e for v in diss_verts for e in v.link_edges if e not in face.edges})
+    diss_verts = list(
+        {loop.vert for loop in face.loops if equal(loop.calc_angle(), math.pi)}
+    )
+    diss_edges = list(
+        {e for v in diss_verts for e in v.link_edges if e not in face.edges}
+    )
     bmesh.ops.dissolve_edges(bm, edges=diss_edges)
     bmesh.ops.dissolve_verts(bm, verts=diss_verts)
 
@@ -406,7 +447,9 @@ def get_selection_groups(bm):
     selected_faces = [f for f in bm.faces if f.select]
 
     def get_adjacent_selected(faces):
-        return list({fa for f in faces for e in f.edges for fa in e.link_faces if fa.select})
+        return list(
+            {fa for f in faces for e in f.edges for fa in e.link_faces if fa.select}
+        )
 
     result = []
     while selected_faces:

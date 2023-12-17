@@ -4,12 +4,7 @@ import numpy as np
 from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
-from ..facemap import (
-    FaceMap,
-    map_new_faces,
-    add_faces_to_map,
-    add_facemap_for_groups
-)
+from ..facemap import FaceMap, map_new_faces, add_faces_to_map, add_facemap_for_groups
 from ...utils import (
     equal,
     select,
@@ -45,11 +40,15 @@ def create_flat_roof(bm, faces, prop):
     # -- add border
     if prop.add_border:
         # -- inset top face
-        bmesh.ops.inset_region(bm, faces=top_face, thickness=prop.border, use_even_offset=True)
+        bmesh.ops.inset_region(
+            bm, faces=top_face, thickness=prop.border, use_even_offset=True
+        )
 
         # -- extrude downwards
         ret = bmesh.ops.extrude_face_region(bm, geom=top_face).get("geom")
-        bmesh.ops.translate(bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert))
+        bmesh.ops.translate(
+            bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert)
+        )
         bmesh.ops.delete(bm, geom=top_face, context="FACES")
 
 
@@ -221,7 +220,9 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         previous = e
         found_edges = [e]
         while v != last:
-            linked = [e for e in v.link_edges if e in skeleton_edges and e not in found_edges]
+            linked = [
+                e for e in v.link_edges if e in skeleton_edges and e not in found_edges
+            ]
             if not linked:
                 common_edge = set(v.link_edges) & set(last.link_edges)
                 if common_edge:
@@ -247,7 +248,10 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
             # esp when outset property is set high on concave polygons
 
             # -- try to help user
-            popup_message("Roof Intersection Detected. Adjust(decrease) roof 'outset'", title="Geometry Error")
+            popup_message(
+                "Roof Intersection Detected. Adjust(decrease) roof 'outset'",
+                title="Geometry Error",
+            )
             continue
         result.extend(bmesh.ops.contextual_create(bm, geom=walk).get("faces"))
     return result
@@ -273,7 +277,9 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
             ortho = edge_vector(e).orthogonal().normalized() * eps
             res = mathutils.geometry.intersect_line_line_2d(v.co, v.co, v1.co, v2.co)
             if res is None:
-                res = mathutils.geometry.intersect_line_line_2d(v.co - ortho, v.co + ortho, v1.co, v2.co)
+                res = mathutils.geometry.intersect_line_line_2d(
+                    v.co - ortho, v.co + ortho, v1.co, v2.co
+                )
 
             if res:
                 split_vert = v1
@@ -316,7 +322,9 @@ def dissolve_lone_verts(bm, face, original_edges):
         return round(loop.calc_angle(), 2) == 3.14
 
     parallel_verts = [loop.vert for loop in loops if is_parallel(loop)]
-    lone_edges = [e for v in parallel_verts for e in v.link_edges if e not in original_edges]
+    lone_edges = [
+        e for v in parallel_verts for e in v.link_edges if e not in original_edges
+    ]
     bmesh.ops.dissolve_edges(bm, edges=lone_edges, use_verts=True)
 
 
@@ -327,11 +335,19 @@ def gable_process_box(bm, roof_faces, prop):
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
 
     # -- move abit upwards (by amount roof thickness)
-    bmesh.ops.translate(bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
+    bmesh.ops.translate(
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
+    )
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- face maps
-    link_faces = {f for fc in filter_geom(result, BMFace) for e in fc.edges for f in e.link_faces if not f.normal.z}
+    link_faces = {
+        f
+        for fc in filter_geom(result, BMFace)
+        for e in fc.edges
+        for f in e.link_faces
+        if not f.normal.z
+    }
     link_faces.update(set(validate(roof_faces)))
     add_faces_to_map(bm, list(link_faces), FaceMap.ROOF_HANGS)
 
@@ -345,7 +361,9 @@ def gable_process_open(bm, roof_faces, prop):
 
     # -- extrude and move up
     result = bmesh.ops.extrude_face_region(bm, geom=top_faces).get("geom")
-    bmesh.ops.translate(bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness))
+    bmesh.ops.translate(
+        bm, verts=filter_geom(result, BMVert), vec=(0, 0, prop.thickness)
+    )
     bmesh.ops.delete(bm, geom=top_faces, context="FACES")
 
     # -- find newly created side faces
@@ -368,7 +386,9 @@ def gable_process_open(bm, roof_faces, prop):
         dissolve_edges.append(max_edge)
 
     # -- outset side faces
-    bmesh.ops.inset_region(bm, use_even_offset=True, faces=side_faces, depth=prop.outset)
+    bmesh.ops.inset_region(
+        bm, use_even_offset=True, faces=side_faces, depth=prop.outset
+    )
 
     # -- move lower vertical edges abit down (inorder to maintain roof slope)
     v_edges = []
@@ -396,12 +416,18 @@ def extrude_and_outset(bm, faces, thickness, outset):
     """Extrude the given faces upwards and outset resulting side faces"""
     # -- extrude faces upwards
     ret = bmesh.ops.extrude_face_region(bm, geom=faces)
-    bmesh.ops.translate(bm, vec=(0, 0, thickness), verts=filter_geom(ret["geom"], BMVert))
+    bmesh.ops.translate(
+        bm, vec=(0, 0, thickness), verts=filter_geom(ret["geom"], BMVert)
+    )
 
     # -- dissolve top faces if they are more than one
     top_face = filter_geom(ret["geom"], BMFace)
     if len(top_face) > 1:
-        top_face = bmesh.ops.dissolve_faces(bm, faces=top_face, use_verts=True).get("region").pop()
+        top_face = (
+            bmesh.ops.dissolve_faces(bm, faces=top_face, use_verts=True)
+            .get("region")
+            .pop()
+        )
     else:
         top_face = top_face.pop()
 

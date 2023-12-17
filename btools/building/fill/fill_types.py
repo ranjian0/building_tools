@@ -4,12 +4,7 @@ import bmesh
 from bmesh.types import BMEdge, BMVert
 from mathutils import Vector, Matrix
 
-from ..facemap import (
-    FaceMap, 
-    map_new_faces, 
-    add_faces_to_map,
-    add_facemap_for_groups
-)
+from ..facemap import FaceMap, map_new_faces, add_faces_to_map, add_facemap_for_groups
 
 from ...utils import (
     VEC_UP,
@@ -41,24 +36,25 @@ def add_fill(bm, faces, prop):
 
 
 def get_fill_type(prop, dw):
-    """Get the fill type property for window/door/multigroup
-    """
+    """Get the fill type property for window/door/multigroup"""
     if hasattr(prop, "fill_type"):
-        # Window/Door 
+        # Window/Door
         return prop.fill_type
     # Multigroup
     return prop.fill_type_door if dw == "DOOR" else prop.fill_type_window
 
 
 def get_fill(prop, fill_name, dw):
-    """Get the fill property for window/door/multigroup with the name 'fill_name'
-    """
+    """Get the fill property for window/door/multigroup with the name 'fill_name'"""
     if hasattr(prop, fill_name):
-        # Window/Door 
+        # Window/Door
         return getattr(prop, fill_name)
     # Multigroup
-    return getattr(prop, f"{fill_name}_door") if dw == "DOOR" else getattr(prop, f"{fill_name}_window")
-    
+    return (
+        getattr(prop, f"{fill_name}_door")
+        if dw == "DOOR"
+        else getattr(prop, f"{fill_name}_window")
+    )
 
 
 def fill_face(bm, face, prop, dw="DOOR"):
@@ -71,10 +67,14 @@ def fill_face(bm, face, prop, dw="DOOR"):
         add_facemap_for_groups(FaceMap.DOOR_PANELS)
         fill_panel(bm, face, get_fill(prop, "panel_fill", dw))
     elif fill_type == "GLASS_PANES":
-        add_facemap_for_groups(FaceMap.DOOR_PANES if dw == "DOOR" else FaceMap.WINDOW_PANES)
+        add_facemap_for_groups(
+            FaceMap.DOOR_PANES if dw == "DOOR" else FaceMap.WINDOW_PANES
+        )
         fill_glass_panes(bm, face, get_fill(prop, "glass_fill", dw), user)
     elif fill_type == "LOUVER":
-        add_facemap_for_groups(FaceMap.DOOR_LOUVERS if dw == "DOOR" else FaceMap.WINDOW_LOUVERS)
+        add_facemap_for_groups(
+            FaceMap.DOOR_LOUVERS if dw == "DOOR" else FaceMap.WINDOW_LOUVERS
+        )
         fill_louver(bm, face, get_fill(prop, "louver_fill", dw), user)
     elif fill_type == "BAR":
         add_facemap_for_groups(FaceMap.WINDOW_BARS)
@@ -87,17 +87,29 @@ def validate_fill_props(prop, dw):
     if fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
         fill = get_fill(prop, "louver_fill", dw)
-        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        depth = getattr(
+            prop,
+            "door_depth",
+            getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)),
+        )
         fill.louver_depth = min(fill.louver_depth, depth)
     elif fill_type == "BAR":
         # XXX keep bar depth smaller than window depth
         fill = get_fill(prop, "bar_fill", dw)
-        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        depth = getattr(
+            prop,
+            "door_depth",
+            getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)),
+        )
         fill.bar_depth = min(fill.bar_depth, depth)
     elif fill_type == "LOUVER":
         # XXX keep louver depth less than window depth
         fill = get_fill(prop, "louver_fill", dw)
-        depth = getattr(prop, "door_depth", getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)))
+        depth = getattr(
+            prop,
+            "door_depth",
+            getattr(prop, "window_depth", getattr(prop, "dw_depth", 1e10)),
+        )
         fill.louver_depth = min(fill.louver_depth, depth)
 
 
@@ -122,7 +134,9 @@ def fill_panel(bm, face, prop):
     min_dimension = min(sum([calc_face_dimensions(q) for q in quads], ()))
     prop.panel_margin = min(prop.panel_margin, min_dimension / 2)
 
-    bmesh.ops.inset_individual(bm, faces=quads, thickness=prop.panel_margin, use_even_offset=True)
+    bmesh.ops.inset_individual(
+        bm, faces=quads, thickness=prop.panel_margin, use_even_offset=True
+    )
     bmesh.ops.translate(
         bm,
         verts=list({v for f in quads for v in f.verts}),
@@ -151,7 +165,13 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     prop.pane_margin = min(prop.pane_margin, min_dimension / 2)
 
     inset = map_new_faces(userframe)(bmesh.ops.inset_individual)
-    inset(bm, faces=quads, thickness=prop.pane_margin, depth=-prop.pane_depth, use_even_offset=True)
+    inset(
+        bm,
+        faces=quads,
+        thickness=prop.pane_margin,
+        depth=-prop.pane_depth,
+        use_even_offset=True,
+    )
 
     usergroup = FaceMap.DOOR if user == FillUser.DOOR else FaceMap.WINDOW
     add_faces_to_map(bm, quads, usergroup)
@@ -168,18 +188,24 @@ def fill_bar(bm, face, prop):
     width, height = calc_face_dimensions(face)
 
     # XXX bar width should not exceed window size
-    min_dimension = min([width / max(prop.bar_count_x, 1), height / max(prop.bar_count_y, 1)])
+    min_dimension = min(
+        [width / max(prop.bar_count_x, 1), height / max(prop.bar_count_y, 1)]
+    )
     prop.bar_width = min(prop.bar_width, min_dimension)
 
     # -- transform vars
-    transform_space = Matrix.Rotation(-VEC_UP.angle(xyz[1]), 4, xyz[0]) @ Matrix.Translation(-face_center)
+    transform_space = Matrix.Rotation(
+        -VEC_UP.angle(xyz[1]), 4, xyz[0]
+    ) @ Matrix.Translation(-face_center)
 
     # -- horizontal
     depth = face.normal * prop.bar_depth
     offset = height / (prop.bar_count_x + 1)
     for i in range(prop.bar_count_x):
         item_off = Vector((0, 0, -height / 2 + (i + 1) * offset))
-        transform = Matrix.Translation(depth + item_off) @ Matrix.Scale(prop.bar_width / height, 4, VEC_UP)
+        transform = Matrix.Translation(depth + item_off) @ Matrix.Scale(
+            prop.bar_width / height, 4, VEC_UP
+        )
         create_bar_from_face(bm, face, transform, transform_space, -depth)
 
     # -- vertical
@@ -188,7 +214,9 @@ def fill_bar(bm, face, prop):
     depth = face.normal * (prop.bar_depth - eps)
     for i in range(prop.bar_count_y):
         item_off = xyz[0] * (-width / 2 + ((i + 1) * offset))
-        transform = Matrix.Translation(depth + item_off) @ Matrix.Scale(prop.bar_width / width, 4, xyz[0])
+        transform = Matrix.Translation(depth + item_off) @ Matrix.Scale(
+            prop.bar_width / width, 4, xyz[0]
+        )
         create_bar_from_face(bm, face, transform, transform_space, -depth, True)
 
 
@@ -197,7 +225,9 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
     normal = face.normal.copy()
     if prop.louver_margin:
         # XXX Louver margin should not exceed smallest face dimension
-        prop.louver_margin = min(prop.louver_margin, min(calc_face_dimensions(face)) / 2)
+        prop.louver_margin = min(
+            prop.louver_margin, min(calc_face_dimensions(face)) / 2
+        )
         inset = map_new_faces(FaceMap.FRAME)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 
@@ -241,7 +271,9 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
 def create_bar_from_face(bm, face, trans, trans_space, depth, vertical=False):
     """Create bar geometry from a face"""
     dup = duplicate_face_translate_scale(bm, face, trans, trans_space).get("geom")
-    edges = [filter_horizontal_edges, filter_vertical_edges][vertical](filter_geom(dup, BMEdge))
+    edges = [filter_horizontal_edges, filter_vertical_edges][vertical](
+        filter_geom(dup, BMEdge)
+    )
     extrude_edges_to_depth(bm, edges, depth)
 
 
@@ -278,7 +310,9 @@ def extrude_faces_add_slope(bm, faces, extrude_normal, extrude_depth):
 
 def subdivide_face_into_vertical_segments(bm, face, segments):
     """Cut a face(quad) vertically into multiple faces"""
-    res = bmesh.ops.subdivide_edges(bm, edges=filter_vertical_edges(face.edges), cuts=segments).get("geom_inner")
+    res = bmesh.ops.subdivide_edges(
+        bm, edges=filter_vertical_edges(face.edges), cuts=segments
+    ).get("geom_inner")
     return list({f for e in filter_geom(res, BMEdge) for f in e.link_faces})
 
 

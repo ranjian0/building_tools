@@ -81,7 +81,9 @@ class RoadProperty(bpy.types.PropertyGroup):
         ("CURVE", "Curve", "", 1),
     ]
 
-    extrusion_type: EnumProperty(items=extrusion_types, default="STRAIGHT", description="Extrusion mode")
+    extrusion_type: EnumProperty(
+        items=extrusion_types, default="STRAIGHT", description="Extrusion mode"
+    )
 
     interval: FloatProperty(
         name="Interval",

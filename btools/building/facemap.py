@@ -18,7 +18,7 @@ class AutoIndex(Enum):
 
 
 class FaceMap(AutoIndex):
-    """ Enum provides names for face_maps """
+    """Enum provides names for face_maps"""
 
     # Buildings
     SLABS = auto()
@@ -148,10 +148,11 @@ def set_material_for_active_facemap(material, context):
     active_facemap = obj.face_maps[index]
 
     link_material(obj, material)
-    mat_id = [idx for idx, mat in enumerate(obj.data.materials) if mat == material].pop()
+    mat_id = [
+        idx for idx, mat in enumerate(obj.data.materials) if mat == material
+    ].pop()
 
     with bmesh_from_active_object(context) as bm:
-
         face_map = bm.faces.layers.face_map.active
         for face in bm.faces:
             if face[face_map] == active_facemap.index:
@@ -165,7 +166,6 @@ def clear_material_for_active_facemap(context):
     active_facemap = obj.face_maps[index]
 
     with bmesh_from_active_object(context) as bm:
-
         face_map = bm.faces.layers.face_map.active
         for face in bm.faces:
             if face[face_map] == active_facemap.index:
@@ -184,7 +184,6 @@ def clear_empty_facemaps(context):
     """Remove all facemaps that don't have any faces assigned"""
     obj = context.object
     with bmesh_from_active_object(context) as bm:
-
         face_map = bm.faces.layers.face_map.active
         used_indices = {f[face_map] for f in bm.faces}
         all_indices = {f.index for f in obj.face_maps}

@@ -35,7 +35,9 @@ class BalconyProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
     )
 
     group_selection: BoolProperty(
-        name="Group Selection", default=True, description="Treat adjacent face selections as a single group"
+        name="Group Selection",
+        default=True,
+        description="Treat adjacent face selections as a single group",
     )
 
     def init(self, wall_dimensions):
@@ -59,7 +61,7 @@ class BalconyProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         if not self.group_selection:
             layout.separator()
             layout.prop(self.array, "count")
-        
+
         layout.prop(self, "has_railing")
         if self.has_railing:
             box = layout.box()

@@ -2,10 +2,10 @@ import bpy
 import bmesh
 
 from ..facemap import (
-    FaceMap, 
+    FaceMap,
     clear_empty_facemaps,
     add_facemap_for_groups,
-    verify_facemaps_for_object
+    verify_facemaps_for_object,
 )
 
 from ...utils import (

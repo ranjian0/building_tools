@@ -23,6 +23,7 @@ def select_top_faces():
         top_faces = btools.utils.validate(top_faces)
         btools.utils.select(top_faces, False)
 
+
 class BuildingGenerator:
     _props = None
 
@@ -67,7 +68,9 @@ class FloorplanGenerator:
             bpy.utils.register_class(FloorplanProperty)
         except ValueError:
             pass  # XXX Already registered
-        bpy.types.Scene.prop_floorplan = bpy.props.PointerProperty(type=FloorplanProperty)
+        bpy.types.Scene.prop_floorplan = bpy.props.PointerProperty(
+            type=FloorplanProperty
+        )
         self._props = btools.utils.dict_from_prop(self.scene.prop_floorplan)
 
     def build_from_props(self, pdict):
@@ -94,37 +97,46 @@ class FloorplanGenerator:
 
     def build_random(self):
         properties = btools.utils.dict_from_prop(self._prop_class)
-        properties['type'] = random.choices(
-            ["RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE"],  # Circular not very usefull, "CIRCULAR"],
+        properties["type"] = random.choices(
+            [
+                "RECTANGULAR",
+                "H-SHAPED",
+                "RANDOM",
+                "COMPOSITE",
+            ],  # Circular not very usefull, "CIRCULAR"],
             weights=[0.8, 0.5, 0.8, 0.7],
             k=1,
         )[-1]
 
         # Main Sizing
-        if properties['type'] in ["RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE"]:
-            properties['width'] = random.choice(range(2, 5))
-            properties['length'] = random.choice(range(2, 5))
+        if properties["type"] in ["RECTANGULAR", "H-SHAPED", "RANDOM", "COMPOSITE"]:
+            properties["width"] = random.choice(range(2, 5))
+            properties["length"] = random.choice(range(2, 5))
         else:
-            properties['radius'] = random.choice(range(2, 5))
+            properties["radius"] = random.choice(range(2, 5))
 
         # Random floorplan options
-        if properties['type'] == "RANDOM":
-            properties['seed'] = random.randint(0, 1000)
-            properties['extension_amount'] = random.randint(1, 3)
+        if properties["type"] == "RANDOM":
+            properties["seed"] = random.randint(0, 1000)
+            properties["extension_amount"] = random.randint(1, 3)
 
         # Composite floorplan options
-        if properties['type'] == "COMPOSITE":
+        if properties["type"] == "COMPOSITE":
             for ke in ["tl1", "tl2", "tl3", "tl4"]:
                 properties[ke] = random.choice(range(0, 5))
 
         # H-shaped floorplan options
-        if properties['type'] == "H-SHAPED":
+        if properties["type"] == "H-SHAPED":
             for ke in ["tl1", "tl2", "tl3", "tl4"]:
                 properties[ke] = random.choice(range(0, 5))
 
             for ke in ["tw1", "tw2", "tw3", "tw4"]:
                 properties[ke] = btools.utils.clamp(
-                    random.random() * max([properties['width'], properties['length']]) / 2, 1.0, 1000
+                    random.random()
+                    * max([properties["width"], properties["length"]])
+                    / 2,
+                    1.0,
+                    1000,
                 )
 
         return self.build_from_props(properties)
@@ -180,10 +192,10 @@ class FloorGenerator:
     def build_random(self):
         properties = btools.utils.dict_from_prop(FloorProperty)
 
-        properties['add_columns'] = False
-        properties['add_slabs'] = True
+        properties["add_columns"] = False
+        properties["add_slabs"] = True
 
-        properties['floor_count'] = random.choice(range(10))
+        properties["floor_count"] = random.choice(range(10))
         return self.build_from_props(properties)
 
 
@@ -234,9 +246,8 @@ class RoofGenerator:
 
     def build_random(self):
         properties = btools.utils.dict_from_prop(RoofProperty)
-        properties['type'] = random.choices(
-            ["FLAT", "GABLE", "HIP"],
-            weights=[0.5, 0.5, 0.9], k=1
+        properties["type"] = random.choices(
+            ["FLAT", "GABLE", "HIP"], weights=[0.5, 0.5, 0.9], k=1
         )[-1]
 
         self.build_from_props(properties)

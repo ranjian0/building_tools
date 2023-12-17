@@ -39,7 +39,7 @@ def uv_map_active_editmesh_selection(faces, method):
 
     # -- perform mapping
     if method == "UNWRAP":
-        bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
+        bpy.ops.uv.unwrap(method="ANGLE_BASED", margin=0.001)
     elif method == "CUBE_PROJECTION":
         bpy.ops.uv.cube_project(cube_size=0.5)
 

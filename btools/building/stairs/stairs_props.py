@@ -11,6 +11,7 @@ from ...utils import get_scaled_unit
 from ..sizeoffset import SizeOffsetProperty
 from ..railing.railing_props import RailProperty
 
+
 class StairsProperty(bpy.types.PropertyGroup):
     depth_offset: FloatProperty(
         name="Depth Offset",
@@ -53,7 +54,9 @@ class StairsProperty(bpy.types.PropertyGroup):
     )
 
     landing: BoolProperty(
-        name="Has Landing", default=True, description="Whether the stairs have a landing"
+        name="Has Landing",
+        default=True,
+        description="Whether the stairs have a landing",
     )
 
     bottom_types = [

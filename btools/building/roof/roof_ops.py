@@ -2,11 +2,7 @@ import bpy
 import bmesh
 
 from ...utils import crash_safe, get_edit_mesh
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object
-)
+from ..facemap import FaceMap, add_facemap_for_groups, verify_facemaps_for_object
 
 from .roof_types import create_roof
 from .roof_props import RoofProperty

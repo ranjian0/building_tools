@@ -1,11 +1,7 @@
 import bpy
 import bmesh
 
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object
-)
+from ..facemap import FaceMap, add_facemap_for_groups, verify_facemaps_for_object
 
 from ...utils import (
     crash_safe,
@@ -39,7 +35,6 @@ class BTOOLS_OT_add_multigroup(bpy.types.Operator):
         self.props.draw(context, self.layout)
 
 
-
 @crash_safe
 def build(context, props):
     verify_facemaps_for_object(context.object)
@@ -62,7 +57,7 @@ def add_multigroup_facemaps():
 
 
 def validate_multigroup_faces(faces):
-    """ Filter out invalid faces """
+    """Filter out invalid faces"""
     # -- remove upward facing faces
     faces = list(filter(lambda f: abs(round(f.normal.z, 3)) == 0.0, faces))
     # -- remove non-rectangular faces

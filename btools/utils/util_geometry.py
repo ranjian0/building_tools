@@ -25,7 +25,9 @@ def plane(bm, width=2, length=2):
 
 def circle(bm, radius=1, segs=10, cap_tris=False):
     """Create circle in the bmesh"""
-    return bmesh.ops.create_circle(bm, cap_ends=True, cap_tris=cap_tris, segments=segs, radius=radius)
+    return bmesh.ops.create_circle(
+        bm, cap_ends=True, cap_tris=cap_tris, segments=segs, radius=radius
+    )
 
 
 def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
@@ -43,7 +45,9 @@ def cone(bm, r1=0.5, r2=0.01, height=2, segs=32):
 
 def cylinder(bm, radius=1, height=2, segs=10):
     """Create cylinder in bmesh"""
-    circle = bmesh.ops.create_circle(bm, cap_ends=True, cap_tris=False, segments=segs, radius=radius)
+    circle = bmesh.ops.create_circle(
+        bm, cap_ends=True, cap_tris=False, segments=segs, radius=radius
+    )
 
     verts = circle["verts"]
     face = list(verts[0].link_faces)

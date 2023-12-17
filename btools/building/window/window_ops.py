@@ -34,7 +34,6 @@ class BTOOLS_OT_add_window(bpy.types.Operator):
         self.props.draw(context, self.layout)
 
 
-
 @crash_safe
 def build(context, prop):
     verify_facemaps_for_object(context.object)
@@ -57,7 +56,7 @@ def add_window_facemaps():
 
 
 def validate_window_faces(faces):
-    """ Filter out invalid faces """
+    """Filter out invalid faces"""
     # -- remove non-rectangular faces
     faces = list(filter(lambda f: is_rectangle(f), faces))
     # -- remove faces that are perpendicular to Z+

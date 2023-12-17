@@ -96,7 +96,9 @@ def crash_safe(func):
 
             # -- cleanup blender context
             if bpy.context.mode == "EDIT_MESH":
-                bmesh.update_edit_mesh(bpy.context.edit_object.data, loop_triangles=True)
+                bmesh.update_edit_mesh(
+                    bpy.context.edit_object.data, loop_triangles=True
+                )
 
             # -- exit operator
             return {"CANCELLED"}
@@ -106,8 +108,12 @@ def crash_safe(func):
 
 def restricted_size(parent_dimensions, offset, size_min, size):
     """Get size restricted by various factors"""
-    limit_x = min(parent_dimensions[0] + 2 * offset[0], parent_dimensions[0] - 2 * offset[0])
-    limit_y = min(parent_dimensions[1] + 2 * offset[1], parent_dimensions[1] - 2 * offset[1])
+    limit_x = min(
+        parent_dimensions[0] + 2 * offset[0], parent_dimensions[0] - 2 * offset[0]
+    )
+    limit_y = min(
+        parent_dimensions[1] + 2 * offset[1], parent_dimensions[1] - 2 * offset[1]
+    )
     x = clamp(size[0], size_min[0], limit_x)
     y = clamp(size[1], size_min[1], limit_y)
     return x, y
@@ -140,12 +146,11 @@ def local_xyz(face):
 def XYDir(vec):
     """Remove the z component from a vector and normalize"""
     vec.z = 0
-    return vec.normalized() 
+    return vec.normalized()
 
 
 def get_scaled_unit(value):
-    """Mostly to scale prop values to current scene unit scale
-    """
+    """Mostly to scale prop values to current scene unit scale"""
     try:
         scale = bpy.context.scene.unit_settings.scale_length
     except AttributeError:
@@ -160,13 +165,13 @@ def get_defaults(prop):
         if data.function == PointerProperty:
             defaults[name] = get_defaults(getattr(prop, name))
         else:
-            defaults[name] = data.keywords.get('default')
+            defaults[name] = data.keywords.get("default")
 
     for name in list(defaults.keys()):
-        data = defaults[name] 
+        data = defaults[name]
         if isinstance(data, dict):
             for k, v in data.items():
-                defaults[f'{name}.{k}'] = v
+                defaults[f"{name}.{k}"] = v
             del defaults[name]
     return defaults
 

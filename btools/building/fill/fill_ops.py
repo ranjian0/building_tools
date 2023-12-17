@@ -31,6 +31,7 @@ class BTOOLS_OT_add_fill(bpy.types.Operator):
     def draw(self, context):
         self.props.draw(context, self.layout)
 
+
 @crash_safe
 def build(context, props):
     verify_facemaps_for_object(context.object)
@@ -47,7 +48,7 @@ def build(context, props):
 
 
 def validate_fill_faces(faces):
-    """ Filter out invalid faces """
+    """Filter out invalid faces"""
     # -- remove upward facing faces
     faces = list(filter(lambda f: abs(round(f.normal.z, 3)) == 0.0, faces))
     # -- remove non-rectangular faces

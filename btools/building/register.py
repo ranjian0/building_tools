@@ -30,7 +30,6 @@ register_funcs = (
     register_custom,
     register_material,
     register_removegeom,
-
     register_railing,
     register_balcony,
     register_fill,
@@ -47,7 +46,6 @@ unregister_funcs = (
     unregister_custom,
     unregister_material,
     unregister_removegeom,
-
     unregister_railing,
     unregister_balcony,
     unregister_fill,
