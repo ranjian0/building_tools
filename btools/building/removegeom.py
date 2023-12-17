@@ -1,6 +1,6 @@
 import bpy
 import bmesh
-from .facemap import FaceMap, add_faces_to_map
+from .materialgroup import MaterialGroup, add_faces_to_group
 from ..utils import (
     minmax,
     select,
@@ -22,7 +22,7 @@ def remove(context):
     bmesh.ops.delete(bm, geom=bound_faces, context="FACES")
     bmesh.ops.dissolve_verts(bm, verts=midv)
     newfaces = bmesh.ops.contextual_create(bm, geom=cornerv).get("faces")
-    add_faces_to_map(bm, newfaces, FaceMap.WALLS)
+    add_faces_to_group(bm, newfaces, MaterialGroup.WALLS)
 
     bmesh.update_edit_mesh(me, loop_triangles=True)
 

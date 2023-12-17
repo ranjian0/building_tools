@@ -5,7 +5,7 @@ import bmesh
 from bmesh.types import BMFace, BMEdge, BMVert
 from mathutils import Vector, Matrix, Quaternion
 
-from ..facemap import FaceMap, map_new_faces, add_facemap_for_groups
+from ..materialgroup import MaterialGroup, map_new_faces, add_material_group
 
 from ...utils import (
     clamp,
@@ -26,7 +26,7 @@ RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")
 
 def create_railing(bm, faces, prop, normal):
     vertical_edges = list({e for f in faces for e in f.edges if edge_is_vertical(e)})
-    add_facemap_for_groups(FaceMap.RAILING_POSTS)
+    add_material_group(MaterialGroup.RAILING_POSTS)
     cposts = make_corner_posts(bm, vertical_edges, prop, faces[0].normal)
     top_rails, fills = [], []
     for f in faces:
@@ -37,7 +37,7 @@ def create_railing(bm, faces, prop, normal):
     return RailingResult(cposts, top_rails, fills)
 
 
-@map_new_faces(FaceMap.RAILING_POSTS)
+@map_new_faces(MaterialGroup.RAILING_POSTS)
 def make_corner_posts(bm, edges, prop, up):
     posts = []
     for edge in edges:
@@ -67,7 +67,7 @@ def make_fill(bm, face, prop):
     )
 
     # create railing top
-    add_facemap_for_groups(FaceMap.RAILING_RAILS)
+    add_material_group(MaterialGroup.RAILING_RAILS)
     top_rail = create_railing_top(bm, top_edge, prop)
 
     # create fill
@@ -78,7 +78,7 @@ def make_fill(bm, face, prop):
     elif prop.fill == "RAILS":
         fill = create_fill_rails(bm, dup_face, prop)
     elif prop.fill == "WALL":
-        add_facemap_for_groups(FaceMap.RAILING_WALLS)
+        add_material_group(MaterialGroup.RAILING_WALLS)
         if prop.bottom_rail:
             create_railing_bottom(bm, bot_edge, prop)
         fill = create_fill_walls(bm, dup_face, prop)
@@ -86,7 +86,7 @@ def make_fill(bm, face, prop):
     return top_rail, fill
 
 
-@map_new_faces(FaceMap.RAILING_RAILS)
+@map_new_faces(MaterialGroup.RAILING_RAILS)
 def create_railing_top(bm, top_edge, prop):
     cylinder = create_railing_cylinder(bm, top_edge, prop)
     bmesh.ops.translate(
@@ -95,7 +95,7 @@ def create_railing_top(bm, top_edge, prop):
     return list({f for v in cylinder for f in v.link_faces})
 
 
-@map_new_faces(FaceMap.RAILING_RAILS)
+@map_new_faces(MaterialGroup.RAILING_RAILS)
 def create_railing_bottom(bm, bot_edge, prop):
     initial_loc = prop.corner_post_width * 1.5
     clamped_offset = clamp(
@@ -128,7 +128,7 @@ def create_railing_cylinder(bm, edge, prop):
     return cylinder
 
 
-@map_new_faces(FaceMap.RAILING_POSTS)
+@map_new_faces(MaterialGroup.RAILING_POSTS)
 def create_fill_posts(bm, face, prop):
     result = []
     sorted_edges = sort_edges(
@@ -170,7 +170,7 @@ def create_fill_posts(bm, face, prop):
     return result
 
 
-@map_new_faces(FaceMap.RAILING_RAILS)
+@map_new_faces(MaterialGroup.RAILING_RAILS)
 def create_fill_rails(bm, face, prop):
     # create rails
     result = []
@@ -205,7 +205,7 @@ def create_fill_rails(bm, face, prop):
     return result
 
 
-@map_new_faces(FaceMap.RAILING_WALLS)
+@map_new_faces(MaterialGroup.RAILING_WALLS)
 def create_fill_walls(bm, face, prop):
     # create walls
     wall_size = clamp(prop.wall_fill.width, 0.001, prop.corner_post_width)

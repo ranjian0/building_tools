@@ -12,10 +12,13 @@ from ...utils import (
     bm_from_obj,
     create_mesh,
     create_object,
-    add_faces_to_map,
-    FaceMap,
-    add_facemap_for_groups,
     filter_geom,
+)
+
+from ...building.materialgroup import (
+    add_faces_to_group,
+    MaterialGroup,
+    add_material_group,    
 )
 
 
@@ -158,65 +161,65 @@ class Road:
             bm, matrix=Matrix.Translation((0, prop.interval, 0)), verts=verts
         )
 
-        # Set facemaps
+        # Set materialgroup
         # Face order is totally random, vertex and edge order is not so get the faces from the edges
-        bm.faces.layers.face_map.verify()
+        # bm.faces.layers.face_map.verify()
 
-        groups = [FaceMap.ROAD]
+        groups = [MaterialGroup.ROAD]
 
         if prop.generate_left_sidewalk or prop.generate_right_sidewalk:
-            groups.append(FaceMap.SIDEWALK)
-            groups.append(FaceMap.SIDEWALK_SIDE)
+            groups.append(MaterialGroup.SIDEWALK)
+            groups.append(MaterialGroup.SIDEWALK_SIDE)
 
         if not prop.generate_left_sidewalk or not prop.generate_right_sidewalk:
-            groups.append(FaceMap.SHOULDER_EXTENSION)
+            groups.append(MaterialGroup.SHOULDER_EXTENSION)
 
         if prop.generate_shoulders:
-            groups.append(FaceMap.SHOULDER)
+            groups.append(MaterialGroup.SHOULDER)
 
-        add_facemap_for_groups(groups)
+        add_material_group(groups)
         bm.edges.ensure_lookup_table()
 
         # Left side of road
         if not prop.generate_left_sidewalk:
-            add_faces_to_map(
-                bm, (bm.edges[0].link_faces[0],), FaceMap.SHOULDER_EXTENSION
+            add_faces_to_group(
+                bm, (bm.edges[0].link_faces[0],), MaterialGroup.SHOULDER_EXTENSION
             )
             face_count = 1
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SHOULDER)
+                add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SHOULDER)
                 face_count += 1
         else:
-            add_faces_to_map(bm, (bm.edges[0].link_faces[0],), FaceMap.SIDEWALK)
-            add_faces_to_map(bm, (bm.edges[1].link_faces[0],), FaceMap.SIDEWALK_SIDE)
+            add_faces_to_group(bm, (bm.edges[0].link_faces[0],), MaterialGroup.SIDEWALK)
+            add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SIDEWALK_SIDE)
             face_count = 2
 
             if prop.generate_shoulders:
-                add_faces_to_map(bm, (bm.edges[2].link_faces[0],), FaceMap.SHOULDER)
+                add_faces_to_group(bm, (bm.edges[2].link_faces[0],), MaterialGroup.SHOULDER)
                 face_count += 1
 
         # Central road
-        add_faces_to_map(bm, (bm.edges[face_count].link_faces[0],), FaceMap.ROAD)
+        add_faces_to_group(bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.ROAD)
         face_count += 1
 
         # Right side of road
         if prop.generate_shoulders:
-            add_faces_to_map(
-                bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SHOULDER
             )
             face_count += 1
 
         if prop.generate_right_sidewalk:
-            add_faces_to_map(
-                bm, (bm.edges[face_count].link_faces[0],), FaceMap.SIDEWALK_SIDE
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SIDEWALK_SIDE
             )
-            add_faces_to_map(
-                bm, (bm.edges[face_count + 1].link_faces[0],), FaceMap.SIDEWALK
+            add_faces_to_group(
+                bm, (bm.edges[face_count + 1].link_faces[0],), MaterialGroup.SIDEWALK
             )
         else:
-            add_faces_to_map(
-                bm, (bm.edges[face_count].link_faces[0],), FaceMap.SHOULDER_EXTENSION
+            add_faces_to_group(
+                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SHOULDER_EXTENSION
             )
 
         # Continue to extrude

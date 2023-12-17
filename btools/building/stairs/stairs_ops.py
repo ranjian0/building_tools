@@ -1,10 +1,10 @@
 import bpy
 import bmesh
 
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
 )
 
 from .stairs_types import create_stairs
@@ -36,13 +36,13 @@ class BTOOLS_OT_add_stairs(bpy.types.Operator):
 
 @crash_safe
 def build(context, prop):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = [f for f in bm.faces if f.select]
 
     if validate_stair_faces(faces):
-        add_stairs_facemaps()
+        add_stairs_matgroup()
         if create_stairs(bm, faces, prop):
             bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
@@ -51,8 +51,8 @@ def build(context, prop):
     return {"CANCELLED"}
 
 
-def add_stairs_facemaps():
-    add_facemap_for_groups(FaceMap.STAIRS)
+def add_stairs_matgroup():
+    add_material_group(MaterialGroup.STAIRS)
 
 
 def validate_stair_faces(faces):

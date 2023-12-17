@@ -1,10 +1,10 @@
 import bpy
 import bmesh
 
-from ..facemap import (
-    FaceMap,
-    add_facemap_for_groups,
-    verify_facemaps_for_object,
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
 )
 
 from .balcony_types import create_balcony
@@ -36,13 +36,13 @@ class BTOOLS_OT_add_balcony(bpy.types.Operator):
 
 @crash_safe
 def build(context, prop):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = [face for face in bm.faces if face.select]
 
     if validate_balcony_faces(faces):
-        add_balcony_facemaps()
+        add_balcony_matgroups()
         create_balcony(bm, faces, prop)
         bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"FINISHED"}
@@ -51,9 +51,9 @@ def build(context, prop):
     return {"CANCELLED"}
 
 
-def add_balcony_facemaps():
-    groups = FaceMap.BALCONY
-    add_facemap_for_groups(groups)
+def add_balcony_matgroups():
+    groups = MaterialGroup.BALCONY
+    add_material_group(groups)
 
 
 def validate_balcony_faces(faces):

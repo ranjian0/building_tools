@@ -1,24 +1,20 @@
-import math
 import bmesh
-from mathutils import Vector
 
 from ..fill import fill_face
 from ..frame import add_frame_depth
 from ..array import spread_array, clamp_array_count, get_array_split_edges
 
 from ..arch import fill_arch, create_arch, add_arch_depth
-from ..facemap import (
-    FaceMap,
+from ..materialgroup import (
+    MaterialGroup,
     map_new_faces,
-    add_faces_to_map,
-    add_facemap_for_groups,
-    find_faces_without_facemap,
+    add_faces_to_group,
+    find_faces_without_matgroup,
 )
 
 from ...utils import (
     clamp,
     XYDir,
-    select,
     validate,
     arc_edge,
     local_xyz,
@@ -65,12 +61,12 @@ def create_window(bm, faces, prop):
                     fill_arch(bm, arch, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-    nulfaces = find_faces_without_facemap(bm)
-    add_faces_to_map(bm, nulfaces, FaceMap.WALLS)
+    nulfaces = find_faces_without_matgroup(bm)
+    add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
     return True
 
 
-@map_new_faces(FaceMap.WALLS)
+@map_new_faces(MaterialGroup.WALLS)
 def create_window_split(bm, face, prop):
     """Use properties from SplitOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
@@ -139,8 +135,8 @@ def create_circular_frame(bm, face, prop):
 
     # -- add window depth
     win, frames = add_window_depth(bm, mid, prop.window_depth, xyz[2])
-    add_faces_to_map(bm, [win], FaceMap.WINDOW)
-    add_faces_to_map(bm, res.get("faces", []) + frames, FaceMap.FRAME)
+    add_faces_to_group(bm, [win], MaterialGroup.WINDOW)
+    add_faces_to_group(bm, res.get("faces", []) + frames, MaterialGroup.FRAME)
     return win, None
 
 
@@ -193,10 +189,10 @@ def create_rectangular_frame(bm, face, prop):
     frame_faces += new_frame_faces
 
     # add face maps
-    add_faces_to_map(bm, [window_face], FaceMap.WINDOW)
-    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
+    add_faces_to_group(bm, [window_face], MaterialGroup.WINDOW)
+    add_faces_to_group(bm, validate(frame_faces), MaterialGroup.FRAME)
     if prop.add_arch:
-        add_faces_to_map(bm, [arch_face], FaceMap.WINDOW)
+        add_faces_to_group(bm, [arch_face], MaterialGroup.WINDOW)
 
     return window_face, arch_face
 

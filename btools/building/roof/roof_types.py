@@ -4,7 +4,7 @@ import numpy as np
 from bmesh.types import BMVert, BMFace
 from mathutils import Vector
 
-from ..facemap import FaceMap, map_new_faces, add_faces_to_map, add_facemap_for_groups
+from ..materialgroup import MaterialGroup, map_new_faces, add_faces_to_group, add_material_group
 from ...utils import (
     equal,
     select,
@@ -24,14 +24,14 @@ def create_roof(bm, faces, prop):
     if prop.type == "FLAT":
         create_flat_roof(bm, faces, prop)
     elif prop.type == "GABLE":
-        add_facemap_for_groups(FaceMap.ROOF_HANGS)
+        add_material_group(MaterialGroup.ROOF_HANGS)
         create_gable_roof(bm, faces, prop)
     elif prop.type == "HIP":
-        add_facemap_for_groups(FaceMap.ROOF_HANGS)
+        add_material_group(MaterialGroup.ROOF_HANGS)
         create_hip_roof(bm, faces, prop)
 
 
-@map_new_faces(FaceMap.ROOF)
+@map_new_faces(MaterialGroup.ROOF)
 def create_flat_roof(bm, faces, prop):
     """Create a flat roof"""
     # -- extrude up and outset
@@ -63,7 +63,7 @@ def create_gable_roof(bm, faces, prop):
         faces = bmesh.ops.contextual_create(bm, geom=validate(all_edges)).get("faces")
 
         bot_faces = [f for e in faces[-1].edges for f in e.link_faces if f not in faces]
-        add_faces_to_map(bm, bot_faces, FaceMap.ROOF_HANGS)
+        add_faces_to_group(bm, bot_faces, MaterialGroup.ROOF_HANGS)
     else:
         # -- Open GABLE
         #  XXX prevent dissolve_lone_verts from destroying lower geometry
@@ -108,7 +108,7 @@ def create_gable_roof(bm, faces, prop):
 def create_hip_roof(bm, faces, prop):
     """Create a hip roof"""
     # -- create base for hip roof
-    roof_hang = map_new_faces(FaceMap.ROOF_HANGS)(extrude_and_outset)
+    roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
     faces = roof_hang(bm, faces, prop.thickness, prop.outset)
     face = faces[-1]
     median = face.calc_center_median()
@@ -198,7 +198,7 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
     return join_intersections_and_get_skeleton_edges(bm, S_verts, skeleton_edges)
 
 
-@map_new_faces(FaceMap.ROOF)
+@map_new_faces(MaterialGroup.ROOF)
 def create_skeleton_faces(bm, original_edges, skeleton_edges):
     """Create faces formed from hiproof verts and edges"""
 
@@ -349,12 +349,12 @@ def gable_process_box(bm, roof_faces, prop):
         if not f.normal.z
     }
     link_faces.update(set(validate(roof_faces)))
-    add_faces_to_map(bm, list(link_faces), FaceMap.ROOF_HANGS)
+    add_faces_to_group(bm, list(link_faces), MaterialGroup.ROOF_HANGS)
 
 
 def gable_process_open(bm, roof_faces, prop):
     """Finalize open gable roof type"""
-    add_faces_to_map(bm, roof_faces, FaceMap.WALLS)
+    add_faces_to_group(bm, roof_faces, MaterialGroup.WALLS)
 
     # -- find only the upward facing faces
     top_faces = [f for f in roof_faces if f.normal.z]
@@ -404,12 +404,12 @@ def gable_process_open(bm, roof_faces, prop):
     # -- post cleanup
     bmesh.ops.dissolve_edges(bm, edges=dissolve_edges)
 
-    # -- facemaps
+    # -- matgroups
     linked = {f for fc in side_faces for e in fc.edges for f in e.link_faces}
     linked_top = [f for f in linked if f.normal.z > 0]
     linked_bot = [f for f in linked if f.normal.z < 0]
-    add_faces_to_map(bm, linked_top, FaceMap.ROOF)
-    add_faces_to_map(bm, side_faces + linked_bot, FaceMap.ROOF_HANGS)
+    add_faces_to_group(bm, linked_top, MaterialGroup.ROOF)
+    add_faces_to_group(bm, side_faces + linked_bot, MaterialGroup.ROOF_HANGS)
 
 
 def extrude_and_outset(bm, faces, thickness, outset):

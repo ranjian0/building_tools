@@ -4,7 +4,7 @@ from bmesh.types import BMVert, BMFace, BMEdge
 from mathutils import Vector
 
 from ..railing.railing import create_railing
-from ..facemap import FaceMap, add_faces_to_map
+from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
     clamp,
     VEC_UP,
@@ -60,7 +60,7 @@ def create_balcony_ungrouped(bm, faces, prop):
         normal = f.normal.copy()
         split_faces = create_balcony_split(bm, f, prop)
         for f in split_faces:
-            add_faces_to_map(bm, [f], FaceMap.BALCONY)
+            add_faces_to_group(bm, [f], MaterialGroup.BALCONY)
             _, top = extrude_balcony(bm, f, prop.depth, normal)
 
             if prop.has_railing:
@@ -163,9 +163,9 @@ def add_railing_to_balcony_grouped(bm, top, prop):
 
 
 def map_balcony_faces(bm, face):
-    """Add balcony faces to their facemap"""
+    """Add balcony faces to their matgroups"""
     new_faces = {f for e in face.edges for f in e.link_faces}
-    add_faces_to_map(bm, new_faces, FaceMap.BALCONY)
+    add_faces_to_group(bm, new_faces, MaterialGroup.BALCONY)
 
 
 def create_balcony_split(bm, face, prop):

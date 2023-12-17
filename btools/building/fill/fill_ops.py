@@ -9,7 +9,7 @@ from ...utils import (
 
 from .fill_types import add_fill
 from .fill_props import FillProperty
-from ..facemap import verify_facemaps_for_object
+from ..materialgroup import verify_matgroup_attribute_for_object
 
 
 class BTOOLS_OT_add_fill(bpy.types.Operator):
@@ -34,7 +34,7 @@ class BTOOLS_OT_add_fill(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_fill_faces([face for face in bm.faces if face.select])

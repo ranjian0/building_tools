@@ -6,7 +6,7 @@ import bmesh
 from mathutils import Matrix, Vector
 from bpy.props import PointerProperty
 
-from .facemap import FaceMap, add_faces_to_map, add_facemap_for_groups
+from .materialgroup import MaterialGroup, add_faces_to_group, add_material_group
 
 from ..utils import (
     select,
@@ -83,7 +83,7 @@ class BTOOLS_OT_add_custom(bpy.types.Operator):
         return context.object is not None and context.mode == "EDIT_MESH"
 
     def execute(self, context):
-        add_facemap_for_groups([FaceMap.CUSTOM])
+        add_material_group([MaterialGroup.CUSTOM])
         return add_custom_execute(self, context)
 
     def draw(self, context):
@@ -210,7 +210,7 @@ def place_object_on_face(bm, face, custom_obj, prop):
     face_idx = face.index
     custom_faces = duplicate_into_bm(bm, custom_obj)
     face = [f for f in bm.faces if f.index == face_idx].pop()  # restore reference
-    add_faces_to_map(bm, custom_faces, FaceMap.CUSTOM)
+    add_faces_to_group(bm, custom_faces, MaterialGroup.CUSTOM)
     custom_verts = list({v for f in custom_faces for v in f.verts})
 
     # (preprocess)calculate bounds of the object

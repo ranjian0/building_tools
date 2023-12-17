@@ -4,7 +4,7 @@ import bmesh
 from bmesh.types import BMEdge, BMVert
 from mathutils import Vector, Matrix
 
-from ..facemap import FaceMap, map_new_faces, add_faces_to_map, add_facemap_for_groups
+from ..materialgroup import MaterialGroup, map_new_faces, add_faces_to_group, add_material_group
 
 from ...utils import (
     VEC_UP,
@@ -64,20 +64,20 @@ def fill_face(bm, face, prop, dw="DOOR"):
 
     fill_type = get_fill_type(prop, dw)
     if fill_type == "PANELS":
-        add_facemap_for_groups(FaceMap.DOOR_PANELS)
+        add_material_group(MaterialGroup.DOOR_PANELS)
         fill_panel(bm, face, get_fill(prop, "panel_fill", dw))
     elif fill_type == "GLASS_PANES":
-        add_facemap_for_groups(
-            FaceMap.DOOR_PANES if dw == "DOOR" else FaceMap.WINDOW_PANES
+        add_material_group(
+            MaterialGroup.DOOR_PANES if dw == "DOOR" else MaterialGroup.WINDOW_PANES
         )
         fill_glass_panes(bm, face, get_fill(prop, "glass_fill", dw), user)
     elif fill_type == "LOUVER":
-        add_facemap_for_groups(
-            FaceMap.DOOR_LOUVERS if dw == "DOOR" else FaceMap.WINDOW_LOUVERS
+        add_material_group(
+            MaterialGroup.DOOR_LOUVERS if dw == "DOOR" else MaterialGroup.WINDOW_LOUVERS
         )
         fill_louver(bm, face, get_fill(prop, "louver_fill", dw), user)
     elif fill_type == "BAR":
-        add_facemap_for_groups(FaceMap.WINDOW_BARS)
+        add_material_group(MaterialGroup.WINDOW_BARS)
         fill_bar(bm, face, get_fill(prop, "bar_fill", dw))
 
 
@@ -113,7 +113,7 @@ def validate_fill_props(prop, dw):
         fill.louver_depth = min(fill.louver_depth, depth)
 
 
-@map_new_faces(FaceMap.FRAME, skip=FaceMap.DOOR_PANELS)
+@map_new_faces(MaterialGroup.FRAME, skip=MaterialGroup.DOOR_PANELS)
 def fill_panel(bm, face, prop):
     """Create panels on face"""
     if prop.panel_count_x + prop.panel_count_y == 0:
@@ -142,7 +142,7 @@ def fill_panel(bm, face, prop):
         verts=list({v for f in quads for v in f.verts}),
         vec=face.normal * prop.panel_depth,
     )
-    add_faces_to_map(bm, quads, FaceMap.DOOR_PANELS)
+    add_faces_to_group(bm, quads, MaterialGroup.DOOR_PANELS)
 
 
 def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
@@ -154,7 +154,7 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     if not round(width) or not round(height):
         return
 
-    userframe = FaceMap.DOOR_PANES if user == FillUser.DOOR else FaceMap.WINDOW_PANES
+    userframe = MaterialGroup.DOOR_PANES if user == FillUser.DOOR else MaterialGroup.WINDOW_PANES
     bmesh.ops.inset_individual(
         bm, faces=[face], thickness=0.0001
     )  # to isolate the working quad and not leave adjacent face as n-gon
@@ -173,11 +173,11 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
         use_even_offset=True,
     )
 
-    usergroup = FaceMap.DOOR if user == FillUser.DOOR else FaceMap.WINDOW
-    add_faces_to_map(bm, quads, usergroup)
+    usergroup = MaterialGroup.DOOR if user == FillUser.DOOR else MaterialGroup.WINDOW
+    add_faces_to_group(bm, quads, usergroup)
 
 
-@map_new_faces(FaceMap.WINDOW_BARS)
+@map_new_faces(MaterialGroup.WINDOW_BARS)
 def fill_bar(bm, face, prop):
     """Create horizontal and vertical bars along a face"""
     if prop.bar_count_x + prop.bar_count_y == 0:
@@ -228,7 +228,7 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
         prop.louver_margin = min(
             prop.louver_margin, min(calc_face_dimensions(face)) / 2
         )
-        inset = map_new_faces(FaceMap.FRAME)(bmesh.ops.inset_individual)
+        inset = map_new_faces(MaterialGroup.FRAME)(bmesh.ops.inset_individual)
         inset(bm, faces=[face], thickness=prop.louver_margin)
 
     segments = double_and_make_even(prop.louver_count)
@@ -245,10 +245,10 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
             space=Matrix.Translation(-face.calc_center_median()),
         )
 
-    usergroup = [FaceMap.WINDOW_LOUVERS, FaceMap.DOOR_LOUVERS][user == FillUser.DOOR]
+    usergroup = [MaterialGroup.WINDOW_LOUVERS, MaterialGroup.DOOR_LOUVERS][user == FillUser.DOOR]
     extrude = map_new_faces(usergroup)(extrude_faces_add_slope)
     extrude(bm, louver_faces, normal, prop.louver_depth)
-    add_faces_to_map(bm, validate(faces[::2]), usergroup)
+    add_faces_to_group(bm, validate(faces[::2]), usergroup)
 
 
 def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):

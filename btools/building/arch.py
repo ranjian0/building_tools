@@ -6,7 +6,7 @@ from bpy.props import (
     EnumProperty,
     FloatProperty,
 )
-from .facemap import FaceMap, map_new_faces, add_facemap_for_groups
+from .materialgroup import MaterialGroup, map_new_faces, add_material_group
 
 from ..utils import (
     clamp,
@@ -79,7 +79,7 @@ class ArchProperty(bpy.types.PropertyGroup):
 def fill_arch(bm, face, prop):
     """Fill arch"""
     if prop.fill_type == "GLASS_PANES":
-        add_facemap_for_groups(FaceMap.DOOR_PANES)
+        add_material_group(MaterialGroup.DOOR_PANES)
         pane_arch_face(bm, face, prop.glass_fill)
 
 
@@ -131,7 +131,7 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
     return arch_face, arch_frame_faces
 
 
-@map_new_faces(FaceMap.DOOR_PANES)
+@map_new_faces(MaterialGroup.DOOR_PANES)
 def pane_arch_face(bm, face, prop):
     bmesh.ops.inset_individual(
         bm, faces=[face], thickness=prop.pane_margin * 0.75, use_even_offset=True

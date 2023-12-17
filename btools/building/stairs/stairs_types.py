@@ -6,7 +6,7 @@ from mathutils import Vector, Quaternion
 
 from ..railing.railing import create_railing
 
-from ..facemap import FaceMap, add_faces_to_map
+from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
     VEC_UP,
     VEC_DOWN,
@@ -40,7 +40,7 @@ def create_stairs(bm, faces, prop):
             return False
 
         f = create_stairs_split(bm, f, prop)
-        add_faces_to_map(bm, [f], FaceMap.STAIRS)
+        add_faces_to_group(bm, [f], MaterialGroup.STAIRS)
 
         normal = f.normal.copy()
         top_faces = create_steps(bm, f, prop)

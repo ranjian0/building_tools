@@ -6,11 +6,11 @@ from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
 from ..array import spread_array, clamp_array_count, get_array_split_edges
-from ..facemap import (
-    FaceMap,
+from ..materialgroup import (
+    MaterialGroup,
     map_new_faces,
-    add_faces_to_map,
-    find_faces_without_facemap,
+    add_faces_to_group,
+    find_faces_without_matgroup,
 )
 from ...utils import (
     clamp,
@@ -78,12 +78,12 @@ def create_multigroup(bm, faces, prop):
                 fill_arch(bm, arch, prop)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
-    nulfaces = find_faces_without_facemap(bm)
-    add_faces_to_map(bm, nulfaces, FaceMap.WALLS)
+    nulfaces = find_faces_without_matgroup(bm)
+    add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
     return True
 
 
-@map_new_faces(FaceMap.WALLS)
+@map_new_faces(MaterialGroup.WALLS)
 def create_multigroup_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
@@ -183,11 +183,11 @@ def create_multigroup_frame(bm, face, prop):
     frame_faces += new_frame_faces
 
     # add face maps
-    add_faces_to_map(bm, door_faces, FaceMap.DOOR)
-    add_faces_to_map(bm, window_faces, FaceMap.WINDOW)
-    add_faces_to_map(bm, validate(frame_faces), FaceMap.FRAME)
+    add_faces_to_group(bm, door_faces, MaterialGroup.DOOR)
+    add_faces_to_group(bm, window_faces, MaterialGroup.WINDOW)
+    add_faces_to_group(bm, validate(frame_faces), MaterialGroup.FRAME)
     if prop.add_arch:
-        add_faces_to_map(bm, [arch_face], FaceMap.DOOR)
+        add_faces_to_group(bm, [arch_face], MaterialGroup.DOOR)
 
     return door_faces, window_faces, arch_face
 

@@ -2,7 +2,7 @@ import bmesh
 from bmesh.types import BMFace
 from mathutils import Vector
 
-from ..facemap import FaceMap, add_faces_to_map
+from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
     equal,
     filter_geom,
@@ -19,9 +19,9 @@ def create_floors(bm, faces, prop):
 
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
 
-    add_faces_to_map(bm, slabs, FaceMap.SLABS)
-    add_faces_to_map(bm, walls, FaceMap.WALLS)
-    add_faces_to_map(bm, roof, FaceMap.ROOF)
+    add_faces_to_group(bm, slabs, MaterialGroup.SLABS)
+    add_faces_to_group(bm, walls, MaterialGroup.WALLS)
+    add_faces_to_group(bm, roof, MaterialGroup.ROOF)
 
 
 def extrude_slabs_and_floors(bm, faces, prop):
@@ -139,4 +139,4 @@ def create_columns(bm, face, prop):
             res.extend(cube.get("verts"))
 
     columns = list({f for v in res for f in v.link_faces})
-    add_faces_to_map(bm, columns, FaceMap.COLUMNS)
+    add_faces_to_group(bm, columns, MaterialGroup.COLUMNS)

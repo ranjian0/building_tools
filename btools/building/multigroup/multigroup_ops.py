@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 
-from ..facemap import FaceMap, add_facemap_for_groups, verify_facemaps_for_object
+from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
 
 from ...utils import (
     crash_safe,
@@ -37,12 +37,12 @@ class BTOOLS_OT_add_multigroup(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_facemaps_for_object(context.object)
+    verify_matgroup_attribute_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_multigroup_faces([face for face in bm.faces if face.select])
     if faces:
-        add_multigroup_facemaps()
+        add_multigroup_matgroups()
         if create_multigroup(bm, faces, props):
             bmesh.update_edit_mesh(me, loop_triangles=True)
             return {"FINISHED"}
@@ -51,9 +51,9 @@ def build(context, props):
     return {"CANCELLED"}
 
 
-def add_multigroup_facemaps():
-    groups = FaceMap.DOOR, FaceMap.WINDOW, FaceMap.FRAME
-    add_facemap_for_groups(groups)
+def add_multigroup_matgroups():
+    groups = MaterialGroup.DOOR, MaterialGroup.WINDOW, MaterialGroup.FRAME
+    add_material_group(groups)
 
 
 def validate_multigroup_faces(faces):
