@@ -13,10 +13,11 @@
 # This tag name will also be included in the created archive name.
 
 import os
-import subprocess
 import sys
 import time
 import zipfile
+import pathlib
+import subprocess
 
 REPO_FILES = (
     "btools/",
@@ -52,6 +53,8 @@ def main() -> None:
 
     basename = "building_tools"
     outfilename = "%s_%s.zip" % (basename, upto if len(upto) < 10 else 'latest')
+    if pathlib.Path(outfilename).exists():
+        os.remove(outfilename)    
     out = zipfile.ZipFile(outfilename, "x")
     for item in REPO_FILES:
         if item.endswith("/"):
