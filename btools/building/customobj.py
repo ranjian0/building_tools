@@ -24,7 +24,7 @@ from ..utils import (
     subdivide_face_horizontally,
     get_selected_face_dimensions,
 )
-from ..utils import VEC_UP, VEC_FORWARD
+from ..utils import VEC_UP
 from .array import ArrayProperty, ArrayGetSet
 from .sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
 
