@@ -73,7 +73,7 @@ def main() -> None:
 
             if info != b"":
                 item = zipfile.ZipInfo()
-                item.filename = os.path.join(basename, filename)
+                item.filename = basename + "/" + filename
                 item.external_attr = 0o100644 << 16
                 item.compress_type = zipfile.ZIP_DEFLATED
                 timestamp, commit_hash = info.split(b":")
