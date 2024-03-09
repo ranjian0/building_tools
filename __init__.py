@@ -1,4 +1,5 @@
 import bpy
+from .btools.api.register import register_api, unregister_api
 from .btools.building.register import register_building, unregister_building
 
 bl_info = {
@@ -33,6 +34,23 @@ class BTOOLS_PT_road_tools(bpy.types.Panel):
         col = layout.column(align=True)
         col.operator("btools.add_array")
         col.operator("btools.finalize_array")
+        
+
+class BTOOLS_PT_ai_tools(bpy.types.Panel):
+    
+    bl_label = "AI Tools"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
+
+    def draw(self, context):
+        layout = self.layout
+
+        # Draw Operators
+        # ``````````````
+        col = layout.column(align=True)
+        col.operator("btools.ai_install")
+        col.operator("btools.ai_generate")
 
 
 class BTOOLS_PT_building_tools(bpy.types.Panel):
@@ -143,7 +161,7 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
                 layout.label(text=("This matgroup was corrupted by a destructive operation on the object."), icon="ERROR")
 
 
-classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
+classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools, BTOOLS_PT_ai_tools)
 
 register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 
@@ -155,6 +173,7 @@ def register():
         pass # XXX script_watcher dev environment
 
     register_building()
+    register_api()
     register_ui()
 
 
@@ -166,6 +185,7 @@ def unregister():
         pass # XXX script_watcher dev environment
 
     unregister_building()
+    unregister_api()
     unregister_ui()
 
 if __name__ == "__main__":
