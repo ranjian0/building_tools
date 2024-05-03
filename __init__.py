@@ -16,7 +16,6 @@ bl_info = {
 
 
 class BTOOLS_PT_road_tools(bpy.types.Panel):
-
     bl_label = "Road Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -34,10 +33,9 @@ class BTOOLS_PT_road_tools(bpy.types.Panel):
         col = layout.column(align=True)
         col.operator("btools.add_array")
         col.operator("btools.finalize_array")
-        
+
 
 class BTOOLS_PT_ai_tools(bpy.types.Panel):
-    
     bl_label = "AI Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -53,7 +51,6 @@ class BTOOLS_PT_ai_tools(bpy.types.Panel):
 
 
 class BTOOLS_PT_building_tools(bpy.types.Panel):
-
     bl_label = "Building Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -91,7 +88,6 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
 
 
 class BTOOLS_PT_material_tools(bpy.types.Panel):
-
     bl_label = "Material Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -119,7 +115,15 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
         layout.label(text="Groups")
 
         row = layout.row()
-        row.template_list("BTOOLS_UL_materials", "", ob, "bt_materials", ob, "bt_materials_active_index", rows=rows)
+        row.template_list(
+            "BTOOLS_UL_materials",
+            "",
+            ob,
+            "bt_materials",
+            ob,
+            "bt_materials_active_index",
+            rows=rows,
+        )
 
         col = row.column(align=True)
         col.operator("btools.material_group_add", icon="ADD", text="")
@@ -155,40 +159,38 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
                 sp = layout.split(factor=0.8, align=True)
                 sp.operator("btools.create_material")
                 sp.operator("btools.remove_material", icon="PANEL_CLOSE", text="")
-                layout.template_ID_preview(face_map_material, "material", hide_buttons=True)
+                layout.template_ID_preview(
+                    face_map_material, "material", hide_buttons=True
+                )
             else:
-                layout.label(text=("This matgroup was corrupted by a destructive operation on the object."), icon="ERROR")
+                layout.label(
+                    text=(
+                        "This matgroup was corrupted by a destructive operation on the object."
+                    ),
+                    icon="ERROR",
+                )
 
 
 classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools, BTOOLS_PT_ai_tools)
 
 register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 
-def register():
-    try:
-        from . import addon_updater_ops
-        addon_updater_ops.register(bl_info)
-    except ImportError:
-        pass # XXX script_watcher dev environment
 
+def register():
     register_building()
     register_api()
     register_ui()
 
 
 def unregister():
-    try:
-        from . import addon_updater_ops
-        addon_updater_ops.unregister()
-    except ImportError:
-        pass # XXX script_watcher dev environment
-
     unregister_building()
     unregister_api()
     unregister_ui()
 
+
 if __name__ == "__main__":
     import os
+
     os.system("clear")
 
     # -- custom unregister for script watcher
