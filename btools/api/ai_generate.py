@@ -1,5 +1,8 @@
 import bpy
+import sys
 import json
+import subprocess
+import importlib.util
 import addon_utils
 from pathlib import Path
 from types import SimpleNamespace
@@ -30,39 +33,47 @@ Your response should be:
 }
 """
 
+
 def is_development():
     for mod in addon_utils.modules():
-        if mod.__name__ == 'building_tools':
-            return False 
+        if mod.__name__ == "building_tools":
+            return False
     return True
+
+
+def ensure_openai_lib():
+    openai_installed = importlib.util.find_spec("openai")
+    if openai_installed:
+        return
+
+    blender_bin = sys.executable
+    print([blender_bin, "-m", "pip", "install", "openai"])
+    subprocess.run([blender_bin, "-m" "pip", "install", "openai"])
+
 
 def get_blender_preferences():
     if is_development():
-        prefs = SimpleNamespace(api_key='', gpt_model='')
-        env_file = Path(__file__).parent.parent.parent / '.env.json'
+        prefs = SimpleNamespace(api_key="", gpt_model="")
+        env_file = Path(__file__).parent.parent.parent / ".env.json"
         if env_file.exists():
             with env_file.open() as f:
                 data = json.load(f)
-                prefs.api_key = data['OPENAI_API_KEY']
-                prefs.gpt_model = data['GPT_MODEL']
+                prefs.api_key = data["OPENAI_API_KEY"]
+                prefs.gpt_model = data["GPT_MODEL"]
         return prefs
-    
+
     prefs = bpy.context.preferences.addons[__package__].preferences
     return prefs
 
+
 def generate_ai_building():
     from openai import OpenAI
+
     prefs = get_blender_preferences()
     client = OpenAI(api_key=prefs.api_key)
 
     response = client.chat.completions.create(
-        model=prefs.gpt_model,
-        messages=[
-            {
-                "role": "system",
-                "content": prompt
-            }
-        ]
+        model=prefs.gpt_model, messages=[{"role": "system", "content": prompt}]
     )
 
     return response.choices[0].message.content
@@ -72,24 +83,11 @@ class BTOOLS_OT_ai_generate(bpy.types.Operator):
     bl_idname = "btools.ai_generate"
     bl_label = "Generate Building"
     bl_description = "Use OpenAI's GPT to generate a building design"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        ensure_openai_lib()
+
         response = generate_ai_building()
         print("AI Response:\n", response)
-        return {'FINISHED'}
-
-
-class BTOOLS_OT_ai_install(bpy.types.Operator):
-    bl_idname = "btools.ai_install"
-    bl_label = "Install OpenAI"
-    bl_description = "Install OpenAI's GPT-3 package"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        import sys
-        import subprocess
-        blender_bin = sys.executable
-        print([blender_bin, '-m', 'pip', 'install', 'openai'])
-        subprocess.run([blender_bin, '-m' 'pip', 'install', 'openai'])
-        return {'FINISHED'}
+        return {"FINISHED"}

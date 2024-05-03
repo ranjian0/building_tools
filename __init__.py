@@ -49,7 +49,6 @@ class BTOOLS_PT_ai_tools(bpy.types.Panel):
         # Draw Operators
         # ``````````````
         col = layout.column(align=True)
-        col.operator("btools.ai_install")
         col.operator("btools.ai_generate")
 
 

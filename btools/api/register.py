@@ -1,9 +1,8 @@
 import bpy
-from .ai_generate import BTOOLS_OT_ai_generate, BTOOLS_OT_ai_install
+from .ai_generate import BTOOLS_OT_ai_generate
 
 classes = (
     BTOOLS_OT_ai_generate,
-    BTOOLS_OT_ai_install,
 )
 
 
