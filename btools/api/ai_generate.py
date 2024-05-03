@@ -67,6 +67,8 @@ def get_blender_preferences():
 
 
 def generate_ai_building():
+    ensure_openai_lib()
+
     from openai import OpenAI
 
     prefs = get_blender_preferences()
@@ -86,8 +88,6 @@ class BTOOLS_OT_ai_generate(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        ensure_openai_lib()
-
         response = generate_ai_building()
         print("AI Response:\n", response)
         return {"FINISHED"}
