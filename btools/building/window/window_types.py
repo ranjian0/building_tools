@@ -1,38 +1,36 @@
 import bmesh
 
-from ..fill import fill_face
-from ..frame import add_frame_depth
-from ..array import spread_array, clamp_array_count, get_array_split_edges
-
-from ..arch import fill_arch, create_arch, add_arch_depth
-from ..materialgroup import (
-    MaterialGroup,
-    map_new_faces,
-    add_faces_to_group,
-    find_faces_without_matgroup,
-)
-
 from ...utils import (
-    clamp,
     XYDir,
-    validate,
     arc_edge,
-    local_xyz,
-    valid_ngon,
-    sort_faces,
-    sort_edges,
+    calc_edge_median,
+    calc_face_dimensions,
+    clamp,
     extrude_face,
-    ngon_to_quad,
+    extrude_face_region,
+    filter_horizontal_edges,
+    filter_vertical_edges,
+    get_bottom_faces,
     get_top_edges,
     get_top_faces,
-    calc_edge_median,
-    get_bottom_faces,
-    extrude_face_region,
-    calc_face_dimensions,
-    filter_vertical_edges,
-    filter_horizontal_edges,
-    subdivide_face_vertically,
+    local_xyz,
+    ngon_to_quad,
+    sort_edges,
+    sort_faces,
     subdivide_face_horizontally,
+    subdivide_face_vertically,
+    valid_ngon,
+    validate,
+)
+from ..arch import add_arch_depth, create_arch, fill_arch
+from ..array import clamp_array_count, get_array_split_edges, spread_array
+from ..fill import fill_face
+from ..frame import add_frame_depth
+from ..materialgroup import (
+    MaterialGroup,
+    add_faces_to_group,
+    find_faces_without_matgroup,
+    map_new_faces,
 )
 
 

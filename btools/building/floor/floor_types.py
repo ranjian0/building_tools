@@ -2,15 +2,15 @@ import bmesh
 from bmesh.types import BMFace
 from mathutils import Vector
 
-from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
-    equal,
-    filter_geom,
     closest_faces,
-    extrude_face_region,
-    filter_vertical_edges,
     create_cube_without_faces,
+    equal,
+    extrude_face_region,
+    filter_geom,
+    filter_vertical_edges,
 )
+from ..materialgroup import MaterialGroup, add_faces_to_group
 
 
 def create_floors(bm, faces, prop):
