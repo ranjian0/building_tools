@@ -1,5 +1,7 @@
 import bmesh
+import bpy
 from bmesh.types import BMFace
+from bmesh.types import BMVert
 from mathutils import Vector
 
 from ..materialgroup import MaterialGroup, add_faces_to_group
@@ -10,6 +12,14 @@ from ...utils import (
     extrude_face_region,
     filter_vertical_edges,
     create_cube_without_faces,
+    create_cube,
+    create_plane,
+    calc_verts_median,
+    get_top_faces,
+    get_bottom_edges,
+    edge_vector,
+    vec_equal,
+    is_parallel
 )
 
 
@@ -122,21 +132,89 @@ def create_columns(bm, face, prop):
         return
 
     res = []
-    col_w = 2 * prop.slab_outset
-    pos_h = prop.floor_height / 2 + (prop.slab_thickness if prop.add_slab else 0)
-    for v in face.verts:
-        for i in range(prop.floor_count):
-            cube = create_cube_without_faces(
-                bm,
-                (col_w, col_w, prop.floor_height),
-                (
-                    v.co.x,
-                    v.co.y,
-                    v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i),
-                ),
-                bottom=True,
-            )
-            res.extend(cube.get("verts"))
+    decoration_h = (prop.floor_height-prop.decoration_padding*(prop.decoration_nb - 1))/prop.decoration_nb
+    decoration_padding = prop.decoration_padding
+    decoration_nb = prop.decoration_nb
 
+    col_w = 2 * prop.slab_outset 
+    pos_h = prop.floor_height / 2 + (prop.slab_thickness if prop.add_slab else 0)
+    
+    center = calc_verts_median(face.verts)
+    ref_vectors = []
+    
+    for v in face.verts:
+        extrud_vectors=[]
+        dir_vector = v.co - center
+        dir_vector.x = dir_vector.x * prop.slab_outset/ (2*abs(dir_vector.x))
+        dir_vector.y = dir_vector.y * prop.slab_outset/ (2*abs(dir_vector.y))
+        for e in v.link_edges:
+            if e.verts[0].index == v.index :
+                extrud_vectors.append(edge_vector(e))
+            else :
+                extrud_vectors.append(-edge_vector(e))
+        
+        if is_parallel(extrud_vectors[0],extrud_vectors[1]):
+            continue
+
+        if len(ref_vectors) == 0:
+            ref_vectors=[extrud_vectors[0],extrud_vectors[1]]
+        
+        
+        for i in range(prop.floor_count):
+            if not prop.add_decoration:
+                cube = create_cube_without_faces(
+                    bm,
+                    (col_w, col_w, prop.floor_height),
+                    (
+                        v.co.x,
+                        v.co.y,
+                        v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i),
+                    ),
+                    bottom=True,
+                )
+                res.extend(cube.get("verts"))
+            else:
+                first_plane = create_plane(bm,(prop.slab_outset/2, prop.slab_outset/2),(
+                        v.co.x+dir_vector.x,
+                        v.co.y+dir_vector.y,
+                        v.co.z + prop.slab_thickness
+                    ))
+                normal = face.normal.copy()
+                first_face = bmesh.ops.contextual_create(bm, geom=first_plane.get("verts"))["faces"][0]
+                next_face = get_top_faces([first_face])
+
+                # determine which king of corner
+                corner_type=0
+
+                if is_parallel(extrud_vectors[0]+extrud_vectors[1],ref_vectors[0]+ref_vectors[1]) :
+                    corner_type = 1
+                
+                for ii in range(decoration_nb):
+                    sup_face, sides = extrude_face_region(bm,next_face,decoration_h,normal)
+                    for _f in sides :
+                        res.extend(_f.verts)
+                    
+                    for f_side in sides:
+                        if vec_equal(f_side.normal,extrud_vectors[0]) or vec_equal(f_side.normal,extrud_vectors[1]):
+                            
+                            if vec_equal(f_side.normal,extrud_vectors[0]):
+                                parity_index = (ii+corner_type)%2
+                            else:
+                                parity_index = (ii+corner_type+1)%2
+
+                            if not prop.alternate_decoration :
+                                parity_index = 1
+                            #print(f'{ii}:{corner_type}:{parity_index}->{-prop.slab_outset*(1+prop.decoration_ratio*parity_index)}')
+    
+                            debug, debug2 = extrude_face_region(bm,[f_side],-prop.slab_outset*(1+prop.decoration_ratio*parity_index),f_side.normal)
+                            
+                    if (ii<decoration_nb-1):
+                        next_face, sides = extrude_face_region(bm,sup_face,decoration_padding,normal)
+                        sides, otherfaces = extrude_face_region(bm,sides,0,normal)
+                            
+                        for f in sides:
+                            bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * - decoration_padding)
+                            res.extend(f.verts)
+                    
     columns = list({f for v in res for f in v.link_faces})
     add_faces_to_group(bm, columns, MaterialGroup.COLUMNS)

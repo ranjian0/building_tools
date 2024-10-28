@@ -21,10 +21,6 @@ class FloorProperty(bpy.types.PropertyGroup):
         name="Add Slab", default=True, description="Add slab between each floor"
     )
 
-    add_columns: BoolProperty(
-        name="Add Columns", default=False, description="Add Columns"
-    )
-
     slab_thickness: FloatProperty(
         name="Slab Thickness",
         min=get_scaled_unit(0.01),
@@ -43,15 +39,71 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Outset of each slab",
     )
 
+    add_columns: BoolProperty(
+        name="Add Columns", default=False, description="Add Columns"
+    )
+
+    add_decoration: BoolProperty(
+        name="Add columns Decoration", default=False, description="Add columns decorations"
+    )
+
+    alternate_decoration: BoolProperty(
+        name="Alternate decoration", default=False, description="Add columns decorations"
+    )
+
+    decoration_nb: IntProperty(
+        name="Decoration nb",
+        min=1,
+        max=100,
+        default=5,
+        step=2,
+        description="number decoration",
+    )
+
+    decoration_padding: FloatProperty(
+        name="Decoration padding",
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(10.0),
+        default=get_scaled_unit(0.01),
+        unit="LENGTH",
+        description="Space column decorations",
+    )
+
+    decoration_ratio: FloatProperty(
+        name="Decoration ration",
+        min=get_scaled_unit(0.5),
+        max=get_scaled_unit(3.0),
+        default=get_scaled_unit(1),
+        description="Space column decorations",
+    )
+
+
+
     def draw(self, context, layout):
         col = layout.column(align=True)
         col.prop(self, "floor_count")
         col.prop(self, "floor_height")
 
-        col = layout.column(align=True)
-        col.prop(self, "add_slab")
-        if self.add_slab:
-            col.prop(self, "slab_thickness")
-            col.prop(self, "slab_outset")
+        
+        #Slab
+        row = layout.box()
+        row.prop(self, "add_slab", text="Add slab ....")
 
-        layout.prop(self, "add_columns")
+        if self.add_slab == True:
+            row.prop(self, "slab_thickness")
+            row.prop(self, "slab_outset")
+
+        #Columns
+        row = layout.box()
+        row.prop(self, "add_columns", text="Add columns ....")
+
+        
+        if self.add_columns == True:
+            row.prop(self,"add_decoration")
+            row.prop(self,"alternate_decoration")
+            row.prop(self, "decoration_nb")
+            row.prop(self, "decoration_padding")
+            row.prop(self, "decoration_ratio")
+
+
+
