@@ -63,7 +63,11 @@ def cylinder(bm, radius=1, height=2, segs=10):
 """
 Convinience functions
 """
-
+def create_plane(bm, size, position=Vector((0, 0, 0))):
+    """Create plane with size and at position"""
+    geom = plane(bm, *size)
+    bmesh.ops.translate(bm, verts=geom["verts"], vec=position)
+    return geom
 
 def create_cube(bm, size, position=Vector((0, 0, 0))):
     """Create cube with size and at position"""
