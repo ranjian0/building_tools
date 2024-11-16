@@ -177,7 +177,7 @@ def create_columns(bm, face, prop):
                 first_plane = create_plane(bm,(prop.slab_outset/2, prop.slab_outset/2),(
                         v.co.x+dir_vector.x,
                         v.co.y+dir_vector.y,
-                        v.co.z + prop.slab_thickness
+                        v.co.z + prop.slab_thickness*prop.add_slab * (i +1) + i * prop.floor_height
                     ))
                 normal = face.normal.copy()
                 first_face = bmesh.ops.contextual_create(bm, geom=first_plane.get("verts"))["faces"][0]
