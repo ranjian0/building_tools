@@ -63,10 +63,10 @@ class FloorProperty(bpy.types.PropertyGroup):
     decoration_padding: FloatProperty(
         name="Decoration Padding",
         min=get_scaled_unit(0.01),
-        max=get_scaled_unit(10.0),
+        max=get_scaled_unit(1.0),
         default=get_scaled_unit(0.01),
         unit="LENGTH",
-        description="Space column decorations",
+        description="Space between decoration steps",
     )
 
     decoration_ratio: FloatProperty(
