@@ -52,12 +52,12 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     decoration_nb: IntProperty(
-        name="Decoration nb",
+        name="Decoration Count",
         min=1,
         max=100,
         default=5,
         step=2,
-        description="number decoration",
+        description="Number of decoration steps",
     )
 
     decoration_padding: FloatProperty(
