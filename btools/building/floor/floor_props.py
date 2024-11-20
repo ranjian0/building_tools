@@ -44,7 +44,7 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     add_decoration: BoolProperty(
-        name="Add columns Decoration", default=False, description="Add columns decorations"
+        name="Add column decoration", default=False, description="Add columns decorations"
     )
 
     alternate_decoration: BoolProperty(
@@ -61,7 +61,7 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     decoration_padding: FloatProperty(
-        name="Decoration padding",
+        name="Decoration Padding",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(10.0),
         default=get_scaled_unit(0.01),
@@ -70,7 +70,7 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     decoration_ratio: FloatProperty(
-        name="Decoration ration",
+        name="Decoration Ration",
         min=get_scaled_unit(0.5),
         max=get_scaled_unit(3.0),
         default=get_scaled_unit(1),
