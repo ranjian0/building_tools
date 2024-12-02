@@ -170,7 +170,7 @@ def unregister():
 
 if __name__ == "__main__":
     import os
-    os.system("clear")
+    os.system("cls" if os.name == "nt" else "clear")
 
     # -- custom unregister for script watcher
     for tp in dir(bpy.types):

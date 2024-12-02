@@ -100,11 +100,17 @@ def is_rectangle(face):
 
 
 def vec_equal(a, b):
+    if a.length == 0.0 or b.length == 0.0:
+        return False
+
     angle = a.angle(b)
     return angle < 0.001 and angle > -0.001
 
 
 def vec_opposite(a, b):
+    if a.length == 0.0 or b.length == 0.0:
+        return False
+
     angle = a.angle(b)
     return angle < math.pi + 0.001 and angle > math.pi - 0.001
 
