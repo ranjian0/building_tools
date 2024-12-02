@@ -7,8 +7,8 @@ import bmesh
 import bpy
 from bmesh.types import BMVert, BMEdge, BMFace
 
-from .util_constants import VEC_UP, VEC_DOWN
 from .util_common import local_xyz, equal, minmax
+from .util_constants import VEC_UP, VEC_DOWN, VEC_FORWARD, VEC_RIGHT
 
 
 def get_edit_mesh():
@@ -137,9 +137,11 @@ def filter_vertical_edges(edges):
     In 2D space(XY Plane), vertical is Y-axis, In 3D, vertical is Z-axis
     """
     rnd = ft.partial(round, ndigits=3)
+    todeg = lambda x: rnd(math.degrees(x))
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        return list(filter(lambda e: abs(rnd(edge_vector(e).y)) == 1.0, edges))
+        # -- the vertical edges will have the smallest angle to Y-AXIS
+        return list(sorted(edges, key=lambda e: todeg(edge_vector(e).angle(VEC_FORWARD))))[:2]
 
     # Any edge that has upward vector is considered vertical
     # if the edge is slanting, it must be slanting on only one axis
@@ -158,9 +160,11 @@ def filter_horizontal_edges(edges):
     In 2D space(XY Plane), horizontal is X-axis, In 3D, horizontal is XY-plane
     """
     rnd = ft.partial(round, ndigits=3)
+    todeg = lambda x: rnd(math.degrees(x))
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        return list(filter(lambda e: abs(rnd(edge_vector(e).x)) == 1.0, edges))
+        # -- the horizontal edges will have the smallest angle to X-AXIS
+        return list(sorted(edges, key=lambda e: todeg(edge_vector(e).angle(VEC_RIGHT))))[:2]
 
     # Any edge that is at right angle to global up vector is horizontal
     def horizontal_3d(e):
