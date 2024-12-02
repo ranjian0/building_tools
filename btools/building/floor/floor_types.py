@@ -142,6 +142,7 @@ def create_columns(bm, face, prop):
     center = calc_verts_median(face.verts)
     ref_vectors = []
     
+    #loop for each corner
     for v in face.verts:
         extrud_vectors=[]
         dir_vector = v.co - center
@@ -159,7 +160,7 @@ def create_columns(bm, face, prop):
         if len(ref_vectors) == 0:
             ref_vectors=[extrud_vectors[0],extrud_vectors[1]]
         
-        
+        #loop for each floor
         for i in range(prop.floor_count):
             if not prop.add_decoration:
                 cube = create_cube_without_faces(
@@ -183,17 +184,19 @@ def create_columns(bm, face, prop):
                 first_face = bmesh.ops.contextual_create(bm, geom=first_plane.get("verts"))["faces"][0]
                 next_face = get_top_faces([first_face])
 
-                # determine which king of corner
+                # determine orientation (left or right) of corner
                 corner_type=0
 
                 if is_parallel(extrud_vectors[0]+extrud_vectors[1],ref_vectors[0]+ref_vectors[1]) :
                     corner_type = 1
                 
+                #loop for decoration step
                 for ii in range(decoration_nb):
                     sup_face, sides = extrude_face_region(bm,next_face,decoration_h,normal)
                     for _f in sides :
                         res.extend(_f.verts)
                     
+                    # extrude decorations
                     for f_side in sides:
                         if vec_equal(f_side.normal,extrud_vectors[0]) or vec_equal(f_side.normal,extrud_vectors[1]):
                             
@@ -204,17 +207,32 @@ def create_columns(bm, face, prop):
 
                             if not prop.alternate_decoration :
                                 parity_index = 1
-                            #print(f'{ii}:{corner_type}:{parity_index}->{-prop.slab_outset*(1+prop.decoration_ratio*parity_index)}')
     
-                            debug, debug2 = extrude_face_region(bm,[f_side],-prop.slab_outset*(1+prop.decoration_ratio*parity_index),f_side.normal)
+                            extern_side, other_sides = extrude_face_region(bm,[f_side],-prop.slab_outset*(1+prop.decoration_ratio*parity_index),f_side.normal)
+
+                            if (ii<decoration_nb-1) and not prop.alternate_decoration:    
+                                tmp, sides = extrude_face_region(bm,get_top_faces(other_sides),decoration_padding,normal)
+                                sides, otherfaces = extrude_face_region(bm,sides,0,normal)
+                                for f in sides: 
+                                    if not vec_equal(f.normal,extrud_vectors[0]) and not vec_equal(f.normal,extrud_vectors[1]):
+                                        if not is_parallel(f.normal,extern_side[0].normal):
+                                            bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * - 0.2  * prop.slab_outset)
+                                    else:
+                                        if is_parallel(f.normal,extern_side[0].normal):
+                                            bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * - 0.2  * prop.slab_outset)
                             
+
+                    #padding decoration        
                     if (ii<decoration_nb-1):
                         next_face, sides = extrude_face_region(bm,sup_face,decoration_padding,normal)
                         sides, otherfaces = extrude_face_region(bm,sides,0,normal)
-                            
-                        for f in sides:
-                            bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * - decoration_padding)
+
+                        for f in sides: 
+                            if not vec_equal(f.normal,extrud_vectors[0]) and not vec_equal(f.normal,extrud_vectors[1]):
+                                bmesh.ops.translate(bm, verts=f.verts, vec=f.normal * - 0.2  * prop.slab_outset)
                             res.extend(f.verts)
-                    
+
+                        
+
     columns = list({f for v in res for f in v.link_faces})
     add_faces_to_group(bm, columns, MaterialGroup.COLUMNS)
