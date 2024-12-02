@@ -206,8 +206,13 @@ def transform_grouped_faces(bm, faces, prop):
     trans_offset = target_height - face_height
     verts = list({v for f in faces for v in f.verts})
     top_verts = sort_verts(verts, VEC_UP)[len(verts) // 2 :]
+    # -- move the top vertices down to match the expected height
     bmesh.ops.translate(bm, verts=top_verts, vec=VEC_UP * trans_offset)
-    bmesh.ops.translate(bm, verts=verts, vec=VEC_UP * prop.height)
+    # -- move the balcony up and down based on the vertical offsets
+    # movement is clamped to within the original face height
+    clamped_offset = clamp(prop.size_offset.offset.y, 0.0, face_height - prop.height)
+    prop.size_offset.offset.y = clamped_offset
+    bmesh.ops.translate(bm, verts=verts, vec=VEC_UP * clamped_offset)
 
 
 def top_face_edges(faces):
