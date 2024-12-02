@@ -142,3 +142,5 @@ dmypy.json
 .pdm.toml
 .pdm-python
 .pdm-build/
+
+.env.json
