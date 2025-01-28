@@ -1,7 +1,5 @@
 import bmesh
-import bpy
 from bmesh.types import BMFace
-from bmesh.types import BMVert
 from mathutils import Vector
 
 from ..materialgroup import MaterialGroup, add_faces_to_group
@@ -12,11 +10,9 @@ from ...utils import (
     extrude_face_region,
     filter_vertical_edges,
     create_cube_without_faces,
-    create_cube,
     create_plane,
     calc_verts_median,
     get_top_faces,
-    get_bottom_edges,
     edge_vector,
     vec_equal,
     is_parallel
