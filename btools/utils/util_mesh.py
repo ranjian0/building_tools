@@ -137,11 +137,13 @@ def filter_vertical_edges(edges):
     In 2D space(XY Plane), vertical is Y-axis, In 3D, vertical is Z-axis
     """
     rnd = ft.partial(round, ndigits=3)
-    todeg = lambda x: rnd(math.degrees(x))
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        # -- the vertical edges will have the smallest angle to Y-AXIS
-        return list(sorted(edges, key=lambda e: todeg(edge_vector(e).angle(VEC_FORWARD))))[:2]
+        # -- the vertical edges will have the smallest angle to Y-AXIS,
+        dot_threshhold = 0.5 # 45 degrees threshold to Y
+        def closest_dot(e):
+            return abs(edge_vector(e).xy.dot(VEC_FORWARD.xy)) > dot_threshhold
+        return list(filter(closest_dot, edges))
 
     # Any edge that has upward vector is considered vertical
     # if the edge is slanting, it must be slanting on only one axis
@@ -160,11 +162,13 @@ def filter_horizontal_edges(edges):
     In 2D space(XY Plane), horizontal is X-axis, In 3D, horizontal is XY-plane
     """
     rnd = ft.partial(round, ndigits=3)
-    todeg = lambda x: rnd(math.degrees(x))
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
-        # -- the horizontal edges will have the smallest angle to X-AXIS
-        return list(sorted(edges, key=lambda e: todeg(edge_vector(e).angle(VEC_RIGHT))))[:2]
+        # -- the vertical edges will have the smallest angle to X-AXIS
+        dot_threshhold = 0.5 # 45 degrees threshold to X
+        def closest_dot(e):
+            return abs(edge_vector(e).xy.dot(VEC_RIGHT.xy)) > dot_threshhold
+        return list(filter(closest_dot, edges))
 
     # Any edge that is at right angle to global up vector is horizontal
     def horizontal_3d(e):
