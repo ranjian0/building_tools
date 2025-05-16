@@ -209,7 +209,7 @@ def create_skeleton_faces(bm, original_edges, skeleton_edges):
         # XXX Order of vector creation is really important
         v1 = vert.co - e1.other_vert(vert).co
         v2 = e2.other_vert(vert).co - vert.co
-        return np.math.atan2(np.linalg.det([v1.xy, v2.xy]), np.dot(v1.xy, v2.xy))
+        return np.arctan2(np.linalg.det([v1.xy, v2.xy]), np.dot(v1.xy, v2.xy))
 
     def boundary_walk(e, reverse=False):
         """Perform boundary walk using least interior angle"""
