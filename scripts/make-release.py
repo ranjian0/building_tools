@@ -86,7 +86,7 @@ def main() -> None:
 
     out.close()
 
-    sys.stdout.write("created archive: %s\n" % outfilename)
+    sys.stdout.write(f"created archive: {outfilename} with size {os.path.getsize(outfilename) / 1000} kb\n")
 
 if __name__ == "__main__":
     main()
