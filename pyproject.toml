@@ -1,6 +1,6 @@
 [project]
 name = "BuildingTools"
-version = "1.0.10"
+version = "1.0.13"
 description = "Crazy fast way to model buildings in Blender"
 authors = [
     {name = "ranjian0", email = "karanjaichungwa@gmail.com"},
@@ -13,13 +13,13 @@ license = {text = "MIT"}
 
 [tool.pdm.dev-dependencies]
 lint = [
-    "black>=23.12.0",
-    "mypy>=1.7.1",
-    "ruff>=0.1.8",
-    "fake-bpy-module-latest>=20231217",
+    "black>=25.1.0",
+    "mypy>=1.15.0",
+    "ruff>=0.11.10",
+    "fake-bpy-module-latest>=20250505",
 ]
 dev = [
-    "numpy>=1.26.2",
+    "numpy>=2.2.5",
 ]
 
 
