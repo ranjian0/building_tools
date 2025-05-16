@@ -22,8 +22,6 @@ import subprocess
 REPO_FILES = (
     "btools/",
     "__init__.py",
-    "addon_updater.py",
-    "addon_updater_ops.py",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"
