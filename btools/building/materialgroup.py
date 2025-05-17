@@ -142,14 +142,6 @@ def add_material_group(groups):
             mt.index = len(obj.bt_materials) - 1
 
 
-def verify_matgroup_attribute_for_object(obj):
-    """Ensure object has a btools material attribute"""
-    obj.data.attributes.new(
-        name=".bt_material_group_index",
-        type="INT",
-        domain="FACE")
-
-
 def set_material_for_active_matgroup(material, context):
     """Set `material` on all the faces for the current/active material group"""
     obj = context.object

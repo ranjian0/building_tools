@@ -1,6 +1,7 @@
 import bpy
 import bpy
 
+from ..layers import ensure_layers_for_object
 from ...utils import (
     link_obj,
     bm_to_obj,
@@ -45,6 +46,7 @@ class BTOOLS_OT_add_floorplan(bpy.types.Operator):
 def build(context, prop):
     name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
     obj = create_object(name, create_mesh(name + "_mesh"))
+    ensure_layers_for_object(obj)
 
     bm = bm_from_obj(obj)
     if prop.type == "RECTANGULAR":

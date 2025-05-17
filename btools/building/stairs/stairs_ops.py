@@ -1,10 +1,10 @@
 import bpy
 import bmesh
 
+from ..layers import ensure_layers_for_object
 from ..materialgroup import (
     MaterialGroup,
     add_material_group,
-    verify_matgroup_attribute_for_object,
 )
 
 from .stairs_types import create_stairs
@@ -36,7 +36,7 @@ class BTOOLS_OT_add_stairs(bpy.types.Operator):
 
 @crash_safe
 def build(context, prop):
-    verify_matgroup_attribute_for_object(context.object)
+    ensure_layers_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = [f for f in bm.faces if f.select]

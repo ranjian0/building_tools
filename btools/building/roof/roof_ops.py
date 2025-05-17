@@ -1,8 +1,9 @@
 import bpy
 import bmesh
 
+from ..layers import ensure_layers_for_object
 from ...utils import crash_safe, get_edit_mesh
-from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
+from ..materialgroup import MaterialGroup, add_material_group
 
 from .roof_types import create_roof
 from .roof_props import RoofProperty
@@ -30,7 +31,7 @@ class BTOOLS_OT_add_roof(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_matgroup_attribute_for_object(context.object)
+    ensure_layers_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = [f for f in bm.faces if f.select]

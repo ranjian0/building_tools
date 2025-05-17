@@ -7,10 +7,10 @@ from ...utils import (
     get_edit_mesh,
 )
 
+from ..layers import ensure_layers_for_object
 from ..materialgroup import (
     MaterialGroup,
     add_material_group,
-    verify_matgroup_attribute_for_object,
 )
 
 from .door_types import create_door
@@ -41,7 +41,7 @@ class BTOOLS_OT_add_door(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_matgroup_attribute_for_object(context.object)
+    ensure_layers_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_door_faces([face for face in bm.faces if face.select])

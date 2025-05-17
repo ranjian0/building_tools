@@ -1,7 +1,8 @@
 import bpy
 import bmesh
 
-from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
+from ..layers import ensure_layers_for_object
+from ..materialgroup import MaterialGroup, add_material_group
 
 from ...utils import (
     crash_safe,
@@ -37,7 +38,7 @@ class BTOOLS_OT_add_multigroup(bpy.types.Operator):
 
 @crash_safe
 def build(context, props):
-    verify_matgroup_attribute_for_object(context.object)
+    ensure_layers_for_object(context.object)
     me = get_edit_mesh()
     bm = bmesh.from_edit_mesh(me)
     faces = validate_multigroup_faces([face for face in bm.faces if face.select])
