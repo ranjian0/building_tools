@@ -26,6 +26,9 @@ def create_roof(bm, faces, prop):
     elif prop.type == "GABLE":
         add_material_group(MaterialGroup.ROOF_HANGS)
         create_gable_roof(bm, faces, prop)
+    elif prop.type == "MANSARD":
+        add_material_group(MaterialGroup.ROOF_HANGS)
+        create_mansard_roof(bm, faces, prop)
     elif prop.type == "HIP":
         add_material_group(MaterialGroup.ROOF_HANGS)
         create_hip_roof(bm, faces, prop)
@@ -134,6 +137,82 @@ def create_hip_roof(bm, faces, prop):
 
     # -- create faces
     create_skeleton_faces(bm, original_edges, skeleton_edges)
+
+
+def create_mansard_roof(bm, faces, prop):
+    """Create mansard roof"""
+    # -- inset the face towards the exterior
+    bmesh.ops.inset_region(bm, faces=faces, thickness=-prop.outset, use_even_offset=True)
+    # -- get the top face
+    top_face = faces[0]
+ 
+    ret = bmesh.ops.extrude_face_region(bm, geom=[top_face]).get("geom")
+    height_ratio = prop.height_ratio
+    bmesh.ops.translate(
+        bm, vec=(0, 0, prop.height * height_ratio), verts=filter_geom(ret, BMVert)
+    )
+
+    top_face = get_top_face(bm, ret)
+
+    scale_factor = prop.mansard_ratio
+    bmesh.ops.scale(
+        bm,
+        vec=(scale_factor, scale_factor, 1),
+        verts=top_face.verts
+    )
+
+    ret = bmesh.ops.extrude_face_region(bm, geom=[top_face]).get("geom")
+    bmesh.ops.translate(
+        bm, vec=(0, 0, prop.height * (1-height_ratio)), verts=filter_geom(ret, BMVert)
+    )
+
+    top_face = get_top_face(bm, ret)
+
+    bmesh.ops.scale(
+        bm,
+        vec=(scale_factor, scale_factor, 1),
+        verts=top_face.verts
+    )
+
+    # Find the longest edge in the top_face
+    longest_edge = max(top_face.edges, key=lambda e: e.calc_length())
+    print(longest_edge)
+
+    # Find the two longest edges in the top_face
+    edges_sorted_by_length = sorted(top_face.edges, key=lambda e: e.calc_length(), reverse=True)
+
+
+    # Calculate and print the length of edges in edges_sorted_by_length
+    for i, edge in enumerate(edges_sorted_by_length):
+        print(f"Edge {i+1} length: {edge.calc_length()}")
+
+
+    """
+    #####
+    median = top_face.calc_center_median()
+
+    # -- remove verts that are between two parallel edges
+    dissolve_lone_verts(bm, top_face, list(top_face.edges))
+    original_edges = validate(top_face.edges)
+
+    # -- get verts in anti-clockwise order
+    verts = [v for v in sort_verts_by_loops(top_face)]
+    points = [v.co.to_tuple()[:2] for v in verts]
+
+    # -- compute straight skeleton
+    skeleton = skeletonize(points, [])
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+
+    height_scale = prop.height / max([arc.height for arc in skeleton])
+
+    # -- create edges and vertices
+    skeleton_edges = create_skeleton_verts_and_edges(
+        bm, skeleton, original_edges, median, height_scale
+    )
+
+    # -- create faces
+    create_skeleton_faces(bm, original_edges, skeleton_edges)"""
+
 
 
 def sort_verts_by_loops(face):
@@ -441,3 +520,19 @@ def extrude_and_outset(bm, faces, thickness, outset):
 
     new_faces = list({f for e in top_face.edges for f in e.link_faces})
     return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")
+
+
+def get_top_face(bm, ret):
+    """Get the top face from the extrusion result"""
+    top_face = filter_geom(ret, BMFace)
+
+    if len(top_face) > 1:
+        top_face = (
+            bmesh.ops.dissolve_faces(bm, faces=top_face, use_verts=True)
+            .get("region")
+            .pop()
+        )
+    else:
+        top_face = top_face.pop()
+    
+    return top_face

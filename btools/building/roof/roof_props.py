@@ -8,7 +8,9 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("FLAT", "Flat", "", 0),
         ("GABLE", "Gable", "", 1),
         ("HIP", "Hip", "", 2),
+        ("MANSARD", "Mansard", "", 3)
     ]
+
     type: EnumProperty(
         name="Roof Type",
         items=roof_types,
@@ -20,13 +22,14 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("OPEN", "Open", "", 0),
         ("BOX", "Box", "", 1),
     ]
+
     gable_type: EnumProperty(
         name="Gable Type",
         items=gable_types,
         default="OPEN",
         description="Type of gable roof to create",
     )
-
+    
     thickness: FloatProperty(
         name="Thickness",
         min=get_scaled_unit(0.01),
@@ -52,6 +55,24 @@ class RoofProperty(bpy.types.PropertyGroup):
         default=get_scaled_unit(1),
         unit="LENGTH",
         description="Height of entire roof",
+    )
+
+    height_ratio: FloatProperty(
+        name="Height of curvature",
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(0.99),
+        default=get_scaled_unit(0.5),
+        unit="LENGTH",
+        description="Height of mansard roof curvature",
+    )
+
+    mansard_ratio: FloatProperty(
+        name="Height of curvature",
+        min=get_scaled_unit(0.5),
+        max=get_scaled_unit(0.9),
+        default=get_scaled_unit(0.8),
+        unit="LENGTH",
+        description="Height of mansard roof curvature",
     )
 
     add_border: BoolProperty(
@@ -88,6 +109,14 @@ class RoofProperty(bpy.types.PropertyGroup):
 
             col = box.column(align=True)
             col.prop(self, "thickness")
+            col.prop(self, "outset")
+            col.prop(self, "height")
+        
+        elif self.type == "MANSARD":
+
+            col = box.column(align=True)
+            col.prop(self, "mansard_ratio")
+            col.prop(self, "height_ratio") 
             col.prop(self, "outset")
             col.prop(self, "height")
 
