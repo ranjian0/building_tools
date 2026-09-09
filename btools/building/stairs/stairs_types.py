@@ -1,31 +1,30 @@
 import math
 
 import bmesh
-from bmesh.types import BMFace, BMEdge
-from mathutils import Vector, Quaternion
+from bmesh.types import BMEdge, BMFace
+from mathutils import Quaternion, Vector
 
-from ..railing.railing import create_railing
-
-from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
-    VEC_UP,
     VEC_DOWN,
-    vec_equal,
-    local_xyz,
-    valid_ngon,
-    sort_faces,
-    sort_edges,
-    sort_verts,
-    filter_geom,
-    create_face,
-    extrude_face,
-    popup_message,
-    edge_is_sloped,
-    subdivide_edges,
+    VEC_UP,
     calc_face_dimensions,
+    create_face,
+    edge_is_sloped,
+    extrude_face,
+    filter_geom,
     filter_parallel_edges,
+    local_xyz,
+    popup_message,
+    sort_edges,
+    sort_faces,
+    sort_verts,
+    subdivide_edges,
     subdivide_face_vertically,
+    valid_ngon,
+    vec_equal,
 )
+from ..materialgroup import MaterialGroup, add_faces_to_group
+from ..railing.railing import create_railing
 
 
 def create_stairs(bm, faces, prop):

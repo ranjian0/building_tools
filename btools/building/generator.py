@@ -1,14 +1,15 @@
-import bpy
-import btools
 import random
 from contextlib import contextmanager
 
-from btools.building.roof import RoofProperty
+import bpy
+
+import btools
 from btools.building.floor import FloorProperty
-from btools.building.floorplan import FloorplanProperty
-from btools.building.roof.roof_ops import build as roof_builder
 from btools.building.floor.floor_ops import build as floor_builder
+from btools.building.floorplan import FloorplanProperty
 from btools.building.floorplan.floorplan_ops import build as floorplan_builder
+from btools.building.roof import RoofProperty
+from btools.building.roof.roof_ops import build as roof_builder
 
 
 @contextmanager
@@ -123,12 +124,12 @@ class FloorplanGenerator:
         # Composite floorplan options
         if properties["type"] == "COMPOSITE":
             for ke in ["tl1", "tl2", "tl3", "tl4"]:
-                properties[ke] = random.choice(range(0, 5))
+                properties[ke] = random.choice(range(5))
 
         # H-shaped floorplan options
         if properties["type"] == "H-SHAPED":
             for ke in ["tl1", "tl2", "tl3", "tl4"]:
-                properties[ke] = random.choice(range(0, 5))
+                properties[ke] = random.choice(range(5))
 
             for ke in ["tw1", "tw2", "tw3", "tw4"]:
                 properties[ke] = btools.utils.clamp(

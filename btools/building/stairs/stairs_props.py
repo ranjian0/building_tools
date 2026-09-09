@@ -1,15 +1,15 @@
 import bpy
 from bpy.props import (
-    IntProperty,
     BoolProperty,
-    FloatProperty,
-    PointerProperty,
     EnumProperty,
+    FloatProperty,
+    IntProperty,
+    PointerProperty,
 )
 
 from ...utils import get_scaled_unit
-from ..sizeoffset import SizeOffsetProperty
 from ..railing.railing_props import RailProperty
+from ..sizeoffset import SizeOffsetProperty
 
 
 class StairsProperty(bpy.types.PropertyGroup):

@@ -1,22 +1,22 @@
-import bpy
 import bmesh
+import bpy
 from bmesh.types import BMEdge
 from bpy.props import (
-    IntProperty,
     EnumProperty,
     FloatProperty,
+    IntProperty,
 )
-from .materialgroup import MaterialGroup, map_new_faces, add_material_group
 
 from ..utils import (
-    clamp,
     arc_edge,
-    sort_verts,
-    filter_geom,
-    get_scaled_unit,
-    get_bottom_faces,
+    clamp,
     extrude_face_region,
+    filter_geom,
+    get_bottom_faces,
+    get_scaled_unit,
+    sort_verts,
 )
+from .materialgroup import MaterialGroup, add_material_group, map_new_faces
 
 
 class ArchProperty(bpy.types.PropertyGroup):

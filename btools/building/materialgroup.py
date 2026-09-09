@@ -1,12 +1,12 @@
-import bpy
-import bmesh
-
 from enum import Enum, auto
 from functools import wraps
 
+import bmesh
+import bpy
+
 from ..utils import (
-    link_material,
     bmesh_from_active_object,
+    link_material,
     uv_map_active_editmesh_selection,
 )
 
@@ -92,14 +92,19 @@ def add_faces_to_group(bm, faces, group, skip=None):
     matgroup = [mt for mt in obj.bt_materials if mt.name == group.name.lower()]
     if not matgroup:
         add_material_group(group)
-        matgroup = [mt for mt in obj.bt_materials if mt.name == group.name.lower()].pop()
+        matgroup = [
+            mt for mt in obj.bt_materials if mt.name == group.name.lower()
+        ].pop()
     else:
         matgroup = matgroup.pop()
-    
+
     group_index = matgroup.index
+
     def remove_skipped(f):
         if skip:
-            matgroup_skip = [mt for mt in obj.bt_materials if mt.name == skip.name.lower()].pop()
+            matgroup_skip = [
+                mt for mt in obj.bt_materials if mt.name == skip.name.lower()
+            ].pop()
             matgroup_skip_index = matgroup_skip.index
             return not (f[layer] == matgroup_skip_index)
         return True
@@ -107,7 +112,6 @@ def add_faces_to_group(bm, faces, group, skip=None):
     for face in list(filter(remove_skipped, faces)):
         face[layer] = group_index
 
-    
     if group_index >= len(obj.bt_materials):
         # Layout of the material groups was destroyed eg through an operation like object join.
         # User on their own for now.
@@ -144,10 +148,7 @@ def add_material_group(groups):
 
 def verify_matgroup_attribute_for_object(obj):
     """Ensure object has a btools material attribute"""
-    obj.data.attributes.new(
-        name=".bt_material_group_index",
-        type="INT",
-        domain="FACE")
+    obj.data.attributes.new(name=".bt_material_group_index", type="INT", domain="FACE")
 
 
 def set_material_for_active_matgroup(material, context):
@@ -155,7 +156,6 @@ def set_material_for_active_matgroup(material, context):
     obj = context.object
     index = obj.bt_materials_active_index
     matgroup = obj.bt_materials[index]
-    
 
     link_material(obj, material)
     mat_id = [

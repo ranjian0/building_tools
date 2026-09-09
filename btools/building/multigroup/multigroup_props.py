@@ -1,17 +1,17 @@
 import bpy
 from bpy.props import (
-    EnumProperty,
     BoolProperty,
+    EnumProperty,
     FloatProperty,
-    StringProperty,
     PointerProperty,
+    StringProperty,
 )
 
-from ..arch import ArchProperty
 from ...utils import get_scaled_unit
+from ..arch import ArchProperty
 from ..array import ArrayGetSet, ArrayProperty
-from ..fill import FillPanel, FillLouver, FillGlassPanes, FillBars
-from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
+from ..fill import FillBars, FillGlassPanes, FillLouver, FillPanel
+from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 
 class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):

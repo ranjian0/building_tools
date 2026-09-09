@@ -1,5 +1,6 @@
 import bpy
-from bpy.props import IntProperty, FloatProperty, BoolProperty
+from bpy.props import BoolProperty, FloatProperty, IntProperty
+
 from ...utils import get_scaled_unit
 
 
@@ -44,11 +45,15 @@ class FloorProperty(bpy.types.PropertyGroup):
     )
 
     add_decoration: BoolProperty(
-        name="Add column decoration", default=False, description="Add columns decorations"
+        name="Add column decoration",
+        default=False,
+        description="Add columns decorations",
     )
 
     alternate_decoration: BoolProperty(
-        name="Alternate decoration", default=False, description="Add columns decorations"
+        name="Alternate decoration",
+        default=False,
+        description="Add columns decorations",
     )
 
     decoration_nb: IntProperty(
@@ -77,15 +82,12 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Space column decorations",
     )
 
-
-
     def draw(self, context, layout):
         col = layout.column(align=True)
         col.prop(self, "floor_count")
         col.prop(self, "floor_height")
 
-        
-        #Slab
+        # Slab
         row = layout.box()
         row.prop(self, "add_slab", text="Add slab ....")
 
@@ -93,17 +95,13 @@ class FloorProperty(bpy.types.PropertyGroup):
             row.prop(self, "slab_thickness")
             row.prop(self, "slab_outset")
 
-        #Columns
+        # Columns
         row = layout.box()
         row.prop(self, "add_columns", text="Add columns ....")
 
-        
         if self.add_columns == True:
-            row.prop(self,"add_decoration")
-            row.prop(self,"alternate_decoration")
+            row.prop(self, "add_decoration")
+            row.prop(self, "alternate_decoration")
             row.prop(self, "decoration_nb")
             row.prop(self, "decoration_padding")
             row.prop(self, "decoration_ratio")
-
-
-

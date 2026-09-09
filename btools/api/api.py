@@ -1,15 +1,17 @@
-import bpy
 from dataclasses import asdict
+
+import bpy
+
+from ..utils import dict_from_prop, get_selected_face_dimensions, prop_from_dict
 from .options import (
     BalconyOptions,
     DoorOptions,
-    RoofOptions,
     FloorOptions,
-    WindowOptions,
     FloorplanOptions,
     MultigroupOptions,
+    RoofOptions,
+    WindowOptions,
 )
-from ...btools.utils import dict_from_prop, prop_from_dict, get_selected_face_dimensions
 
 
 def register_property(cls):
@@ -20,12 +22,12 @@ def register_property(cls):
 
 
 def create_floorplan(options: FloorplanOptions):
-    from ...btools.building.floorplan import FloorplanProperty
-    from ...btools.building.floorplan.floorplan_ops import build
+    from ..building.floorplan import FloorplanProperty
+    from ..building.floorplan.floorplan_ops import build
 
     register_property(FloorplanProperty)
-    bpy.types.Scene.floorplan_prop = bpy.props.PointerProperty(type=FloorplanProperty)
-    prop = bpy.context.scene.floorplan_prop
+    bpy.types.Scene.floorplan_prop = bpy.props.PointerProperty(type=FloorplanProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.floorplan_prop  # type: ignore[union-attr]
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
@@ -34,18 +36,18 @@ def create_floorplan(options: FloorplanOptions):
     # -- create floorplan
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.floorplan_prop
+    del bpy.types.Scene.floorplan_prop  # type: ignore[attr-defined]
 
     return result
 
 
 def create_floors(options: FloorOptions):
-    from ...btools.building.floor import FloorProperty
-    from ...btools.building.floor.floor_ops import build
+    from ..building.floor import FloorProperty
+    from ..building.floor.floor_ops import build
 
     register_property(FloorProperty)
-    bpy.types.Scene.floor_prop = bpy.props.PointerProperty(type=FloorProperty)
-    prop = bpy.context.scene.floor_prop
+    bpy.types.Scene.floor_prop = bpy.props.PointerProperty(type=FloorProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.floor_prop  # type: ignore[union-attr]
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
@@ -53,33 +55,33 @@ def create_floors(options: FloorOptions):
     prop_from_dict(prop, props_dict)
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.floor_prop
+    del bpy.types.Scene.floor_prop  # type: ignore[attr-defined]
 
     return result
 
 
 def create_door(options: DoorOptions):
-    from ...btools.building.arch import ArchProperty
-    from ...btools.building.array import ArrayProperty
-    from ...btools.building.sizeoffset import SizeOffsetProperty
+    from ..building.arch import ArchProperty
+    from ..building.array import ArrayProperty
+    from ..building.sizeoffset import SizeOffsetProperty
 
     register_property(ArchProperty)
     register_property(ArrayProperty)
     register_property(SizeOffsetProperty)
 
-    from ...btools.building.fill import FillPanel, FillLouver, FillGlassPanes
+    from ..building.fill import FillGlassPanes, FillLouver, FillPanel
 
     register_property(FillPanel)
     register_property(FillLouver)
     register_property(FillGlassPanes)
 
-    from ...btools.building.door import DoorProperty
-    from ...btools.building.door.door_ops import build
+    from ..building.door import DoorProperty
+    from ..building.door.door_ops import build
 
     register_property(DoorProperty)
 
-    bpy.types.Scene.door_prop = bpy.props.PointerProperty(type=DoorProperty)
-    prop = bpy.context.scene.door_prop
+    bpy.types.Scene.door_prop = bpy.props.PointerProperty(type=DoorProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.door_prop  # type: ignore[union-attr]
     prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
@@ -89,33 +91,33 @@ def create_door(options: DoorOptions):
 
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.door_prop
+    del bpy.types.Scene.door_prop  # type: ignore[attr-defined]
 
     return result
 
 
 def create_window(options: WindowOptions):
-    from ...btools.building.arch import ArchProperty
-    from ...btools.building.array import ArrayProperty
-    from ...btools.building.sizeoffset import SizeOffsetProperty
+    from ..building.arch import ArchProperty
+    from ..building.array import ArrayProperty
+    from ..building.sizeoffset import SizeOffsetProperty
 
     register_property(ArchProperty)
     register_property(ArrayProperty)
     register_property(SizeOffsetProperty)
 
-    from ...btools.building.fill import FillBars, FillLouver, FillGlassPanes
+    from ..building.fill import FillBars, FillGlassPanes, FillLouver
 
     register_property(FillBars)
     register_property(FillLouver)
     register_property(FillGlassPanes)
 
-    from ...btools.building.window import WindowProperty
-    from ...btools.building.window.window_ops import build
+    from ..building.window import WindowProperty
+    from ..building.window.window_ops import build
 
     register_property(WindowProperty)
 
-    bpy.types.Scene.window_prop = bpy.props.PointerProperty(type=WindowProperty)
-    prop = bpy.context.scene.window_prop
+    bpy.types.Scene.window_prop = bpy.props.PointerProperty(type=WindowProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.window_prop  # type: ignore[union-attr]
     prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
@@ -125,32 +127,34 @@ def create_window(options: WindowOptions):
 
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.window_prop
+    del bpy.types.Scene.window_prop  # type: ignore[attr-defined]
+
+    return result
 
 
 def create_multigroup(options: MultigroupOptions):
-    from ...btools.building.arch import ArchProperty
-    from ...btools.building.array import ArrayProperty
-    from ...btools.building.sizeoffset import SizeOffsetProperty
+    from ..building.arch import ArchProperty
+    from ..building.array import ArrayProperty
+    from ..building.sizeoffset import SizeOffsetProperty
 
     register_property(ArchProperty)
     register_property(ArrayProperty)
     register_property(SizeOffsetProperty)
 
-    from ...btools.building.fill import FillBars, FillPanel, FillLouver, FillGlassPanes
+    from ..building.fill import FillBars, FillGlassPanes, FillLouver, FillPanel
 
     register_property(FillBars)
     register_property(FillPanel)
     register_property(FillLouver)
     register_property(FillGlassPanes)
 
-    from ...btools.building.multigroup import MultigroupProperty
-    from ...btools.building.multigroup.multigroup_ops import build
+    from ..building.multigroup import MultigroupProperty
+    from ..building.multigroup.multigroup_ops import build
 
     register_property(MultigroupProperty)
 
-    bpy.types.Scene.multigroup_prop = bpy.props.PointerProperty(type=MultigroupProperty)
-    prop = bpy.context.scene.multigroup_prop
+    bpy.types.Scene.multigroup_prop = bpy.props.PointerProperty(type=MultigroupProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.multigroup_prop  # type: ignore[union-attr]
     prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
@@ -160,16 +164,18 @@ def create_multigroup(options: MultigroupOptions):
     # -- create multigroup
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.multigroup_prop
+    del bpy.types.Scene.multigroup_prop  # type: ignore[attr-defined]
+
+    return result
 
 
 def create_roof(options: RoofOptions):
-    from ...btools.building.roof import RoofProperty
-    from ...btools.building.roof.roof_ops import build
+    from ..building.roof import RoofProperty
+    from ..building.roof.roof_ops import build
 
     register_property(RoofProperty)
-    bpy.types.Scene.roof_prop = bpy.props.PointerProperty(type=RoofProperty)
-    prop = bpy.context.scene.roof_prop
+    bpy.types.Scene.roof_prop = bpy.props.PointerProperty(type=RoofProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.roof_prop  # type: ignore[union-attr]
 
     # -- update prop options from kwargs
     props_dict = dict_from_prop(prop)
@@ -178,20 +184,20 @@ def create_roof(options: RoofOptions):
     # -- create floorplan
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.roof_prop
+    del bpy.types.Scene.roof_prop  # type: ignore[attr-defined]
 
     return result
 
 
 def create_balcony(options: BalconyOptions):
-    from ...btools.building.array import ArrayProperty
-    from ...btools.building.sizeoffset import SizeOffsetProperty
-    from ...btools.building.railing import (
-        RailProperty,
-        RailFillProperty,
+    from ..building.array import ArrayProperty
+    from ..building.railing import (
         PostFillProperty,
+        RailFillProperty,
+        RailProperty,
         WallFillProperty,
     )
+    from ..building.sizeoffset import SizeOffsetProperty
 
     register_property(ArrayProperty)
     register_property(SizeOffsetProperty)
@@ -200,12 +206,12 @@ def create_balcony(options: BalconyOptions):
     register_property(WallFillProperty)
     register_property(RailProperty)
 
-    from ...btools.building.balcony import BalconyProperty
-    from ...btools.building.balcony.balcony_ops import build
+    from ..building.balcony import BalconyProperty
+    from ..building.balcony.balcony_ops import build
 
     register_property(BalconyProperty)
-    bpy.types.Scene.balcony_prop = bpy.props.PointerProperty(type=BalconyProperty)
-    prop = bpy.context.scene.balcony_prop
+    bpy.types.Scene.balcony_prop = bpy.props.PointerProperty(type=BalconyProperty)  # type: ignore[attr-defined]
+    prop = bpy.context.scene.balcony_prop  # type: ignore[union-attr]
     prop.init(get_selected_face_dimensions(bpy.context))
 
     # -- update prop options from kwargs
@@ -215,6 +221,6 @@ def create_balcony(options: BalconyOptions):
     # -- create floorplan
     result = build(bpy.context, prop)
     # -- unregister prop
-    del bpy.types.Scene.balcony_prop
+    del bpy.types.Scene.balcony_prop  # type: ignore[attr-defined]
 
     return result

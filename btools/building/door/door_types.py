@@ -1,35 +1,35 @@
 import bmesh
 
-from ..arch import (
-    fill_arch,
-    create_arch,
-    add_arch_depth,
+from ...utils import (
+    VEC_UP,
+    XYDir,
+    calc_face_dimensions,
+    clamp,
+    extrude_face_region,
+    get_bottom_faces,
+    get_top_edges,
+    get_top_faces,
+    local_xyz,
+    ngon_to_quad,
+    sort_verts,
+    subdivide_face_horizontally,
+    subdivide_face_vertically,
+    valid_ngon,
+    validate,
 )
-from ..array import spread_array, clamp_array_count, get_array_split_edges
+from ..arch import (
+    add_arch_depth,
+    create_arch,
+    fill_arch,
+)
+from ..array import clamp_array_count, get_array_split_edges, spread_array
 from ..fill import fill_face
 from ..frame import add_frame_depth
 from ..materialgroup import (
     MaterialGroup,
-    map_new_faces,
     add_faces_to_group,
     find_faces_without_matgroup,
-)
-from ...utils import (
-    clamp,
-    XYDir,
-    VEC_UP,
-    validate,
-    local_xyz,
-    sort_verts,
-    valid_ngon,
-    ngon_to_quad,
-    get_top_edges,
-    get_top_faces,
-    get_bottom_faces,
-    extrude_face_region,
-    calc_face_dimensions,
-    subdivide_face_vertically,
-    subdivide_face_horizontally,
+    map_new_faces,
 )
 
 
@@ -66,7 +66,8 @@ def create_door(bm, faces, prop):
 def create_door_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
-    width, height, offset = *prop.size, prop.offset
+    width, height = prop.size
+    offset = prop.offset
     # horizontal split
     h_widths = [
         wall_w / 2 - offset.x - width / 2,

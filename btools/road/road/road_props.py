@@ -1,6 +1,5 @@
 import bpy
-
-from bpy.props import FloatProperty, BoolProperty, EnumProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty
 
 
 class RoadProperty(bpy.types.PropertyGroup):

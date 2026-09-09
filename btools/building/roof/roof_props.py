@@ -1,5 +1,6 @@
 import bpy
-from bpy.props import EnumProperty, FloatProperty, BoolProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty
+
 from ...utils import get_scaled_unit
 
 

@@ -3,21 +3,21 @@ import random
 
 import bmesh
 from bmesh.types import BMEdge, BMVert
-from mathutils import Vector, Matrix
+from mathutils import Matrix, Vector
 
 from ...utils import (
-    clamp,
-    plane,
-    circle,
-    VEC_UP,
-    VEC_RIGHT,
     VEC_FORWARD,
-    filter_geom,
+    VEC_RIGHT,
+    VEC_UP,
     calc_edge_median,
     calc_verts_median,
-    sort_edges_clockwise,
-    filter_vertical_edges,
+    circle,
+    clamp,
+    filter_geom,
     filter_horizontal_edges,
+    filter_vertical_edges,
+    plane,
+    sort_edges_clockwise,
 )
 
 

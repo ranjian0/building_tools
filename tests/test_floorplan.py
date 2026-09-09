@@ -44,7 +44,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         verts = context.object.data.vertices
-        self.assertEquals(len(verts), 4)
+        self.assertEqual(len(verts), 4)
 
         # -- check default size
         srt = sorted([v.co for v in verts], key=lambda co: co.xy.to_tuple(2))
@@ -71,7 +71,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), 1)  # cap_tris False
+        self.assertEqual(len(faces), 1)  # cap_tris False
 
         # -- check default size
         verts = context.object.data.vertices
@@ -87,7 +87,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), 1)
+        self.assertEqual(len(faces), 1)
 
     def test_composite(self):
         context = bpy.context
@@ -98,10 +98,10 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), 5)
+        self.assertEqual(len(faces), 5)
 
         verts = context.object.data.vertices
-        self.assertEquals(len(verts), 12)
+        self.assertEqual(len(verts), 12)
 
         self.clear_objects()
 
@@ -113,7 +113,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         areas = {p.area for p in context.object.data.polygons}
-        self.assertEquals(areas, {1, 2, 3, 4})
+        self.assertEqual(areas, {1, 2, 3, 4})
 
     def test_hshaped(self):
         context = bpy.context
@@ -124,14 +124,14 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         faces = context.object.data.polygons
-        self.assertEquals(len(faces), 7)
+        self.assertEqual(len(faces), 7)
 
         verts = context.object.data.vertices
-        self.assertEquals(len(verts), 16)
+        self.assertEqual(len(verts), 16)
 
         # with default size (4, 4) and 1 for fans
         areas = {p.area for p in context.object.data.polygons}
-        self.assertEquals(areas, {1, 4, 16})
+        self.assertEqual(areas, {1, 4, 16})
 
         self.clear_objects()
 
@@ -144,7 +144,7 @@ class TestFloorplan(unittest.TestCase):
         self.assertIsNotNone(res)
 
         areas = {p.area for p in context.object.data.polygons}
-        self.assertEquals(areas, {1, 2, 3, 4})
+        self.assertEqual(areas, {1, 2, 3, 4})
 
     def test_random(self):
         context = bpy.context
@@ -165,5 +165,5 @@ class TestFloorplan(unittest.TestCase):
             self.assertIsNotNone(res)
 
             faces = context.object.data.polygons
-            self.assertEquals(len(faces), i + 1)
+            self.assertEqual(len(faces), i + 1)
             self.clear_objects()

@@ -1,15 +1,14 @@
-import bpy
 import bmesh
+import bpy
 
 from ...utils import (
     crash_safe,
-    is_rectangle,
     get_edit_mesh,
+    is_rectangle,
 )
-
-from .fill_types import add_fill
-from .fill_props import FillProperty
 from ..materialgroup import verify_matgroup_attribute_for_object
+from .fill_props import FillProperty
+from .fill_types import add_fill
 
 
 class BTOOLS_OT_add_fill(bpy.types.Operator):

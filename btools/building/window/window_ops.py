@@ -1,16 +1,19 @@
-import bpy
 import bmesh
+import bpy
 
+from ...utils import (
+    crash_safe,
+    get_edit_mesh,
+    get_selected_face_dimensions,
+    is_rectangle,
+)
 from ..materialgroup import (
     MaterialGroup,
     add_material_group,
     verify_matgroup_attribute_for_object,
 )
-
-from .window_types import create_window
 from .window_props import WindowProperty
-from ...utils import get_selected_face_dimensions
-from ...utils import crash_safe, get_edit_mesh, is_rectangle
+from .window_types import create_window
 
 
 class BTOOLS_OT_add_window(bpy.types.Operator):

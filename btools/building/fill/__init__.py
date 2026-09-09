@@ -1,8 +1,8 @@
 import bpy
 
-from .fill_props import FillBars, FillPanel, FillLouver, FillGlassPanes, FillProperty
 from .fill_ops import BTOOLS_OT_add_fill
-from .fill_types import fill_face
+from .fill_props import FillBars, FillGlassPanes, FillLouver, FillPanel, FillProperty
+from .fill_types import fill_face as fill_face
 
 classes = (
     FillBars,

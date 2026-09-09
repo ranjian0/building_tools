@@ -1,16 +1,16 @@
 import bpy
 from bpy.props import (
-    EnumProperty,
     BoolProperty,
+    EnumProperty,
     FloatProperty,
     PointerProperty,
 )
 
-from ..arch import ArchProperty
 from ...utils import get_scaled_unit
-from ..array import ArrayProperty, ArrayGetSet
-from ..fill import FillPanel, FillLouver, FillGlassPanes
-from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
+from ..arch import ArchProperty
+from ..array import ArrayGetSet, ArrayProperty
+from ..fill import FillGlassPanes, FillLouver, FillPanel
+from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 
 class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):

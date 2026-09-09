@@ -2,24 +2,23 @@ import math
 from collections import namedtuple
 
 import bmesh
-from bmesh.types import BMFace, BMEdge, BMVert
-from mathutils import Vector, Matrix, Quaternion
-
-from ..materialgroup import MaterialGroup, map_new_faces, add_material_group
+from bmesh.types import BMEdge, BMFace, BMVert
+from mathutils import Matrix, Quaternion, Vector
 
 from ...utils import (
-    clamp,
     VEC_DOWN,
-    validate,
-    sort_edges,
-    sort_verts,
-    edge_vector,
-    filter_geom,
+    calc_verts_median,
+    clamp,
     edge_is_sloped,
     edge_is_vertical,
+    edge_vector,
+    filter_geom,
+    sort_edges,
+    sort_verts,
     subdivide_edges,
-    calc_verts_median,
+    validate,
 )
+from ..materialgroup import MaterialGroup, add_material_group, map_new_faces
 
 RailingResult = namedtuple("RailingResult", "corner_posts top_rails fill")
 
@@ -235,7 +234,7 @@ def edge_to_cylinder(bm, edge, radius, up, n=4, fill=False):
     bmesh.ops.translate(bm, verts=edge.verts, vec=dir * radius / math.sin(theta / 2))
     all_verts = [v for v in edge.verts]
     dir.rotate(Quaternion(edge_vec, math.pi - theta / 2).to_euler())
-    for i in range(0, n):
+    for i in range(n):
         ret = bmesh.ops.extrude_edge_only(bm, edges=[edge])
         edge = filter_geom(ret["geom"], BMEdge)[0]
         bmesh.ops.translate(bm, verts=edge.verts, vec=dir * length)

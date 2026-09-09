@@ -1,32 +1,32 @@
 """
 Tools to allow users to place custom meshes on a building
 """
-import bpy
-import bmesh
-from mathutils import Matrix, Vector
-from bpy.props import PointerProperty
 
-from .materialgroup import MaterialGroup, add_faces_to_group, add_material_group
+import bmesh
+import bpy
+from bpy.props import PointerProperty
+from mathutils import Matrix, Vector
 
 from ..utils import (
-    select,
-    local_xyz,
-    bm_to_obj,
-    crash_safe,
+    VEC_UP,
     bm_from_obj,
-    popup_message,
+    bm_to_obj,
+    bmesh_from_active_object,
+    calc_face_dimensions,
     calc_faces_median,
     calc_verts_median,
+    crash_safe,
     get_bounding_verts,
-    calc_face_dimensions,
-    bmesh_from_active_object,
-    subdivide_face_vertically,
-    subdivide_face_horizontally,
     get_selected_face_dimensions,
+    local_xyz,
+    popup_message,
+    select,
+    subdivide_face_horizontally,
+    subdivide_face_vertically,
 )
-from ..utils import VEC_UP
-from .array import ArrayProperty, ArrayGetSet
-from .sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
+from .array import ArrayGetSet, ArrayProperty
+from .materialgroup import MaterialGroup, add_faces_to_group, add_material_group
+from .sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 
 class CustomObjectProperty(bpy.types.PropertyGroup, SizeOffsetGetSet, ArrayGetSet):
@@ -162,7 +162,7 @@ def transfer_materials(from_object, to_obj):
         for i, m in enumerate(materials):
             if i == idx:
                 return m.name.encode()
-        return "".encode()
+        return b""
 
     # -- store material names on the face layer
     bm = bm_from_obj(from_object)

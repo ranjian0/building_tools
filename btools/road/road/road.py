@@ -1,24 +1,23 @@
 import math
-from math import sin, cos
+from math import cos, sin
 
 import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
+from ...building.materialgroup import (
+    MaterialGroup,
+    add_faces_to_group,
+    add_material_group,
+)
 from ...utils import (
-    link_obj,
+    bm_from_obj,
     bm_to_obj,
     crash_safe,
-    bm_from_obj,
     create_mesh,
     create_object,
     filter_geom,
-)
-
-from ...building.materialgroup import (
-    add_faces_to_group,
-    MaterialGroup,
-    add_material_group,    
+    link_obj,
 )
 
 
@@ -27,7 +26,7 @@ class Road:
     @crash_safe
     def build(cls, context, prop):
         """Create road object"""
-        name = "road_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
+        name = "road_" + str(f"{len(bpy.data.objects) + 1:0>3}")
         obj = create_object(name, create_mesh(name + "_mesh"))
         link_obj(obj)
 
@@ -129,7 +128,7 @@ class Road:
     @classmethod
     def create_curve(cls, context):
         # Create curve
-        name = "curve_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
+        name = "curve_" + str(f"{len(bpy.data.objects) + 1:0>3}")
         curve_data = bpy.data.curves.new(name=name, type="CURVE")
         curve_data.dimensions = "3D"
         curve_data.resolution_u = 500
@@ -188,19 +187,27 @@ class Road:
             face_count = 1
 
             if prop.generate_shoulders:
-                add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SHOULDER)
+                add_faces_to_group(
+                    bm, (bm.edges[1].link_faces[0],), MaterialGroup.SHOULDER
+                )
                 face_count += 1
         else:
             add_faces_to_group(bm, (bm.edges[0].link_faces[0],), MaterialGroup.SIDEWALK)
-            add_faces_to_group(bm, (bm.edges[1].link_faces[0],), MaterialGroup.SIDEWALK_SIDE)
+            add_faces_to_group(
+                bm, (bm.edges[1].link_faces[0],), MaterialGroup.SIDEWALK_SIDE
+            )
             face_count = 2
 
             if prop.generate_shoulders:
-                add_faces_to_group(bm, (bm.edges[2].link_faces[0],), MaterialGroup.SHOULDER)
+                add_faces_to_group(
+                    bm, (bm.edges[2].link_faces[0],), MaterialGroup.SHOULDER
+                )
                 face_count += 1
 
         # Central road
-        add_faces_to_group(bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.ROAD)
+        add_faces_to_group(
+            bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.ROAD
+        )
         face_count += 1
 
         # Right side of road
@@ -219,7 +226,9 @@ class Road:
             )
         else:
             add_faces_to_group(
-                bm, (bm.edges[face_count].link_faces[0],), MaterialGroup.SHOULDER_EXTENSION
+                bm,
+                (bm.edges[face_count].link_faces[0],),
+                MaterialGroup.SHOULDER_EXTENSION,
             )
 
         # Continue to extrude

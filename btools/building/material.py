@@ -1,18 +1,18 @@
 import bpy
 from bpy.props import (
-    IntProperty,
     BoolProperty,
-    EnumProperty,
-    StringProperty,
-    PointerProperty,
     CollectionProperty,
+    EnumProperty,
+    IntProperty,
+    PointerProperty,
+    StringProperty,
 )
 
-from ..utils import create_object_material, bmesh_from_active_object
+from ..utils import bmesh_from_active_object, create_object_material
 from .materialgroup import (
     clear_empty_matgroups,
-    set_material_for_active_matgroup,
     clear_material_for_active_matgroup,
+    set_material_for_active_matgroup,
 )
 
 
@@ -112,7 +112,7 @@ class BTOOLS_OT_material_group_add(bpy.types.Operator):
         mt.name = "mat_group_" + str(len(obj.bt_materials))
         mt.index = len(obj.bt_materials) - 1
         return {"FINISHED"}
-    
+
 
 class BTOOLS_OT_material_group_remove(bpy.types.Operator):
     """Remove the active material group"""
@@ -148,7 +148,7 @@ class BTOOLS_OT_material_group_assign(bpy.types.Operator):
     def execute(self, context):
         obj = context.object
         active_matgroup = obj.bt_materials[obj.bt_materials_active_index]
-        
+
         with bmesh_from_active_object(context) as bm:
             layer = bm.faces.layers.int.get(".bt_material_group_index")
             for face in bm.faces:
@@ -156,12 +156,14 @@ class BTOOLS_OT_material_group_assign(bpy.types.Operator):
                     face[layer] = active_matgroup.index
                     # -- assign material to face
                     if active_matgroup.material:
-                        face.material_index = obj.data.materials.find(active_matgroup.material.name)
+                        face.material_index = obj.data.materials.find(
+                            active_matgroup.material.name
+                        )
                     else:
                         face.material_index = 0
-        
+
         return {"FINISHED"}
-    
+
 
 class BTOOLS_OT_material_group_remove_from(bpy.types.Operator):
     """Remove the selected faces from the active material group"""
@@ -184,10 +186,10 @@ class BTOOLS_OT_material_group_remove_from(bpy.types.Operator):
                     face[layer] = -1
                     # -- remove material from face
                     face.material_index = 0
-        
+
         return {"FINISHED"}
-    
-    
+
+
 class BTOOLS_OT_material_group_select(bpy.types.Operator):
     """Select all faces belonging to the active material group"""
 
@@ -209,9 +211,9 @@ class BTOOLS_OT_material_group_select(bpy.types.Operator):
             for face in bm.faces:
                 if face[layer] == active_group.index:
                     face.select = True
-        
+
         return {"FINISHED"}
-    
+
 
 class BTOOLS_OT_material_group_deselect(bpy.types.Operator):
     """Deselect all faces belonging to the active material group"""
@@ -234,17 +236,18 @@ class BTOOLS_OT_material_group_deselect(bpy.types.Operator):
             for face in bm.faces:
                 if face[layer] == active_group.index:
                     face.select = False
-        
+
         return {"FINISHED"}
 
 
 def update_group_material(self, context):
     """Assign the updated material to all faces belonging to active group"""
     set_material_for_active_matgroup(self.material, context)
-    return None
+
 
 class BTMaterial(bpy.types.PropertyGroup):
     """Tracks materials for each face in an object"""
+
     index: IntProperty(default=-1)
     name: StringProperty(name="Name", default="")
     material: PointerProperty(type=bpy.types.Material, update=update_group_material)
@@ -266,6 +269,7 @@ class BTMaterial(bpy.types.PropertyGroup):
         description="How to perform UV Mapping",
     )
 
+
 classes = (
     BTMaterial,
     BTOOLS_UL_materials,
@@ -277,7 +281,7 @@ classes = (
     BTOOLS_OT_material_group_assign,
     BTOOLS_OT_material_group_select,
     BTOOLS_OT_material_group_deselect,
-    BTOOLS_OT_material_group_remove_from
+    BTOOLS_OT_material_group_remove_from,
 )
 
 

@@ -2,21 +2,25 @@ from enum import Enum, auto
 
 import bmesh
 from bmesh.types import BMEdge, BMVert
-from mathutils import Vector, Matrix
-
-from ..materialgroup import MaterialGroup, map_new_faces, add_faces_to_group, add_material_group
+from mathutils import Matrix, Vector
 
 from ...utils import (
     VEC_UP,
-    validate,
-    local_xyz,
-    valid_ngon,
-    filter_geom,
-    ngon_to_quad,
     calc_edge_median,
     calc_face_dimensions,
-    filter_vertical_edges,
+    filter_geom,
     filter_horizontal_edges,
+    filter_vertical_edges,
+    local_xyz,
+    ngon_to_quad,
+    valid_ngon,
+    validate,
+)
+from ..materialgroup import (
+    MaterialGroup,
+    add_faces_to_group,
+    add_material_group,
+    map_new_faces,
 )
 
 
@@ -154,7 +158,11 @@ def fill_glass_panes(bm, face, prop, user=FillUser.DOOR):
     if not round(width) or not round(height):
         return
 
-    userframe = MaterialGroup.DOOR_PANES if user == FillUser.DOOR else MaterialGroup.WINDOW_PANES
+    userframe = (
+        MaterialGroup.DOOR_PANES
+        if user == FillUser.DOOR
+        else MaterialGroup.WINDOW_PANES
+    )
     bmesh.ops.inset_individual(
         bm, faces=[face], thickness=0.0001
     )  # to isolate the working quad and not leave adjacent face as n-gon
@@ -245,7 +253,9 @@ def fill_louver(bm, face, prop, user=FillUser.DOOR):
             space=Matrix.Translation(-face.calc_center_median()),
         )
 
-    usergroup = [MaterialGroup.WINDOW_LOUVERS, MaterialGroup.DOOR_LOUVERS][user == FillUser.DOOR]
+    usergroup = [MaterialGroup.WINDOW_LOUVERS, MaterialGroup.DOOR_LOUVERS][
+        user == FillUser.DOOR
+    ]
     extrude = map_new_faces(usergroup)(extrude_faces_add_slope)
     extrude(bm, louver_faces, normal, prop.louver_depth)
     add_faces_to_group(bm, validate(faces[::2]), usergroup)

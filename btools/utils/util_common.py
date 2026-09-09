@@ -1,10 +1,12 @@
-import bpy
 import enum
-import bmesh
 import traceback
-from mathutils import Vector
+
+import bmesh
+import bpy
 from bpy.props import PointerProperty
-from .util_constants import VEC_UP, VEC_RIGHT
+from mathutils import Vector
+
+from .util_constants import VEC_RIGHT, VEC_UP
 
 
 def equal(a, b, eps=0.001):

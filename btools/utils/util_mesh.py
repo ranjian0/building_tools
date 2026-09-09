@@ -1,14 +1,14 @@
+import collections
 import functools as ft
 import math
 import operator
-import collections
 
 import bmesh
 import bpy
-from bmesh.types import BMVert, BMEdge, BMFace
+from bmesh.types import BMEdge, BMFace, BMVert
 
-from .util_common import local_xyz, equal, minmax
-from .util_constants import VEC_UP, VEC_DOWN, VEC_FORWARD, VEC_RIGHT
+from .util_common import equal, local_xyz, minmax
+from .util_constants import VEC_DOWN, VEC_FORWARD, VEC_RIGHT, VEC_UP
 
 
 def get_edit_mesh():
@@ -140,9 +140,11 @@ def filter_vertical_edges(edges):
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
         # -- the vertical edges will have the smallest angle to Y-AXIS,
-        dot_threshhold = 0.5 # 45 degrees threshold to Y
+        dot_threshhold = 0.5  # 45 degrees threshold to Y
+
         def closest_dot(e):
             return abs(edge_vector(e).xy.dot(VEC_FORWARD.xy)) > dot_threshhold
+
         return list(filter(closest_dot, edges))
 
     # Any edge that has upward vector is considered vertical
@@ -165,9 +167,11 @@ def filter_horizontal_edges(edges):
     space_2d = len(set(rnd(v.co.z) for e in edges for v in e.verts)) == 1
     if space_2d:
         # -- the vertical edges will have the smallest angle to X-AXIS
-        dot_threshhold = 0.5 # 45 degrees threshold to X
+        dot_threshhold = 0.5  # 45 degrees threshold to X
+
         def closest_dot(e):
             return abs(edge_vector(e).xy.dot(VEC_RIGHT.xy)) > dot_threshhold
+
         return list(filter(closest_dot, edges))
 
     # Any edge that is at right angle to global up vector is horizontal

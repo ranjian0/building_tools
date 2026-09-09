@@ -1,20 +1,19 @@
-import bpy
 import bmesh
-from bpy.props import IntProperty, FloatProperty
+import bpy
+from bpy.props import FloatProperty, IntProperty
+from mathutils import Vector
 
 from ..utils import (
-    clamp,
     VEC_DOWN,
+    calc_edge_median,
+    calc_face_dimensions,
+    calc_faces_median,
+    clamp,
+    edge_is_vertical,
+    get_scaled_unit,
     sort_edges,
     sort_faces,
-    get_scaled_unit,
-    edge_is_vertical,
-    calc_edge_median,
-    calc_faces_median,
-    calc_face_dimensions,
 )
-
-from mathutils import Vector
 
 
 class ArrayProperty(bpy.types.PropertyGroup):

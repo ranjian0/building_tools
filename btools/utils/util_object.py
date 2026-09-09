@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import bmesh
 import bpy
 
-from .util_mesh import select, get_edit_mesh
+from .util_mesh import get_edit_mesh, select
 
 
 def create_object(name, data=None):

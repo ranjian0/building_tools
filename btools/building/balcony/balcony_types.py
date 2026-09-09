@@ -1,26 +1,27 @@
 import math
+
 import bmesh
-from bmesh.types import BMVert, BMFace, BMEdge
+from bmesh.types import BMEdge, BMFace, BMVert
 from mathutils import Vector
 
-from ..railing.railing import create_railing
-from ..materialgroup import MaterialGroup, add_faces_to_group
 from ...utils import (
-    clamp,
     VEC_UP,
-    validate,
-    local_xyz,
-    sort_verts,
-    sort_edges,
-    valid_ngon,
-    filter_geom,
-    create_face,
-    ngon_to_quad,
-    get_top_faces,
     calc_edge_median,
-    get_selection_groups,
     calc_face_dimensions,
+    clamp,
+    create_face,
+    filter_geom,
+    get_selection_groups,
+    get_top_faces,
+    local_xyz,
+    ngon_to_quad,
+    sort_edges,
+    sort_verts,
+    valid_ngon,
+    validate,
 )
+from ..materialgroup import MaterialGroup, add_faces_to_group
+from ..railing.railing import create_railing
 
 
 def create_balcony(bm, faces, prop):

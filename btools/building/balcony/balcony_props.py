@@ -2,9 +2,9 @@ import bpy
 from bpy.props import BoolProperty, FloatProperty, PointerProperty
 
 from ...utils import get_scaled_unit
-from ..array import ArrayProperty, ArrayGetSet
-from ..sizeoffset import SizeOffsetProperty, SizeOffsetGetSet
+from ..array import ArrayGetSet, ArrayProperty
 from ..railing.railing_props import RailProperty
+from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 
 class BalconyProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):

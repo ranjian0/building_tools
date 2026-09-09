@@ -1,35 +1,36 @@
 import re
+
 import bmesh
 
-from ..arch import fill_arch, create_arch, add_arch_depth
+from ...utils import (
+    VEC_DOWN,
+    VEC_UP,
+    XYDir,
+    calc_face_dimensions,
+    clamp,
+    filter_horizontal_edges,
+    get_top_edges,
+    get_top_faces,
+    local_xyz,
+    ngon_to_quad,
+    popup_message,
+    sort_faces,
+    sort_verts,
+    subdivide_face_horizontally,
+    subdivide_face_vertically,
+    valid_ngon,
+    validate,
+)
+from ..arch import add_arch_depth, create_arch, fill_arch
+from ..array import clamp_array_count, get_array_split_edges, spread_array
 from ..door.door_types import add_door_depth
 from ..fill.fill_types import fill_face
 from ..frame import add_frame_depth
-from ..array import spread_array, clamp_array_count, get_array_split_edges
 from ..materialgroup import (
     MaterialGroup,
-    map_new_faces,
     add_faces_to_group,
     find_faces_without_matgroup,
-)
-from ...utils import (
-    clamp,
-    XYDir,
-    VEC_UP,
-    VEC_DOWN,
-    validate,
-    local_xyz,
-    sort_faces,
-    sort_verts,
-    valid_ngon,
-    ngon_to_quad,
-    get_top_faces,
-    get_top_edges,
-    popup_message,
-    calc_face_dimensions,
-    filter_horizontal_edges,
-    subdivide_face_horizontally,
-    subdivide_face_vertically,
+    map_new_faces,
 )
 
 # XXX small value to provide split margins
@@ -87,7 +88,8 @@ def create_multigroup(bm, faces, prop):
 def create_multigroup_split(bm, face, prop):
     """Use properties from SizeOffset to subdivide face into regular quads"""
     wall_w, wall_h = calc_face_dimensions(face)
-    width, height, offset = *prop.size, prop.offset
+    width, height = prop.size
+    offset = prop.offset
     # horizontal split
     h_widths = [
         wall_w / 2 - offset.x - width / 2,
@@ -214,7 +216,8 @@ def add_multi_window_depth(bm, window_faces, depth, normal):
 
 def make_multigroup_insets(bm, face, prop, dws):
     face_h = calc_face_dimensions(face)[1]
-    width, height, frame_thickness = *prop.size, prop.frame_thickness
+    width, height = prop.size
+    frame_thickness = prop.frame_thickness
 
     # XXX Frame thickness should not exceed size of any multigroup component
     min_frame_size = min([width / count(dws), face_h]) / 2
@@ -359,7 +362,7 @@ def parse_components(components):
                 dws.append({"type": char_to_type.get(c), "count": 1})
                 previous = c
             else:
-                raise Exception("Unsupported component: {}".format(c))
+                raise Exception(f"Unsupported component: {c}")
     return dws
 
 

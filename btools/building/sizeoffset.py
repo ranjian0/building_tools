@@ -4,14 +4,13 @@ from bpy.props import (
     FloatProperty,
     FloatVectorProperty,
 )
+from mathutils import Vector
 
 from ..utils import (
     clamp,
-    restricted_size,
     restricted_offset,
+    restricted_size,
 )
-
-from mathutils import Vector
 
 
 class SizeOffsetProperty(bpy.types.PropertyGroup):

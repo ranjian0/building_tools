@@ -1,21 +1,19 @@
-import bpy
 import bmesh
+import bpy
 
 from ...utils import (
     crash_safe,
-    is_rectangle,
     get_edit_mesh,
+    get_selected_face_dimensions,
+    is_rectangle,
 )
-
 from ..materialgroup import (
     MaterialGroup,
     add_material_group,
     verify_matgroup_attribute_for_object,
 )
-
-from .door_types import create_door
 from .door_props import DoorProperty
-from ...utils import get_selected_face_dimensions
+from .door_types import create_door
 
 
 class BTOOLS_OT_add_door(bpy.types.Operator):

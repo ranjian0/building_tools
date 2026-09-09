@@ -1,17 +1,19 @@
-import bpy
 import bmesh
-
-from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
+import bpy
 
 from ...utils import (
     crash_safe,
-    is_rectangle,
     get_edit_mesh,
+    get_selected_face_dimensions,
+    is_rectangle,
 )
-
-from .multigroup_types import create_multigroup
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
+)
 from .multigroup_props import MultigroupProperty
-from ...utils import get_selected_face_dimensions
+from .multigroup_types import create_multigroup
 
 
 class BTOOLS_OT_add_multigroup(bpy.types.Operator):

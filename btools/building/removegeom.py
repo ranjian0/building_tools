@@ -1,15 +1,16 @@
-import bpy
 import bmesh
-from .materialgroup import MaterialGroup, add_faces_to_group
+import bpy
+
 from ..utils import (
+    VEC_DOWN,
+    VEC_UP,
+    get_edit_mesh,
     minmax,
     select,
-    VEC_UP,
-    VEC_DOWN,
     sort_faces,
     sort_verts,
-    get_edit_mesh,
 )
+from .materialgroup import MaterialGroup, add_faces_to_group
 
 
 def remove(context):

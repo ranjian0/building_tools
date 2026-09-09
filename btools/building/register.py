@@ -1,23 +1,21 @@
 import bpy
+
 from .arch import ArchProperty
 from .array import ArrayProperty
-from .sizeoffset import SizeOffsetProperty
-
-from .customobj import register_custom, unregister_custom
-from .material import register_material, unregister_material
-from .removegeom import register_removegeom, unregister_removegeom
-
 from .balcony import register_balcony, unregister_balcony
+from .customobj import register_custom, unregister_custom
 from .door import register_door, unregister_door
 from .fill import register_fill, unregister_fill
 from .floor import register_floor, unregister_floor
 from .floorplan import register_floorplan, unregister_floorplan
+from .material import register_material, unregister_material
 from .multigroup import register_multigroup, unregister_multigroup
 from .railing import register_railing, unregister_railing
+from .removegeom import register_removegeom, unregister_removegeom
 from .roof import register_roof, unregister_roof
+from .sizeoffset import SizeOffsetProperty
 from .stairs import register_stairs, unregister_stairs
 from .window import register_window, unregister_window
-
 
 classes = (
     ArchProperty,

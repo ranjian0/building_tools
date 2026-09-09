@@ -1,21 +1,19 @@
 import bpy
-import bpy
 
 from ...utils import (
-    link_obj,
+    bm_from_obj,
     bm_to_obj,
     crash_safe,
-    bm_from_obj,
     create_mesh,
     create_object,
+    link_obj,
 )
-
 from .floorplan_props import FloorplanProperty
 from .floorplan_types import (
-    create_random_floorplan,
-    create_hshaped_floorplan,
     create_circular_floorplan,
     create_composite_floorplan,
+    create_hshaped_floorplan,
+    create_random_floorplan,
     create_rectangular_floorplan,
 )
 
@@ -43,7 +41,7 @@ class BTOOLS_OT_add_floorplan(bpy.types.Operator):
 
 @crash_safe
 def build(context, prop):
-    name = "building_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
+    name = "building_" + str(f"{len(bpy.data.objects) + 1:0>3}")
     obj = create_object(name, create_mesh(name + "_mesh"))
 
     bm = bm_from_obj(obj)

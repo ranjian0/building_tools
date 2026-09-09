@@ -1,16 +1,16 @@
 import bpy
 from bpy.props import (
-    IntProperty,
     BoolProperty,
     EnumProperty,
     FloatProperty,
+    IntProperty,
     PointerProperty,
 )
 
-from ..arch import ArchProperty
 from ...utils import get_scaled_unit
-from ..array import ArrayProperty, ArrayGetSet
-from ..fill import FillBars, FillLouver, FillGlassPanes
+from ..arch import ArchProperty
+from ..array import ArrayGetSet, ArrayProperty
+from ..fill import FillBars, FillGlassPanes, FillLouver
 from ..sizeoffset import SizeOffsetGetSet, SizeOffsetProperty
 
 

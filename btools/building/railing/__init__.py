@@ -3,8 +3,8 @@ import bpy
 from .railing_props import (
     PostFillProperty,
     RailFillProperty,
-    WallFillProperty,
     RailProperty,
+    WallFillProperty,
 )
 
 classes = (

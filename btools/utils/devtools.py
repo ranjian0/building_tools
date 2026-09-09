@@ -1,7 +1,7 @@
 import cProfile
 import io
-import pstats
 import itertools as it
+import pstats
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from os import devnull
 

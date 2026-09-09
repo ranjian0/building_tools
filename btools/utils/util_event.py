@@ -1,6 +1,3 @@
-from functools import wraps
-
-
 class Events:
     def __init__(self, events):
         self.subscribers = {e: list() for e in events}

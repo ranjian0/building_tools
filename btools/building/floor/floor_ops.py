@@ -1,21 +1,19 @@
-import bpy
 import bmesh
-
-from ..materialgroup import (
-    MaterialGroup,
-    clear_empty_matgroups,
-    add_material_group,
-    verify_matgroup_attribute_for_object,
-)
+import bpy
 
 from ...utils import (
-    select,
     crash_safe,
     get_edit_mesh,
+    select,
 )
-
-from .floor_types import create_floors
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    clear_empty_matgroups,
+    verify_matgroup_attribute_for_object,
+)
 from .floor_props import FloorProperty
+from .floor_types import create_floors
 
 
 class BTOOLS_OT_add_floors(bpy.types.Operator):

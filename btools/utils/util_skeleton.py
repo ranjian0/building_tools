@@ -1,16 +1,15 @@
-""" Adapted from https://github.com/yonghah/polyskel
-"""
+"""Adapted from https://github.com/yonghah/polyskel"""
 
-import math
 import heapq
-import operator as op
 import itertools as it
+import math
+import operator as op
 from collections import namedtuple
 
 
 class Vector2:
     __slots__ = ["x", "y"]
-    __hash__ = None
+    __hash__ = None  # type: ignore[assignment] # explicit unhashable idiom
 
     def __init__(self, x=0, y=0):
         self.x = x
@@ -448,9 +447,7 @@ class SplitEvent(
     __slots__ = ()
 
     def __str__(self):
-        return "{} Split event @ {} from {} to {}".format(
-            self.distance, self.intersection_point, self.vertex, self.opposite_edge
-        )
+        return f"{self.distance} Split event @ {self.intersection_point} from {self.vertex} to {self.opposite_edge}"
 
 
 # -- Event Type (etype) is 0
@@ -460,12 +457,10 @@ class EdgeEvent(
     __slots__ = ()
 
     def __str__(self):
-        return "{} Edge event @ {} between {} and {}".format(
-            self.distance, self.intersection_point, self.vertex_a, self.vertex_b
-        )
+        return f"{self.distance} Edge event @ {self.intersection_point} between {self.vertex_a} and {self.vertex_b}"
 
 
-OriginalEdge = namedtuple("_OriginalEdge", "edge bisector_left, bisector_right")
+OriginalEdge = namedtuple("OriginalEdge", "edge bisector_left, bisector_right")
 
 Subtree = namedtuple("Subtree", "source, height, sinks")
 
@@ -596,7 +591,7 @@ class LAVertex:
         return self._valid
 
     def __str__(self):
-        return "Vertex ({:.2f};{:.2f})".format(self.point.x, self.point.y)
+        return f"Vertex ({self.point.x:.2f};{self.point.y:.2f})"
 
     def __lt__(self, other):
         if isinstance(other, LAVertex):
@@ -841,10 +836,10 @@ class LAV:
         return replacement
 
     def __str__(self):
-        return "LAV {}".format(id(self))
+        return f"LAV {id(self)}"
 
     def __repr__(self):
-        return "{} = {}".format(str(self), [vertex for vertex in self])
+        return f"{self!s} = {[vertex for vertex in self]}"
 
     def __len__(self):
         return self._len
@@ -917,12 +912,12 @@ def skeletonize(polygon, holes=None, zero_gradient=False):
         if isinstance(i, EdgeEvent):
             if not i.vertex_a.is_valid or not i.vertex_b.is_valid:
                 continue
-            (arc, events) = slav.handle_edge_event(i, zero_gradient)
+            arc, events = slav.handle_edge_event(i, zero_gradient)
 
         elif isinstance(i, SplitEvent):
             if not i.vertex.is_valid:
                 continue
-            (arc, events) = slav.handle_split_event(i)
+            arc, events = slav.handle_split_event(i)
 
         prioque.put_all(events)
 

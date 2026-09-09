@@ -1,11 +1,14 @@
-import bpy
 import bmesh
+import bpy
 
 from ...utils import crash_safe, get_edit_mesh
-from ..materialgroup import MaterialGroup, add_material_group, verify_matgroup_attribute_for_object
-
-from .roof_types import create_roof
+from ..materialgroup import (
+    MaterialGroup,
+    add_material_group,
+    verify_matgroup_attribute_for_object,
+)
 from .roof_props import RoofProperty
+from .roof_types import create_roof
 
 
 class BTOOLS_OT_add_roof(bpy.types.Operator):

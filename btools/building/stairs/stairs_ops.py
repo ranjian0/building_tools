@@ -1,16 +1,14 @@
-import bpy
 import bmesh
+import bpy
 
+from ...utils import crash_safe, get_edit_mesh, get_selected_face_dimensions
 from ..materialgroup import (
     MaterialGroup,
     add_material_group,
     verify_matgroup_attribute_for_object,
 )
-
-from .stairs_types import create_stairs
 from .stairs_props import StairsProperty
-from ...utils import crash_safe, get_edit_mesh
-from ...utils import get_selected_face_dimensions
+from .stairs_types import create_stairs
 
 
 class BTOOLS_OT_add_stairs(bpy.types.Operator):

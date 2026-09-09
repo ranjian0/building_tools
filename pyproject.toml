@@ -25,3 +25,41 @@ dev = [
 [tool.uv]
 package = false
 default-groups = ["lint", "dev"]
+
+[tool.mypy]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "btools.*"
+# Blender's declarative property pattern uses function calls as annotations:
+#   foo: FloatProperty(...)
+disable_error_code = ["valid-type"]
+
+[tool.ruff.lint]
+ignore = [
+    # Blender's declarative property pattern: mutable class attrs and
+    # function calls as defaults are how bpy PropertyGroups are defined
+    "RUF012",
+    "RUF009",
+    "B008",
+    # Legacy style in stable geometry code -- adopt incrementally
+    "UP031",  # printf-string-formatting
+    "UP028",  # yield-in-for-loop -> yield from
+    "SIM101", # duplicate-isinstance-call
+    "SIM102", # collapsible-if
+    "SIM117", # multiple-with-statements
+    "SIM118", # in-dict-keys
+    "C401",   # unnecessary-generator-set
+    "C408",   # unnecessary-collection-call
+    "C417",   # unnecessary-map
+    "C419",   # unnecessary-comprehension-in-call
+    # These rewrites can change behavior in this codebase
+    "RUF015", # next(iter()) raises StopIteration where list()[0] raises IndexError
+    "SIM201", # != rewrite is not equivalent for numpy array comparisons
+    "RUF017", # quadratic summation rewrite over bmesh sequences
+    "FURB192",# sorted()[0] -> min() rewrites
+    # Intentional patterns
+    "PLR1704",# redefined-argument-from-local: renaming needs API decisions
+    "TRY002", # vanilla exceptions are the addon's error style
+    "BLE001", # blind except at Blender operator boundaries
+]

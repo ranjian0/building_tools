@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import EnumProperty, IntProperty, FloatProperty, BoolProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty
 
 from ...utils import clamp, get_scaled_unit
 

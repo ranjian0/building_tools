@@ -1,20 +1,25 @@
 import bmesh
 import mathutils
 import numpy as np
-from bmesh.types import BMVert, BMFace
+from bmesh.types import BMFace, BMVert
 from mathutils import Vector
 
-from ..materialgroup import MaterialGroup, map_new_faces, add_faces_to_group, add_material_group
 from ...utils import (
-    equal,
-    select,
-    validate,
+    calc_edge_median,
+    edge_is_vertical,
     edge_vector,
-    skeletonize,
+    equal,
     filter_geom,
     popup_message,
-    edge_is_vertical,
-    calc_edge_median,
+    select,
+    skeletonize,
+    validate,
+)
+from ..materialgroup import (
+    MaterialGroup,
+    add_faces_to_group,
+    add_material_group,
+    map_new_faces,
 )
 
 
@@ -284,7 +289,7 @@ def join_intersecting_verts_and_edges(bm, edges, verts):
             if res:
                 split_vert = v1
                 split_factor = (v1.co - v.co).length / e.calc_length()
-                new_edge, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
+                _, new_vert = bmesh.utils.edge_split(e, split_vert, split_factor)
                 new_verts.append(new_vert)
     return validate(new_verts)
 

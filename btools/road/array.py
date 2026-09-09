@@ -1,14 +1,14 @@
 import bpy
 
 from ..utils import (
+    Matrix,
+    bm_from_obj,
+    bm_to_obj,
     crash_safe,
     create_mesh,
     create_object,
-    plane,
-    bm_from_obj,
-    bm_to_obj,
     link_obj,
-    Matrix,
+    plane,
     select,
 )
 
@@ -21,7 +21,7 @@ class Array:
 
         # Can't array nothing
         if context.active_object is None:
-            return None
+            return
 
         # Create children
         object = context.object
@@ -59,7 +59,7 @@ class Array:
     @classmethod
     def create_curve(cls, context):
         # Create curve
-        name = "curve_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
+        name = "curve_" + str(f"{len(bpy.data.objects) + 1:0>3}")
         curve_data = bpy.data.curves.new(name=name, type="CURVE")
         curve_data.dimensions = "3D"
         curve_data.resolution_u = 500
@@ -85,7 +85,7 @@ class Array:
     @classmethod
     def create_plane(cls, context, curve):
         # Create plane
-        name = "plane_" + str("{:0>3}".format(len(bpy.data.objects) + 1))
+        name = "plane_" + str(f"{len(bpy.data.objects) + 1:0>3}")
         obj = create_object(name, create_mesh(name + "_mesh"))
         bm = bm_from_obj(obj)
 
