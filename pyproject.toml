@@ -7,27 +7,21 @@ authors = [
 ]
 dependencies = [
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 lint = [
-    "black>=25.1.0",
-    "mypy>=1.15.0",
-    "ruff>=0.11.10",
-    "fake-bpy-module-latest>=20250505",
+    "black>=26.5.1",
+    "mypy>=2.3.1",
+    "ruff>=0.16.6",
+    "fake-bpy-module-latest>=20260909",
 ]
 dev = [
-    "numpy>=2.2.5",
+    "numpy>=2.5.3",
 ]
 
-
-[tool.pdm.scripts]
-test = {cmd = "blender --window-geometry 0 0 1 1 --no-window-focus -P tests/__main__.py"}
-build = {cmd = "python scripts/make-release.py"}
-build-dev = {cmd = "python scripts/make-release.py latest"}
-install-dev = {cmd = "blender -P scripts/install-dev-addon.py"}
-dev = {composite = ["build-dev", "install-dev"]}
-format = {cmd = "black btools"}
-check = {cmd = "mypy btools"}
+[tool.uv]
+package = false
+default-groups = ["lint", "dev"]

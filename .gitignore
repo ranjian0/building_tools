@@ -139,8 +139,5 @@ dmypy.json
 /docs/_site
 /docs/Gemfile.lock
 
-.pdm.toml
-.pdm-python
-.pdm-build/
-
 .env.json
+.agent
