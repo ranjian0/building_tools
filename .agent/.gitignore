@@ -1,0 +1,3 @@
+# Transient session output (screenshots, logs, protocol files, pid files).
+# Everything else under .agent/ (tools/, plans/) is tracked.
+out/

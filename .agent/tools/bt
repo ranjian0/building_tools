@@ -1,0 +1,555 @@
+#!/usr/bin/env python3
+"""bt -- Building Tools Blender session controller.
+
+Manages a persistent Blender session for validating addon changes:
+start/stop Blender, run code in the live session, hot-reload the addon
+from this repo, and capture screenshots for visual analysis.
+
+Usage: bt <command> [options]   (see `bt --help`)
+"""
+
+import argparse
+import glob
+import json
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import time
+
+TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_DIR = os.path.abspath(os.path.join(TOOLS_DIR, "..", ".."))
+OUT_DIR = os.path.join(TOOLS_DIR, "out")
+SESSION_DIR = os.path.join(OUT_DIR, "session")
+SHOTS_DIR = os.path.join(OUT_DIR, "screenshots")
+LOG_PATH = os.path.join(OUT_DIR, "blender.log")
+PID_FILE = os.path.join(SESSION_DIR, "pid")
+DRIVER = os.path.join(TOOLS_DIR, "lib", "driver.py")
+SNIPPETS = os.path.join(TOOLS_DIR, "snippets")
+
+ADDON_MODULE = "building_tools"
+
+DEFAULT_BLENDER = "/home/ranjian0/tools/blender-5.1.2-linux-x64/blender"
+
+
+# ---------------------------------------------------------------- helpers
+
+def session_env():
+    env = os.environ.copy()
+    env["BT_SESSION_DIR"] = SESSION_DIR
+    return env
+
+
+def blender_binary():
+    return (
+        os.environ.get("BT_BLENDER")
+        or (DEFAULT_BLENDER if os.path.exists(DEFAULT_BLENDER) else None)
+        or shutil.which("blender")
+        or "blender"
+    )
+
+
+def read_pid():
+    try:
+        with open(PID_FILE) as f:
+            return int(f.read().strip())
+    except (OSError, ValueError):
+        return None
+
+
+def pid_alive(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def detect_monitor_geometry():
+    """Geometry (x, y, w, h) of the 4K monitor, else the largest connected one.
+
+    Prefers an exact 3840x2160 output; falls back to the connected output with
+    the largest pixel area; last resort is a static ultrawide at origin.
+    """
+    found = []
+    try:
+        out = subprocess.run(
+            ["xrandr", "--query"], capture_output=True, text=True, timeout=5
+        ).stdout
+        for line in out.splitlines():
+            if " connected" not in line:
+                continue
+            m = re.search(r"(\d+)x(\d+)\+(\d+)\+(\d+)", line)
+            if m:
+                w, h, x, y = map(int, m.groups())
+                found.append((x, y, w, h))
+    except Exception:
+        pass
+    if not found:
+        return 0, 0, 3440, 1440
+
+    for geo in found:  # explicit 4K wins
+        if (geo[2], geo[3]) == (3840, 2160):
+            return geo
+    return max(found, key=lambda g: g[2] * g[3])
+
+
+def parse_geometry(spec):
+    m = re.match(r"(\d+)x(\d+)\+(\d+)\+(\d+)$", spec)
+    if not m:
+        raise SystemExit("bad --geometry (want WxH+X+Y): %s" % spec)
+    x, y, w, h = map(int, m.groups())
+    return x, y, w, h
+
+
+def check_running(need=True):
+    running = is_running()
+    if need and not running:
+        raise SystemExit(
+            "no blender session running -- start one with: bt start"
+        )
+    if not need and running:
+        raise SystemExit(
+            "session already running (pid %s) -- use `bt restart` or `bt stop` first"
+            % read_pid()
+        )
+
+
+def is_running():
+    pid = read_pid()
+    if pid and pid_alive(pid):
+        return True
+    # A running blender without our pid file would break session control.
+    return False
+
+
+# ---------------------------------------------------------------- commands
+
+def cmd_start(args):
+    check_running(need=False)
+    os.makedirs(SESSION_DIR, exist_ok=True)
+    for stale in ("ready", "info"):
+        p = os.path.join(SESSION_DIR, stale)
+        if os.path.exists(p):
+            os.remove(p)
+
+    x, y, w, h = (
+        parse_geometry(args.geometry)
+        if args.geometry
+        else detect_monitor_geometry()
+    )
+
+    cmd = [blender_binary()]
+    if args.bg:
+        cmd += ["--background"]
+    else:
+        cmd += ["--window-geometry", str(x), str(y), str(w), str(h)]
+        if args.factory:
+            cmd += ["--factory-startup"]
+    cmd += ["--python", DRIVER]
+
+    log = open(LOG_PATH, "a")
+    log.write("\n===== bt start %s =====\n" % time.strftime("%F %T"))
+    log.flush()
+    proc = subprocess.Popen(
+        cmd, stdout=log, stderr=log, env=session_env(), start_new_session=True
+    )
+    with open(PID_FILE, "w") as f:
+        f.write(str(proc.pid))
+
+    mode = "background" if args.bg else "gui %dx%d+%d+%d" % (w, h, x, y)
+    print("starting blender (pid %d, %s)..." % (proc.pid, mode))
+
+    deadline = time.time() + args.wait
+    while time.time() < deadline:
+        if proc.poll() is not None:
+            raise SystemExit(
+                "blender exited early (code %s) -- see %s" % (proc.returncode, LOG_PATH)
+            )
+        if os.path.exists(os.path.join(SESSION_DIR, "ready")):
+            print("session ready. log: %s" % LOG_PATH)
+            return
+        time.sleep(0.2)
+    raise SystemExit("session did not become ready within %ss -- see %s" % (args.wait, LOG_PATH))
+
+
+def cmd_stop(args):
+    pid = read_pid()
+    if not pid or not pid_alive(pid):
+        print("no session running")
+        return
+    os.kill(pid, signal.SIGTERM)
+    for _ in range(50):
+        if not pid_alive(pid):
+            break
+        time.sleep(0.1)
+    else:
+        print("pid %d did not exit on SIGTERM, sending SIGKILL" % pid)
+        os.kill(pid, signal.SIGKILL)
+    print("session stopped (pid %d)" % pid)
+
+
+def cmd_restart(args):
+    cmd_stop(args)
+    time.sleep(0.5)
+    cmd_start(args)
+
+
+def cmd_status(args):
+    if not is_running():
+        print("stopped")
+        return
+    info_path = os.path.join(SESSION_DIR, "info")
+    print("running (pid %s)" % read_pid())
+    if os.path.exists(info_path):
+        print(open(info_path).read().rstrip())
+
+
+def communicate(code, timeout):
+    """Send code to the session, return (exit_status, output)."""
+    if not os.path.exists(os.path.join(SESSION_DIR, "ready")):
+        raise SystemExit("session not ready")
+    rid = str(time.time_ns())
+    with open(os.path.join(SESSION_DIR, "cmd-%s.py" % rid), "w") as f:
+        f.write(code)
+    # touch last so the driver picks up cmd and req atomically enough
+    time.sleep(0.01)
+    with open(os.path.join(SESSION_DIR, "req-%s" % rid), "w") as f:
+        f.write("run")
+
+    deadline = time.time() + timeout
+    resp = os.path.join(SESSION_DIR, "resp-%s" % rid)
+    while time.time() < deadline:
+        if os.path.exists(resp):
+            with open(resp) as f:
+                content = f.read()
+            first, _, output = content.partition("\n")
+            m = re.match(r"EXIT:(\d+)(?: DURATION:([\d.]+))?", first)
+            status = int(m.group(1)) if m else 1
+            dur = m.group(2)
+            os.remove(resp)
+            return status, output, dur
+        time.sleep(0.05)
+    raise SystemExit(
+        "timed out after %ss waiting for the session (heavy op? retry with --timeout)"
+        % timeout
+    )
+
+
+def cmd_exec(args):
+    check_running(need=True)
+    if args.code is not None:
+        code = args.code if args.code.endswith("\n") else args.code + "\n"
+        label = "<code>"
+    elif args.path == "-":
+        code = sys.stdin.read()
+        label = "<stdin>"
+    else:
+        path = os.path.abspath(args.path)
+        if not os.path.exists(path):
+            # allow running snippets by bare name
+            guess = os.path.join(SNIPPETS, args.path)
+            if os.path.exists(guess):
+                path = guess
+            elif os.path.exists(guess + ".py"):
+                path = guess + ".py"
+            else:
+                raise SystemExit("no such file: %s" % args.path)
+        with open(path) as f:
+            code = f.read()
+        label = path
+
+    if args.profile:
+        code = (
+            "import time; _t0 = time.time()\n" + code
+            + "\nprint('--- %s execution: %.3fs' % ('%s', time.time() - _t0))\n"
+            % label
+        )
+
+    status, output, dur = communicate(code, args.timeout)
+    sys.stdout.write(output)
+    if not output.endswith("\n"):
+        sys.stdout.write("\n")
+    print("[bt] %s %s%s" % ("FAILED" if status else "ok", label,
+                            " (%ss)" % dur if dur else ""))
+    sys.exit(status)
+
+
+def cmd_eval(args):
+    check_running(need=True)
+    code = "print(repr(eval(%r)))" % args.expr
+    status, output, dur = communicate(code, args.timeout)
+    sys.stdout.write(output)
+    if not output.endswith("\n"):
+        sys.stdout.write("\n")
+    sys.exit(status)
+
+
+RELOAD_CODE = '''\
+import importlib.util
+import os
+import sys
+
+import bpy
+
+REPO = {repo!r}
+MODULE = {module!r}
+
+old = sys.modules.get(MODULE)
+if old is not None and hasattr(old, "unregister"):
+    try:
+        old.unregister()
+        print("[bt] unregistered previous addon state")
+    except Exception:
+        import traceback
+        print("[bt] unregister FAILED:")
+        traceback.print_exc()
+
+for name in [n for n in sys.modules if n == MODULE or n.startswith(MODULE + ".")]:
+    del sys.modules[name]
+
+spec = importlib.util.spec_from_file_location(
+    MODULE, os.path.join(REPO, "__init__.py"), submodule_search_locations=[REPO]
+)
+mod = importlib.util.module_from_spec(spec)
+sys.modules[MODULE] = mod
+spec.loader.exec_module(mod)
+mod.register()
+print("[bt] loaded %s v%s" % (MODULE, ".".join(map(str, mod.bl_info.get("version", ()))) ))
+'''
+
+
+def cmd_reload(args):
+    check_running(need=True)
+    code = RELOAD_CODE.format(repo=REPO_DIR, module=ADDON_MODULE)
+    status, output, _ = communicate(code, args.timeout)
+    sys.stdout.write(output)
+    if not output.endswith("\n"):
+        sys.stdout.write("\n")
+    sys.exit(status)
+
+
+SCREENSHOT_CODE = '''\
+import bpy
+import os
+
+path = {path!r}
+os.makedirs(os.path.dirname(path), exist_ok=True)
+
+wm = bpy.context.window_manager
+win = wm.windows[0] if wm.windows else bpy.context.window
+if win is None:
+    raise RuntimeError("no blender window available")
+
+with bpy.context.temp_override(window=win, screen=win.screen):
+    bpy.ops.screen.screenshot(filepath=path)
+print("[bt] saved %s" % path)
+'''
+
+
+def cmd_screenshot(args):
+    check_running(need=True)
+    os.makedirs(SHOTS_DIR, exist_ok=True)
+    name = args.name or time.strftime("shot-%H%M%S")
+    if not name.endswith(".png"):
+        name += ".png"
+    path = os.path.join(SHOTS_DIR, name)
+    code = SCREENSHOT_CODE.format(path=path)
+    status, output, _ = communicate(code, args.timeout)
+    sys.stdout.write(output)
+    if not output.endswith("\n"):
+        sys.stdout.write("\n")
+    sys.exit(status)
+
+
+def cmd_log(args):
+    if not os.path.exists(LOG_PATH):
+        raise SystemExit("no log yet: %s" % LOG_PATH)
+    if args.follow:
+        os.execvp("tail", ["tail", "-n", "50", "-f", LOG_PATH])
+    lines = subprocess.run(
+        ["tail", "-n", str(args.lines), LOG_PATH], capture_output=True, text=True
+    ).stdout
+    sys.stdout.write(lines)
+
+
+# ------------------------------------------------- structured op commands
+
+def _emit_result(printed, raw_json):
+    """Extract the __JSON__ line, print remaining output, return parsed dict."""
+    payload = None
+    rest = []
+    for line in printed.splitlines():
+        if line.startswith("__JSON__"):
+            payload = json.loads(line[len("__JSON__"):])
+        else:
+            rest.append(line)
+    for line in rest:
+        print(line)
+    if payload is None:
+        raise SystemExit("no __JSON__ output from session script")
+    print(json.dumps(payload, indent=2 if raw_json else None, sort_keys=True))
+    return payload
+
+
+API_CODE = '''\
+import bpy
+import json
+
+from building_tools.btools.api import apply_feature, FaceTarget
+from building_tools.btools.api.core import options_from_dict, OPTION_TYPES
+
+options = options_from_dict(OPTION_TYPES[{feature!r}], {options!r})
+target = None
+if {feature!r} != "floorplan":
+    obj = bpy.data.objects.get({objname!r}) or bpy.context.object
+    if obj is None:
+        raise RuntimeError("no target object (pass --object)")
+    target = FaceTarget(obj, {faces!r})
+result = apply_feature({feature!r}, options, target)
+print("__JSON__" + json.dumps(result.to_dict()))
+if not result.ok:
+    raise SystemExit(1)
+'''
+
+
+def cmd_api(args):
+    check_running(need=True)
+    options = json.loads(args.options) if args.options else {}
+    faces = [int(x) for x in args.faces.split(",") if x != ""] if args.faces else []
+    code = API_CODE.format(
+        feature=args.feature, options=options, objname=args.object or "", faces=faces
+    )
+    status, output, dur = communicate(code, args.timeout)
+    payload = _emit_result(output, args.json)
+    sys.exit(status or (0 if payload.get("ok") else 1))
+
+
+VALIDATE_CODE = '''\
+import bpy
+import json
+
+from building_tools.btools.api.validate import validate_object
+
+obj = bpy.data.objects.get({objname!r}) or bpy.context.object
+if obj is None or obj.type != "MESH":
+    raise RuntimeError("no mesh object to validate (pass --object)")
+expect = {expect!r}
+report = validate_object(obj, expect=expect, include_geometry={include_geometry!r})
+print("__JSON__" + json.dumps(report))
+'''
+
+
+def cmd_validate(args):
+    check_running(need=True)
+    expect = json.loads(args.expect) if args.expect else {}
+    code = VALIDATE_CODE.format(
+        objname=args.object or "", expect=expect,
+        include_geometry=bool(args.geometry),
+    )
+    status, output, dur = communicate(code, args.timeout)
+    payload = _emit_result(output, True)
+    sys.exit(0 if payload.get("ok") else 1)
+
+
+def cmd_scenario(args):
+    check_running(need=True)
+    path = os.path.join(SNIPPETS, "scenarios", args.name)
+    if not os.path.exists(path):
+        if os.path.exists(path + ".py"):
+            path += ".py"
+        else:
+            raise SystemExit("no such scenario: %s" % args.name)
+    with open(path) as f:
+        code = f.read()
+    status, output, dur = communicate(code, args.timeout)
+    payload = _emit_result(output, args.json)
+    sys.exit(status)
+
+
+# ---------------------------------------------------------------- parser
+
+def main():
+    p = argparse.ArgumentParser(
+        prog="bt",
+        description="Persistent Blender session toolkit for Building Tools development.",
+    )
+    sub = p.add_subparsers(dest="command", required=True)
+
+    sp = sub.add_parser("start", help="start a blender session (GUI on the primary monitor)")
+    sp.add_argument("--bg", action="store_true", help="headless session (no screenshots)")
+    sp.add_argument("--factory", action="store_true", help="launch with --factory-startup")
+    sp.add_argument("--geometry", help="window geometry WxH+X+Y (default: auto-detect primary monitor)")
+    sp.add_argument("--wait", type=int, default=90, help="seconds to wait for session ready")
+    sp.set_defaults(func=cmd_start)
+
+    sp = sub.add_parser("stop", help="stop the blender session")
+    sp.set_defaults(func=cmd_stop)
+
+    sp = sub.add_parser("restart", help="stop then start the session")
+    sp.add_argument("--bg", action="store_true", help="headless session (no screenshots)")
+    sp.add_argument("--factory", action="store_true", help="launch with --factory-startup")
+    sp.add_argument("--geometry", help="window geometry WxH+X+Y (default: auto-detect primary monitor)")
+    sp.add_argument("--wait", type=int, default=90, help="seconds to wait for session ready")
+    sp.set_defaults(func=cmd_restart)
+
+    sp = sub.add_parser("status", help="show session status")
+    sp.set_defaults(func=cmd_status)
+
+    sp = sub.add_parser("exec", help="run a python file/snippet (or -c code, or -) in the session")
+    sp.add_argument("path", nargs="?", help="script path, snippet name, or '-' for stdin")
+    sp.add_argument("-c", "--code", help="inline python code to run")
+    sp.add_argument("-t", "--timeout", type=int, default=120)
+    sp.add_argument("--profile", action="store_true", help="report wall time")
+    sp.set_defaults(func=cmd_exec)
+
+    sp = sub.add_parser("eval", help="evaluate a python expression and print its repr")
+    sp.add_argument("expr")
+    sp.add_argument("-t", "--timeout", type=int, default=120)
+    sp.set_defaults(func=cmd_eval)
+
+    sp = sub.add_parser("reload", help="hot-reload the addon from this repo into the session")
+    sp.add_argument("-t", "--timeout", type=int, default=120)
+    sp.set_defaults(func=cmd_reload)
+
+    sp = sub.add_parser("screenshot", help="save a screenshot of the blender window")
+    sp.add_argument("name", nargs="?", help="screenshot name (saved under out/screenshots/)")
+    sp.add_argument("-t", "--timeout", type=int, default=60)
+    sp.set_defaults(func=cmd_screenshot)
+
+    sp = sub.add_parser("log", help="show blender session log")
+    sp.add_argument("-n", "--lines", type=int, default=50)
+    sp.add_argument("-f", "--follow", action="store_true")
+    sp.set_defaults(func=cmd_log)
+
+    sp = sub.add_parser("api", help="run a building feature via the scriptable api")
+    sp.add_argument("feature", help="floorplan|floor|roof|door|window|multigroup|balcony|stairs|fill")
+    sp.add_argument("--options", help="options as JSON, e.g. '{\"type\": \"HIP\"}'")
+    sp.add_argument("--object", help="target object name (default: active)")
+    sp.add_argument("--faces", help="comma-separated face indices (default: all)")
+    sp.add_argument("--json", action="store_true", help="pretty-print the result JSON")
+    sp.add_argument("-t", "--timeout", type=int, default=120)
+    sp.set_defaults(func=cmd_api)
+
+    sp = sub.add_parser("validate", help="validate a mesh object (matgroups, geometry, normals)")
+    sp.add_argument("--object", help="object name (default: active)")
+    sp.add_argument("--expect", help="assertions JSON, e.g. '{\"groups\": [\"walls\"]}'")
+    sp.add_argument("--geometry", action="store_true",
+                    help="gate ok on geometry problems too (frame seams are common)")
+    sp.add_argument("-t", "--timeout", type=int, default=60)
+    sp.set_defaults(func=cmd_validate)
+
+    sp = sub.add_parser("scenario", help="build a reusable test scenario (wall, multi_storey, curved_wall)")
+    sp.add_argument("name")
+    sp.add_argument("--json", action="store_true", help="pretty-print the scenario JSON")
+    sp.add_argument("-t", "--timeout", type=int, default=120)
+    sp.set_defaults(func=cmd_scenario)
+
+    args = p.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
