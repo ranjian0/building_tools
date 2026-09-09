@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -23,8 +23,10 @@ class ArrayOptions:
 
 @dataclass
 class SizeOffsetOptions:
-    size: tuple[float, float] = (0.5, 0.5)
-    offset: tuple[float, float] = (0.0, 0.0)
+    # None = use the feature's operator default (computed by SizeOffsetProperty
+    # init() from the target face; e.g. door = (1.0, 1.8), window = (1.0, 1.0))
+    size: tuple | None = None
+    offset: tuple | None = None
 
 
 @dataclass
@@ -96,7 +98,13 @@ class FloorOptions:
     add_slab: bool = True
     add_columns: bool = False
     slab_thickness: float = 0.2
-    slab_outsset: float = 0.1
+    slab_outset: float = 0.1
+
+    add_decoration: bool = False
+    alternate_decoration: bool = False
+    decoration_nb: int = 5
+    decoration_padding: float = 0.01
+    decoration_ratio: float = 1.0
 
 
 class DoorFillType(Enum):
@@ -108,12 +116,12 @@ class DoorFillType(Enum):
 
 @dataclass
 class DoorOptions:
-    arch: ArchOptions = ArchOptions()
-    array: ArrayOptions = ArrayOptions()
-    size_offset: SizeOffsetOptions = SizeOffsetOptions()
-    panel_fill: FillPanelOptions = FillPanelOptions()
-    louver_fill: FillLouverOptions = FillLouverOptions()
-    glass_fill: FillGlassPaneOptions = FillGlassPaneOptions()
+    arch: ArchOptions = field(default_factory=ArchOptions)
+    array: ArrayOptions = field(default_factory=ArrayOptions)
+    size_offset: SizeOffsetOptions = field(default_factory=SizeOffsetOptions)
+    panel_fill: FillPanelOptions = field(default_factory=FillPanelOptions)
+    louver_fill: FillLouverOptions = field(default_factory=FillLouverOptions)
+    glass_fill: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
 
     frame_thickness: float = 0.1
     frame_depth: float = 0.1
@@ -137,12 +145,12 @@ class WindowFillType(Enum):
 
 @dataclass
 class WindowOptions:
-    arch: ArchOptions = ArchOptions()
-    array: ArrayOptions = ArrayOptions()
-    size_offset: SizeOffsetOptions = SizeOffsetOptions()
-    bar_fill: FillBarOptions = FillBarOptions()
-    louver_fill: FillLouverOptions = FillLouverOptions()
-    glass_fill: FillGlassPaneOptions = FillGlassPaneOptions()
+    arch: ArchOptions = field(default_factory=ArchOptions)
+    array: ArrayOptions = field(default_factory=ArrayOptions)
+    size_offset: SizeOffsetOptions = field(default_factory=SizeOffsetOptions)
+    bar_fill: FillBarOptions = field(default_factory=FillBarOptions)
+    louver_fill: FillLouverOptions = field(default_factory=FillLouverOptions)
+    glass_fill: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
 
     type: WindowType = WindowType.RECTANGULAR
     frame_thickness: float = 0.1
@@ -150,28 +158,32 @@ class WindowOptions:
     window_depth: float = 0.05
     resolution: int = 20
     add_arch: bool = False
+    fill_type: WindowFillType = WindowFillType.NONE
 
 
 @dataclass
 class MultigroupOptions:
-    arch: ArchOptions = ArchOptions()
-    array: ArrayOptions = ArrayOptions()
-    size_offset: SizeOffsetOptions = SizeOffsetOptions()
+    arch: ArchOptions = field(default_factory=ArchOptions)
+    array: ArrayOptions = field(default_factory=ArrayOptions)
+    size_offset: SizeOffsetOptions = field(default_factory=SizeOffsetOptions)
 
-    bar_fill_window: FillBarOptions = FillBarOptions()
-    panel_fill_window: FillPanelOptions = FillPanelOptions()
-    louver_fill_window: FillLouverOptions = FillLouverOptions()
-    glass_fill_window: FillGlassPaneOptions = FillGlassPaneOptions()
+    bar_fill_window: FillBarOptions = field(default_factory=FillBarOptions)
+    panel_fill_window: FillPanelOptions = field(default_factory=FillPanelOptions)
+    louver_fill_window: FillLouverOptions = field(default_factory=FillLouverOptions)
+    glass_fill_window: FillGlassPaneOptions = field(
+        default_factory=FillGlassPaneOptions
+    )
 
-    panel_fill_door: FillPanelOptions = FillPanelOptions()
-    louver_fill_door: FillLouverOptions = FillLouverOptions()
-    glass_fill_door: FillGlassPaneOptions = FillGlassPaneOptions()
+    panel_fill_door: FillPanelOptions = field(default_factory=FillPanelOptions)
+    louver_fill_door: FillLouverOptions = field(default_factory=FillLouverOptions)
+    glass_fill_door: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
 
     frame_thickness: float = 0.1
     frame_depth: float = 0.1
     dw_depth: float = 0.05
     add_arch: bool = False
     components: str = "dw"
+    window_height: float = 1.0
     show_door_fill: bool = False
     fill_type_door: DoorFillType = DoorFillType.NONE
     show_window_fill: bool = False
@@ -231,9 +243,9 @@ class RailOptions:
     has_corner_post: bool = True
     offset: float = 0.05
 
-    post_fill: PostFillOptions = PostFillOptions()
-    rail_fill: RailFillOptions = RailFillOptions()
-    wall_fill: WallFillOptions = WallFillOptions()
+    post_fill: PostFillOptions = field(default_factory=PostFillOptions)
+    rail_fill: RailFillOptions = field(default_factory=RailFillOptions)
+    wall_fill: WallFillOptions = field(default_factory=WallFillOptions)
 
     bottom_rail: bool = True
     bottom_rail_offset: float = 0.0
@@ -241,11 +253,55 @@ class RailOptions:
 
 @dataclass
 class BalconyOptions:
-    rail: RailOptions = RailOptions()
-    array: ArrayOptions = ArrayOptions()
-    size_offset: SizeOffsetOptions = SizeOffsetOptions()
+    rail: RailOptions = field(default_factory=RailOptions)
+    array: ArrayOptions = field(default_factory=ArrayOptions)
+    size_offset: SizeOffsetOptions = field(default_factory=SizeOffsetOptions)
 
     depth: float = 1.0
     depth_offset: float = 0.0
     has_railing: bool = True
     group_selection: bool = True
+
+
+class StairsBottomType(Enum):
+    FILLED = "FILLED"
+    BLOCKED = "BLOCKED"
+    SLOPE = "SLOPE"
+
+
+@dataclass
+class StairsOptions:
+    rail: RailOptions = field(default_factory=RailOptions)
+    size_offset: SizeOffsetOptions = field(default_factory=SizeOffsetOptions)
+
+    depth_offset: float = 0.0
+    step_count: int = 3
+    step_width: float = 0.2
+    step_height: float = 0.12
+    landing_width: float = 1.0
+    landing: bool = True
+    bottom: StairsBottomType = StairsBottomType.FILLED
+    has_railing: bool = True
+
+
+class FillType(Enum):
+    PANELS = "PANELS"
+    GLASS_PANES = "GLASS_PANES"
+    LOUVER = "LOUVER"
+    BAR = "BAR"
+
+
+class FillComponentType(Enum):
+    DOOR = "DOOR"
+    WINDOW = "WINDOW"
+
+
+@dataclass
+class FillOptions:
+    panel_fill: FillPanelOptions = field(default_factory=FillPanelOptions)
+    glass_fill: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
+    louver_fill: FillLouverOptions = field(default_factory=FillLouverOptions)
+    bar_fill: FillBarOptions = field(default_factory=FillBarOptions)
+
+    fill_type: FillType = FillType.PANELS
+    comp: FillComponentType = FillComponentType.DOOR

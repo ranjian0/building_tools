@@ -81,8 +81,9 @@ def dict_from_prop(prop):
         if isinstance(pn, valid_types):
             result[p] = pn
         elif isinstance(pn, bpy.types.PropertyGroup) and not isinstance(pn, type(prop)):
-            # property group within this property
-            result.update(dict_from_prop(pn))
+            # property group within this property -- keep nesting so that
+            # same-named leaves in different groups don't collide
+            result[p] = dict_from_prop(pn)
     return result
 
 

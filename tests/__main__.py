@@ -14,6 +14,8 @@ try:
     import test_utils
     import test_floors
     import test_floorplan
+    import test_api_options
+    import test_api
 except Exception:
     # XXX Error importing test modules.
     # Print Traceback and close blender process
@@ -36,6 +38,8 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_utils))
     suite.addTests(loader.loadTestsFromModule(test_floors))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
+    suite.addTests(loader.loadTestsFromModule(test_api_options))
+    suite.addTests(loader.loadTestsFromModule(test_api))
 
     # initialize a runner, pass it your suite and run it
     runner = unittest.TextTestRunner(verbosity=3)
