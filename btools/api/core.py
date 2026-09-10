@@ -39,7 +39,12 @@ from ..building.floorplan.floorplan_types import (
     create_random_floorplan,
     create_rectangular_floorplan,
 )
-from ..building.materialgroup import verify_matgroup_attribute_for_object
+from ..building.materialgroup import (
+    MaterialGroup,
+    add_faces_to_group,
+    find_faces_without_matgroup,
+    verify_matgroup_attribute_for_object,
+)
 from ..building.multigroup import MultigroupProperty
 from ..building.multigroup.multigroup_ops import (
     add_multigroup_matgroups,
@@ -150,6 +155,13 @@ def _edit_session(target):
         faces = [by_index[i] for i in target.face_indices]
     else:
         faces = list(bm.faces)
+
+    # -- mirror the operator precondition: some geometry code reads the
+    #    bmesh selection state directly (e.g. balcony get_selection_groups)
+    for f in bm.faces:
+        f.select = False
+    for f in faces:
+        f.select = True
 
     try:
         yield bm, faces
@@ -281,6 +293,12 @@ def _apply_face_feature(
                     if matgroup_fn:
                         matgroup_fn()
                     create_fn(bm, valid, prop)
+                    # -- untouched faces carry the -1 "no group" sentinel;
+                    #    they are wall surface -> WALLS (door/window/multigroup
+                    #    already run this pass internally)
+                    nulfaces = find_faces_without_matgroup(bm)
+                    if nulfaces:
+                        add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
 
         # -- read counts in object mode (edit-mode obj.data is stale)
         return OpResult(

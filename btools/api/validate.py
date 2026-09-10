@@ -28,8 +28,8 @@ def _matgroup_names(obj):
 
 
 def matgroup_counts(obj):
-    """{matgroup_name: face_count} for an object; unknown indices are
-    reported as 'invalid_<n>' (corrupted matgroups)."""
+    """{matgroup_name: face_count} for an object; -1 = untagged (excluded),
+    out-of-range indices are reported as 'invalid_<n>' (corrupted matgroups)."""
     attr = obj.data.attributes.get(MATGROUP_LAYER)
     if attr is None:
         return {}
@@ -39,7 +39,7 @@ def matgroup_counts(obj):
     names = _matgroup_names(obj)
     vals = [0] * total
     attr.data.foreach_get("value", vals)
-    counts = Counter(vals)
+    counts = Counter(v for v in vals if v >= 0)
     return {
         (names[i] if 0 <= i < len(names) else "invalid_%d" % i): n
         for i, n in sorted(counts.items())
@@ -48,8 +48,9 @@ def matgroup_counts(obj):
 
 def matgroup_report(obj):
     """Face tagging completeness for the btools material-group system.
-    Objects without the material-group layer (e.g. a fresh floorplan) are
-    treated as fully tagged -- there is nothing to tag yet."""
+    Faces carrying -1 (the layer sentinel written by
+    verify_matgroup_attribute_for_object) count as untagged; objects without
+    the layer at all (e.g. a fresh floorplan) are treated as fully tagged."""
     names = _matgroup_names(obj)
     attr = obj.data.attributes.get(MATGROUP_LAYER)
     if attr is None:
@@ -61,16 +62,19 @@ def matgroup_report(obj):
             "all_tagged": True,
             "no_layer": True,
         }
+    total = len(obj.data.polygons)
+    vals = [0] * total
+    if total:
+        attr.data.foreach_get("value", vals)
+    invalid = sum(1 for v in vals if v >= len(names))
+    untagged = sum(1 for v in vals if v < 0)
     counts = matgroup_counts(obj)
-    invalid = {k: v for k, v in counts.items() if k.startswith("invalid_")}
-    tagged = sum(counts.values())
-    untagged = len(obj.data.polygons) - tagged
     return {
         "groups": counts,
         "num_groups": len(names),
         "untagged_faces": untagged,
-        "invalid_index_faces": sum(invalid.values()),
-        "all_tagged": untagged == 0 and not invalid,
+        "invalid_index_faces": invalid,
+        "all_tagged": untagged == 0 and invalid == 0,
     }
 
 

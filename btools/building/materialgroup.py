@@ -81,6 +81,42 @@ def map_new_faces(group, skip=None):
     return outer
 
 
+def restore_wall_plane_faces(bm, planes):
+    """Faces lying exactly in one of the original wall planes but carrying an
+    element/frame material group are split leftovers (the wall strips around
+    an opening over-captured by frame tagging) -- restore them to WALLS.
+
+    planes: [(median, normal)] captured from the source faces before the
+    split; frame/fill/element faces are extruded out-of-plane, so only wall
+    strips match the coplanarity test.
+    """
+    layer = bm.faces.layers.int.get(".bt_material_group_index")
+    if layer is None or not planes:
+        return
+
+    obj = bpy.context.object
+    names = [mt.name for mt in obj.bt_materials]
+    walls_name = MaterialGroup.WALLS.name.lower()
+    if walls_name not in names:
+        return
+    walls_index = names.index(walls_name)
+    element_indices = {
+        i for i, name in enumerate(names) if name != walls_name
+    }
+
+    for face in bm.faces:
+        if face[layer] not in element_indices:
+            continue
+        median = face.calc_center_median()
+        for plane_median, plane_normal in planes:
+            if (
+                abs(face.normal.dot(plane_normal)) > 0.99
+                and abs((median - plane_median).dot(plane_normal)) < 1e-5
+            ):
+                face[layer] = walls_index
+                break
+
+
 def add_faces_to_group(bm, faces, group, skip=None):
     """Sets the attribute index of faces to the index of the material group called
     group.name.lower()
@@ -147,8 +183,27 @@ def add_material_group(groups):
 
 
 def verify_matgroup_attribute_for_object(obj):
-    """Ensure object has a btools material attribute"""
+    """Ensure object has a btools material attribute.
+
+    Face values are initialized to -1 (= no group); find_faces_without_matgroup
+    relies on that sentinel to re-tag untouched faces to WALLS. Without the
+    initialization every face silently inherits group index 0.
+    """
+    if obj.data.attributes.get(".bt_material_group_index") is not None:
+        return
     obj.data.attributes.new(name=".bt_material_group_index", type="INT", domain="FACE")
+    if obj.mode == "EDIT":
+        # -- in edit mode the mesh data array is deferred; init via the live
+        #    edit bmesh instead
+        me = obj.data
+        bm = bmesh.from_edit_mesh(me)
+        layer = bm.faces.layers.int.get(".bt_material_group_index")
+        for f in bm.faces:
+            f[layer] = -1
+    else:
+        attr = obj.data.attributes.get(".bt_material_group_index")
+        vals = [-1] * len(obj.data.polygons)
+        attr.data.foreach_set("value", vals)
 
 
 def set_material_for_active_matgroup(material, context):

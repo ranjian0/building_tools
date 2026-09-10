@@ -10,14 +10,46 @@ import bpy
 
 import btools
 from btools.api import (
+    BalconyOptions,
     DoorOptions,
     FaceTarget,
     FloorOptions,
     FloorplanOptions,
     RoofOptions,
+    SizeOffsetOptions,
+    WindowOptions,
     apply_feature,
 )
 from btools.api.validate import validate_object
+
+
+def make_wall():
+    """6 x 0.4 x 3 wall box; front face (-Y) is the canonical element target."""
+    import bmesh
+
+    me = bpy.data.meshes.new("wall_mesh")
+    obj = bpy.data.objects.new("wall", me)
+    bpy.context.scene.collection.objects.link(obj)
+    bm = bmesh.new()
+    bmesh.ops.create_cube(bm, size=1.0)
+    for v in bm.verts:
+        v.co = (v.co.x * 6.0, v.co.y * 0.4, (v.co.z + 0.5) * 3.0)
+    bm.normal_update()
+    bm.to_mesh(me)
+    bm.free()
+    return obj
+
+
+def front_face(obj):
+    import bmesh
+
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.faces.ensure_lookup_table()
+    bm.faces.index_update()
+    idx = [f.index for f in bm.faces if f.normal.y < -0.9][0]
+    bm.free()
+    return idx
 
 
 def clean_scene():
@@ -120,6 +152,54 @@ class TestApiSmoke(unittest.TestCase):
     def test_unknown_feature_raises(self):
         with self.assertRaises(ValueError):
             apply_feature("nonsense", None)
+
+
+class TestWallElements(unittest.TestCase):
+    """Elements applied to a bare wall: strips must stay WALLS and selection
+    driven features (balcony) must actually build."""
+
+    def setUp(self):
+        clean_scene()
+        self.obj = make_wall()
+
+    def test_door_tags_wall_strips(self):
+        # -- 5 untouched box faces + 2 side strips + 1 restored sliver = 8
+        #    (pre-fix this was 7: a wall-plane face was tagged into the door)
+        res = apply_feature(
+            "door",
+            DoorOptions(size_offset=SizeOffsetOptions(size=(1.5, 2.4))),
+            FaceTarget(self.obj, [front_face(self.obj)]),
+        )
+        self.assertTrue(res.ok, res.errors)
+        counts = res.matgroup_counts
+        self.assertGreaterEqual(counts.get("walls", 0), 8)
+        for group in ("door", "frame"):
+            self.assertGreater(counts.get(group, 0), 0, group)
+
+    def test_window_tags_wall_strips(self):
+        # -- 5 untouched + 2 side strips + 1 restored = 8 (pre-fix: 7)
+        res = apply_feature(
+            "window",
+            WindowOptions(size_offset=SizeOffsetOptions(size=(2.4, 1.6))),
+            FaceTarget(self.obj, [front_face(self.obj)]),
+        )
+        self.assertTrue(res.ok, res.errors)
+        counts = res.matgroup_counts
+        self.assertGreaterEqual(counts.get("walls", 0), 7)
+        for group in ("window", "frame"):
+            self.assertGreater(counts.get(group, 0), 0, group)
+
+    def test_balcony_builds_geometry(self):
+        # -- regression: balcony used to no-op when nothing was 'selected'
+        before = len(self.obj.data.polygons)
+        res = apply_feature(
+            "balcony",
+            BalconyOptions(size_offset=SizeOffsetOptions(size=(5.0, 0.2))),
+            FaceTarget(self.obj, [front_face(self.obj)]),
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertGreater(len(self.obj.data.polygons), before)
+        self.assertGreater(res.matgroup_counts.get("balcony", 0), 0)
 
 
 if __name__ == "__main__":

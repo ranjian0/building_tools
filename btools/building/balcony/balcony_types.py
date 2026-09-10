@@ -48,7 +48,13 @@ def create_balcony_grouped(bm, faces, prop):
 
         if prop.has_railing:
             top_face = bmesh.ops.dissolve_faces(bm, faces=top_faces)["region"].pop()
+            # -- the grouped path never tagged the platform (ungrouped does
+            #    via map_balcony_faces): without this the platform falls to
+            #    the "no group" sentinel
+            add_faces_to_group(bm, [top_face], MaterialGroup.BALCONY)
             add_railing_to_balcony_grouped(bm, top_face, prop)
+        else:
+            add_faces_to_group(bm, top_faces, MaterialGroup.BALCONY)
 
 
 def create_balcony_ungrouped(bm, faces, prop):

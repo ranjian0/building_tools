@@ -31,6 +31,7 @@ from ..materialgroup import (
     add_faces_to_group,
     find_faces_without_matgroup,
     map_new_faces,
+    restore_wall_plane_faces,
 )
 
 # XXX small value to provide split margins
@@ -39,6 +40,8 @@ SPLIT_EPS = 0.0011
 
 def create_multigroup(bm, faces, prop):
     """Create multigroup from face selection"""
+    # -- source wall planes, for the wall-strip restore pass at the end
+    planes = [(f.calc_center_median().copy(), f.normal.copy()) for f in faces]
 
     # Convert components to lowercase (allow user to enter lower or uppercase)
     prop.components = prop.components.lower()
@@ -81,6 +84,7 @@ def create_multigroup(bm, faces, prop):
 
     nulfaces = find_faces_without_matgroup(bm)
     add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
+    restore_wall_plane_faces(bm, planes)
     return True
 
 

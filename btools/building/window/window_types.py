@@ -31,11 +31,14 @@ from ..materialgroup import (
     add_faces_to_group,
     find_faces_without_matgroup,
     map_new_faces,
+    restore_wall_plane_faces,
 )
 
 
 def create_window(bm, faces, prop):
     """Generate a window"""
+    # -- source wall planes, for the wall-strip restore pass at the end
+    planes = [(f.calc_center_median().copy(), f.normal.copy()) for f in faces]
     for face in faces:
         face.select_set(False)
         if not valid_ngon(face):
@@ -61,6 +64,7 @@ def create_window(bm, faces, prop):
 
     nulfaces = find_faces_without_matgroup(bm)
     add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
+    restore_wall_plane_faces(bm, planes)
     return True
 
 
