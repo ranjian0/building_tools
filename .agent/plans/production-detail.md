@@ -26,7 +26,7 @@ and production export — for both archviz renders and game-engine workflows.
 
 ## Checklist
 
-### Phase 0 — Dimensional correctness (defaults pass)
+### Phase 0 — Dimensional correctness (defaults pass) — DONE (c0fe68e)
 - [x] door: frame_thickness 0.10→0.06, frame_depth 0→0.05, door_depth 0.05→0.045
 - [x] window: frame_thickness 0.10→0.06
 - [x] fills: pane_margin 0.10→0.03, bar_width 0.10→0.06, panel_depth min 0.01→0.002 default 0.015
@@ -38,7 +38,7 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] presets: storey heights to residential norms; regen corpus (baseline
       change is expected and IS the changelog); visual sanity check
 
-### Phase 3 — Materials system (before geometry: biggest visual payoff)
+### Phase 3 — Materials system (before geometry: biggest visual payoff) — DONE (4f7b42c)
 - [x] default_materials.py → PBR node materials per group:
       walls stucco (procedural bump), slabs concrete, roof tile/seam,
       door painted wood, frame dark metal, window panes GLASS
@@ -56,7 +56,7 @@ and production export — for both archviz renders and game-engine workflows.
 - [ ] scope `remove_doubles(dist=0.01)` in fill_types down to 0.0001
 - [ ] gate + commit
 
-### Phase 2 — Opening details
+### Phase 2 — Opening details — REMAINING
 - [ ] window sill: protruding sill member (75mm projection, 50mm high,
       25mm drip lip) under the bottom frame member
 - [ ] door threshold: low sill member at the door opening base
@@ -69,7 +69,7 @@ and production export — for both archviz renders and game-engine workflows.
 - [ ] arch default resolution bump + smooth shading on arcs
 - [ ] tests: sill/threshold/hardware presence per case; corpus update; commit
 
-### Phase 4 — Silhouette tier
+### Phase 4 — Silhouette tier — REMAINING
 - [ ] roof fascia band along the eave (roof_hangs bottom rim)
 - [ ] gutters (half-round sweep on fascia) + downspouts at corners
       (prop add_gutters, default False; presets opt in)
@@ -81,7 +81,7 @@ and production export — for both archviz renders and game-engine workflows.
 - [ ] dormers — DEFERRED (roof-intersection complexity; follow-up)
 - [ ] tests + corpus + commit
 
-### Phase 5 — Presets & production workflow
+### Phase 5 — Presets & production workflow — REMAINING
 - [ ] Detail level (Low/Medium/High) — scene setting + api param; gates
       bevels/hardware/gutters/cornices/chimney/glass thickness
 - [ ] re-tune all 8 presets on the new detail features (gutters on
