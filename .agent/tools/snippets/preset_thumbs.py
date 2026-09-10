@@ -107,11 +107,11 @@ def render(obj, path):
     scene.render.engine = "BLENDER_WORKBENCH"
     shading = scene.display.shading
     if hasattr(shading, "lighting"):
-        shading.lighting = "STUDIO"
+        shading.lighting = "FLAT"
     elif hasattr(shading, "light"):
-        shading.light = "STUDIO"
+        shading.light = "FLAT"
     shading.color_type = "MATERIAL"
-    shading.show_cavity = False
+    shading.show_cavity = True
     scene.render.resolution_x, scene.render.resolution_y = SIZE
     scene.render.resolution_percentage = 100
     scene.render.film_transparent = False

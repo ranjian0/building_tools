@@ -212,11 +212,11 @@ def render_case(obj, path):
     shading = scene.display.shading
     # -- attr renamed between blender versions (lighting -> light)
     if hasattr(shading, "lighting"):
-        shading.lighting = "STUDIO"
+        shading.lighting = "FLAT"
     elif hasattr(shading, "light"):
-        shading.light = "STUDIO"
+        shading.light = "FLAT"
     shading.color_type = "MATERIAL"
-    shading.show_cavity = False
+    shading.show_cavity = True
     scene.render.resolution_x, scene.render.resolution_y = IMG_SIZE
     scene.render.resolution_percentage = 100
     scene.render.film_transparent = False

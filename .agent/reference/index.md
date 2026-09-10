@@ -241,7 +241,7 @@ image size: 1280x800 -- 51 cases
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `760a8b8e737d8c06`
+- faces: 775 -- geometry_hash: `dddf887d8e1af2b3`
 
 ![balcony-inner-curved](balcony-inner-curved/image.png)
 
@@ -318,14 +318,14 @@ image size: 1280x800 -- 51 cases
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 5373 -- geometry_hash: `25f9da478f275286`
+- faces: 5373 -- geometry_hash: `db2cddb47e75b187`
 
 ![preset-apartment-block](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 847 -- geometry_hash: `0ed00204f9c7f507`
+- faces: 847 -- geometry_hash: `2be14f6ffa45c168`
 
 ![preset-modern-villa](preset-modern-villa/image.png)
 
@@ -353,6 +353,6 @@ image size: 1280x800 -- 51 cases
 ## preset-office-block
 
 - status: `ok`
-- faces: 3321 -- geometry_hash: `31dc712b2c3f795b`
+- faces: 3321 -- geometry_hash: `67dac5b85d19fc0b`
 
 ![preset-office-block](preset-office-block/image.png)

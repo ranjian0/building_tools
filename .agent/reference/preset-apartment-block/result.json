@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "25f9da478f275286",
+  "geometry_hash": "db2cddb47e75b187",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -15,7 +15,7 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 41
+    "zero_area_faces": 53
   },
   "id": "preset-apartment-block",
   "image": "image.png",
@@ -62,7 +62,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 41
+      "zero_area_faces": 53
     },
     "matgroups": {
       "all_tagged": true,
