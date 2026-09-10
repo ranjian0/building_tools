@@ -39,14 +39,14 @@ and production export — for both archviz renders and game-engine workflows.
       change is expected and IS the changelog); visual sanity check
 
 ### Phase 3 — Materials system (before geometry: biggest visual payoff)
-- [ ] default_materials.py → PBR node materials per group:
+- [x] default_materials.py → PBR node materials per group:
       walls stucco (procedural bump), slabs concrete, roof tile/seam,
       door painted wood, frame dark metal, window panes GLASS
       (transmission 1.0, IOR 1.52), railing metal, balcony concrete
-- [ ] keep flat `diffuse_color` per material (corpus workbench readability)
-- [ ] object-coordinate mapping node per material (box-mapping basis)
-- [ ] variation hook: per-object random offset into the mapping (seed)
-- [ ] reference corpus + thumbs regen; commit
+- [x] keep flat `diffuse_color` per material (corpus workbench readability)
+- [x] object-coordinate mapping node per material (box-mapping basis)
+- [x] variation hook: per-object random offset into the mapping (seed)
+- [x] reference corpus + thumbs regen; commit
 
 ### Phase 1 — Foundation utilities
 - [ ] util_mesh: `bevel_edges(bm, edges, width, segments)` with clamping
