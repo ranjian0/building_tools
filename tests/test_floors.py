@@ -1,19 +1,22 @@
-import bpy
-import btools
 import random
 import unittest
 
+import bpy
+
+import btools
 from btools.building.floor import FloorProperty
 from btools.building.floor.floor_ops import build as floor_builder
-
 from btools.building.floorplan import FloorplanProperty
 from btools.building.floorplan.floorplan_ops import build as floorplan_builder
+
 
 class TestFloor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         bpy.utils.register_class(FloorplanProperty)
-        bpy.types.Scene.floorplan_prop = bpy.props.PointerProperty(type=FloorplanProperty)
+        bpy.types.Scene.floorplan_prop = bpy.props.PointerProperty(
+            type=FloorplanProperty
+        )
 
         bpy.utils.register_class(FloorProperty)
         bpy.types.Scene.floor_prop = bpy.props.PointerProperty(type=FloorProperty)
@@ -39,7 +42,7 @@ class TestFloor(unittest.TestCase):
         [bpy.data.objects.remove(o) for o in bpy.data.objects]
 
     def iter_floorplans(self):
-        """ Build some floorplans for testing floor tools"""
+        """Build some floorplans for testing floor tools"""
         context = bpy.context
         prop = context.scene.floorplan_prop
 
@@ -80,7 +83,6 @@ class TestFloor(unittest.TestCase):
         context = bpy.context
         prop = context.scene.floor_prop
         for _ in self.iter_floorplans():
-
             with btools.utils.bmesh_from_active_object(context) as bm:
                 # Number of faces in the floorplan
                 self.assertTrue(1 <= len(bm.faces) <= 10)

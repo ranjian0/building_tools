@@ -1,11 +1,12 @@
-import bmesh
-import bpy
-import btools
 import math
 import random
 import unittest
 
+import bmesh
+import bpy
 from mathutils import Vector
+
+import btools
 
 
 class TestUtilsCommon(unittest.TestCase):
@@ -71,23 +72,36 @@ class TestUtilsCommon(unittest.TestCase):
     def test_restricted_sizeoffset(self):
         # XXX OFFSET
         # -- restrict sane
-        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [0, 0]), (0, 0))
+        self.assertEqual(
+            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [0, 0]), (0, 0)
+        )
 
         # -- restrict min
-        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [-1, -1]), (-0.25, -0.25))
+        self.assertEqual(
+            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [-1, -1]), (-0.25, -0.25)
+        )
 
         # -- restrict max
-        self.assertEqual(btools.utils.restricted_offset([1, 1], [0.5, 0.5], [1, 1]), (0.25, 0.25))
+        self.assertEqual(
+            btools.utils.restricted_offset([1, 1], [0.5, 0.5], [1, 1]), (0.25, 0.25)
+        )
 
         # XXX SIZE
         # -- restrict sane
-        self.assertEqual(btools.utils.restricted_size([1, 1], [0, 0], [0, 0], [0.5, 0.5]), (0.5, 0.5))
+        self.assertEqual(
+            btools.utils.restricted_size([1, 1], [0, 0], [0, 0], [0.5, 0.5]), (0.5, 0.5)
+        )
 
         # -- restrict min
-        self.assertEqual(btools.utils.restricted_size([1, 1], [0, 0], [1, 1], [0.5, 0.5]), (1, 1))
+        self.assertEqual(
+            btools.utils.restricted_size([1, 1], [0, 0], [1, 1], [0.5, 0.5]), (1, 1)
+        )
 
         # -- restrict with offset
-        self.assertEqual(btools.utils.restricted_size([1, 1], [0.5, 0.5], [0.5, 0.5], [0.75, 0.75]), (0.5, 0.5))
+        self.assertEqual(
+            btools.utils.restricted_size([1, 1], [0.5, 0.5], [0.5, 0.5], [0.75, 0.75]),
+            (0.5, 0.5),
+        )
 
     def test_local_to_global(self):
         X = Vector((1, 0, 0))
@@ -141,7 +155,10 @@ class TestUtilsCommon(unittest.TestCase):
         self.assertEqual(btools.utils.XYDir(Vector((0, 1, 0))), Vector((0, 1, 0)))
         self.assertEqual(btools.utils.XYDir(Vector((0, 0, 1))), Vector((0, 0, 0)))
 
-        self.assertEqual(btools.utils.XYDir(Vector((1, 1, 1))).to_tuple(2), Vector((0.71, 0.71, 0)).to_tuple(2))
+        self.assertEqual(
+            btools.utils.XYDir(Vector((1, 1, 1))).to_tuple(2),
+            Vector((0.71, 0.71, 0)).to_tuple(2),
+        )
 
 
 class TestUtilsGeometry(unittest.TestCase):
@@ -192,14 +209,23 @@ class TestUtilsGeometry(unittest.TestCase):
 
         self.clean_bmesh()
 
-        btools.utils.create_cube_without_faces(self.bm, Vector((1, 1, 1)), top=True, bottom=True)
+        btools.utils.create_cube_without_faces(
+            self.bm, Vector((1, 1, 1)), top=True, bottom=True
+        )
         self.assertEqual(len(self.bm.faces), 4)
         self.assertEqual(len(self.bm.verts), 8)
 
         self.clean_bmesh()
 
         btools.utils.create_cube_without_faces(
-            self.bm, Vector((1, 1, 1)), top=True, bottom=True, left=True, right=True, front=True, back=True
+            self.bm,
+            Vector((1, 1, 1)),
+            top=True,
+            bottom=True,
+            left=True,
+            right=True,
+            front=True,
+            back=True,
         )
         self.assertEqual(len(self.bm.faces), 0)
         self.assertEqual(len(self.bm.verts), 8)
@@ -261,15 +287,23 @@ class TestUtilsMesh(unittest.TestCase):
         btools.utils.cube(self.bm)
         slopes = [es(e) for e in self.bm.edges]
         self.assertEqual(len([s for s in slopes if s == 0]), 8)
-        self.assertEqual(len([s for s in slopes if s == float('inf')]), 4)
+        self.assertEqual(len([s for s in slopes if s == float("inf")]), 4)
 
         angles = [btools.utils.edge_angle(e) for e in self.bm.edges]
         self.assertEqual(len([a for a in angles if a == 0]), 8)
-        self.assertEqual(len([a for a in angles if round(a, 4) == round(math.pi / 2, 4)]), 4)
+        self.assertEqual(
+            len([a for a in angles if round(a, 4) == round(math.pi / 2, 4)]), 4
+        )
 
-        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_vertical(e)]), 4)
-        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_horizontal(e)]), 8)
-        self.assertEqual(len([e for e in self.bm.edges if btools.utils.edge_is_sloped(e)]), 0)
+        self.assertEqual(
+            len([e for e in self.bm.edges if btools.utils.edge_is_vertical(e)]), 4
+        )
+        self.assertEqual(
+            len([e for e in self.bm.edges if btools.utils.edge_is_horizontal(e)]), 8
+        )
+        self.assertEqual(
+            len([e for e in self.bm.edges if btools.utils.edge_is_sloped(e)]), 0
+        )
 
     def test_vec_equalopposite(self):
         LEFT = Vector((-1, 0, 0))
@@ -299,7 +333,9 @@ class TestUtilsMesh(unittest.TestCase):
         self.assertEqual(len(btools.utils.filter_vertical_edges(self.bm.edges)), 4)
 
         # -- parallel
-        self.assertEqual(len(btools.utils.filter_parallel_edges(self.bm.edges, Vector((1, 0, 0)))), 4)
+        self.assertEqual(
+            len(btools.utils.filter_parallel_edges(self.bm.edges, Vector((1, 0, 0)))), 4
+        )
 
     def test_rectangular_ngon(self):
         btools.utils.plane(self.bm)
@@ -330,20 +366,16 @@ class TestUtilsMesh(unittest.TestCase):
 
 
 class TestUtilsEvent(unittest.TestCase):
-
     def setUp(self):
-        self.event_manager = btools.utils.Events([
-            "updated",
-            "resized"
-        ])
+        self.event_manager = btools.utils.Events(["updated", "resized"])
 
-        self.update_callback = lambda : None
-        self.resized_callback = lambda : None
-        self.common_callback = lambda : None
-        
+        self.update_callback = lambda: None
+        self.resized_callback = lambda: None
+        self.common_callback = lambda: None
+
     def tearDown(self):
         del self.event_manager
-        
+
     def test_get_subscribers(self):
         self.assertEqual(self.event_manager.get_subscribers(""), None)
         self.assertEqual(self.event_manager.get_subscribers("updated"), [])
@@ -355,7 +387,6 @@ class TestUtilsEvent(unittest.TestCase):
         self.assertEqual(len(self.event_manager.subscribers["updated"]), 1)
         self.assertEqual(len(self.event_manager.subscribers["resized"]), 1)
 
-
     def test_unregister(self):
         self.event_manager.register_all(self.common_callback)
         self.event_manager.unregister("updated", self.common_callback)
@@ -366,7 +397,7 @@ class TestUtilsEvent(unittest.TestCase):
     def test_dispatch(self):
         class ResizeProp:
             def __init__(self):
-                self.resized = False 
+                self.resized = False
 
             def on_resized(self):
                 self.resized = not self.resized

@@ -10,7 +10,6 @@ Blender property groups they mirror.
 
 import dataclasses
 import enum
-import math
 import unittest
 
 import bpy
@@ -150,9 +149,14 @@ def prop_leaves(prop, prefix="", skip=()):
             fixed = getattr(p, "fixed_type", None)
             if fixed is not None and _is_prop_group_struct(fixed):
                 child = getattr(prop, p.identifier)
-                for k, v in prop_leaves(child, prefix + p.identifier + ".", skip).items():
+                for k, v in prop_leaves(
+                    child, prefix + p.identifier + ".", skip
+                ).items():
                     out[k] = v
-        elif p.type in {"INT", "FLOAT", "BOOLEAN", "ENUM", "STRING"} and not p.is_readonly:
+        elif (
+            p.type in {"INT", "FLOAT", "BOOLEAN", "ENUM", "STRING"}
+            and not p.is_readonly
+        ):
             out[prefix + p.identifier] = getattr(prop, p.identifier)
     return out
 
@@ -189,7 +193,9 @@ class TestOptionsDrift(unittest.TestCase):
         register_all()
         problems = []
         for name, options_cls, prop_cls in PAIRS:
-            setattr(bpy.types.Scene, SCENE_NAME, bpy.props.PointerProperty(type=prop_cls))
+            setattr(
+                bpy.types.Scene, SCENE_NAME, bpy.props.PointerProperty(type=prop_cls)
+            )
             try:
                 inst = getattr(bpy.context.scene, SCENE_NAME)
                 dc = dc_leaves(options_cls())
@@ -200,14 +206,19 @@ class TestOptionsDrift(unittest.TestCase):
             ignore = PROP_ONLY.get(prop_cls, set())
             for leaf in dc:
                 if leaf not in rna:
-                    problems.append("%s: options field %r missing on PropertyGroup" % (name, leaf))
+                    problems.append(
+                        "%s: options field %r missing on PropertyGroup" % (name, leaf)
+                    )
             for leaf in rna:
                 if leaf.split(".")[-1] in ALWAYS_SKIP:
                     continue
                 if "." not in leaf and leaf.split(".")[-1] in ignore:
                     continue
                 if leaf not in dc:
-                    problems.append("%s: PropertyGroup prop %r missing on options dataclass" % (name, leaf))
+                    problems.append(
+                        "%s: PropertyGroup prop %r missing on options dataclass"
+                        % (name, leaf)
+                    )
         self.assertEqual(problems, [], "\n".join(problems))
 
 
@@ -216,14 +227,19 @@ class TestOptionsRoundTrip(unittest.TestCase):
         register_all()
         problems = []
         for name, options_cls, prop_cls in PAIRS:
-            setattr(bpy.types.Scene, SCENE_NAME, bpy.props.PointerProperty(type=prop_cls))
+            setattr(
+                bpy.types.Scene, SCENE_NAME, bpy.props.PointerProperty(type=prop_cls)
+            )
             try:
                 inst = getattr(bpy.context.scene, SCENE_NAME)
                 options = options_cls()
-                payload = _strip_nones({
-                    k: v for k, v in dataclasses.asdict(options).items()
-                    if k not in ROUND_TRIP_SKIP
-                })
+                payload = _strip_nones(
+                    {
+                        k: v
+                        for k, v in dataclasses.asdict(options).items()
+                        if k not in ROUND_TRIP_SKIP
+                    }
+                )
                 btools.utils.prop_from_dict(inst, payload)
                 got = prop_leaves(inst, skip=NESTED_SKIP)
                 want = dc_leaves(options, skip_none=True)
@@ -231,8 +247,7 @@ class TestOptionsRoundTrip(unittest.TestCase):
                 delattr(bpy.types.Scene, SCENE_NAME)
 
             want = {
-                k: v for k, v in want.items()
-                if k.split(".")[0] not in ROUND_TRIP_SKIP
+                k: v for k, v in want.items() if k.split(".")[0] not in ROUND_TRIP_SKIP
             }
 
             for leaf, expected in want.items():
@@ -241,7 +256,8 @@ class TestOptionsRoundTrip(unittest.TestCase):
                     continue
                 if comparable(got[leaf]) != comparable(expected):
                     problems.append(
-                        "%s: leaf %r changed: %r -> %r" % (name, leaf, expected, got[leaf])
+                        "%s: leaf %r changed: %r -> %r"
+                        % (name, leaf, expected, got[leaf])
                     )
         self.assertEqual(problems, [], "\n".join(problems))
 

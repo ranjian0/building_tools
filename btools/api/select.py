@@ -73,39 +73,64 @@ def select(obj, selector, floor_height=3.0, storeys=None, group=None):
             if storeys is None:
                 return True
             z = f.calc_center_median().z
-            return any(i * floor_height <= z < (i + 1) * floor_height
-                       for i in storeys)
+            return any(i * floor_height <= z < (i + 1) * floor_height for i in storeys)
 
         if selector == "all":
             cands = faces
         elif selector == "top_face":
-            cands = [f for f in faces
-                     if f.normal.z > 0.9
-                     and abs(f.calc_center_median().z - top_z) < 1e-4]
+            cands = [
+                f
+                for f in faces
+                if f.normal.z > 0.9 and abs(f.calc_center_median().z - top_z) < 1e-4
+            ]
         elif selector in ("front_wall", "front_walls"):
-            cands = [f for f in faces if vertical(f) and front(f) and big(f) and in_storeys(f)]
+            cands = [
+                f
+                for f in faces
+                if vertical(f) and front(f) and big(f) and in_storeys(f)
+            ]
         elif selector in ("side_wall", "side_walls"):
-            cands = [f for f in faces if vertical(f) and side(f) and big(f) and in_storeys(f)]
+            cands = [
+                f for f in faces if vertical(f) and side(f) and big(f) and in_storeys(f)
+            ]
         elif selector in ("back_wall", "back_walls"):
-            cands = [f for f in faces if vertical(f) and back(f) and big(f) and in_storeys(f)]
+            cands = [
+                f for f in faces if vertical(f) and back(f) and big(f) and in_storeys(f)
+            ]
         elif selector in ("walls", "wall"):
             cands = [f for f in faces if vertical(f) and big(f) and in_storeys(f)]
         elif selector in ("ground_front_wall", "ground_front_walls"):
-            cands = [f for f in faces
-                     if vertical(f) and front(f) and big(f)
-                     and f.calc_center_median().z < floor_height]
+            cands = [
+                f
+                for f in faces
+                if vertical(f)
+                and front(f)
+                and big(f)
+                and f.calc_center_median().z < floor_height
+            ]
         elif selector in ("ground_wall", "ground_walls"):
-            cands = [f for f in faces
-                     if vertical(f) and big(f)
-                     and f.calc_center_median().z < floor_height]
+            cands = [
+                f
+                for f in faces
+                if vertical(f) and big(f) and f.calc_center_median().z < floor_height
+            ]
         elif selector in ("upper_front_wall", "upper_front_walls"):
-            cands = [f for f in faces
-                     if vertical(f) and front(f) and big(f)
-                     and floor_height < f.calc_center_median().z < top_z - 0.5]
+            cands = [
+                f
+                for f in faces
+                if vertical(f)
+                and front(f)
+                and big(f)
+                and floor_height < f.calc_center_median().z < top_z - 0.5
+            ]
         elif selector in ("upper_wall", "upper_walls"):
-            cands = [f for f in faces
-                     if vertical(f) and big(f)
-                     and floor_height < f.calc_center_median().z < top_z - 0.5]
+            cands = [
+                f
+                for f in faces
+                if vertical(f)
+                and big(f)
+                and floor_height < f.calc_center_median().z < top_z - 0.5
+            ]
         elif selector == "inner":
             cands = []
             for f in faces:

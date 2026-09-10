@@ -100,9 +100,7 @@ def restore_wall_plane_faces(bm, planes):
     if walls_name not in names:
         return
     walls_index = names.index(walls_name)
-    element_indices = {
-        i for i, name in enumerate(names) if name != walls_name
-    }
+    element_indices = {i for i, name in enumerate(names) if name != walls_name}
 
     for face in bm.faces:
         if face[layer] not in element_indices:

@@ -20,7 +20,7 @@ class LoadModule:
             mod_name, mod_root = self.get_mod_name()
 
             # Create the module and setup the basic properties.
-            mod = types.ModuleType('__main__')
+            mod = types.ModuleType("__main__")
             mod.__file__ = filepath
             mod.__path__ = paths
             mod.__package__ = mod_name
@@ -29,11 +29,13 @@ class LoadModule:
             sys.modules[mod_name] = mod
 
             # Fianally, execute the module.
-            exec(compile(f.read(), filepath, 'exec'), mod.__dict__)
-        except IOError:
-            print('Could not open script file.')
+            exec(compile(f.read(), filepath, "exec"), mod.__dict__)
+        except OSError:
+            print("Could not open script file.")
         except Exception:
-            sys.stderr.write("There was an error when running the script:\n" + traceback.format_exc())
+            sys.stderr.write(
+                "There was an error when running the script:\n" + traceback.format_exc()
+            )
         else:
             f.close()
 
@@ -46,7 +48,7 @@ class LoadModule:
         filepaths = []
 
         for root, dirs, files in os.walk(dirname, topdown=True):
-            if '__init__.py' in files:
+            if "__init__.py" in files:
                 paths.append(root)
                 for f in files:
                     filepaths.append(os.path.join(root, f))
@@ -61,7 +63,7 @@ class LoadModule:
         dir, mod = os.path.split(self.filepath)
 
         # Module is a package.
-        if mod == '__init__.py':
+        if mod == "__init__.py":
             mod = os.path.basename(dir)
             dir = os.path.dirname(dir)
 
@@ -76,7 +78,7 @@ class LoadModule:
         paths, files = self.get_paths()
         for mod_name, mod in list(sys.modules.items()):
             try:
-                if hasattr(mod, '__file__') and os.path.dirname(mod.__file__) in paths:
+                if hasattr(mod, "__file__") and os.path.dirname(mod.__file__) in paths:
                     del sys.modules[mod_name]
             except TypeError:
                 pass

@@ -7,16 +7,16 @@ authors = [
 ]
 dependencies = [
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.13,<3.14"
 readme = "README.md"
 license = "MIT"
 
 [dependency-groups]
 lint = [
-    "black>=26.5.1",
     "mypy>=2.3.1",
     "ruff>=0.16.6",
     "fake-bpy-module-latest>=20260909",
+    "bpy==5.1.2",
 ]
 dev = [
     "numpy>=2.5.3",
@@ -63,3 +63,7 @@ ignore = [
     "TRY002", # vanilla exceptions are the addon's error style
     "BLE001", # blind except at Blender operator boundaries
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# legacy test harness: dynamic exec + loose unpacks are intentional
+"tests/tools.py" = ["SIM115", "RUF059", "S102", "F401"]

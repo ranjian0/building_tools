@@ -264,8 +264,10 @@ def _apply_face_feature(
             #    fill) or a bool verdict (balcony/stairs/roof-style)
             if validate_fn:
                 validated = validate_fn(faces)
-                valid = list(validated) if not isinstance(validated, bool) else (
-                    list(faces) if validated else []
+                valid = (
+                    list(validated)
+                    if not isinstance(validated, bool)
+                    else (list(faces) if validated else [])
                 )
             else:
                 valid = faces

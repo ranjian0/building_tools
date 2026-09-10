@@ -8,13 +8,17 @@ default:
 sync:
     uv sync
 
-# run addon tests inside blender
+# run addon tests headless via the bpy module
 test:
+    uv run python tests/__main__.py
+
+# run addon tests inside the blender gui (parity)
+test-blender:
     blender --window-geometry 0 0 1 1 --no-window-focus -P tests/__main__.py
 
-# format code (black)
+# format code (ruff)
 format:
-    uv run black btools
+    uv run ruff format btools tests
 
 # type-check code (mypy)
 check:

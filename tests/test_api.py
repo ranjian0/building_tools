@@ -8,7 +8,6 @@ import unittest
 
 import bpy
 
-import btools
 from btools.api import (
     BalconyOptions,
     DoorOptions,
@@ -117,16 +116,24 @@ class TestApiSmoke(unittest.TestCase):
         self.assertTrue(res.ok)
         obj = bpy.data.objects[res.created_object]
 
-        res = apply_feature("floor", FloorOptions(floor_count=2, floor_height=3.0), FaceTarget(obj))
+        res = apply_feature(
+            "floor", FloorOptions(floor_count=2, floor_height=3.0), FaceTarget(obj)
+        )
         self.assertTrue(res.ok, res.errors)
         for group in ("walls", "roof", "slabs"):
             self.assertGreater(res.matgroup_counts.get(group, 0), 0, group)
 
-        res = apply_feature("roof", RoofOptions(type="HIP", height=1.0), FaceTarget(obj, [top_face(obj)]))
+        res = apply_feature(
+            "roof",
+            RoofOptions(type="HIP", height=1.0),
+            FaceTarget(obj, [top_face(obj)]),
+        )
         self.assertTrue(res.ok, res.errors)
         self.assertGreater(res.matgroup_counts.get("roof_hangs", 0), 0)
 
-        res = apply_feature("door", DoorOptions(), FaceTarget(obj, [ground_wall_face(obj)]))
+        res = apply_feature(
+            "door", DoorOptions(), FaceTarget(obj, [ground_wall_face(obj)])
+        )
         self.assertTrue(res.ok, res.errors)
         for group in ("door", "frame"):
             self.assertGreater(res.matgroup_counts.get(group, 0), 0, group)
@@ -144,7 +151,9 @@ class TestApiSmoke(unittest.TestCase):
         apply_feature("floor", FloorOptions(floor_count=2), FaceTarget(obj))
         # -- top face (z~6) + ground wall face (z~1.5): not coplanar -> cancelled
         res = apply_feature(
-            "floor", FloorOptions(), FaceTarget(obj, [top_face(obj), ground_wall_face(obj)])
+            "floor",
+            FloorOptions(),
+            FaceTarget(obj, [top_face(obj), ground_wall_face(obj)]),
         )
         self.assertEqual(res.status, "cancelled")
         self.assertTrue(res.errors)
@@ -217,8 +226,7 @@ class TestPresets(unittest.TestCase):
                 self.assertTrue(res.ok, "%s: %s" % (pid, res.errors))
                 obj = bpy.data.objects[res.created_object]
                 report = validate_object(obj, include_geometry=False)
-                self.assertTrue(report["ok"],
-                                "%s: %s" % (pid, report["problems"]))
+                self.assertTrue(report["ok"], "%s: %s" % (pid, report["problems"]))
                 self.assertGreater(len(obj.data.polygons), 10, pid)
 
 

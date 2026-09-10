@@ -1,9 +1,12 @@
-import bpy
-import btools
 import random
 import unittest
+
+import bpy
+
+import btools
 from btools.building.floorplan import FloorplanProperty
 from btools.building.floorplan.floorplan_ops import build
+
 
 class TestFloorplan(unittest.TestCase):
     @classmethod

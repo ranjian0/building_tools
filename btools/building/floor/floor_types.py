@@ -212,7 +212,6 @@ def create_columns(bm, face, prop):
                         if vec_equal(f_side.normal, extrud_vectors[0]) or vec_equal(
                             f_side.normal, extrud_vectors[1]
                         ):
-
                             if vec_equal(f_side.normal, extrud_vectors[0]):
                                 parity_index = (ii + corner_type) % 2
                             else:

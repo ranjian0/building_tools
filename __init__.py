@@ -1,6 +1,7 @@
 import os
 
 import bpy
+import bpy.utils.previews  # noqa: F401,E402 -- lazy submodule, must be explicit
 from bpy.props import (
     EnumProperty,
     IntProperty,
@@ -26,14 +27,13 @@ bl_info = {
 _presets_icons = None
 
 
-def get_preset_icons():
-    """Lazy preview-collection of the bundled preset thumbnails.
+_preset_items_cache = []
 
-    Returns None when the previews API is unavailable (removed in Blender 5.x)
-    -- the dropdown then falls back to text-only items.
-    """
+
+def get_preset_icons():
+    """Lazy preview-collection of the bundled preset thumbnails."""
     global _presets_icons
-    if _presets_icons is None and hasattr(bpy.utils, "previews"):
+    if _presets_icons is None:
         _presets_icons = bpy.utils.previews.new()
         thumbs = os.path.join(os.path.dirname(__file__), "btools", "presets", "thumbs")
         from .btools.api.presets import PRESETS
@@ -46,12 +46,17 @@ def get_preset_icons():
 
 
 def _preset_enum_items(self, context):
+    global _preset_items_cache
     from .btools.api.presets import PRESETS
 
     icons = get_preset_icons()
-    return [(p.id, p.label, p.description,
-             icons[pid].icon_id if icons and pid in icons else 0, i)
-            for i, (pid, p) in enumerate(PRESETS.items())]
+    # -- cache the list: Blender holds raw references to these tuples
+    _preset_items_cache = [
+        (pid, p.label, p.description,
+         icons[pid].icon_id if pid in icons else 0, i)
+        for i, (pid, p) in enumerate(PRESETS.items())
+    ]
+    return _preset_items_cache
 
 
 class BTOOLS_PresetSettings(bpy.types.PropertyGroup):
