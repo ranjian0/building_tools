@@ -25,7 +25,7 @@ from ...utils import (
 from ..arch import add_arch_depth, create_arch, fill_arch
 from ..array import clamp_array_count, get_array_split_edges, spread_array
 from ..fill import fill_face
-from ..frame import add_frame_depth
+from ..frame import add_frame_depth, add_sill
 from ..materialgroup import (
     MaterialGroup,
     add_faces_to_group,
@@ -33,7 +33,6 @@ from ..materialgroup import (
     map_new_faces,
     restore_wall_plane_faces,
 )
-from ..frame import add_sill
 
 
 def create_window(bm, faces, prop):
@@ -200,8 +199,7 @@ def create_rectangular_frame(bm, face, prop):
         add_faces_to_group(bm, [arch_face], MaterialGroup.WINDOW)
 
     # -- protruding sill below the bottom frame member
-    from ..frame import add_sill
-    add_sill(bm, frame_faces, normal)
+        add_sill(bm, frame_faces, normal)
 
     return window_face, arch_face
 
