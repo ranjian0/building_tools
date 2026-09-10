@@ -3,30 +3,55 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "step failed: error",
-  "geometry_hash": null,
-  "geometry_report": null,
+  "error": null,
+  "geometry_hash": "70f916a8f44cf6d2",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 231,
+      "faces": 106,
+      "verts": 128
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
   "id": "multigroup-fills",
-  "image": null,
+  "image": "image.png",
   "known_issues": [
     "zero_width_window_fill"
   ],
-  "mesh": null,
+  "mesh": {
+    "edges": 231,
+    "faces": 106,
+    "verts": 128,
+    "z_range": [
+      0.0,
+      9.6
+    ]
+  },
   "scenario": "floors_only",
   "step_results": [
     {
-      "errors": [
-        "ZeroDivisionError: float division by zero"
-      ],
+      "errors": [],
       "feature": "multigroup",
-      "matgroup_counts": {},
-      "status": "error",
+      "matgroup_counts": {
+        "door_panels": 4,
+        "frame": 34,
+        "roof": 1,
+        "slabs": 38,
+        "walls": 22,
+        "window": 1,
+        "window_bars": 6
+      },
+      "status": "ok",
       "warnings": []
     }
   ],
   "steps": [
     {
-      "faces": "ground_wall",
+      "faces": "ground_front_wall",
       "feature": "multigroup",
       "options": {
         "fill_type_door": "PANELS",
@@ -36,5 +61,40 @@
       }
     }
   ],
-  "validation": null
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 231,
+        "faces": 106,
+        "verts": 128
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door_panels": 4,
+        "frame": 34,
+        "roof": 1,
+        "slabs": 38,
+        "walls": 22,
+        "window": 1,
+        "window_bars": 6
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 8,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
 }

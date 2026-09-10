@@ -26,6 +26,17 @@ IMG_SIZE = (IMG_W, IMG_H)
 ISO_DIR = Vector((1.0, -1.0, 0.85)).normalized()
 
 
+# -- face selection: shared library (lib/face_select.py), world-space
+#    selectors with deterministic area ordering
+def _load_face_select():
+    ns = {}
+    exec(compile(open(FACES_LIB).read(), FACES_LIB, "exec"), ns)
+    return ns["select"]
+
+
+select_faces = _load_face_select()
+
+
 # ---------------------------------------------------------------- helpers
 
 def purge_orphans():
@@ -58,47 +69,8 @@ def run_scenario(name):
     raise RuntimeError("scenario %r produced no __JSON__ output" % name)
 
 
-def select_faces(obj, selector):
-    """Resolve a face selector name to live face indices."""
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    bm.faces.ensure_lookup_table()
-    bm.faces.index_update()
-    top_z = max(f.calc_center_median().z for f in bm.faces)
-    out = []
-    if selector == "all":
-        out = [f.index for f in bm.faces]
-    elif selector == "top_face":
-        cands = [f for f in bm.faces if abs(f.calc_center_median().z - top_z) < 1e-4]
-        out = [max(cands, key=lambda f: f.calc_area()).index]
-    elif selector in ("ground_wall", "ground_walls"):
-        hits = [f.index for f in bm.faces
-                if abs(f.normal.z) < 0.001 and f.calc_center_median().z < 3.0
-                and f.calc_area() > 1.0]
-        out = hits[:1] if selector.endswith("_wall") else hits
-    elif selector in ("upper_wall", "upper_walls"):
-        hits = [f.index for f in bm.faces
-                if abs(f.normal.z) < 0.001 and 3.0 < f.calc_center_median().z < top_z - 0.5
-                and f.calc_area() > 1.0]
-        out = hits[:1] if selector.endswith("_wall") else hits
-    elif selector == "front":
-        out = [f.index for f in bm.faces if f.normal.y > 0.9]
-    elif selector == "inner":
-        inner = []
-        for f in bm.faces:
-            if abs(f.normal.z) >= 0.1:
-                continue
-            c = f.calc_center_median()
-            radial = Vector((c.x, c.y)).normalized()
-            if f.normal.xy.normalized().dot(radial) < -0.9:
-                inner.append(f.index)
-        out = inner
-    else:
-        raise RuntimeError("unknown face selector %r" % selector)
-    bm.free()
-    if not out:
-        raise RuntimeError("face selector %r matched nothing" % selector)
-    return out
+# -- face selection lives in lib/face_select.py (shared, world-space
+#    selectors, deterministic area ordering); loaded via _load_face_select()
 
 
 def apply_steps(steps, face_map):
@@ -142,9 +114,82 @@ def geometry_hash(obj):
     return hashlib.sha256(payload).hexdigest()[:16]
 
 
+# -- per-matgroup render palette: distinct colors make features visible and
+#    matgroup mistakes obvious; untagged faces render bright red
+MATGROUP_COLORS = {
+    "walls": (0.72, 0.70, 0.67),
+    "slabs": (0.52, 0.52, 0.55),
+    "columns": (0.60, 0.60, 0.62),
+    "roof": (0.60, 0.27, 0.19),
+    "roof_hangs": (0.42, 0.19, 0.14),
+    "door": (0.43, 0.27, 0.12),
+    "door_panels": (0.56, 0.37, 0.19),
+    "door_panes": (0.56, 0.37, 0.19),
+    "door_louvers": (0.56, 0.37, 0.19),
+    "frame": (0.13, 0.13, 0.14),
+    "window": (0.42, 0.65, 0.82),
+    "window_bars": (0.13, 0.13, 0.14),
+    "window_panes": (0.56, 0.76, 0.88),
+    "window_louvers": (0.56, 0.76, 0.88),
+    "balcony": (0.78, 0.64, 0.28),
+    "railing_posts": (0.25, 0.25, 0.28),
+    "railing_walls": (0.36, 0.39, 0.43),
+    "railing_rails": (0.25, 0.25, 0.28),
+    "stairs": (0.63, 0.56, 0.46),
+    "custom": (0.65, 0.45, 0.65),
+}
+UNTAGGED_COLOR = (0.90, 0.10, 0.10)
+FALLBACK_COLOR = (0.50, 0.50, 0.50)
+
+
+def assign_matgroup_materials(obj):
+    """Give every face a flat material by its material group (render aid)."""
+    me = obj.data
+    me.materials.clear()
+    mats = {}
+    default = bpy.data.materials.new("ref_default")
+    default.use_nodes = True
+    me.materials.append(default)
+    default_idx = 0
+
+    def mat_for(name, color):
+        if name not in mats:
+            m = bpy.data.materials.new("ref_" + name)
+            m.use_nodes = True
+            # -- workbench MATERIAL mode reads the viewport display color,
+            #    not the node tree
+            m.diffuse_color = (*color, 1.0)
+            bsdf = next((n for n in m.node_tree.nodes
+                         if n.type == "BSDF_PRINCIPLED"), None)
+            if bsdf:
+                bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+                bsdf.inputs["Roughness"].default_value = 0.9
+            me.materials.append(m)
+            mats[name] = len(me.materials) - 1
+        return mats[name]
+
+    group_names = [mt.name for mt in getattr(obj, "bt_materials", [])]
+    layer = me.attributes.get(".bt_material_group_index")
+    if layer is None:
+        return  # everything stays default; nothing tagged yet
+
+    total = len(me.polygons)
+    vals = [0] * total
+    layer.data.foreach_get("value", vals)
+    for i, g in enumerate(vals):
+        if 0 <= g < len(group_names):
+            me.polygons[i].material_index = mat_for(
+                group_names[g], MATGROUP_COLORS.get(group_names[g], FALLBACK_COLOR))
+        else:
+            me.polygons[i].material_index = mat_for(
+                "untagged_%d" % g, UNTAGGED_COLOR)
+
+
 def render_case(obj, path):
     """Deterministic workbench render: iso ortho camera, fixed resolution."""
     scene = bpy.context.scene
+
+    assign_matgroup_materials(obj)
 
     cam_data = bpy.data.cameras.new("ref_cam")
     cam_data.type = "ORTHO"

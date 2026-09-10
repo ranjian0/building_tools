@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "a2df6b1f8bab2e2b",
+  "geometry_hash": "ba49dbb37a2e9dfd",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 133,
-      "faces": 64,
-      "verts": 70
+      "edges": 136,
+      "faces": 65,
+      "verts": 72
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,9 +23,9 @@
     "non_manifold"
   ],
   "mesh": {
-    "edges": 133,
-    "faces": 64,
-    "verts": 70,
+    "edges": 136,
+    "faces": 65,
+    "verts": 72,
     "z_range": [
       0.0,
       9.6
@@ -41,7 +41,7 @@
         "frame": 7,
         "roof": 1,
         "slabs": 37,
-        "walls": 18
+        "walls": 19
       },
       "status": "ok",
       "warnings": []
@@ -49,7 +49,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_wall",
+      "faces": "ground_front_wall",
       "feature": "door",
       "options": {}
     }
@@ -58,9 +58,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 133,
-        "faces": 64,
-        "verts": 70
+        "edges": 136,
+        "faces": 65,
+        "verts": 72
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -74,15 +74,15 @@
         "frame": 7,
         "roof": 1,
         "slabs": 37,
-        "walls": 18
+        "walls": 19
       },
       "invalid_index_faces": 0,
       "num_groups": 5,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": false,
-      "flip_seams": 4
+      "consistent": true,
+      "flip_seams": 0
     },
     "object": "building_001",
     "ok": true,

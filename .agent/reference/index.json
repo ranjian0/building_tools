@@ -158,8 +158,8 @@
       "status": "ok"
     },
     {
-      "faces": 64,
-      "geometry_hash": "a2df6b1f8bab2e2b",
+      "faces": 65,
+      "geometry_hash": "ba49dbb37a2e9dfd",
       "id": "door-default",
       "image": "image.png",
       "known_issues": [
@@ -169,8 +169,8 @@
       "status": "ok"
     },
     {
-      "faces": 64,
-      "geometry_hash": "8a6c3604156db63b",
+      "faces": 88,
+      "geometry_hash": "1fd53f33c165df7a",
       "id": "door-panels",
       "image": "image.png",
       "known_issues": [
@@ -180,8 +180,8 @@
       "status": "ok"
     },
     {
-      "faces": 118,
-      "geometry_hash": "62dfd8286a0482b6",
+      "faces": 119,
+      "geometry_hash": "ba4be5e646271aff",
       "id": "door-louver",
       "image": "image.png",
       "known_issues": [
@@ -191,8 +191,8 @@
       "status": "ok"
     },
     {
-      "faces": 64,
-      "geometry_hash": "a2df6b1f8bab2e2b",
+      "faces": 88,
+      "geometry_hash": "c89f64a142df6038",
       "id": "door-glass-panes",
       "image": "image.png",
       "known_issues": [
@@ -203,86 +203,8 @@
     },
     {
       "faces": 66,
-      "geometry_hash": "9bec774c7cb889b1",
+      "geometry_hash": "362c42d8390f17ee",
       "id": "door-double",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 87,
-      "geometry_hash": "6672cf1f29e8317b",
-      "id": "door-arch",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 63,
-      "geometry_hash": "4beb544ca319cd4c",
-      "id": "window-default",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 69,
-      "geometry_hash": "7bf7eba2993155b2",
-      "id": "window-bar",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 67,
-      "geometry_hash": "c7f32255067401e2",
-      "id": "window-louver",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold",
-        "flaky_louver_max_empty"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 63,
-      "geometry_hash": "4beb544ca319cd4c",
-      "id": "window-glass-panes",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 103,
-      "geometry_hash": "1950ce96ba86e26e",
-      "id": "window-circular",
-      "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 81,
-      "geometry_hash": "cdb82249fab098cc",
-      "id": "multigroup-default",
       "image": "image.png",
       "known_issues": [
         "non_manifold"
@@ -293,13 +215,92 @@
     {
       "faces": null,
       "geometry_hash": null,
-      "id": "multigroup-fills",
+      "id": "door-arch",
       "image": null,
+      "known_issues": [
+        "non_manifold",
+        "flaky_arch_unpack"
+      ],
+      "problems": [],
+      "status": "step failed: error"
+    },
+    {
+      "faces": 65,
+      "geometry_hash": "c73b037c57ce0b65",
+      "id": "window-default",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 71,
+      "geometry_hash": "1b4f22ed69525b41",
+      "id": "window-bar",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 119,
+      "geometry_hash": "4f3f5b83bdf08d18",
+      "id": "window-louver",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold",
+        "flaky_louver_max_empty"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 88,
+      "geometry_hash": "ff3f7468651fa28b",
+      "id": "window-glass-panes",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 103,
+      "geometry_hash": "acabfeeadc618307",
+      "id": "window-circular",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 77,
+      "geometry_hash": "0453559624eab9f9",
+      "id": "multigroup-default",
+      "image": "image.png",
+      "known_issues": [
+        "non_manifold"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 106,
+      "geometry_hash": "70f916a8f44cf6d2",
+      "id": "multigroup-fills",
+      "image": "image.png",
       "known_issues": [
         "zero_width_window_fill"
       ],
       "problems": [],
-      "status": "step failed: error"
+      "status": "ok"
     },
     {
       "faces": 6,
@@ -349,7 +350,7 @@
     },
     {
       "faces": 206,
-      "geometry_hash": "feb5b7b32e130ab1",
+      "geometry_hash": "f49fca28353759a8",
       "id": "stairs-filled",
       "image": "image.png",
       "known_issues": [],
@@ -358,7 +359,7 @@
     },
     {
       "faces": 209,
-      "geometry_hash": "298bfda71b24a98a",
+      "geometry_hash": "b3674892e3b71201",
       "id": "stairs-blocked",
       "image": "image.png",
       "known_issues": [],
@@ -367,7 +368,7 @@
     },
     {
       "faces": 207,
-      "geometry_hash": "4ac576f6231907c7",
+      "geometry_hash": "d7740a83db49826d",
       "id": "stairs-slope",
       "image": "image.png",
       "known_issues": [],
@@ -376,7 +377,7 @@
     },
     {
       "faces": 101,
-      "geometry_hash": "9280fbd76ed921c8",
+      "geometry_hash": "cb46a1a9010fa196",
       "id": "stairs-no-landing",
       "image": "image.png",
       "known_issues": [],
@@ -385,7 +386,7 @@
     },
     {
       "faces": 29,
-      "geometry_hash": "875120ebc7a6629f",
+      "geometry_hash": "6228abc314f25fce",
       "id": "fill-panels",
       "image": "image.png",
       "known_issues": [],
@@ -394,7 +395,7 @@
     },
     {
       "faces": 29,
-      "geometry_hash": "07439f94ff6244d9",
+      "geometry_hash": "769e1826c0ea22ad",
       "id": "fill-glass-panes",
       "image": "image.png",
       "known_issues": [],
@@ -403,7 +404,7 @@
     },
     {
       "faces": 70,
-      "geometry_hash": "7022f516e5d94c7a",
+      "geometry_hash": "069641f4e6ef1582",
       "id": "fill-louver",
       "image": "image.png",
       "known_issues": [],
@@ -412,7 +413,7 @@
     },
     {
       "faces": 12,
-      "geometry_hash": "65cd9cb2303fdec0",
+      "geometry_hash": "38efe1d061bc8d47",
       "id": "fill-bar",
       "image": "image.png",
       "known_issues": [],

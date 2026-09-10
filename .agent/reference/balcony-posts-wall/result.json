@@ -45,7 +45,7 @@
   ],
   "steps": [
     {
-      "faces": "front",
+      "faces": "front_wall",
       "feature": "balcony",
       "options": {}
     }

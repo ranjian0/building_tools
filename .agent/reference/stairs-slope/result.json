@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "4ac576f6231907c7",
+  "geometry_hash": "d7740a83db49826d",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -45,7 +45,7 @@
   ],
   "steps": [
     {
-      "faces": "front",
+      "faces": "front_wall",
       "feature": "stairs",
       "options": {
         "bottom": "SLOPE"

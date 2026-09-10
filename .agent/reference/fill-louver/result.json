@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "7022f516e5d94c7a",
+  "geometry_hash": "069641f4e6ef1582",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -44,7 +44,7 @@
   ],
   "steps": [
     {
-      "faces": "front",
+      "faces": "front_wall",
       "feature": "fill",
       "options": {
         "comp": "WINDOW",

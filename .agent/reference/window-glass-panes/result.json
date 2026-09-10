@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "4beb544ca319cd4c",
+  "geometry_hash": "ff3f7468651fa28b",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 130,
-      "faces": 63,
-      "verts": 68
+      "edges": 180,
+      "faces": 88,
+      "verts": 93
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 0
+    "zero_area_faces": 1
   },
   "id": "window-glass-panes",
   "image": "image.png",
@@ -23,9 +23,9 @@
     "non_manifold"
   ],
   "mesh": {
-    "edges": 130,
-    "faces": 63,
-    "verts": 68,
+    "edges": 180,
+    "faces": 88,
+    "verts": 93,
     "z_range": [
       0.0,
       9.6
@@ -39,9 +39,10 @@
       "matgroup_counts": {
         "frame": 8,
         "roof": 1,
-        "slabs": 37,
-        "walls": 16,
-        "window": 1
+        "slabs": 36,
+        "walls": 19,
+        "window": 8,
+        "window_panes": 16
       },
       "status": "ok",
       "warnings": []
@@ -49,7 +50,7 @@
   ],
   "steps": [
     {
-      "faces": "upper_wall",
+      "faces": "upper_front_wall",
       "feature": "window",
       "options": {
         "fill_type": "GLASS_PANES"
@@ -58,33 +59,34 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 130,
-        "faces": 63,
-        "verts": 68
+        "edges": 180,
+        "faces": 88,
+        "verts": 93
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 0
+      "zero_area_faces": 1
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "frame": 8,
         "roof": 1,
-        "slabs": 37,
-        "walls": 16,
-        "window": 1
+        "slabs": 36,
+        "walls": 19,
+        "window": 8,
+        "window_panes": 16
       },
       "invalid_index_faces": 0,
       "num_groups": 6,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": false,
-      "flip_seams": 2
+      "consistent": true,
+      "flip_seams": 0
     },
     "object": "building_001",
     "ok": true,

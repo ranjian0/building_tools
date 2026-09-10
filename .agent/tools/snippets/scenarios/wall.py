@@ -39,7 +39,7 @@ def main():
         if abs(n.z) > 0.9:
             faces["top" if n.z > 0 else "bottom"].append(f.index)
         elif abs(n.y) > 0.9:
-            faces["front" if n.y > 0 else "back"].append(f.index)
+            faces["front" if n.y < 0 else "back"].append(f.index)
         else:
             faces["sides"].append(f.index)
     bm.free()

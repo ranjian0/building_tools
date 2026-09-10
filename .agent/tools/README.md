@@ -63,6 +63,28 @@ only, does not fail the diff). Known addon flaws are recorded per case in
 `known_issues` (e.g. `multigroup-fills` zero-width window division,
 `balcony-inner-curved` grouped-curved platform).
 
+### Face selectors
+
+Steps reference faces by selector name, resolved live per step by
+`lib/face_select.py` (world-space semantics: canonical front = **-Y**, the
+side the render camera sees; candidates ordered by area, largest first):
+
+| Selector | Matches |
+|----------|---------|
+| `front_wall` / `front_walls` | vertical, -Y-facing, area > 1 |
+| `ground_front_wall`(s) | front + median z < 3 |
+| `upper_front_wall`(s) | front + 3 < z < top |
+| `ground_wall`(s) / `upper_wall`(s) | any side, by height band |
+| `top_face` | largest upward face at max z |
+| `inner` | curved-wall faces whose normals point at the arc center |
+| `all` | everything |
+
+Renders color faces by material group (workbench MATERIAL mode via
+`diffuse_color`): walls gray, slabs darker gray, roof/roof_hangs red-brown,
+door brown, frame near-black, window blues, balcony ochre, stairs tan —
+**untagged faces render bright red**, which makes contract violations
+visible at a glance.
+
 ## Agent loop (typical)
 
 ```bash

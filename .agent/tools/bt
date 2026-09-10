@@ -480,6 +480,7 @@ REFERENCE_CODE_TMPL = """\
 CASES_PATH = {cases!r}
 OUT_DIR = {out!r}
 SCENARIOS_DIR = {scenarios!r}
+FACES_LIB = {faces_lib!r}
 FILTER = {filt!r}
 IMG_W, IMG_H = {img_w}, {img_h}
 """
@@ -490,6 +491,7 @@ def reference_generate(out_dir, filt, timeout):
     check_running(need=True)
     code = REFERENCE_CODE_TMPL.format(
         cases=CASES_FILE, out=out_dir, scenarios=os.path.join(SNIPPETS, "scenarios"),
+        faces_lib=os.path.join(TOOLS_DIR, "lib", "face_select.py"),
         filt=filt or "", img_w=1280, img_h=800,
     ) + open(SWEEP_FILE).read()
     os.makedirs(out_dir, exist_ok=True)

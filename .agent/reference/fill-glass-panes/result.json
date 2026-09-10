@@ -4,9 +4,9 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "07439f94ff6244d9",
+  "geometry_hash": "769e1826c0ea22ad",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
       "edges": 56,
       "faces": 29,
@@ -15,7 +15,7 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 0
+    "zero_area_faces": 1
   },
   "id": "fill-glass-panes",
   "image": "image.png",
@@ -44,7 +44,7 @@
   ],
   "steps": [
     {
-      "faces": "front",
+      "faces": "front_wall",
       "feature": "fill",
       "options": {
         "comp": "WINDOW",
@@ -54,7 +54,7 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
         "edges": 56,
         "faces": 29,
@@ -63,7 +63,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 0
+      "zero_area_faces": 1
     },
     "matgroups": {
       "all_tagged": true,

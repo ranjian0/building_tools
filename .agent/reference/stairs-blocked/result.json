@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "298bfda71b24a98a",
+  "geometry_hash": "b3674892e3b71201",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -45,7 +45,7 @@
   ],
   "steps": [
     {
-      "faces": "front",
+      "faces": "front_wall",
       "feature": "stairs",
       "options": {
         "bottom": "BLOCKED"
