@@ -49,12 +49,12 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] reference corpus + thumbs regen; commit
 
 ### Phase 1 — Foundation utilities
-- [ ] util_mesh: `bevel_edges(bm, edges, width, segments)` with clamping
-- [ ] util_mesh: `set_smooth_shading(bm, faces, angle)` for arcs/cylinders
-- [ ] util_mesh: `sweep_profile(bm, edge_run, profile_verts, normal)` —
+- [x] util_mesh: `bevel_edges(bm, edges, width, segments)` with clamping
+- [x] util_mesh: `set_smooth_shading(bm, faces, angle)` for arcs/cylinders
+- [x] util_mesh: `sweep_profile(bm, edge_run, profile_verts, normal)` —
       simple straight-run profile sweep (fascia/sill/gutter building block)
-- [ ] scope `remove_doubles(dist=0.01)` in fill_types down to 0.0001
-- [ ] gate + commit
+- [x] scope `remove_doubles(dist=0.01)` in fill_types down to 0.0001
+- [x] gate + commit
 
 ### Phase 2 — Opening details
 - [ ] window sill: protruding sill member (75mm projection, 50mm high,
