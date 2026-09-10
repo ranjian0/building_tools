@@ -1,0 +1,43 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": "step failed: error",
+  "geometry_hash": null,
+  "geometry_report": null,
+  "id": "multigroup-arch",
+  "image": null,
+  "known_issues": [
+    "multigroup_arch_broken"
+  ],
+  "mesh": null,
+  "scenario": "wall",
+  "step_results": [
+    {
+      "errors": [
+        "AttributeError: 'MultigroupProperty' object has no attribute 'fill_type'"
+      ],
+      "feature": "multigroup",
+      "matgroup_counts": {},
+      "status": "error",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "front_wall",
+      "feature": "multigroup",
+      "options": {
+        "add_arch": true,
+        "size_offset": {
+          "size": [
+            2.0,
+            1.8
+          ]
+        }
+      }
+    }
+  ],
+  "validation": null
+}

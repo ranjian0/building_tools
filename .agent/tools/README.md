@@ -97,6 +97,14 @@ replace the element group on buildings (`fill_drops_element_group`),
 `door-arch` are occasionally flaky (bmesh iteration order), `fill-panels`
 ignores `comp`, and `floor-decoration` without columns produces nothing.
 
+### Building presets
+
+`preset-*` cases build the bundled presets via `btools/api/presets.py`
+(`build_preset`) — the same engine the Building Presets panel uses. Preset
+thumbnails in `btools/presets/thumbs/` are rendered by `bt thumbs` using the
+same camera/material pipeline; regenerate them with `bt thumbs` whenever a
+preset recipe changes.
+
 ## Agent loop (typical)
 
 ```bash

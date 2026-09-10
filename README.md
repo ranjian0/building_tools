@@ -44,6 +44,9 @@ and `Building Tools` was born.
 * [Roof](https://github.com/ranjian0/building_tools/wiki/Roof)
 * [Stairs](https://github.com/ranjian0/building_tools/wiki/Stairs)
 * [Balcony](https://github.com/ranjian0/building_tools/wiki/Balcony)
+* **Building Presets** — one-click complete buildings (suburban house,
+  townhouse, apartment block, modern villa, mediterranean villa, corner
+  shop, warehouse, office block) with floor-count and footprint scaling
 
 ## Status
 

@@ -202,5 +202,25 @@ class TestWallElements(unittest.TestCase):
         self.assertGreater(res.matgroup_counts.get("balcony", 0), 0)
 
 
+class TestPresets(unittest.TestCase):
+    """Every bundled preset must build and satisfy the matgroup contract."""
+
+    def test_all_presets_build_and_validate(self):
+        # -- import through the addon's own namespace: its property groups
+        #    are the ones registered by the harness
+        from building_tools.btools.api.presets import PRESETS, build_preset
+
+        for pid, preset in PRESETS.items():
+            with self.subTest(preset=pid):
+                clean_scene()
+                res = build_preset(preset)
+                self.assertTrue(res.ok, "%s: %s" % (pid, res.errors))
+                obj = bpy.data.objects[res.created_object]
+                report = validate_object(obj, include_geometry=False)
+                self.assertTrue(report["ok"],
+                                "%s: %s" % (pid, report["problems"]))
+                self.assertGreater(len(obj.data.polygons), 10, pid)
+
+
 if __name__ == "__main__":
     unittest.main()

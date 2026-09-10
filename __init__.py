@@ -1,4 +1,11 @@
+import os
+
 import bpy
+from bpy.props import (
+    EnumProperty,
+    IntProperty,
+    PointerProperty,
+)
 from .btools.building.register import register_building, unregister_building
 
 bl_info = {
@@ -12,6 +19,100 @@ bl_info = {
     "doc_url": "https://github.com/ranjian0/building_tools/wiki",
     "category": "Mesh",
 }
+
+
+# ---------------------------------------------------------------- presets ui
+
+_presets_icons = None
+
+
+def get_preset_icons():
+    """Lazy preview-collection of the bundled preset thumbnails.
+
+    Returns None when the previews API is unavailable (removed in Blender 5.x)
+    -- the dropdown then falls back to text-only items.
+    """
+    global _presets_icons
+    if _presets_icons is None and hasattr(bpy.utils, "previews"):
+        _presets_icons = bpy.utils.previews.new()
+        thumbs = os.path.join(os.path.dirname(__file__), "btools", "presets", "thumbs")
+        from .btools.api.presets import PRESETS
+
+        for pid in PRESETS:
+            path = os.path.join(thumbs, pid + ".png")
+            if os.path.exists(path):
+                _presets_icons.load(pid, path, "IMAGE")
+    return _presets_icons
+
+
+def _preset_enum_items(self, context):
+    from .btools.api.presets import PRESETS
+
+    icons = get_preset_icons()
+    return [(p.id, p.label, p.description,
+             icons[pid].icon_id if icons and pid in icons else 0, i)
+            for i, (pid, p) in enumerate(PRESETS.items())]
+
+
+class BTOOLS_PresetSettings(bpy.types.PropertyGroup):
+    preset_id: EnumProperty(name="Preset", items=_preset_enum_items)
+    floors: IntProperty(name="Floors", min=0, max=20, default=0,
+                        description="Number of floors (0 = preset default)")
+    width_pct: IntProperty(name="Width %", min=25, max=400, default=100,
+                           description="Floorplan width scale")
+    depth_pct: IntProperty(name="Depth %", min=25, max=400, default=100,
+                           description="Floorplan depth scale")
+
+
+class BTOOLS_OT_build_preset(bpy.types.Operator):
+    """Build a complete building from the selected preset"""
+
+    bl_idname = "btools.build_preset"
+    bl_label = "Build Complete Building"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.mode == "OBJECT"
+
+    def execute(self, context):
+        from .btools.api.presets import PRESETS, build_preset
+
+        settings = context.scene.btools_preset
+        res = build_preset(
+            PRESETS[settings.preset_id],
+            floors=settings.floors or None,
+            width_scale=settings.width_pct / 100,
+            depth_scale=settings.depth_pct / 100,
+        )
+        if res.ok:
+            self.report({"INFO"}, "Building created: %s" % res.created_object)
+            return {"FINISHED"}
+        self.report({"ERROR"}, res.errors[0] if res.errors else "Preset failed")
+        return {"CANCELLED"}
+
+
+class BTOOLS_PT_building_presets(bpy.types.Panel):
+    bl_label = "Building Presets"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category = "Building Tools"
+
+    def draw(self, context):
+        layout = self.layout
+        settings = context.scene.btools_preset
+
+        col = layout.column(align=True)
+        col.template_icon_view(settings, "preset_id", show_labels=True)
+        col.prop(settings, "preset_id", text="")
+
+        col = layout.column(align=True)
+        col.prop(settings, "floors")
+        row = col.row(align=True)
+        row.prop(settings, "width_pct")
+        row.prop(settings, "depth_pct")
+
+        layout.operator("btools.build_preset", icon="OUTLINER_OB_MESH")
 
 
 class BTOOLS_PT_road_tools(bpy.types.Panel):
@@ -143,7 +244,13 @@ class BTOOLS_PT_material_tools(bpy.types.Panel):
                 layout.label(text=("This matgroup was corrupted by a destructive operation on the object."), icon="ERROR")
 
 
-classes = (BTOOLS_PT_building_tools, BTOOLS_PT_material_tools)
+classes = (
+    BTOOLS_PresetSettings,
+    BTOOLS_OT_build_preset,
+    BTOOLS_PT_building_presets,
+    BTOOLS_PT_building_tools,
+    BTOOLS_PT_material_tools,
+)
 
 register_ui, unregister_ui = bpy.utils.register_classes_factory(classes)
 
@@ -156,6 +263,7 @@ def register():
 
     register_building()
     register_ui()
+    bpy.types.Scene.btools_preset = PointerProperty(type=BTOOLS_PresetSettings)
 
 
 def unregister():
@@ -165,8 +273,14 @@ def unregister():
     except ImportError:
         pass # XXX script_watcher dev environment
 
+    del bpy.types.Scene.btools_preset
     unregister_building()
     unregister_ui()
+
+    global _presets_icons
+    if _presets_icons is not None:
+        bpy.utils.previews.remove(_presets_icons)
+        _presets_icons = None
 
 if __name__ == "__main__":
     import os

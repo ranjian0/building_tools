@@ -1,0 +1,85 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "0ed00204f9c7f507",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 1740,
+      "faces": 847,
+      "verts": 894
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 20
+  },
+  "id": "preset-modern-villa",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 1740,
+    "faces": 847,
+    "verts": 894,
+    "z_range": [
+      0.0,
+      7.05
+    ]
+  },
+  "scenario": null,
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "preset:modern-villa",
+      "matgroup_counts": {
+        "frame": 144,
+        "roof": 49,
+        "slabs": 72,
+        "walls": 150,
+        "window": 144,
+        "window_panes": 288
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 1740,
+        "faces": 847,
+        "verts": 894
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 20
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "frame": 144,
+        "roof": 49,
+        "slabs": 72,
+        "walls": 150,
+        "window": 144,
+        "window_panes": 288
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 6,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 48
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

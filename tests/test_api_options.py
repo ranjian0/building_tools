@@ -111,14 +111,6 @@ def register_all():
             pass  # already registered
 
 
-def unregister_all():
-    for cls in reversed(REGISTER_ORDER):
-        try:
-            bpy.utils.unregister_class(cls)
-        except (ValueError, KeyError):
-            pass
-
-
 def dc_leaves(options, prefix="", skip_none=False):
     """{(prefix,)name: value} for an options dataclass instance.
     skip_none drops None-valued leaves (None = 'delegate to the prop's
@@ -216,7 +208,6 @@ class TestOptionsDrift(unittest.TestCase):
                     continue
                 if leaf not in dc:
                     problems.append("%s: PropertyGroup prop %r missing on options dataclass" % (name, leaf))
-        unregister_all()
         self.assertEqual(problems, [], "\n".join(problems))
 
 
@@ -252,7 +243,6 @@ class TestOptionsRoundTrip(unittest.TestCase):
                     problems.append(
                         "%s: leaf %r changed: %r -> %r" % (name, leaf, expected, got[leaf])
                     )
-        unregister_all()
         self.assertEqual(problems, [], "\n".join(problems))
 
 

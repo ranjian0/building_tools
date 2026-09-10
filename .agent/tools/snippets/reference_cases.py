@@ -130,6 +130,12 @@ CASES = [
          "faces": "front_wall"}],
      "expect": {"groups": ["window", "frame", "door_panels", "window_bars"]},
      "known_issues": ["zero_width_window_fill"]},
+    {"id": "multigroup-arch", "scenario": "wall", "steps": [
+        {"feature": "multigroup",
+         "options": {"add_arch": True, "size_offset": {"size": [2.0, 1.8]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["door", "window", "frame"]},
+     "known_issues": ["multigroup_arch_broken"]},
     # -- balcony -------------------------------------------------------------------
     {"id": "balcony-posts-wall", "scenario": "wall", "steps": [
         {"feature": "balcony",
@@ -175,4 +181,13 @@ CASES = [
     {"id": "fill-bar", "scenario": "wall", "steps": [
         {"feature": "fill", "options": {"fill_type": "BAR", "comp": "WINDOW"}, "faces": "front_wall"}],
      "expect": {"groups": ["window_bars"]}},
+    # -- building presets ----------------------------------------------------
+    {"id": "preset-suburban-house", "preset": "suburban-house"},
+    {"id": "preset-townhouse", "preset": "townhouse"},
+    {"id": "preset-apartment-block", "preset": "apartment-block"},
+    {"id": "preset-modern-villa", "preset": "modern-villa"},
+    {"id": "preset-mediterranean-villa", "preset": "mediterranean-villa"},
+    {"id": "preset-corner-shop", "preset": "corner-shop"},
+    {"id": "preset-warehouse", "preset": "warehouse"},
+    {"id": "preset-office-block", "preset": "office-block"},
 ]

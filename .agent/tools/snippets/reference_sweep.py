@@ -20,21 +20,11 @@ from mathutils import Vector
 
 from building_tools.btools.api import FaceTarget, apply_feature
 from building_tools.btools.api.core import OPTION_TYPES, options_from_dict
+from building_tools.btools.api.select import select as select_faces
 from building_tools.btools.api.validate import geometry_report, validate_object
 
 IMG_SIZE = (IMG_W, IMG_H)
 ISO_DIR = Vector((1.0, -1.0, 0.85)).normalized()
-
-
-# -- face selection: shared library (lib/face_select.py), world-space
-#    selectors with deterministic area ordering
-def _load_face_select():
-    ns = {}
-    exec(compile(open(FACES_LIB).read(), FACES_LIB, "exec"), ns)
-    return ns["select"]
-
-
-select_faces = _load_face_select()
 
 
 # ---------------------------------------------------------------- helpers
@@ -264,7 +254,24 @@ def _run_case_once(case):
     step_summaries = []
     obj = None
     error = None
-    if steps:
+    if case.get("preset"):
+        from building_tools.btools.api.presets import PRESETS, build_preset
+
+        try:
+            res = build_preset(PRESETS[case["preset"]])
+            obj = bpy.data.objects.get(res.created_object or "")
+            step_summaries.append({
+                "feature": "preset:" + case["preset"],
+                "status": res.status,
+                "matgroup_counts": res.matgroup_counts,
+                "errors": res.errors[:1],
+                "warnings": res.warnings[:2],
+            })
+            if not res.ok:
+                error = "preset failed: %s" % res.status
+        except Exception as exc:  # noqa: BLE001 -- sweep must continue
+            error = "%s: %s" % (type(exc).__name__, exc)
+    elif steps:
         try:
             last, obj, step_summaries = apply_steps(steps, face_map)
             if not last.ok:

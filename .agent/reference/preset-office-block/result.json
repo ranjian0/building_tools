@@ -1,0 +1,87 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "31dc712b2c3f795b",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 6871,
+      "faces": 3321,
+      "verts": 3551
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 41
+  },
+  "id": "preset-office-block",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 6871,
+    "faces": 3321,
+    "verts": 3551,
+    "z_range": [
+      0.0,
+      19.45
+    ]
+  },
+  "scenario": null,
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "preset:office-block",
+      "matgroup_counts": {
+        "door": 1,
+        "frame": 654,
+        "roof": 17,
+        "slabs": 74,
+        "walls": 654,
+        "window": 641,
+        "window_panes": 1280
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 6871,
+        "faces": 3321,
+        "verts": 3551
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 41
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 1,
+        "frame": 654,
+        "roof": 17,
+        "slabs": 74,
+        "walls": 654,
+        "window": 641,
+        "window_panes": 1280
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 7,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

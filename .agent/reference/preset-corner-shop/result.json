@@ -1,0 +1,85 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "f7687548dbf83ace",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 277,
+      "faces": 127,
+      "verts": 151
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "preset-corner-shop",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 277,
+    "faces": 127,
+    "verts": 151,
+    "z_range": [
+      0.0,
+      7.6
+    ]
+  },
+  "scenario": null,
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "preset:corner-shop",
+      "matgroup_counts": {
+        "door": 1,
+        "frame": 38,
+        "roof": 17,
+        "slabs": 26,
+        "walls": 41,
+        "window": 4
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 277,
+        "faces": 127,
+        "verts": 151
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 1,
+        "frame": 38,
+        "roof": 17,
+        "slabs": 26,
+        "walls": 41,
+        "window": 4
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 6,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}
