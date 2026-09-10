@@ -274,8 +274,7 @@ def subdivide_face_into_quads(bm, face, cuts_x, cuts_y):
     if cuts_y > 0:
         res = bmesh.ops.subdivide_edges(bm, edges=h_edges + edges, cuts=cuts_y)
         edges.extend(filter_geom(res["geom_inner"], BMEdge))
-    # -- tight weld: 1cm would erase millimetre-scale detail (frames, beads)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.01)
     return list({f for ed in validate(edges) for f in ed.link_faces})
 
 
