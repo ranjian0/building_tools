@@ -69,15 +69,15 @@ and production export — for both archviz renders and game-engine workflows.
 - [ ] arch default resolution bump + smooth shading on arcs
 - [ ] tests: sill/threshold/hardware presence per case; corpus update; commit
 
-### Phase 4 — Silhouette tier — REMAINING
-- [ ] roof fascia band along the eave (roof_hangs bottom rim)
-- [ ] gutters (half-round sweep on fascia) + downspouts at corners
+### Phase 4 — Silhouette tier — PARTIAL (gutters/chimney props; cornice/columns deferred)
+- [x] roof fascia band along the eave (roof_hangs bottom rim)
+- [x] gutters (half-round sweep on fascia) + downspouts at corners
       (prop add_gutters, default False; presets opt in)
 - [ ] gable ridge cap; verge boards on open gables
 - [ ] flat-roof parapet coping (bevel/chamfer the coping top)
 - [ ] cornice/string-course option on floor slabs (add_cornice, per slab line)
 - [ ] column base + capital options; decoration decoupled from slab_outset
-- [ ] chimney (#183): masonry stack + cap + flue pot (prop add_chimney)
+- [x] chimney (#183): masonry stack + cap + flue pot (prop add_chimney)
 - [ ] dormers — DEFERRED (roof-intersection complexity; follow-up)
 - [ ] tests + corpus + commit
 

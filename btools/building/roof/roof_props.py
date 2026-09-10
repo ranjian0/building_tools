@@ -46,6 +46,25 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Outset of roof hangs",
     )
 
+    add_gutters: BoolProperty(
+        name="Add Gutters", default=False,
+        description="Add half-round gutters along the eaves",
+    )
+
+    gutter_size: FloatProperty(
+        name="Gutter Size",
+        min=get_scaled_unit(0.03),
+        max=get_scaled_unit(0.2),
+        default=get_scaled_unit(0.08),
+        unit="LENGTH",
+        description="Gutter radius",
+    )
+
+    add_chimney: BoolProperty(
+        name="Add Chimney", default=False,
+        description="Add a masonry chimney on the roof slope",
+    )
+
     height: FloatProperty(
         name="Height",
         min=get_scaled_unit(0.01),

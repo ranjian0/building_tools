@@ -57,6 +57,7 @@ PROP_ONLY = {
     DoorProperty: {"wall_dimensions"},
     WindowProperty: {"wall_dimensions"},
     MultigroupProperty: {"wall_dimensions"},
+    RoofProperty: {"add_gutters", "gutter_size", "add_chimney"},
 }
 
 # -- getter/setter aliases and UI toggles inside nested groups: they mirror

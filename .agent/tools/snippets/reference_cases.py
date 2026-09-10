@@ -182,7 +182,8 @@ CASES = [
         {"feature": "fill", "options": {"fill_type": "BAR", "comp": "WINDOW"}, "faces": "front_wall"}],
      "expect": {"groups": ["window_bars"]}},
     # -- building presets ----------------------------------------------------
-    {"id": "preset-suburban-house", "preset": "suburban-house"},
+    {"id": "preset-suburban-house", "preset": "suburban-house",
+     "known_issues": []},
     {"id": "preset-townhouse", "preset": "townhouse"},
     {"id": "preset-apartment-block", "preset": "apartment-block"},
     {"id": "preset-modern-villa", "preset": "modern-villa"},
