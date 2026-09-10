@@ -10,7 +10,10 @@ Source repo: https://github.com/ranjian0/building_tools
 
 - [api-control-surface](api-control-surface.md) — scriptable, deterministic
   operations (`btools/api`) + `bt api`/`bt validate`/`bt scenario` commands.
-  **Implemented** (branch `chore/uv-migration`).
+  **Done**.
+- [building-presets](building-presets.md) — complete-building presets
+  (`btools/api/presets.py`) + Building Presets panel + thumbnails.
+  **Done (v1)**.
 
 ## Status Snapshot (2026-09)
 
