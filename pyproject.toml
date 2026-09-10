@@ -67,3 +67,4 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 # legacy test harness: dynamic exec + loose unpacks are intentional
 "tests/tools.py" = ["SIM115", "RUF059", "S102", "F401"]
+

@@ -8,9 +8,14 @@ default:
 sync:
     uv sync
 
-# run addon tests headless via the bpy module
+# run addon tests headless via the bpy module (isolated user config so a
+# stale installed addon copy can't interfere)
 test:
-    uv run python tests/__main__.py
+    #!/usr/bin/env bash
+    set -e
+    mkdir -p .agent/tools/out/test-user
+    BLENDER_USER_RESOURCES="$PWD/.agent/tools/out/test-user" \
+        uv run python tests/__main__.py
 
 # run addon tests inside the blender gui (parity)
 test-blender:

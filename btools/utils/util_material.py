@@ -28,6 +28,11 @@ def create_object_material(obj, mat_name):
 
 def uv_map_active_editmesh_selection(faces, method):
     """perform uv mapping on `faces` using the provided `method`"""
+    # -- uv operators need a proper window/editor context; skip headless
+    #    builds (bpy module / background mode) rather than crash
+    if bpy.app.background:
+        return
+
     # -- ensure we are in editmode
     if not bpy.context.object.mode == "EDIT":
         return

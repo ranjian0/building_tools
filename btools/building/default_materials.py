@@ -86,7 +86,7 @@ def _mat_concrete(mat, color=None):
 
 def _mat_roof(mat):
     color = MATGROUP_COLORS["roof"]
-    bsdf = _base_nodes(mat, color, 0.7)
+    _base_nodes(mat, color, 0.7)
     nt = mat.node_tree
     brick = nt.nodes.new("ShaderNodeTexBrick")
     brick.offset = 0.5

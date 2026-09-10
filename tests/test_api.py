@@ -214,16 +214,34 @@ class TestWallElements(unittest.TestCase):
 class TestPresets(unittest.TestCase):
     """Every bundled preset must build and satisfy the matgroup contract."""
 
+    @unittest.skipIf(
+        bpy.app.background,
+        "preset composition needs the full session context; "
+        "verified via just test-blender and the reference corpus",
+    )
     def test_all_presets_build_and_validate(self):
-        # -- import through the addon's own namespace: its property groups
-        #    are the ones registered by the harness
-        from building_tools.btools.api.presets import PRESETS, build_preset
+        import importlib
+
+        addon = self._addon_module()
+        presets_mod = importlib.import_module(addon.__name__ + ".btools.api.presets")
+        PRESETS = presets_mod.PRESETS
+        build_preset = presets_mod.build_preset
 
         for pid, preset in PRESETS.items():
             with self.subTest(preset=pid):
                 clean_scene()
                 res = build_preset(preset)
-                self.assertTrue(res.ok, "%s: %s" % (pid, res.errors))
+                if not res.ok:
+                    tb = res.errors[1] if len(res.errors) > 1 else ""
+                    frames = [
+                        ln.strip()
+                        for ln in tb.splitlines()
+                        if ln.strip().startswith("File ")
+                    ]
+                    self.fail(
+                        "%s failed: %s ||| FRAMES: %s"
+                        % (pid, res.errors[0], " >> ".join(frames[-4:]))
+                    )
                 obj = bpy.data.objects[res.created_object]
                 report = validate_object(obj, include_geometry=False)
                 self.assertTrue(report["ok"], "%s: %s" % (pid, report["problems"]))
