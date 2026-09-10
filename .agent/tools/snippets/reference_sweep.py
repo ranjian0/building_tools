@@ -4,7 +4,7 @@
 IMG_W, IMG_H) and execs this file. For every case in the manifest:
 clean scene -> run scenario -> apply steps -> validate -> render -> log.
 
-Writes OUT_DIR/<case-id>/result.json + image.png, plus index.json/index.md.
+Writes OUT_DIR/<case-id>/result.json + iso/front/right renders, plus index.json/index.md.
 """
 
 import contextlib
@@ -173,40 +173,30 @@ def assign_matgroup_materials(obj):
                 "untagged_%d" % g, UNTAGGED_COLOR)
 
 
-def render_case(obj, path):
-    """Deterministic workbench render: iso ortho camera, fixed resolution."""
-    scene = bpy.context.scene
+VIEW_DIRECTIONS = {
+    "": Vector((1.0, -1.0, 0.85)).normalized(),   # iso
+    "-front": Vector((0.0, -1.0, 0.0)),           # elevation: sees -Y face
+    "-right": Vector((1.0, 0.0, 0.0)),            # elevation: sees +X face
+}
 
+
+def render_case(obj, case_dir, case_id):
+    """Deterministic workbench renders (iso + front + right elevations)."""
     assign_matgroup_materials(obj)
 
+    corners = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
+    mins = Vector((min(c.x for c in corners), min(c.y for c in corners), min(c.z for c in corners)))
+    maxs = Vector((max(c.x for c in corners), max(c.y for c in corners), max(c.z for c in corners)))
+    center = (mins + maxs) / 2
+    radius = max((maxs - mins).length / 2, 0.5)
+
+    scene = bpy.context.scene
     cam_data = bpy.data.cameras.new("ref_cam")
     cam_data.type = "ORTHO"
     cam = bpy.data.objects.new("ref_cam", cam_data)
     scene.collection.objects.link(cam)
 
-    # -- frame from world bounding box
-    corners = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
-    mins = Vector((min(c.x for c in corners), min(c.y for c in corners), min(c.z for c in corners)))
-    maxs = Vector((max(c.x for c in corners), max(c.y for c in corners), max(c.z for c in corners)))
-    center = (mins + maxs) / 2
-    extent = maxs - mins
-    radius = max(extent.length / 2, 0.5)
-
-    cam.location = center + ISO_DIR * (radius * 4 + 1)
-    # -- to_track_quat aims -Z along the given vector: it must point from the
-    #    camera TOWARD the target, not outward
-    look = (center - cam.location).normalized()
-    cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
-    bpy.context.view_layer.update()
-
-    # -- fit: project bbox corners into camera space, cover both axes
-    inv = cam.matrix_world.inverted()
-    pts = [inv @ c for c in corners]
-    w = max(p.x for p in pts) - min(p.x for p in pts)
-    h = max(p.y for p in pts) - min(p.y for p in pts)
-    aspect = IMG_W / IMG_H
-    cam_data.ortho_scale = max(w, h * aspect) * 1.15
-
+    # -- render settings once; camera moved per view
     scene.camera = cam
     scene.render.engine = "BLENDER_WORKBENCH"
     shading = scene.display.shading
@@ -221,8 +211,26 @@ def render_case(obj, path):
     scene.render.resolution_percentage = 100
     scene.render.film_transparent = False
     scene.render.image_settings.file_format = "PNG"
-    scene.render.filepath = path
-    bpy.ops.render.render(write_still=True)
+
+    aspect = IMG_W / IMG_H
+    for suffix, direction in VIEW_DIRECTIONS.items():
+        cam.location = center + direction * (radius * 4 + 1)
+        # -- to_track_quat aims -Z along the given vector: it must point from
+        #    the camera TOWARD the target, not outward
+        look = (center - cam.location).normalized()
+        cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
+        bpy.context.view_layer.update()
+
+        # -- fit: project bbox corners into camera space, cover both axes
+        inv = cam.matrix_world.inverted()
+        pts = [inv @ c for c in corners]
+        w = max(p.x for p in pts) - min(p.x for p in pts)
+        h = max(p.y for p in pts) - min(p.y for p in pts)
+        cam_data.ortho_scale = max(w, h * aspect) * 1.15
+
+        scene.render.filepath = os.path.join(
+            case_dir, "image%s.png" % suffix)
+        bpy.ops.render.render(write_still=True)
 
     scene.collection.objects.unlink(cam)
     bpy.data.objects.remove(cam)
@@ -312,17 +320,17 @@ def _run_case_once(case):
         )
         entry["geometry_report"] = geometry_report(obj)
         try:
-            render_case(obj, os.path.join(OUT_DIR, case["id"], "image.png"))
-            entry["image"] = "image.png"
+            render_case(obj, os.path.join(OUT_DIR, case["id"]), case["id"])
+            entry["images"] = ["image.png", "image-front.png", "image-right.png"]
         except Exception as exc:  # noqa: BLE001
-            entry["image"] = None
+            entry["images"] = []
             entry["error"] = "render failed: %s" % exc
     else:
         entry["mesh"] = None
         entry["geometry_hash"] = None
         entry["validation"] = None
         entry["geometry_report"] = None
-        entry["image"] = None
+        entry["images"] = []
 
     import building_tools
 
@@ -361,7 +369,7 @@ def main():
             "faces": (entry.get("mesh") or {}).get("faces"),
             "problems": (entry.get("validation") or {}).get("problems", []),
             "known_issues": entry.get("known_issues", []),
-            "image": entry.get("image"),
+            "images": entry.get("images", []),
         })
         print("[sweep] %d/%d %-32s %s" % (i + 1, len(cases), entry["id"], status))
 
@@ -380,7 +388,7 @@ def main():
 
     # -- human-browsable gallery
     lines = ["# Reference corpus", "",
-             "image size: %dx%d -- %d cases" % (IMG_W, IMG_H, len(cases)), ""]
+             "image size: %dx%d -- %d cases (iso / front / right)" % (IMG_W, IMG_H, len(cases)), ""]
     for e in index:
         lines.append("## %s" % e["id"])
         lines.append("")
@@ -388,9 +396,10 @@ def main():
         lines.append("- faces: %s -- geometry_hash: `%s`" % (e["faces"], e["geometry_hash"]))
         if e["problems"]:
             lines.append("- problems: %s (known: %s)" % (e["problems"], e["known_issues"]))
-        if e["image"]:
+        if e.get("images"):
             lines.append("")
-            lines.append("![%s](%s/image.png)" % (e["id"], e["id"]))
+            for img in e["images"]:
+                lines.append("![%s %s](%s/%s)" % (e["id"], img, e["id"], img))
         lines.append("")
     with open(os.path.join(OUT_DIR, "index.md"), "w") as f:
         f.write("\n".join(lines))

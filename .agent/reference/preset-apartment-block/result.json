@@ -18,7 +18,11 @@
     "zero_area_faces": 53
   },
   "id": "preset-apartment-block",
-  "image": "image.png",
+  "images": [
+    "image.png",
+    "image-front.png",
+    "image-right.png"
+  ],
   "known_issues": [],
   "mesh": {
     "edges": 13295,

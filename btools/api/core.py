@@ -122,6 +122,24 @@ def _target_context(obj):
         yield
 
 
+def _normalize_normals(bm):
+    """Make all face normals consistent AND point outward.
+
+    recalc_face_normals only guarantees consistency: a solid that is already
+    consistently inverted (the floor op's per-face Z-flip hack inverts the
+    whole mesh) stays inverted, which is what makes preset windows render
+    inside-out and protrude beyond the walls. Measure the signed volume and
+    flip the entire solid when it is negative.
+    """
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+
+    volume = 0.0
+    for f in bm.faces:
+        volume += f.calc_center_median().dot(f.normal) * f.calc_area()
+    if volume < 0.0:
+        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+
+
 @contextmanager
 def _edit_session(target):
     """Enter edit mode on the target object, yield (bm, faces), then flush and
@@ -166,6 +184,11 @@ def _edit_session(target):
     try:
         yield bm, faces
     finally:
+        # -- leave the mesh with consistent outward normals: individual ops
+        #    (per-face Z-flips, extrusions on inverted bases) leave mixed
+        #    orientations behind, which is what makes windows render
+        #    inside-out and protruding
+        _normalize_normals(bm)
         bmesh.update_edit_mesh(obj.data, loop_triangles=True)
         bpy.ops.object.mode_set(mode="OBJECT")
         bpy.context.view_layer.objects.active = prev_active

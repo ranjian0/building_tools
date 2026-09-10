@@ -18,7 +18,11 @@
     "zero_area_faces": 0
   },
   "id": "floor-decoration",
-  "image": "image.png",
+  "images": [
+    "image.png",
+    "image-front.png",
+    "image-right.png"
+  ],
   "known_issues": [
     "decoration_no_columns_no_output"
   ],

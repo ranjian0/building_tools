@@ -172,9 +172,9 @@ _apartment = BuildingPreset(
 _modern_villa = BuildingPreset(
     id="modern-villa",
     label="Modern Villa",
-    description="Two storey L-shaped flat-roof villa with wide ribbon glazing.",
+    description="Two storey plus-shaped flat-roof villa with wide ribbon glazing.",
     reference="https://commons.wikimedia.org/wiki/File:Savoye_3.JPG",
-    floorplan={"type": "COMPOSITE"},
+    floorplan={"type": "RECTANGULAR", "width": 12.0, "length": 9.0},
     floors={"floor_count": 2, "floor_height": 3.2, "add_slab": True},
     roof={
         "type": "FLAT",
@@ -185,9 +185,21 @@ _modern_villa = BuildingPreset(
     },
     facade=[
         FacadeRule(
+            "door",
+            "ground_front_wall",
+            (0,),
+            {"size_offset": {"size": [1.2, 2.4]}},
+        ),
+        FacadeRule(
             "window",
             "front_walls",
-            (0, 1),
+            (0,),
+            {"fill_type": "GLASS_PANES", "size_offset": {"size": [2.0, 1.6]}},
+        ),
+        FacadeRule(
+            "window",
+            "front_walls",
+            (1,),
             {"fill_type": "GLASS_PANES", "size_offset": {"size": [3.0, 2.0]}},
         ),
         FacadeRule(
@@ -195,6 +207,12 @@ _modern_villa = BuildingPreset(
             "side_walls",
             (0, 1),
             {"fill_type": "GLASS_PANES", "size_offset": {"size": [2.0, 1.6]}},
+        ),
+        FacadeRule(
+            "window",
+            "back_walls",
+            (0, 1),
+            {"size_offset": {"size": [2.0, 1.4]}},
         ),
     ],
 )

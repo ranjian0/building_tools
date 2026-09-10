@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "f7687548dbf83ace",
+  "geometry_hash": "9a9d162480cf1601",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -18,7 +18,11 @@
     "zero_area_faces": 0
   },
   "id": "preset-corner-shop",
-  "image": "image.png",
+  "images": [
+    "image.png",
+    "image-front.png",
+    "image-right.png"
+  ],
   "known_issues": [],
   "mesh": {
     "edges": 277,

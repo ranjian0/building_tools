@@ -7,7 +7,7 @@
   "geometry_hash": null,
   "geometry_report": null,
   "id": "multigroup-arch",
-  "image": null,
+  "images": [],
   "known_issues": [
     "multigroup_arch_broken"
   ],

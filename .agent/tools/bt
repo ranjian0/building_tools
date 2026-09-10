@@ -598,22 +598,27 @@ def cmd_reference_diff(args):
             continue
 
         ae = None
-        base_img = os.path.join(baseline, cid, "image.png")
-        new_img = os.path.join(tmp, cid, "image.png")
-        if os.path.exists(base_img) and os.path.exists(new_img):
+        views = ["image.png", "image-front.png", "image-right.png"]
+        base_images = [os.path.join(baseline, cid, v) for v in views]
+        new_images = [os.path.join(tmp, cid, v) for v in views]
+        if all(os.path.exists(p) for p in base_images + new_images):
             try:
-                r = subprocess.run(
-                    # -- fuzz 8%: ignore AA / sub-pixel edge jitter
-                    ["compare", "-metric", "AE", "-fuzz", "8%",
-                     base_img, new_img, os.path.join(DIFF_DIR, cid + "-diff.png")],
-                    capture_output=True, text=True, timeout=60,
-                )
-                ae = int(float(r.stderr.strip() or r.stdout.strip() or 0))
+                ae = 0
+                for view, b_img, n_img in zip(views, base_images, new_images):
+                    r = subprocess.run(
+                        # -- fuzz 8%: ignore AA / sub-pixel edge jitter
+                        ["compare", "-metric", "AE", "-fuzz", "8%",
+                         b_img, n_img, os.path.join(
+                             DIFF_DIR, "%s%s-diff.png" % (cid, view.replace(".png", "")))],
+                        capture_output=True, text=True, timeout=60,
+                    )
+                    view_ae = int(float(r.stderr.strip() or r.stdout.strip() or 0))
+                    ae = max(ae, view_ae)
             except (OSError, subprocess.TimeoutExpired, ValueError):
                 pass
             try:
                 subprocess.run(
-                    ["convert", base_img, new_img, "+append",
+                    ["convert", base_images[0], new_images[0], "+append",
                      os.path.join(DIFF_DIR, cid + "-side.png")],
                     check=True, timeout=60,
                 )
