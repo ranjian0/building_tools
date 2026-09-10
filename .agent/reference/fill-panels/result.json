@@ -1,0 +1,84 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "875120ebc7a6629f",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 60,
+      "faces": 29,
+      "verts": 33
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "fill-panels",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 60,
+    "faces": 29,
+    "verts": 33,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "wall",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "fill",
+      "matgroup_counts": {
+        "door_panels": 29
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "front",
+      "feature": "fill",
+      "options": {
+        "comp": "WINDOW",
+        "fill_type": "PANELS"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 60,
+        "faces": 29,
+        "verts": 33
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door_panels": 29
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 2,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "wall",
+    "ok": true,
+    "problems": []
+  }
+}

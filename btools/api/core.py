@@ -248,7 +248,15 @@ def _apply_face_feature(
         from .validate import matgroup_report
 
         with _edit_session(target) as (bm, faces):
-            valid = list(validate_fn(faces)) if validate_fn else faces
+            # -- validators either return a face list (door/window/multigroup/
+            #    fill) or a bool verdict (balcony/stairs/roof-style)
+            if validate_fn:
+                validated = validate_fn(faces)
+                valid = list(validated) if not isinstance(validated, bool) else (
+                    list(faces) if validated else []
+                )
+            else:
+                valid = faces
             rejected = len(faces) - len(valid)
             warnings = []
             if rejected:

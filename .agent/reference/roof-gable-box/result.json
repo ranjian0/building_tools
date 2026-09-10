@@ -1,0 +1,90 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "c19fe454c2c5d6f7",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 125,
+      "faces": 62,
+      "verts": 64
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "roof-gable-box",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 125,
+    "faces": 62,
+    "verts": 64,
+    "z_range": [
+      0.0,
+      10.7
+    ]
+  },
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "roof",
+      "matgroup_counts": {
+        "roof": 2,
+        "roof_hangs": 12,
+        "slabs": 36,
+        "walls": 12
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "top_face",
+      "feature": "roof",
+      "options": {
+        "gable_type": "BOX",
+        "type": "GABLE"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 125,
+        "faces": 62,
+        "verts": 64
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "roof": 2,
+        "roof_hangs": 12,
+        "slabs": 36,
+        "walls": 12
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 4,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

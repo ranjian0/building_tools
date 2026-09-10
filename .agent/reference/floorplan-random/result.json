@@ -1,0 +1,81 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "fb09b2c9a688e09c",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 9,
+      "faces": 2,
+      "verts": 8
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "floorplan-random",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 9,
+    "faces": 2,
+    "verts": 8,
+    "z_range": [
+      0.0,
+      0.0
+    ]
+  },
+  "scenario": null,
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "floorplan",
+      "matgroup_counts": {},
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": null,
+      "feature": "floorplan",
+      "options": {
+        "seed": 1,
+        "type": "RANDOM"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 9,
+        "faces": 2,
+        "verts": 8
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {},
+      "invalid_index_faces": 0,
+      "no_layer": true,
+      "num_groups": 0,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "10062cb82da91443",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 28,
+      "faces": 13,
+      "verts": 16
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "floor-slabs-off",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 28,
+    "faces": 13,
+    "verts": 16,
+    "z_range": [
+      0.0,
+      6.0
+    ]
+  },
+  "scenario": "floorplan",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "floor",
+      "matgroup_counts": {
+        "roof": 1,
+        "walls": 12
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "all",
+      "feature": "floor",
+      "options": {
+        "add_slab": false,
+        "floor_count": 3
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 28,
+        "faces": 13,
+        "verts": 16
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "roof": 1,
+        "walls": 12
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 3,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

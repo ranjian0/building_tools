@@ -1,0 +1,64 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "ae77a2dcde0752f2",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 100,
+      "faces": 50,
+      "verts": 52
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "scenario-curved-wall",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 100,
+    "faces": 50,
+    "verts": 52,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "curved_wall",
+  "step_results": [],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 100,
+        "faces": 50,
+        "verts": 52
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {},
+      "invalid_index_faces": 0,
+      "no_layer": true,
+      "num_groups": 0,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "curved_wall",
+    "ok": true,
+    "problems": []
+  }
+}

@@ -30,13 +30,38 @@ xrandr; override with `--geometry WxH+X+Y`).
 | `bt eval "expr"` | Evaluate an expression, print its repr |
 | `bt api <feature> [--options JSON] [--object N] [--faces i,j] [--json]` | Run a building feature via the scriptable api; JSON result, exit 1 on failure |
 | `bt validate [--object N] [--expect JSON]` | Structured validation (matgroups/geometry/normals); exit 1 if invalid |
-| `bt scenario <name> [--json]` | Build a reusable test scenario (`wall`, `multi_storey`, `curved_wall`); prints face-map JSON |
+| `bt scenario <name> [--json]` | Build a reusable test scenario (`wall`, `curved_wall`, `floorplan`, `floors_only`, `multi_storey`); prints face-map JSON |
+| `bt reference generate [--filter G] [--out D]` | Run the full reference corpus sweep (JSON log + deterministic render per case) |
+| `bt reference diff [--update] [--filter G]` | Regenerate + compare vs committed baseline; SEVERE/VISUAL/minor classification, exit 1 on severe/visual |
 | `bt screenshot [name]` | Save `out/screenshots/<name>.png` of the Blender window |
 | `bt log [-n N] [-f]` | Show/tail the Blender stdout log |
 
 `bt exec` accepts snippet bare names (e.g. `demo_building.py`) from
 `snippets/`, absolute paths, `-` for stdin, or `-c 'code'`. Failed scripts
 print the traceback and exit non-zero.
+
+## Reference corpus (`.agent/reference/`)
+
+Golden baseline of what every tool generates: per case, `result.json`
+(inputs, step results, matgroup counts, validation report, `geometry_hash`,
+environment) + a deterministic 1280x800 workbench render from a canonical
+iso camera. Browsed via `index.md`.
+
+```bash
+bt start --factory && bt reload          # factory session for reproducible theme
+bt reference generate                    # regenerate everything (~2 min)
+bt reference diff                        # compare vs committed baseline
+bt reference diff --update               # promote the new run to baseline
+bt reference generate --filter "balcony*"  # subset
+```
+
+Diff severity: **SEVERE** = contract change (validation ok/problems, step
+status/errors, added/removed case); **VISUAL** = >0.5% pixels changed;
+**minor** = geometry nondeterminism (bmesh iteration order varies per
+session, so door/arch frame geometry wiggles by a few faces — advisory
+only, does not fail the diff). Known addon flaws are recorded per case in
+`known_issues` (e.g. `multigroup-fills` zero-width window division,
+`balcony-inner-curved` grouped-curved platform).
 
 ## Agent loop (typical)
 

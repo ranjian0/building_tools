@@ -71,6 +71,22 @@ Blender 5.1 gotchas).
    `bt api`/`bt validate`/`bt scenario` emit JSON + exit codes — branch on
    those, not on prose. Use screenshots only for genuine visual judgment.
 
+## Reference corpus (regression baseline)
+
+`.agent/reference/` holds the committed baseline of what every tool
+generates: per case, a JSON log (options, matgroup counts, validation,
+`geometry_hash`) + a deterministic iso render. When fixing issues or adding
+features, regenerate the affected cases and diff:
+
+```bash
+bt reference generate --filter "balcony*"   # subset or full sweep
+bt reference diff                            # SEVERE/VISUAL = act; minor = noise
+bt reference diff --update                   # promote the new baseline
+```
+
+Commit the updated baseline alongside the fix — the reference diff IS the
+visual changelog. Known addon flaws are recorded per case in `known_issues`.
+
 ## Scriptable api — the only scripted path
 
 **Never drive `bpy.ops.btools.*` from scripts**: Blender resets operator

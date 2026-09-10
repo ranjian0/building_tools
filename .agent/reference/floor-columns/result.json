@@ -1,0 +1,92 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "b0b208f1cdb562bc",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 164,
+      "faces": 73,
+      "verts": 100
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "floor-columns",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 164,
+    "faces": 73,
+    "verts": 100,
+    "z_range": [
+      0.0,
+      4.4
+    ]
+  },
+  "scenario": "floorplan",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "floor",
+      "matgroup_counts": {
+        "columns": 40,
+        "roof": 1,
+        "slabs": 24,
+        "walls": 8
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "all",
+      "feature": "floor",
+      "options": {
+        "add_columns": true,
+        "floor_count": 2
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 164,
+        "faces": 73,
+        "verts": 100
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "columns": 40,
+        "roof": 1,
+        "slabs": 24,
+        "walls": 8
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 4,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

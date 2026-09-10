@@ -1,0 +1,93 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "4beb544ca319cd4c",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 130,
+      "faces": 63,
+      "verts": 68
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "window-glass-panes",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 130,
+    "faces": 63,
+    "verts": 68,
+    "z_range": [
+      0.0,
+      9.6
+    ]
+  },
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "window",
+      "matgroup_counts": {
+        "frame": 8,
+        "roof": 1,
+        "slabs": 37,
+        "walls": 16,
+        "window": 1
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "upper_wall",
+      "feature": "window",
+      "options": {
+        "fill_type": "GLASS_PANES"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 130,
+        "faces": 63,
+        "verts": 68
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "frame": 8,
+        "roof": 1,
+        "slabs": 37,
+        "walls": 16,
+        "window": 1
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 6,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 2
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

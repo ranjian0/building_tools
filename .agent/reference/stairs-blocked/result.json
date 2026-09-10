@@ -1,0 +1,87 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "298bfda71b24a98a",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 570,
+      "faces": 209,
+      "verts": 376
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "stairs-blocked",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 570,
+    "faces": 209,
+    "verts": 376,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "wall",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "stairs",
+      "matgroup_counts": {
+        "railing_posts": 148,
+        "railing_rails": 32,
+        "stairs": 29
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "front",
+      "feature": "stairs",
+      "options": {
+        "bottom": "BLOCKED"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 570,
+        "faces": 209,
+        "verts": 376
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "railing_posts": 148,
+        "railing_rails": 32,
+        "stairs": 29
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 3,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "wall",
+    "ok": true,
+    "problems": []
+  }
+}

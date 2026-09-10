@@ -1,0 +1,40 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": "step failed: error",
+  "geometry_hash": null,
+  "geometry_report": null,
+  "id": "multigroup-fills",
+  "image": null,
+  "known_issues": [
+    "zero_width_window_fill"
+  ],
+  "mesh": null,
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [
+        "ZeroDivisionError: float division by zero"
+      ],
+      "feature": "multigroup",
+      "matgroup_counts": {},
+      "status": "error",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "ground_wall",
+      "feature": "multigroup",
+      "options": {
+        "fill_type_door": "PANELS",
+        "fill_type_window": "BAR",
+        "show_door_fill": true,
+        "show_window_fill": true
+      }
+    }
+  ],
+  "validation": null
+}

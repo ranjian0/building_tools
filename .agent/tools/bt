@@ -469,6 +469,176 @@ def cmd_scenario(args):
     sys.exit(status)
 
 
+# ------------------------------------------------------- reference corpus
+
+REFERENCE_DIR = os.path.join(REPO_DIR, ".agent", "reference")
+SWEEP_FILE = os.path.join(SNIPPETS, "reference_sweep.py")
+CASES_FILE = os.path.join(SNIPPETS, "reference_cases.py")
+DIFF_DIR = os.path.join(OUT_DIR, "reference-diff")
+
+REFERENCE_CODE_TMPL = """\
+CASES_PATH = {cases!r}
+OUT_DIR = {out!r}
+SCENARIOS_DIR = {scenarios!r}
+FILTER = {filt!r}
+IMG_W, IMG_H = {img_w}, {img_h}
+"""
+
+
+def reference_generate(out_dir, filt, timeout):
+    """Run the sweep in the session; returns parsed summary (never exits)."""
+    check_running(need=True)
+    code = REFERENCE_CODE_TMPL.format(
+        cases=CASES_FILE, out=out_dir, scenarios=os.path.join(SNIPPETS, "scenarios"),
+        filt=filt or "", img_w=1280, img_h=800,
+    ) + open(SWEEP_FILE).read()
+    os.makedirs(out_dir, exist_ok=True)
+    status, output, dur = communicate(code, timeout)
+    return _emit_result(output, False)
+
+
+def deep_diff(a, b, path=""):
+    """Yield human-readable differences between two parsed JSON values."""
+    if type(a) is not type(b):
+        yield "%s: type %s -> %s" % (path, type(a).__name__, type(b).__name__)
+    elif isinstance(a, dict):
+        for k in sorted(set(a) | set(b)):
+            if k not in a:
+                yield "%s.%s: added = %r" % (path, k, b[k])
+            elif k not in b:
+                yield "%s.%s: removed (was %r)" % (path, k, a[k])
+            else:
+                yield from deep_diff(a[k], b[k], "%s.%s" % (path, k))
+    elif isinstance(a, list):
+        if len(a) != len(b):
+            yield "%s: list length %d -> %d" % (path, len(a), len(b))
+        for i, (x, y) in enumerate(zip(a, b)):
+            yield from deep_diff(x, y, "%s[%d]" % (path, i))
+    elif a != b:
+        yield "%s: %r -> %r" % (path, a, b)
+
+
+def load_reference(out_dir):
+    index_path = os.path.join(out_dir, "index.json")
+    if not os.path.exists(index_path):
+        return None, {}
+    with open(index_path) as f:
+        index = json.load(f)
+    cases = {}
+    for c in index["cases"]:
+        rp = os.path.join(out_dir, c["id"], "result.json")
+        if os.path.exists(rp):
+            with open(rp) as f:
+                cases[c["id"]] = json.load(f)
+    return index, cases
+
+
+def cmd_reference_generate(args):
+    payload = reference_generate(os.path.abspath(args.out), args.filter, args.timeout)
+    failed = payload.get("failed") or []
+    if failed:
+        print("cases with errors (see their result.json): %s" % ", ".join(failed))
+    sys.exit(0)
+
+
+def cmd_reference_diff(args):
+    baseline = REFERENCE_DIR
+    if not os.path.exists(os.path.join(baseline, "index.json")):
+        raise SystemExit(
+            "no baseline at %s -- generate one first: bt reference generate" % baseline
+        )
+
+    if args.update and not args.out:
+        # update-in-place: generate straight over the baseline
+        reference_generate(baseline, args.filter, args.timeout)
+        print("baseline updated at %s" % baseline)
+        return
+
+    tmp = os.path.abspath(args.out or os.path.join(OUT_DIR, "reference-tmp"))
+    if os.path.exists(tmp):
+        shutil.rmtree(tmp)
+    reference_generate(tmp, args.filter, args.timeout)
+
+    base_index, base_cases = load_reference(baseline)
+    new_index, new_cases = load_reference(tmp)
+    base_ids = set(base_cases) if base_index else set()
+    new_ids = set(new_cases)
+
+    os.makedirs(DIFF_DIR, exist_ok=True)
+    pixel_threshold = 1280 * 800 * 0.005  # 0.5% of pixels
+    severe, visual, minor = [], [], []
+    for cid in sorted(base_ids - new_ids):
+        severe.append((cid, ["REMOVED"]))
+    for cid in sorted(new_ids - base_ids):
+        severe.append((cid, ["ADDED"]))
+    for cid in sorted(base_ids & new_ids):
+        diffs = [
+            d for d in deep_diff(base_cases[cid], new_cases[cid])
+            if ".environment" not in d
+        ]
+        if not diffs:
+            continue
+
+        ae = None
+        base_img = os.path.join(baseline, cid, "image.png")
+        new_img = os.path.join(tmp, cid, "image.png")
+        if os.path.exists(base_img) and os.path.exists(new_img):
+            try:
+                r = subprocess.run(
+                    ["compare", "-metric", "AE", base_img, new_img,
+                     os.path.join(DIFF_DIR, cid + "-diff.png")],
+                    capture_output=True, text=True, timeout=60,
+                )
+                ae = int(float(r.stderr.strip() or r.stdout.strip() or 0))
+            except (OSError, subprocess.TimeoutExpired, ValueError):
+                pass
+            try:
+                subprocess.run(
+                    ["convert", base_img, new_img, "+append",
+                     os.path.join(DIFF_DIR, cid + "-side.png")],
+                    check=True, timeout=60,
+                )
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+
+        gate_fields = (".validation.ok", ".validation.problems", ".error",
+                       ".status", ".errors[0]")
+        is_severe = (
+            any(k in d for d in diffs for k in gate_fields)
+            or "REMOVED" in diffs or "ADDED" in diffs
+        )
+        is_visual = ae is not None and ae > pixel_threshold
+        tag = "" if ae is None else " image AE=%s px" % ae
+        if is_severe:
+            severe.append((cid, diffs + [tag] if tag else diffs))
+        elif is_visual:
+            visual.append((cid, diffs + [tag] if tag else diffs))
+        else:
+            minor.append((cid, diffs + [tag] if tag else diffs))
+
+    if not (severe or visual or minor):
+        print("no differences (%d cases compared)" % len(base_ids & new_ids))
+        return
+
+    for label, group in (("SEVERE (contract)", severe),
+                         ("VISUAL", visual),
+                         ("minor (geometry nondeterminism)", minor)):
+        if not group:
+            continue
+        print("%s (%d):" % (label, len(group)))
+        for cid, diffs in group:
+            print("  %s" % cid)
+            if label.startswith("SEVERE"):
+                for d in diffs:
+                    print("    - %s" % d)
+    print("visual review material: %s" % DIFF_DIR)
+    if args.update:
+        shutil.rmtree(baseline)
+        shutil.copytree(tmp, baseline)
+        print("baseline updated at %s" % baseline)
+    sys.exit(1 if (severe or visual) else 0)
+
+
 # ---------------------------------------------------------------- parser
 
 def main():
@@ -546,6 +716,22 @@ def main():
     sp.add_argument("--json", action="store_true", help="pretty-print the scenario JSON")
     sp.add_argument("-t", "--timeout", type=int, default=120)
     sp.set_defaults(func=cmd_scenario)
+
+    sp = sub.add_parser("reference", help="golden reference corpus (JSON logs + deterministic renders)")
+    ref = sp.add_subparsers(dest="reference_command", required=True)
+
+    sp = ref.add_parser("generate", help="generate/refresh reference cases in the live session")
+    sp.add_argument("--out", default=REFERENCE_DIR, help="output dir (default: .agent/reference)")
+    sp.add_argument("--filter", help="glob filter on case ids, e.g. 'balcony*'")
+    sp.add_argument("-t", "--timeout", type=int, default=900)
+    sp.set_defaults(func=cmd_reference_generate)
+
+    sp = ref.add_parser("diff", help="regenerate and diff against the committed baseline")
+    sp.add_argument("--out", help="temp dir for the new run (default: out/reference-tmp)")
+    sp.add_argument("--filter", help="glob filter on case ids")
+    sp.add_argument("--update", action="store_true", help="apply the new run as the baseline")
+    sp.add_argument("-t", "--timeout", type=int, default=900)
+    sp.set_defaults(func=cmd_reference_diff)
 
     args = p.parse_args()
     args.func(args)

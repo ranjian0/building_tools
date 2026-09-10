@@ -1,0 +1,93 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "62dfd8286a0482b6",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 251,
+      "faces": 118,
+      "verts": 134
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "door-louver",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 251,
+    "faces": 118,
+    "verts": 134,
+    "z_range": [
+      0.0,
+      9.6
+    ]
+  },
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "door",
+      "matgroup_counts": {
+        "door_louvers": 51,
+        "frame": 11,
+        "roof": 1,
+        "slabs": 37,
+        "walls": 18
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "ground_wall",
+      "feature": "door",
+      "options": {
+        "fill_type": "LOUVER"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 251,
+        "faces": 118,
+        "verts": 134
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door_louvers": 51,
+        "frame": 11,
+        "roof": 1,
+        "slabs": 37,
+        "walls": 18
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 6,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 14
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

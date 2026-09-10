@@ -1,0 +1,99 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "1950ce96ba86e26e",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 232,
+      "faces": 103,
+      "verts": 130
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "window-circular",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 232,
+    "faces": 103,
+    "verts": 130,
+    "z_range": [
+      0.0,
+      9.6
+    ]
+  },
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "window",
+      "matgroup_counts": {
+        "frame": 44,
+        "roof": 1,
+        "slabs": 36,
+        "walls": 21,
+        "window": 1
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "upper_wall",
+      "feature": "window",
+      "options": {
+        "size_offset": {
+          "size": [
+            1.0,
+            1.0
+          ]
+        },
+        "type": "CIRCULAR"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 232,
+        "faces": 103,
+        "verts": 130
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "frame": 44,
+        "roof": 1,
+        "slabs": 36,
+        "walls": 21,
+        "window": 1
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 5,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 4
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

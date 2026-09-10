@@ -1,0 +1,68 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "251ca31659a2aaed",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 121,
+      "faces": 60,
+      "verts": 62
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "scenario-multi-storey",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 121,
+    "faces": 60,
+    "verts": 62,
+    "z_range": [
+      0.0,
+      11.2
+    ]
+  },
+  "scenario": "multi_storey",
+  "step_results": [],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 121,
+        "faces": 60,
+        "verts": 62
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "roof": 4,
+        "roof_hangs": 8,
+        "slabs": 36,
+        "walls": 12
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 4,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

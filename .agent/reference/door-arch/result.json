@@ -1,0 +1,99 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "6672cf1f29e8317b",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 195,
+      "faces": 87,
+      "verts": 108
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "door-arch",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 195,
+    "faces": 87,
+    "verts": 108,
+    "z_range": [
+      0.0,
+      9.6
+    ]
+  },
+  "scenario": "floors_only",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "door",
+      "matgroup_counts": {
+        "door": 2,
+        "frame": 22,
+        "roof": 1,
+        "slabs": 38,
+        "walls": 24
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "ground_wall",
+      "feature": "door",
+      "options": {
+        "add_arch": true,
+        "size_offset": {
+          "size": [
+            1.0,
+            2.0
+          ]
+        }
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 195,
+        "faces": 87,
+        "verts": 108
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 2,
+        "frame": 22,
+        "roof": 1,
+        "slabs": 38,
+        "walls": 24
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 5,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 7
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

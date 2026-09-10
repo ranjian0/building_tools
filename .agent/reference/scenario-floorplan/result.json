@@ -1,0 +1,64 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "274dfbcafe0bcb4b",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 4,
+      "faces": 1,
+      "verts": 4
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "scenario-floorplan",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 4,
+    "faces": 1,
+    "verts": 4,
+    "z_range": [
+      0.0,
+      0.0
+    ]
+  },
+  "scenario": "floorplan",
+  "step_results": [],
+  "steps": [],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 4,
+        "faces": 1,
+        "verts": 4
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {},
+      "invalid_index_faces": 0,
+      "no_layer": true,
+      "num_groups": 0,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
+}

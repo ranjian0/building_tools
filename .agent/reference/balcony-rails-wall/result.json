@@ -1,0 +1,87 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "696a9cb143dee764",
+  "geometry_report": {
+    "clean": true,
+    "counts": {
+      "edges": 12,
+      "faces": 6,
+      "verts": 8
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 0
+  },
+  "id": "balcony-rails-wall",
+  "image": "image.png",
+  "known_issues": [
+    "non_manifold"
+  ],
+  "mesh": {
+    "edges": 12,
+    "faces": 6,
+    "verts": 8,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "wall",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "balcony",
+      "matgroup_counts": {
+        "balcony": 6
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "front",
+      "feature": "balcony",
+      "options": {
+        "rail": {
+          "fill": "RAILS"
+        }
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": true,
+      "counts": {
+        "edges": 12,
+        "faces": 6,
+        "verts": 8
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 0
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "balcony": 6
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 1,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "wall",
+    "ok": true,
+    "problems": []
+  }
+}

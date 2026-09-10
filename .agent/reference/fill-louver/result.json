@@ -1,0 +1,86 @@
+{
+  "environment": {
+    "addon_version": "1.0.13",
+    "blender": "5.1.2"
+  },
+  "error": null,
+  "geometry_hash": "7022f516e5d94c7a",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 160,
+      "faces": 70,
+      "verts": 92
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 10
+  },
+  "id": "fill-louver",
+  "image": "image.png",
+  "known_issues": [],
+  "mesh": {
+    "edges": 160,
+    "faces": 70,
+    "verts": 92,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "wall",
+  "step_results": [
+    {
+      "errors": [],
+      "feature": "fill",
+      "matgroup_counts": {
+        "frame": 4,
+        "window_louvers": 66
+      },
+      "status": "ok",
+      "warnings": []
+    }
+  ],
+  "steps": [
+    {
+      "faces": "front",
+      "feature": "fill",
+      "options": {
+        "comp": "WINDOW",
+        "fill_type": "LOUVER"
+      }
+    }
+  ],
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 160,
+        "faces": 70,
+        "verts": 92
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 10
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "frame": 4,
+        "window_louvers": 66
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 2,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": true,
+      "flip_seams": 0
+    },
+    "object": "wall",
+    "ok": true,
+    "problems": []
+  }
+}
