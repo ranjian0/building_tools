@@ -27,15 +27,15 @@ and production export — for both archviz renders and game-engine workflows.
 ## Checklist
 
 ### Phase 0 — Dimensional correctness (defaults pass)
-- [ ] door: frame_thickness 0.10→0.06, frame_depth 0→0.05, door_depth 0.05→0.045
-- [ ] window: frame_thickness 0.10→0.06
-- [ ] fills: pane_margin 0.10→0.03, bar_width 0.10→0.06, panel_depth min 0.01→0.002 default 0.015
-- [ ] railing: corner_post_height 0.7→1.0
-- [ ] stairs: step_width 0.2→0.28, step_height 0.12→0.175
-- [ ] arch resolution 6→24; circular window resolution 20→32
-- [ ] roof: thickness 0.1→0.15, outset 0.1→0.25
-- [ ] floors: floor_height default 2.0→2.7 (props + api options)
-- [ ] presets: storey heights to residential norms; regen corpus (baseline
+- [x] door: frame_thickness 0.10→0.06, frame_depth 0→0.05, door_depth 0.05→0.045
+- [x] window: frame_thickness 0.10→0.06
+- [x] fills: pane_margin 0.10→0.03, bar_width 0.10→0.06, panel_depth min 0.01→0.002 default 0.015
+- [x] railing: corner_post_height 0.7→1.0
+- [x] stairs: step_width 0.2→0.28, step_height 0.12→0.175
+- [x] arch resolution 6→24; circular window resolution 20→32
+- [x] roof: thickness 0.1→0.15, outset 0.1→0.25
+- [x] floors: floor_height default 2.0→2.7 (props + api options)
+- [x] presets: storey heights to residential norms; regen corpus (baseline
       change is expected and IS the changelog); visual sanity check
 
 ### Phase 3 — Materials system (before geometry: biggest visual payoff)
