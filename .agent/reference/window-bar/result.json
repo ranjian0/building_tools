@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "265f4639c8e0b326",
+  "geometry_hash": "4c14d36773202b5d",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -36,8 +36,8 @@
       "feature": "window",
       "matgroup_counts": {
         "frame": 8,
-        "walls": 6,
-        "window": 8,
+        "walls": 13,
+        "window": 1,
         "window_bars": 6
       },
       "status": "ok",
@@ -49,7 +49,13 @@
       "faces": "front_wall",
       "feature": "window",
       "options": {
-        "fill_type": "BAR"
+        "fill_type": "BAR",
+        "size_offset": {
+          "size": [
+            2.4,
+            1.6
+          ]
+        }
       }
     }
   ],
@@ -70,8 +76,8 @@
       "all_tagged": true,
       "groups": {
         "frame": 8,
-        "walls": 6,
-        "window": 8,
+        "walls": 13,
+        "window": 1,
         "window_bars": 6
       },
       "invalid_index_faces": 0,

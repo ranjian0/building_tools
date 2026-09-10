@@ -1,146 +1,9 @@
 {
   "cases": [
     {
-      "faces": 6,
-      "geometry_hash": "696a9cb143dee764",
-      "id": "scenario-wall",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 50,
-      "geometry_hash": "ae77a2dcde0752f2",
-      "id": "scenario-curved-wall",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 1,
-      "geometry_hash": "274dfbcafe0bcb4b",
-      "id": "scenario-floorplan",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 49,
-      "geometry_hash": "6a35d08351c2e850",
-      "id": "scenario-floors-only",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 60,
-      "geometry_hash": "251ca31659a2aaed",
-      "id": "scenario-multi-storey",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 1,
-      "geometry_hash": "5a24bad0e065fe38",
-      "id": "floorplan-circular",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 5,
-      "geometry_hash": "36e1aded8a4a87a1",
-      "id": "floorplan-composite",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 7,
-      "geometry_hash": "8d8321ddda67589c",
-      "id": "floorplan-h-shaped",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 2,
-      "geometry_hash": "fb09b2c9a688e09c",
-      "id": "floorplan-random",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 17,
-      "geometry_hash": "3042ebd13bf34b78",
-      "id": "floor-count-1",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 13,
-      "geometry_hash": "10062cb82da91443",
-      "id": "floor-slabs-off",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 73,
-      "geometry_hash": "b0b208f1cdb562bc",
-      "id": "floor-columns",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 33,
-      "geometry_hash": "1ee79335baa8ab55",
-      "id": "floor-decoration",
-      "image": "image.png",
-      "known_issues": [
-        "decoration_no_columns_no_output"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 65,
-      "geometry_hash": "b35807cb98e40918",
-      "id": "roof-flat",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 68,
-      "geometry_hash": "23907af2cc4b35c5",
-      "id": "roof-gable-open",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 62,
-      "geometry_hash": "c19fe454c2c5d6f7",
-      "id": "roof-gable-box",
+      "faces": 12,
+      "geometry_hash": "38efe1d061bc8d47",
+      "id": "fill-bar",
       "image": "image.png",
       "known_issues": [],
       "problems": [],
@@ -156,28 +19,46 @@
       "status": "ok"
     },
     {
-      "faces": 22,
-      "geometry_hash": "39a2885c671af685",
-      "id": "door-default",
+      "faces": 44,
+      "geometry_hash": "19c6bf8ecbaa2ba5",
+      "id": "door-arch",
+      "image": "image.png",
+      "known_issues": [
+        "flaky_arch_unpack"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 65,
+      "geometry_hash": "b35807cb98e40918",
+      "id": "roof-flat",
       "image": "image.png",
       "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 45,
-      "geometry_hash": "78745179f68c42bf",
-      "id": "door-panels",
+      "faces": 28,
+      "geometry_hash": "4c14d36773202b5d",
+      "id": "window-bar",
       "image": "image.png",
-      "known_issues": [
-        "fill_drops_element_group"
-      ],
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 23,
+      "geometry_hash": "e12c19b1a2ea06a6",
+      "id": "door-double",
+      "image": "image.png",
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
       "faces": 76,
-      "geometry_hash": "48d4e938b6b54642",
+      "geometry_hash": "a545cadf0e703119",
       "id": "door-louver",
       "image": "image.png",
       "known_issues": [
@@ -188,185 +69,19 @@
     },
     {
       "faces": 45,
-      "geometry_hash": "09afab203c22f74b",
-      "id": "door-glass-panes",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 23,
-      "geometry_hash": "0716bab0318c941e",
-      "id": "door-double",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 44,
-      "geometry_hash": "eb12595929a7883c",
-      "id": "door-arch",
+      "geometry_hash": "0c61d2962d1e33dd",
+      "id": "door-panels",
       "image": "image.png",
       "known_issues": [
-        "flaky_arch_unpack"
+        "fill_drops_element_group"
       ],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 22,
-      "geometry_hash": "def25cfdadb6ea5f",
-      "id": "window-default",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 28,
-      "geometry_hash": "265f4639c8e0b326",
-      "id": "window-bar",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 76,
-      "geometry_hash": "1d2c4e5b353064c3",
-      "id": "window-louver",
-      "image": "image.png",
-      "known_issues": [
-        "fill_drops_element_group",
-        "flaky_louver_max_empty"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 45,
-      "geometry_hash": "08f987660be83016",
-      "id": "window-glass-panes",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 60,
-      "geometry_hash": "d2f6ae0ce9abe3ab",
-      "id": "window-circular",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 34,
-      "geometry_hash": "fa48d09e828515c2",
-      "id": "multigroup-default",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 63,
-      "geometry_hash": "6461d74b0b613ec3",
-      "id": "multigroup-fills",
-      "image": "image.png",
-      "known_issues": [
-        "zero_width_window_fill"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 6,
-      "geometry_hash": "696a9cb143dee764",
-      "id": "balcony-posts-wall",
-      "image": "image.png",
-      "known_issues": [
-        "balcony_railing_untagged"
-      ],
-      "problems": [
-        "missing/empty matgroups: ['railing_posts']"
-      ],
-      "status": "contract violated"
-    },
-    {
-      "faces": 6,
-      "geometry_hash": "696a9cb143dee764",
-      "id": "balcony-rails-wall",
-      "image": "image.png",
-      "known_issues": [
-        "balcony_railing_untagged"
-      ],
-      "problems": [
-        "missing/empty matgroups: ['railing_rails']"
-      ],
-      "status": "contract violated"
-    },
-    {
-      "faces": 6,
-      "geometry_hash": "696a9cb143dee764",
-      "id": "balcony-wallfill-wall",
-      "image": "image.png",
-      "known_issues": [
-        "balcony_railing_untagged"
-      ],
-      "problems": [
-        "missing/empty matgroups: ['railing_walls']"
-      ],
-      "status": "contract violated"
-    },
-    {
-      "faces": 50,
-      "geometry_hash": "ae77a2dcde0752f2",
-      "id": "balcony-inner-curved",
-      "image": "image.png",
-      "known_issues": [
-        "balcony_railing_untagged",
-        "grouped_balcony_curved_platform"
-      ],
-      "problems": [
-        "missing/empty matgroups: ['railing_posts']"
-      ],
-      "status": "contract violated"
-    },
-    {
-      "faces": 206,
-      "geometry_hash": "f49fca28353759a8",
-      "id": "stairs-filled",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 209,
-      "geometry_hash": "b3674892e3b71201",
-      "id": "stairs-blocked",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 207,
-      "geometry_hash": "d7740a83db49826d",
-      "id": "stairs-slope",
-      "image": "image.png",
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 101,
-      "geometry_hash": "cb46a1a9010fa196",
-      "id": "stairs-no-landing",
+      "faces": 70,
+      "geometry_hash": "069641f4e6ef1582",
+      "id": "fill-louver",
       "image": "image.png",
       "known_issues": [],
       "problems": [],
@@ -384,6 +99,135 @@
       "status": "ok"
     },
     {
+      "faces": 22,
+      "geometry_hash": "4983cb85a16d457f",
+      "id": "door-default",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 207,
+      "geometry_hash": "d7740a83db49826d",
+      "id": "stairs-slope",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 73,
+      "geometry_hash": "b0b208f1cdb562bc",
+      "id": "floor-columns",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 17,
+      "geometry_hash": "3042ebd13bf34b78",
+      "id": "floor-count-1",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 6,
+      "geometry_hash": "696a9cb143dee764",
+      "id": "scenario-wall",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 206,
+      "geometry_hash": "f49fca28353759a8",
+      "id": "stairs-filled",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 76,
+      "geometry_hash": "ec9645c9f6ebfe33",
+      "id": "window-louver",
+      "image": "image.png",
+      "known_issues": [
+        "fill_drops_element_group",
+        "flaky_louver_max_empty"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 62,
+      "geometry_hash": "c19fe454c2c5d6f7",
+      "id": "roof-gable-box",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 209,
+      "geometry_hash": "b3674892e3b71201",
+      "id": "stairs-blocked",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 22,
+      "geometry_hash": "6314e3aa72be0ff3",
+      "id": "window-default",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 13,
+      "geometry_hash": "10062cb82da91443",
+      "id": "floor-slabs-off",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 68,
+      "geometry_hash": "23907af2cc4b35c5",
+      "id": "roof-gable-open",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 60,
+      "geometry_hash": "b0c162fc5a8a918d",
+      "id": "window-circular",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 45,
+      "geometry_hash": "7f5efadd23543cf6",
+      "id": "door-glass-panes",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
       "faces": 29,
       "geometry_hash": "769e1826c0ea22ad",
       "id": "fill-glass-panes",
@@ -393,18 +237,157 @@
       "status": "ok"
     },
     {
-      "faces": 70,
-      "geometry_hash": "069641f4e6ef1582",
-      "id": "fill-louver",
+      "faces": 33,
+      "geometry_hash": "1ee79335baa8ab55",
+      "id": "floor-decoration",
+      "image": "image.png",
+      "known_issues": [
+        "decoration_no_columns_no_output"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 2,
+      "geometry_hash": "fb09b2c9a688e09c",
+      "id": "floorplan-random",
       "image": "image.png",
       "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 12,
-      "geometry_hash": "38efe1d061bc8d47",
-      "id": "fill-bar",
+      "faces": 63,
+      "geometry_hash": "fd20a5d391aea3da",
+      "id": "multigroup-fills",
+      "image": "image.png",
+      "known_issues": [
+        "zero_width_window_fill"
+      ],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 101,
+      "geometry_hash": "cb46a1a9010fa196",
+      "id": "stairs-no-landing",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 315,
+      "geometry_hash": "3becddba45cdfde8",
+      "id": "balcony-posts-wall",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 95,
+      "geometry_hash": "84bee869c71dddf3",
+      "id": "balcony-rails-wall",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 1,
+      "geometry_hash": "5a24bad0e065fe38",
+      "id": "floorplan-circular",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 7,
+      "geometry_hash": "8d8321ddda67589c",
+      "id": "floorplan-h-shaped",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 34,
+      "geometry_hash": "83c616358f94916d",
+      "id": "multigroup-default",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 1,
+      "geometry_hash": "274dfbcafe0bcb4b",
+      "id": "scenario-floorplan",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 45,
+      "geometry_hash": "993064b83dae175e",
+      "id": "window-glass-panes",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 5,
+      "geometry_hash": "36e1aded8a4a87a1",
+      "id": "floorplan-composite",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 775,
+      "geometry_hash": "760a8b8e737d8c06",
+      "id": "balcony-inner-curved",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 50,
+      "geometry_hash": "ae77a2dcde0752f2",
+      "id": "scenario-curved-wall",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 49,
+      "geometry_hash": "6a35d08351c2e850",
+      "id": "scenario-floors-only",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 65,
+      "geometry_hash": "f4506ac89f12c67c",
+      "id": "balcony-wallfill-wall",
+      "image": "image.png",
+      "known_issues": [],
+      "problems": [],
+      "status": "ok"
+    },
+    {
+      "faces": 60,
+      "geometry_hash": "251ca31659a2aaed",
+      "id": "scenario-multi-storey",
       "image": "image.png",
       "known_issues": [],
       "problems": [],

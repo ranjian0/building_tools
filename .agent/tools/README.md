@@ -90,10 +90,12 @@ visible at a glance.
 Every feature case carries `expect: {"groups": [...]}` — the matgroups the
 feature must produce. A missing/empty expected group marks the case
 `contract violated` in the index; violations are **expected states** for
-cases with matching `known_issues` markers (they document current addon
-tagging gaps, e.g. `balcony_railing_untagged`), and the diff flags any
-*change* in them. Current known violations: the 4 `balcony-*` cases
-(railings never tagged).
+cases with matching `known_issues` markers, and the diff flags any *change*
+in them. Current known issues (all recorded per case): louver/panel fills
+replace the element group on buildings (`fill_drops_element_group`),
+`multigroup-fills` divides by a zero-width window face, `window-louver` and
+`door-arch` are occasionally flaky (bmesh iteration order), `fill-panels`
+ignores `comp`, and `floor-decoration` without columns produces nothing.
 
 ## Agent loop (typical)
 

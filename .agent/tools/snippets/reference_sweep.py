@@ -117,7 +117,7 @@ def geometry_hash(obj):
 # -- per-matgroup render palette: distinct colors make features visible and
 #    matgroup mistakes obvious; untagged faces render bright red
 MATGROUP_COLORS = {
-    "walls": (0.72, 0.70, 0.67),
+    "walls": (0.66, 0.63, 0.59),
     "slabs": (0.52, 0.52, 0.55),
     "columns": (0.60, 0.60, 0.62),
     "roof": (0.60, 0.27, 0.19),
@@ -148,7 +148,6 @@ def assign_matgroup_materials(obj):
     me.materials.clear()
     mats = {}
     default = bpy.data.materials.new("ref_default")
-    default.use_nodes = True
     me.materials.append(default)
     default_idx = 0
 
@@ -328,6 +327,7 @@ def _run_case_once(case):
 
 
 def main():
+    import fnmatch
     import importlib.util
 
     spec = importlib.util.spec_from_file_location("ref_cases", CASES_PATH)
@@ -336,7 +336,6 @@ def main():
     cases = mod.CASES
 
     if FILTER:
-        import fnmatch
         cases = [c for c in cases if fnmatch.fnmatch(c["id"], FILTER)]
 
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -358,6 +357,16 @@ def main():
             "image": entry.get("image"),
         })
         print("[sweep] %d/%d %-32s %s" % (i + 1, len(cases), entry["id"], status))
+
+    # -- merge with the existing index so filtered runs don't clobber the
+    #    cases that were not part of this run
+    index_path = os.path.join(OUT_DIR, "index.json")
+    if FILTER and os.path.exists(index_path):
+        with open(index_path) as f:
+            by_id = {c["id"]: c for c in json.load(f).get("cases", [])}
+        for c in index:
+            by_id[c["id"]] = c
+        index = [by_id[k] for k in sorted(by_id, key=lambda s: (len(s), s))]
 
     with open(os.path.join(OUT_DIR, "index.json"), "w") as f:
         json.dump({"image_size": list(IMG_SIZE), "cases": index}, f, indent=2, sort_keys=True)

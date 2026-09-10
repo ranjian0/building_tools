@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "6461d74b0b613ec3",
+  "geometry_hash": "fd20a5d391aea3da",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -37,10 +37,9 @@
       "errors": [],
       "feature": "multigroup",
       "matgroup_counts": {
-        "door": 8,
         "door_panels": 4,
         "frame": 34,
-        "walls": 10,
+        "walls": 18,
         "window": 1,
         "window_bars": 6
       },
@@ -56,7 +55,13 @@
         "fill_type_door": "PANELS",
         "fill_type_window": "BAR",
         "show_door_fill": true,
-        "show_window_fill": true
+        "show_window_fill": true,
+        "size_offset": {
+          "size": [
+            3.2,
+            2.4
+          ]
+        }
       }
     }
   ],
@@ -76,10 +81,9 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 8,
         "door_panels": 4,
         "frame": 34,
-        "walls": 10,
+        "walls": 18,
         "window": 1,
         "window_bars": 6
       },

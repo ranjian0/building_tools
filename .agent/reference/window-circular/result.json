@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "d2f6ae0ce9abe3ab",
+  "geometry_hash": "b0c162fc5a8a918d",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -36,8 +36,8 @@
       "feature": "window",
       "matgroup_counts": {
         "frame": 44,
-        "walls": 9,
-        "window": 7
+        "walls": 15,
+        "window": 1
       },
       "status": "ok",
       "warnings": []
@@ -50,8 +50,8 @@
       "options": {
         "size_offset": {
           "size": [
-            1.0,
-            1.0
+            1.6,
+            1.6
           ]
         },
         "type": "CIRCULAR"
@@ -75,8 +75,8 @@
       "all_tagged": true,
       "groups": {
         "frame": 44,
-        "walls": 9,
-        "window": 7
+        "walls": 15,
+        "window": 1
       },
       "invalid_index_faces": 0,
       "num_groups": 3,

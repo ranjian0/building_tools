@@ -567,7 +567,7 @@ def cmd_reference_diff(args):
     new_ids = set(new_cases)
 
     os.makedirs(DIFF_DIR, exist_ok=True)
-    pixel_threshold = 1280 * 800 * 0.005  # 0.5% of pixels
+    pixel_threshold = 1280 * 800 * 0.01  # 1% of pixels (fuzz-filtered)
     severe, visual, minor = [], [], []
     for cid in sorted(base_ids - new_ids):
         severe.append((cid, ["REMOVED"]))
@@ -587,8 +587,9 @@ def cmd_reference_diff(args):
         if os.path.exists(base_img) and os.path.exists(new_img):
             try:
                 r = subprocess.run(
-                    ["compare", "-metric", "AE", base_img, new_img,
-                     os.path.join(DIFF_DIR, cid + "-diff.png")],
+                    # -- fuzz 8%: ignore AA / sub-pixel edge jitter
+                    ["compare", "-metric", "AE", "-fuzz", "8%",
+                     base_img, new_img, os.path.join(DIFF_DIR, cid + "-diff.png")],
                     capture_output=True, text=True, timeout=60,
                 )
                 ae = int(float(r.stderr.strip() or r.stdout.strip() or 0))

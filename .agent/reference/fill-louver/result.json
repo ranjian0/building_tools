@@ -36,7 +36,8 @@
       "feature": "fill",
       "matgroup_counts": {
         "frame": 4,
-        "window_louvers": 66
+        "walls": 5,
+        "window_louvers": 61
       },
       "status": "ok",
       "warnings": []
@@ -69,10 +70,11 @@
       "all_tagged": true,
       "groups": {
         "frame": 4,
-        "window_louvers": 66
+        "walls": 5,
+        "window_louvers": 61
       },
       "invalid_index_faces": 0,
-      "num_groups": 2,
+      "num_groups": 3,
       "untagged_faces": 0
     },
     "normals": {

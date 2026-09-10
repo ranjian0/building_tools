@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "ae77a2dcde0752f2",
+  "geometry_hash": "760a8b8e737d8c06",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 100,
-      "faces": 50,
-      "verts": 52
+      "edges": 2182,
+      "faces": 775,
+      "verts": 1440
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -19,14 +19,11 @@
   },
   "id": "balcony-inner-curved",
   "image": "image.png",
-  "known_issues": [
-    "balcony_railing_untagged",
-    "grouped_balcony_curved_platform"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 100,
-    "faces": 50,
-    "verts": 52,
+    "edges": 2182,
+    "faces": 775,
+    "verts": 1440,
     "z_range": [
       0.0,
       3.0
@@ -38,7 +35,10 @@
       "errors": [],
       "feature": "balcony",
       "matgroup_counts": {
-        "balcony": 50
+        "balcony": 1,
+        "railing_posts": 586,
+        "railing_rails": 112,
+        "walls": 76
       },
       "status": "ok",
       "warnings": []
@@ -55,9 +55,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 100,
-        "faces": 50,
-        "verts": 52
+        "edges": 2182,
+        "faces": 775,
+        "verts": 1440
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -67,10 +67,13 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "balcony": 50
+        "balcony": 1,
+        "railing_posts": 586,
+        "railing_rails": 112,
+        "walls": 76
       },
       "invalid_index_faces": 0,
-      "num_groups": 1,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {
@@ -78,9 +81,7 @@
       "flip_seams": 0
     },
     "object": "curved_wall",
-    "ok": false,
-    "problems": [
-      "missing/empty matgroups: ['railing_posts']"
-    ]
+    "ok": true,
+    "problems": []
   }
 }

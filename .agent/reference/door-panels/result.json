@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "78745179f68c42bf",
+  "geometry_hash": "0c61d2962d1e33dd",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -37,10 +37,9 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 7,
         "door_panels": 4,
         "frame": 27,
-        "walls": 7
+        "walls": 14
       },
       "status": "ok",
       "warnings": []
@@ -51,7 +50,13 @@
       "faces": "front_wall",
       "feature": "door",
       "options": {
-        "fill_type": "PANELS"
+        "fill_type": "PANELS",
+        "size_offset": {
+          "size": [
+            1.5,
+            2.4
+          ]
+        }
       }
     }
   ],
@@ -71,10 +76,9 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 7,
         "door_panels": 4,
         "frame": 27,
-        "walls": 7
+        "walls": 14
       },
       "invalid_index_faces": 0,
       "num_groups": 4,

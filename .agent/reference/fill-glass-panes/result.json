@@ -35,8 +35,9 @@
       "errors": [],
       "feature": "fill",
       "matgroup_counts": {
+        "walls": 9,
         "window": 4,
-        "window_panes": 25
+        "window_panes": 16
       },
       "status": "ok",
       "warnings": []
@@ -68,11 +69,12 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
+        "walls": 9,
         "window": 4,
-        "window_panes": 25
+        "window_panes": 16
       },
       "invalid_index_faces": 0,
-      "num_groups": 2,
+      "num_groups": 3,
       "untagged_faces": 0
     },
     "normals": {

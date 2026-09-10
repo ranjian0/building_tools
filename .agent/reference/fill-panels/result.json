@@ -37,7 +37,9 @@
       "errors": [],
       "feature": "fill",
       "matgroup_counts": {
-        "door_panels": 29
+        "door_panels": 4,
+        "frame": 20,
+        "walls": 5
       },
       "status": "ok",
       "warnings": []
@@ -69,10 +71,12 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door_panels": 29
+        "door_panels": 4,
+        "frame": 20,
+        "walls": 5
       },
       "invalid_index_faces": 0,
-      "num_groups": 2,
+      "num_groups": 3,
       "untagged_faces": 0
     },
     "normals": {

@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "696a9cb143dee764",
+  "geometry_hash": "f4506ac89f12c67c",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 12,
-      "faces": 6,
-      "verts": 8
+      "edges": 168,
+      "faces": 65,
+      "verts": 120
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -19,13 +19,11 @@
   },
   "id": "balcony-wallfill-wall",
   "image": "image.png",
-  "known_issues": [
-    "balcony_railing_untagged"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 12,
-    "faces": 6,
-    "verts": 8,
+    "edges": 168,
+    "faces": 65,
+    "verts": 120,
     "z_range": [
       0.0,
       3.0
@@ -37,7 +35,11 @@
       "errors": [],
       "feature": "balcony",
       "matgroup_counts": {
-        "balcony": 6
+        "balcony": 5,
+        "railing_posts": 24,
+        "railing_rails": 24,
+        "railing_walls": 6,
+        "walls": 6
       },
       "status": "ok",
       "warnings": []
@@ -50,6 +52,12 @@
       "options": {
         "rail": {
           "fill": "WALL"
+        },
+        "size_offset": {
+          "size": [
+            5.0,
+            0.2
+          ]
         }
       }
     }
@@ -58,9 +66,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 12,
-        "faces": 6,
-        "verts": 8
+        "edges": 168,
+        "faces": 65,
+        "verts": 120
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -70,10 +78,14 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "balcony": 6
+        "balcony": 5,
+        "railing_posts": 24,
+        "railing_rails": 24,
+        "railing_walls": 6,
+        "walls": 6
       },
       "invalid_index_faces": 0,
-      "num_groups": 1,
+      "num_groups": 5,
       "untagged_faces": 0
     },
     "normals": {
@@ -81,9 +93,7 @@
       "flip_seams": 0
     },
     "object": "wall",
-    "ok": false,
-    "problems": [
-      "missing/empty matgroups: ['railing_walls']"
-    ]
+    "ok": true,
+    "problems": []
   }
 }

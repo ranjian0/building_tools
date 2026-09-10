@@ -37,7 +37,8 @@
       "matgroup_counts": {
         "railing_posts": 148,
         "railing_rails": 32,
-        "stairs": 29
+        "stairs": 23,
+        "walls": 6
       },
       "status": "ok",
       "warnings": []
@@ -70,10 +71,11 @@
       "groups": {
         "railing_posts": 148,
         "railing_rails": 32,
-        "stairs": 29
+        "stairs": 23,
+        "walls": 6
       },
       "invalid_index_faces": 0,
-      "num_groups": 3,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {

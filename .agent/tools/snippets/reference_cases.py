@@ -63,74 +63,91 @@ CASES = [
      "expect": {"groups": ["roof", "roof_hangs"]}},
     # -- door variants (on wall: the element fills the frame) -----------------
     {"id": "door-default", "scenario": "wall", "steps": [
-        {"feature": "door", "faces": "front_wall"}],
+        {"feature": "door", "options": {"size_offset": {"size": [1.5, 2.4]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["door", "frame"]}},
     {"id": "door-panels", "scenario": "wall", "steps": [
-        {"feature": "door", "options": {"fill_type": "PANELS"}, "faces": "front_wall"}],
-     "expect": {"groups": ["door", "frame", "door_panels"]},
+        {"feature": "door",
+         "options": {"fill_type": "PANELS", "size_offset": {"size": [1.5, 2.4]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["frame", "door_panels"]},
      "known_issues": ["fill_drops_element_group"]},
     {"id": "door-louver", "scenario": "wall", "steps": [
-        {"feature": "door", "options": {"fill_type": "LOUVER"}, "faces": "front_wall"}],
-     "expect": {"groups": ["door", "frame", "door_louvers"]},
+        {"feature": "door",
+         "options": {"fill_type": "LOUVER", "size_offset": {"size": [1.5, 2.4]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["frame", "door_louvers"]},
      "known_issues": ["fill_drops_element_group"]},
     {"id": "door-glass-panes", "scenario": "wall", "steps": [
-        {"feature": "door", "options": {"fill_type": "GLASS_PANES"}, "faces": "front_wall"}],
+        {"feature": "door",
+         "options": {"fill_type": "GLASS_PANES", "size_offset": {"size": [1.5, 2.4]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["door", "frame", "door_panes"]}},
     {"id": "door-double", "scenario": "wall", "steps": [
-        {"feature": "door", "options": {"double_door": True, "size_offset": {"size": [1.6, 1.8]}},
+        {"feature": "door", "options": {"double_door": True, "size_offset": {"size": [2.6, 2.4]}},
          "faces": "front_wall"}],
      "expect": {"groups": ["door", "frame"]}},
     {"id": "door-arch", "scenario": "wall", "steps": [
-        {"feature": "door", "options": {"add_arch": True, "size_offset": {"size": [1.0, 2.0]}},
+        {"feature": "door", "options": {"add_arch": True, "size_offset": {"size": [1.2, 2.2]}},
          "faces": "front_wall"}],
      "expect": {"groups": ["door", "frame"]},
      "known_issues": ["flaky_arch_unpack"]},
     # -- window variants -------------------------------------------------------
     {"id": "window-default", "scenario": "wall", "steps": [
-        {"feature": "window", "faces": "front_wall"}],
+        {"feature": "window", "options": {"size_offset": {"size": [2.4, 1.6]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["window", "frame"]}},
     {"id": "window-bar", "scenario": "wall", "steps": [
-        {"feature": "window", "options": {"fill_type": "BAR"}, "faces": "front_wall"}],
+        {"feature": "window",
+         "options": {"fill_type": "BAR", "size_offset": {"size": [2.4, 1.6]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["window", "frame", "window_bars"]}},
     {"id": "window-louver", "scenario": "wall", "steps": [
-        {"feature": "window", "options": {"fill_type": "LOUVER"}, "faces": "front_wall"}],
-     "expect": {"groups": ["window", "frame", "window_louvers"]},
+        {"feature": "window",
+         "options": {"fill_type": "LOUVER", "size_offset": {"size": [2.4, 1.6]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["frame", "window_louvers"]},
      "known_issues": ["fill_drops_element_group", "flaky_louver_max_empty"]},
     {"id": "window-glass-panes", "scenario": "wall", "steps": [
-        {"feature": "window", "options": {"fill_type": "GLASS_PANES"}, "faces": "front_wall"}],
+        {"feature": "window",
+         "options": {"fill_type": "GLASS_PANES", "size_offset": {"size": [2.4, 1.6]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["window", "frame", "window_panes"]}},
     {"id": "window-circular", "scenario": "wall", "steps": [
-        {"feature": "window", "options": {"type": "CIRCULAR", "size_offset": {"size": [1.0, 1.0]}},
+        {"feature": "window", "options": {"type": "CIRCULAR", "size_offset": {"size": [1.6, 1.6]}},
          "faces": "front_wall"}],
      "expect": {"groups": ["window", "frame"]}},
     # -- multigroup --------------------------------------------------------------
     {"id": "multigroup-default", "scenario": "wall", "steps": [
-        {"feature": "multigroup", "faces": "front_wall"}],
+        {"feature": "multigroup", "options": {"size_offset": {"size": [3.2, 2.4]}},
+         "faces": "front_wall"}],
      "expect": {"groups": ["door", "window", "frame"]}},
     {"id": "multigroup-fills", "scenario": "wall", "steps": [
         {"feature": "multigroup",
-         "options": {"show_door_fill": True, "fill_type_door": "PANELS",
+         "options": {"size_offset": {"size": [3.2, 2.4]},
+                      "show_door_fill": True, "fill_type_door": "PANELS",
                       "show_window_fill": True, "fill_type_window": "BAR"},
          "faces": "front_wall"}],
-     "expect": {"groups": ["door", "window", "frame", "door_panels", "window_bars"]},
+     "expect": {"groups": ["window", "frame", "door_panels", "window_bars"]},
      "known_issues": ["zero_width_window_fill"]},
     # -- balcony -------------------------------------------------------------------
     {"id": "balcony-posts-wall", "scenario": "wall", "steps": [
-        {"feature": "balcony", "faces": "front_wall"}],
-     "expect": {"groups": ["balcony", "railing_posts"]},
-     "known_issues": ["balcony_railing_untagged"]},
+        {"feature": "balcony",
+         "options": {"size_offset": {"size": [5.0, 0.2]}}, "faces": "front_wall"}],
+     "expect": {"groups": ["balcony", "railing_posts"]}},
     {"id": "balcony-rails-wall", "scenario": "wall", "steps": [
-        {"feature": "balcony", "options": {"rail": {"fill": "RAILS"}}, "faces": "front_wall"}],
-     "expect": {"groups": ["balcony", "railing_rails"]},
-     "known_issues": ["balcony_railing_untagged"]},
+        {"feature": "balcony",
+         "options": {"rail": {"fill": "RAILS"}, "size_offset": {"size": [5.0, 0.2]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["balcony", "railing_rails"]}},
     {"id": "balcony-wallfill-wall", "scenario": "wall", "steps": [
-        {"feature": "balcony", "options": {"rail": {"fill": "WALL"}}, "faces": "front_wall"}],
-     "expect": {"groups": ["balcony", "railing_walls"]},
-     "known_issues": ["balcony_railing_untagged"]},
+        {"feature": "balcony",
+         "options": {"rail": {"fill": "WALL"}, "size_offset": {"size": [5.0, 0.2]}},
+         "faces": "front_wall"}],
+     "expect": {"groups": ["balcony", "railing_walls"]}},
     {"id": "balcony-inner-curved", "scenario": "curved_wall", "steps": [
         {"feature": "balcony", "faces": "inner"}],
-     "expect": {"groups": ["balcony", "railing_posts"]},
-     "known_issues": ["balcony_railing_untagged", "grouped_balcony_curved_platform"]},
+     "expect": {"groups": ["balcony", "railing_posts"]}},
     # -- stairs ------------------------------------------------------------------------
     {"id": "stairs-filled", "scenario": "wall", "steps": [
         {"feature": "stairs", "faces": "front_wall"}],

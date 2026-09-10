@@ -4,9 +4,9 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "09afab203c22f74b",
+  "geometry_hash": "7f5efadd23543cf6",
   "geometry_report": {
-    "clean": false,
+    "clean": true,
     "counts": {
       "edges": 92,
       "faces": 45,
@@ -15,7 +15,7 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 1
+    "zero_area_faces": 0
   },
   "id": "door-glass-panes",
   "image": "image.png",
@@ -35,10 +35,10 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 15,
+        "door": 8,
         "door_panes": 16,
         "frame": 7,
-        "walls": 7
+        "walls": 14
       },
       "status": "ok",
       "warnings": []
@@ -49,13 +49,19 @@
       "faces": "front_wall",
       "feature": "door",
       "options": {
-        "fill_type": "GLASS_PANES"
+        "fill_type": "GLASS_PANES",
+        "size_offset": {
+          "size": [
+            1.5,
+            2.4
+          ]
+        }
       }
     }
   ],
   "validation": {
     "geometry": {
-      "clean": false,
+      "clean": true,
       "counts": {
         "edges": 92,
         "faces": 45,
@@ -64,15 +70,15 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 1
+      "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 15,
+        "door": 8,
         "door_panes": 16,
         "frame": 7,
-        "walls": 7
+        "walls": 14
       },
       "invalid_index_faces": 0,
       "num_groups": 4,
