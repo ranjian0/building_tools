@@ -8,7 +8,7 @@ addon_dir = os.path.dirname(tests_dir)
 sys.path.insert(0, tests_dir)
 sys.path.insert(0, addon_dir)
 
-import bpy  # noqa: E402 -- must precede bmesh/mathutils imports
+import bpy  # must precede bmesh/mathutils imports (also registers submodules)
 
 # -- clean slate: user prefs may auto-enable an old installed copy of the
 #    addon, whose registration would collide with the working tree

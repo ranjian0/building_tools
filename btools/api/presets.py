@@ -366,8 +366,9 @@ def _scale(plan_kwargs, width_scale, depth_scale):
     return kwargs
 
 
-def build_preset(preset, floors=None, width_scale=1.0, depth_scale=1.0,
-                 assign_materials=True):
+def build_preset(
+    preset, floors=None, width_scale=1.0, depth_scale=1.0, assign_materials=True
+):
     """Build a complete building from a preset recipe.
 
     floors       -- floor-count override (default: preset value)
@@ -391,9 +392,7 @@ def build_preset(preset, floors=None, width_scale=1.0, depth_scale=1.0,
 
     def build():
         fp_kwargs = _scale(preset.floorplan, width_scale, depth_scale)
-        res = apply_feature(
-            "floorplan", options_from_dict(FloorplanOptions, fp_kwargs)
-        )
+        res = apply_feature("floorplan", options_from_dict(FloorplanOptions, fp_kwargs))
         record("floorplan", res)
         if not res.ok:
             return res

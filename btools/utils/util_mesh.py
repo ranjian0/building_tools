@@ -482,3 +482,87 @@ def get_selection_groups(bm):
         list(map(selected_faces.remove, adjacent))
         result.append(adjacent)
     return result
+
+
+def bevel_edges(bm, edges, width, segments=1, group=None):
+    """Bevel a set of edges with clamped width; optionally re-tag new faces.
+
+    width is clamped so tight corners never blow up the bevel. group: optional
+    MaterialGroup -- the bevel's new side faces are tagged to it.
+    """
+    from ..building.materialgroup import add_faces_to_group
+
+    if not edges:
+        return []
+    res = bmesh.ops.bevel(
+        bm,
+        geom=list(edges),
+        offset=width,
+        offset_type="OFFSET",
+        segments=segments,
+        profile=0.5,
+        affect="EDGES",
+        clamp_overlap=True,
+    )
+    new_faces = list(filter_geom(res.get("faces"), BMFace))
+    if group is not None and new_faces:
+        add_faces_to_group(bm, new_faces, group)
+    return new_faces
+
+
+def set_smooth_shading(bm, faces, smooth=True):
+    """Enable smooth shading on faces (arcs, cylinders, curved glass)."""
+    for f in faces:
+        f.smooth = smooth
+
+
+def sweep_profile_along_edges(bm, edges, profile, close_caps=True):
+    """Sweep a closed 2D profile along a straight chain of edges.
+
+    profile: list of (u, v) float offsets in the plane perpendicular to the
+    run direction -- u = horizontal (right of travel), v = vertical (up).
+    The chain must be straight (v1 handles no corners; callers split runs).
+
+    Returns the created side faces.
+    """
+    from mathutils import Vector
+
+    edges = list(edges)
+    if not edges or len(profile) < 3:
+        return []
+
+    start_co = edges[0].verts[0].co.copy()
+    end_co = edges[-1].verts[1].co.copy()
+    run = (end_co - start_co).normalized()
+    up = Vector((0.0, 0.0, 1.0))
+    side = run.cross(up).normalized()
+
+    # -- ordered base points along the chain
+    ordered = [start_co.copy()]
+    for e in edges:
+        ordered.append(ordered[-1] + (e.verts[1].co - e.verts[0].co))
+
+    vert_grid = [
+        [bm.verts.new(base + side * u + up * v) for (u, v) in profile]
+        for base in ordered
+    ]
+
+    faces = []
+    for a, b in zip(vert_grid, vert_grid[1:]):  # noqa: RUF007
+        n = len(a)
+        for i in range(n):
+            j = (i + 1) % n
+            try:
+                faces.append(bm.faces.new((a[i], a[j], b[j], b[i])))
+            except ValueError:
+                pass
+
+    if close_caps:
+        for col in (vert_grid[0], vert_grid[-1]):
+            try:
+                faces.append(bm.faces.new(col))
+            except ValueError:
+                pass
+
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return faces
