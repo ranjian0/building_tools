@@ -3,89 +3,25 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
-  "geometry_hash": "ba2b85abcca736b7",
-  "geometry_report": {
-    "clean": true,
-    "counts": {
-      "edges": 434,
-      "faces": 197,
-      "verts": 238
-    },
-    "loose_edges": 0,
-    "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 0
-  },
+  "error": "preset failed: error",
+  "geometry_hash": null,
+  "geometry_report": null,
   "id": "preset-suburban-house",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
-  "mesh": {
-    "edges": 434,
-    "faces": 197,
-    "verts": 238,
-    "z_range": [
-      0.0,
-      8.121
-    ]
-  },
+  "mesh": null,
   "scenario": null,
   "step_results": [
     {
-      "errors": [],
+      "errors": [
+        "StopIteration: "
+      ],
       "feature": "preset:suburban-house",
-      "matgroup_counts": {
-        "door": 1,
-        "frame": 71,
-        "roof": 3,
-        "roof_hangs": 12,
-        "slabs": 25,
-        "walls": 77,
-        "window": 8
-      },
-      "status": "ok",
+      "matgroup_counts": {},
+      "status": "error",
       "warnings": []
     }
   ],
   "steps": [],
-  "validation": {
-    "geometry": {
-      "clean": true,
-      "counts": {
-        "edges": 434,
-        "faces": 197,
-        "verts": 238
-      },
-      "loose_edges": 0,
-      "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 0
-    },
-    "matgroups": {
-      "all_tagged": true,
-      "groups": {
-        "door": 1,
-        "frame": 71,
-        "roof": 3,
-        "roof_hangs": 12,
-        "slabs": 25,
-        "walls": 77,
-        "window": 8
-      },
-      "invalid_index_faces": 0,
-      "num_groups": 7,
-      "untagged_faces": 0
-    },
-    "normals": {
-      "consistent": true,
-      "flip_seams": 0
-    },
-    "object": "building_001",
-    "ok": true,
-    "problems": []
-  }
+  "validation": null
 }

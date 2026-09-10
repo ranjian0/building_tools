@@ -8,6 +8,13 @@ addon_dir = os.path.dirname(tests_dir)
 sys.path.insert(0, tests_dir)
 sys.path.insert(0, addon_dir)
 
+import bpy  # noqa: E402 -- must precede bmesh/mathutils imports
+
+# -- clean slate: user prefs may auto-enable an old installed copy of the
+#    addon, whose registration would collide with the working tree
+bpy.ops.wm.read_factory_settings(use_empty=True)
+for _mod in [m for m in sys.modules if "building_tools" in m or m == "btools"]:
+    del sys.modules[_mod]
 
 import tools
 

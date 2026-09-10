@@ -3,95 +3,25 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
-  "geometry_hash": "db2cddb47e75b187",
-  "geometry_report": {
-    "clean": false,
-    "counts": {
-      "edges": 13295,
-      "faces": 5373,
-      "verts": 8015
-    },
-    "loose_edges": 0,
-    "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 53
-  },
+  "error": "preset failed: error",
+  "geometry_hash": null,
+  "geometry_report": null,
   "id": "preset-apartment-block",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
-  "mesh": {
-    "edges": 13295,
-    "faces": 5373,
-    "verts": 8015,
-    "z_range": [
-      0.0,
-      16.2
-    ]
-  },
+  "mesh": null,
   "scenario": null,
   "step_results": [
     {
-      "errors": [],
+      "errors": [
+        "StopIteration: "
+      ],
       "feature": "preset:apartment-block",
-      "matgroup_counts": {
-        "balcony": 4,
-        "door": 1,
-        "frame": 526,
-        "railing_posts": 2144,
-        "railing_rails": 368,
-        "roof": 17,
-        "slabs": 62,
-        "walls": 714,
-        "window": 513,
-        "window_panes": 1024
-      },
-      "status": "ok",
+      "matgroup_counts": {},
+      "status": "error",
       "warnings": []
     }
   ],
   "steps": [],
-  "validation": {
-    "geometry": {
-      "clean": false,
-      "counts": {
-        "edges": 13295,
-        "faces": 5373,
-        "verts": 8015
-      },
-      "loose_edges": 0,
-      "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 53
-    },
-    "matgroups": {
-      "all_tagged": true,
-      "groups": {
-        "balcony": 4,
-        "door": 1,
-        "frame": 526,
-        "railing_posts": 2144,
-        "railing_rails": 368,
-        "roof": 17,
-        "slabs": 62,
-        "walls": 714,
-        "window": 513,
-        "window_panes": 1024
-      },
-      "invalid_index_faces": 0,
-      "num_groups": 10,
-      "untagged_faces": 0
-    },
-    "normals": {
-      "consistent": false,
-      "flip_seams": 16
-    },
-    "object": "building_001",
-    "ok": true,
-    "problems": []
-  }
+  "validation": null
 }

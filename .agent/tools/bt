@@ -146,7 +146,9 @@ def cmd_start(args):
         cmd += ["--background"]
     else:
         cmd += ["--window-geometry", str(x), str(y), str(w), str(h)]
-        if args.factory:
+        # -- factory startup by default: user prefs may auto-enable a stale
+        #    installed copy of the addon that would collide with bt reload
+        if not args.userprefs:
             cmd += ["--factory-startup"]
     cmd += ["--python", DRIVER]
 
@@ -287,7 +289,7 @@ def cmd_eval(args):
     sys.exit(status)
 
 
-RELOAD_CODE = '''\
+RELOAD_CODE = """\\
 import importlib.util
 import os
 import sys
@@ -296,6 +298,15 @@ import bpy
 
 REPO = {repo!r}
 MODULE = {module!r}
+
+# -- user prefs may auto-enable a stale installed copy at startup; disable
+#    it and drop its modules so the working tree loads cleanly
+prefs = bpy.context.preferences
+if "building_tools" in prefs.addons:
+    try:
+        bpy.ops.preferences.addon_disable(module="building_tools")
+    except Exception:
+        pass
 
 old = sys.modules.get(MODULE)
 if old is not None and hasattr(old, "unregister"):
@@ -309,6 +320,16 @@ if old is not None and hasattr(old, "unregister"):
 
 for name in [n for n in sys.modules if n == MODULE or n.startswith(MODULE + ".")]:
     del sys.modules[name]
+for name in [n for n in sys.modules if n == "btools" or n.startswith("btools.")]:
+    del sys.modules[name]
+
+# -- defensively clear any BTOOLS classes left registered by a stale copy
+for tp in list(bpy.types.__dict__):
+    if tp.startswith("BTOOLS_"):
+        try:
+            bpy.utils.unregister_class(getattr(bpy.types, tp))
+        except Exception:
+            pass
 
 spec = importlib.util.spec_from_file_location(
     MODULE, os.path.join(REPO, "__init__.py"), submodule_search_locations=[REPO]
@@ -318,7 +339,7 @@ sys.modules[MODULE] = mod
 spec.loader.exec_module(mod)
 mod.register()
 print("[bt] loaded %s v%s" % (MODULE, ".".join(map(str, mod.bl_info.get("version", ()))) ))
-'''
+"""
 
 
 def cmd_reload(args):
@@ -672,9 +693,10 @@ def main():
     )
     sub = p.add_subparsers(dest="command", required=True)
 
-    sp = sub.add_parser("start", help="start a blender session (GUI on the primary monitor)")
+    sp = sub.add_parser("start", help="start a blender session (GUI on the 4K monitor)")
     sp.add_argument("--bg", action="store_true", help="headless session (no screenshots)")
-    sp.add_argument("--factory", action="store_true", help="launch with --factory-startup")
+    sp.add_argument("--userprefs", action="store_true",
+                    help="load user preferences instead of factory startup")
     sp.add_argument("--geometry", help="window geometry WxH+X+Y (default: auto-detect primary monitor)")
     sp.add_argument("--wait", type=int, default=90, help="seconds to wait for session ready")
     sp.set_defaults(func=cmd_start)
@@ -683,8 +705,8 @@ def main():
     sp.set_defaults(func=cmd_stop)
 
     sp = sub.add_parser("restart", help="stop then start the session")
-    sp.add_argument("--bg", action="store_true", help="headless session (no screenshots)")
-    sp.add_argument("--factory", action="store_true", help="launch with --factory-startup")
+    sp.add_argument("--userprefs", action="store_true",
+                    help="load user preferences instead of factory startup")
     sp.add_argument("--geometry", help="window geometry WxH+X+Y (default: auto-detect primary monitor)")
     sp.add_argument("--wait", type=int, default=90, help="seconds to wait for session ready")
     sp.set_defaults(func=cmd_restart)
