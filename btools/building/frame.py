@@ -83,7 +83,7 @@ def add_sill(
     )
 
     # -- extrude the bottom face outward past the wall + down
-    offset = wall_normal * projection - (0, 0, thickness / 2)
+    offset = wall_normal * projection
     ret = bmesh.ops.extrude_face_region(bm, geom=[bottom])
     verts = [v for v in ret["geom"] if isinstance(v, bmesh.types.BMVert)]
     bmesh.ops.translate(bm, verts=verts, vec=offset)
