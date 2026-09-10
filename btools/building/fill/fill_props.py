@@ -42,9 +42,9 @@ class FillPanel(bpy.types.PropertyGroup):
     panel_depth: FloatProperty(
         name="Panel Depth",
         step=1,
-        min=get_scaled_unit(0.01),
+        min=get_scaled_unit(0.002),
         max=get_scaled_unit(100.0),
-        default=get_scaled_unit(0.01),
+        default=get_scaled_unit(0.015),
         unit="LENGTH",
         description="Depth of panels",
     )
@@ -82,7 +82,7 @@ class FillGlassPanes(bpy.types.PropertyGroup):
         name="Glass Pane Margin",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.03),
         unit="LENGTH",
         description="Margin of glass pane frames",
     )
@@ -175,7 +175,7 @@ class FillBars(bpy.types.PropertyGroup):
         name="Bar Width",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(100.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.06),
         unit="LENGTH",
         description="Width of bars",
     )

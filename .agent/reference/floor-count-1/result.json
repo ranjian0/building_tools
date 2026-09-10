@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "3042ebd13bf34b78",
+  "geometry_hash": "407b34a973c223b7",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -30,7 +30,7 @@
     "verts": 20,
     "z_range": [
       0.0,
-      2.2
+      2.9
     ]
   },
   "scenario": "floorplan",

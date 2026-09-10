@@ -13,7 +13,7 @@ class FloorProperty(bpy.types.PropertyGroup):
         name="Floor Height",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1000.0),
-        default=get_scaled_unit(2.0),
+        default=get_scaled_unit(2.7),
         unit="LENGTH",
         description="Height of each floor",
     )

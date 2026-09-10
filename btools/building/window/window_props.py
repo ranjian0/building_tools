@@ -39,7 +39,7 @@ class WindowProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         name="Frame Thickness",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.06),
         unit="LENGTH",
         description="Thickness of window Frame",
     )
@@ -66,7 +66,7 @@ class WindowProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         name="Resolution",
         min=3,
         max=128,
-        default=20,
+        default=32,
         description="Number of segements for the circle",
     )
 

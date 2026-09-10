@@ -119,7 +119,7 @@
     },
     {
       "faces": 17,
-      "geometry_hash": "3042ebd13bf34b78",
+      "geometry_hash": "407b34a973c223b7",
       "id": "floor-count-1",
       "images": [
         "image.png",
@@ -132,7 +132,7 @@
     },
     {
       "faces": 13,
-      "geometry_hash": "10062cb82da91443",
+      "geometry_hash": "5c3db702b4dbea79",
       "id": "floor-slabs-off",
       "images": [
         "image.png",
@@ -145,7 +145,7 @@
     },
     {
       "faces": 73,
-      "geometry_hash": "b0b208f1cdb562bc",
+      "geometry_hash": "1d487bd0456723bd",
       "id": "floor-columns",
       "images": [
         "image.png",
@@ -158,7 +158,7 @@
     },
     {
       "faces": 33,
-      "geometry_hash": "1ee79335baa8ab55",
+      "geometry_hash": "642d6f8514143c04",
       "id": "floor-decoration",
       "images": [
         "image.png",
@@ -455,7 +455,7 @@
     },
     {
       "faces": 775,
-      "geometry_hash": "9b3c315286cc61ad",
+      "geometry_hash": "cde276ea481afa43",
       "id": "balcony-inner-curved",
       "images": [
         "image.png",
@@ -665,7 +665,7 @@
     },
     {
       "faces": 3321,
-      "geometry_hash": "4223cdca5ec6bff5",
+      "geometry_hash": "592c4778bc9a3193",
       "id": "preset-office-block",
       "images": [
         "image.png",

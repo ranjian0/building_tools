@@ -32,7 +32,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         name="Thickness",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.15),
         unit="LENGTH",
         description="Thickness of roof hangs",
     )
@@ -41,7 +41,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         name="Outset",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.25),
         unit="LENGTH",
         description="Outset of roof hangs",
     )

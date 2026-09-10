@@ -26,7 +26,7 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         name="Frame Thickness",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.06),
         unit="LENGTH",
         description="Thickness of door Frame",
     )
@@ -36,7 +36,7 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         min=get_scaled_unit(-1.0),
         max=get_scaled_unit(1.0),
         step=1,
-        default=get_scaled_unit(0.0),
+        default=get_scaled_unit(0.05),
         unit="LENGTH",
         description="Depth of door Frame",
     )
@@ -45,7 +45,7 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         name="Door Depth",
         min=get_scaled_unit(0.0),
         max=get_scaled_unit(1.0),
-        default=get_scaled_unit(0.05),
+        default=get_scaled_unit(0.045),
         unit="LENGTH",
         description="Depth of door",
     )

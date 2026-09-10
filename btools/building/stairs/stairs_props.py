@@ -30,7 +30,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Step Width",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(100.0),
-        default=get_scaled_unit(0.2),
+        default=get_scaled_unit(0.28),
         unit="LENGTH",
         description="Width of each step",
     )
@@ -39,7 +39,7 @@ class StairsProperty(bpy.types.PropertyGroup):
         name="Step Height",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(100.0),
-        default=get_scaled_unit(0.12),
+        default=get_scaled_unit(0.175),
         unit="LENGTH",
         description="Height of each step",
     )

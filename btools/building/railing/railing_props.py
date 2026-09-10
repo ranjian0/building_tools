@@ -94,7 +94,7 @@ class RailProperty(bpy.types.PropertyGroup):
         name="Height",
         min=get_scaled_unit(0.01),
         max=get_scaled_unit(100.0),
-        default=get_scaled_unit(0.7),
+        default=get_scaled_unit(1.0),
         unit="LENGTH",
         description="Height of each corner post",
     )

@@ -94,7 +94,7 @@ class FloorplanOptions:
 @dataclass
 class FloorOptions:
     floor_count: int = 1
-    floor_height: float = 2.0
+    floor_height: float = 2.7
     add_slab: bool = True
     add_columns: bool = False
     slab_thickness: float = 0.2

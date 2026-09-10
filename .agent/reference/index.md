@@ -86,7 +86,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## floor-count-1
 
 - status: `ok`
-- faces: 17 -- geometry_hash: `3042ebd13bf34b78`
+- faces: 17 -- geometry_hash: `407b34a973c223b7`
 
 ![floor-count-1 image.png](floor-count-1/image.png)
 ![floor-count-1 image-front.png](floor-count-1/image-front.png)
@@ -95,7 +95,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## floor-slabs-off
 
 - status: `ok`
-- faces: 13 -- geometry_hash: `10062cb82da91443`
+- faces: 13 -- geometry_hash: `5c3db702b4dbea79`
 
 ![floor-slabs-off image.png](floor-slabs-off/image.png)
 ![floor-slabs-off image-front.png](floor-slabs-off/image-front.png)
@@ -104,7 +104,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## floor-columns
 
 - status: `ok`
-- faces: 73 -- geometry_hash: `b0b208f1cdb562bc`
+- faces: 73 -- geometry_hash: `1d487bd0456723bd`
 
 ![floor-columns image.png](floor-columns/image.png)
 ![floor-columns image-front.png](floor-columns/image-front.png)
@@ -113,7 +113,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## floor-decoration
 
 - status: `ok`
-- faces: 33 -- geometry_hash: `1ee79335baa8ab55`
+- faces: 33 -- geometry_hash: `642d6f8514143c04`
 
 ![floor-decoration image.png](floor-decoration/image.png)
 ![floor-decoration image-front.png](floor-decoration/image-front.png)
@@ -307,7 +307,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `9b3c315286cc61ad`
+- faces: 775 -- geometry_hash: `cde276ea481afa43`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 ![balcony-inner-curved image-front.png](balcony-inner-curved/image-front.png)
@@ -451,7 +451,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## preset-office-block
 
 - status: `ok`
-- faces: 3321 -- geometry_hash: `4223cdca5ec6bff5`
+- faces: 3321 -- geometry_hash: `592c4778bc9a3193`
 
 ![preset-office-block image.png](preset-office-block/image.png)
 ![preset-office-block image-front.png](preset-office-block/image-front.png)

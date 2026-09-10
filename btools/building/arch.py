@@ -34,7 +34,7 @@ class ArchProperty(bpy.types.PropertyGroup):
         name="Arc Resolution",
         min=1,
         max=128,
-        default=6,
+        default=24,
         description="Number of segements for the arc",
     )
 
