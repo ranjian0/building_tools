@@ -37,14 +37,16 @@ def add_frame_depth(
 
         def hash_face(f):
             return hash(
-                (f.calc_perimeter(), f.calc_area(),
-                 f.calc_center_median().to_tuple(4))
+                (f.calc_perimeter(), f.calc_area(), f.calc_center_median().to_tuple(4))
             )
 
         def hash_face_after(f):
             return hash(
-                (f.calc_perimeter(), f.calc_area(),
-                 (f.calc_center_median() + normal * depth).to_tuple(4))
+                (
+                    f.calc_perimeter(),
+                    f.calc_area(),
+                    (f.calc_center_median() + normal * depth).to_tuple(4),
+                )
             )
 
         door_hashes = list(map(hash_face, door_faces))

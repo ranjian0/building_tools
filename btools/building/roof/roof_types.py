@@ -459,13 +459,11 @@ def extrude_and_outset(bm, faces, thickness, outset):
 
 def _find_eave_edges(bm, roof_faces):
     """Find horizontal edges at the lowest z of the given roof face set."""
-    min_z = min(
-        v.co.z for f in roof_faces for v in f.verts
-    )
+    min_z = min(v.co.z for f in roof_faces for v in f.verts)
     eave = [
-        e for e in bm.edges
-        if abs(e.verts[0].co.z - min_z) < 0.01
-        and abs(e.verts[1].co.z - min_z) < 0.01
+        e
+        for e in bm.edges
+        if abs(e.verts[0].co.z - min_z) < 0.01 and abs(e.verts[1].co.z - min_z) < 0.01
     ]
     return eave
 
@@ -480,11 +478,13 @@ def add_gutters(bm, eave_edges, radius=0.04):
         for i in range(profile_segments):
             angle = math.pi * i / (profile_segments - 1)
             # -- half circle opening upward
-            local = Vector((
-                math.cos(angle) * radius,
-                math.sin(angle) * radius * 0.7,
-                -math.sin(angle) * radius * 0.5,
-            ))
+            local = Vector(
+                (
+                    math.cos(angle) * radius,
+                    math.sin(angle) * radius * 0.7,
+                    -math.sin(angle) * radius * 0.5,
+                )
+            )
             verts_ring.append(bm.verts.new(mid + local))
         if len(verts_ring) >= 2:
             for i in range(len(verts_ring) - 1):
@@ -506,7 +506,8 @@ def add_chimney(bm, roof_faces, width=0.45, depth=0.45, height=1.2):
     roof_z = max(zs)
 
     bmesh.ops.create_cube(
-        bm, size=1.0,
+        bm,
+        size=1.0,
         matrix=Matrix.Translation((cx + width * 0.3, cy, roof_z + height / 2))
         @ Matrix.Scale(width, 4, Vector((1, 0, 0)))
         @ Matrix.Scale(depth, 4, Vector((0, 1, 0)))
@@ -519,9 +520,13 @@ def add_chimney(bm, roof_faces, width=0.45, depth=0.45, height=1.2):
     pot_verts = []
     for i in range(segs):
         a = 2 * math.pi * i / segs
-        pot_verts.append(bm.verts.new((
-            cx + width * 0.3 + pot_r * math.cos(a),
-            cy + pot_r * math.sin(a),
-            roof_z + height + pot_h,
-        )))
+        pot_verts.append(
+            bm.verts.new(
+                (
+                    cx + width * 0.3 + pot_r * math.cos(a),
+                    cy + pot_r * math.sin(a),
+                    roof_z + height + pot_h,
+                )
+            )
+        )
     bmesh.ops.contextual_create(bm, geom=pot_verts)

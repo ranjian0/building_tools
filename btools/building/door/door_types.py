@@ -140,6 +140,7 @@ def create_door_frame(bm, face, prop):
 
     # -- protruding threshold at the door base
     from ..frame import add_threshold
+
     add_threshold(bm, frame_faces, normal)
 
     return door_face, arch_face

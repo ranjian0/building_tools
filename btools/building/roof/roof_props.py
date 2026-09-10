@@ -47,7 +47,8 @@ class RoofProperty(bpy.types.PropertyGroup):
     )
 
     add_gutters: BoolProperty(
-        name="Add Gutters", default=False,
+        name="Add Gutters",
+        default=False,
         description="Add half-round gutters along the eaves",
     )
 
@@ -61,7 +62,8 @@ class RoofProperty(bpy.types.PropertyGroup):
     )
 
     add_chimney: BoolProperty(
-        name="Add Chimney", default=False,
+        name="Add Chimney",
+        default=False,
         description="Add a masonry chimney on the roof slope",
     )
 

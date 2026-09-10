@@ -198,7 +198,7 @@ def create_rectangular_frame(bm, face, prop):
     if prop.add_arch:
         add_faces_to_group(bm, [arch_face], MaterialGroup.WINDOW)
 
-    # -- protruding sill below the bottom frame member
+        # -- protruding sill below the bottom frame member
         add_sill(bm, frame_faces, normal)
 
     return window_face, arch_face
