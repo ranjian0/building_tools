@@ -3,31 +3,51 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "step failed: error",
-  "geometry_hash": null,
-  "geometry_report": null,
+  "error": null,
+  "geometry_hash": "eb12595929a7883c",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 98,
+      "faces": 44,
+      "verts": 56
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 0,
+    "zero_area_faces": 1
+  },
   "id": "door-arch",
-  "image": null,
+  "image": "image.png",
   "known_issues": [
-    "non_manifold",
     "flaky_arch_unpack"
   ],
-  "mesh": null,
-  "scenario": "floors_only",
+  "mesh": {
+    "edges": 98,
+    "faces": 44,
+    "verts": 56,
+    "z_range": [
+      0.0,
+      3.0
+    ]
+  },
+  "scenario": "wall",
   "step_results": [
     {
-      "errors": [
-        "ValueError: not enough values to unpack (expected 1, got 0)"
-      ],
+      "errors": [],
       "feature": "door",
-      "matgroup_counts": {},
-      "status": "error",
+      "matgroup_counts": {
+        "door": 9,
+        "frame": 22,
+        "walls": 13
+      },
+      "status": "ok",
       "warnings": []
     }
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "door",
       "options": {
         "add_arch": true,
@@ -40,5 +60,36 @@
       }
     }
   ],
-  "validation": null
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 98,
+        "faces": 44,
+        "verts": 56
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 0,
+      "zero_area_faces": 1
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 9,
+        "frame": 22,
+        "walls": 13
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 3,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 6
+    },
+    "object": "wall",
+    "ok": true,
+    "problems": []
+  }
 }

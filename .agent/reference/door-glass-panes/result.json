@@ -4,45 +4,41 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "c89f64a142df6038",
+  "geometry_hash": "09afab203c22f74b",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 180,
-      "faces": 88,
-      "verts": 93
+      "edges": 92,
+      "faces": 45,
+      "verts": 49
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 0
+    "zero_area_faces": 1
   },
   "id": "door-glass-panes",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 180,
-    "faces": 88,
-    "verts": 93,
+    "edges": 92,
+    "faces": 45,
+    "verts": 49,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 8,
+        "door": 15,
         "door_panes": 16,
         "frame": 7,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "status": "ok",
       "warnings": []
@@ -50,7 +46,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "door",
       "options": {
         "fill_type": "GLASS_PANES"
@@ -59,36 +55,34 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 180,
-        "faces": 88,
-        "verts": 93
+        "edges": 92,
+        "faces": 45,
+        "verts": 49
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 0
+      "zero_area_faces": 1
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 8,
+        "door": 15,
         "door_panes": 16,
         "frame": 7,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "invalid_index_faces": 0,
-      "num_groups": 6,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

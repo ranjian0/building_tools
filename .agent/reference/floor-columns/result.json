@@ -19,9 +19,7 @@
   },
   "id": "floor-columns",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
     "edges": 164,
     "faces": 73,

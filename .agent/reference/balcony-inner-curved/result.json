@@ -20,8 +20,7 @@
   "id": "balcony-inner-curved",
   "image": "image.png",
   "known_issues": [
-    "non_manifold",
-    "inverted_normals",
+    "balcony_railing_untagged",
     "grouped_balcony_curved_platform"
   ],
   "mesh": {
@@ -79,7 +78,9 @@
       "flip_seams": 0
     },
     "object": "curved_wall",
-    "ok": true,
-    "problems": []
+    "ok": false,
+    "problems": [
+      "missing/empty matgroups: ['railing_posts']"
+    ]
   }
 }

@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "1fd53f33c165df7a",
+  "geometry_hash": "78745179f68c42bf",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 184,
-      "faces": 88,
-      "verts": 97
+      "edges": 96,
+      "faces": 45,
+      "verts": 53
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -20,28 +20,27 @@
   "id": "door-panels",
   "image": "image.png",
   "known_issues": [
-    "non_manifold"
+    "fill_drops_element_group"
   ],
   "mesh": {
-    "edges": 184,
-    "faces": 88,
-    "verts": 97,
+    "edges": 96,
+    "faces": 45,
+    "verts": 53,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
+        "door": 7,
         "door_panels": 4,
         "frame": 27,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "status": "ok",
       "warnings": []
@@ -49,7 +48,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "door",
       "options": {
         "fill_type": "PANELS"
@@ -60,9 +59,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 184,
-        "faces": 88,
-        "verts": 97
+        "edges": 96,
+        "faces": 45,
+        "verts": 53
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -72,21 +71,20 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
+        "door": 7,
         "door_panels": 4,
         "frame": 27,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "invalid_index_faces": 0,
-      "num_groups": 6,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

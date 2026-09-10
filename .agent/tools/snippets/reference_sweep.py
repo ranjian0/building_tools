@@ -155,9 +155,8 @@ def assign_matgroup_materials(obj):
     def mat_for(name, color):
         if name not in mats:
             m = bpy.data.materials.new("ref_" + name)
-            m.use_nodes = True
-            # -- workbench MATERIAL mode reads the viewport display color,
-            #    not the node tree
+            # -- materials have a node tree by default; workbench MATERIAL
+            #    mode reads the viewport display color, not the nodes
             m.diffuse_color = (*color, 1.0)
             bsdf = next((n for n in m.node_tree.nodes
                          if n.type == "BSDF_PRINCIPLED"), None)
@@ -380,10 +379,15 @@ def main():
     with open(os.path.join(OUT_DIR, "index.md"), "w") as f:
         f.write("\n".join(lines))
 
+    # -- 'failed' = hard errors only; contract violations are expected states
+    #    for cases carrying known_issues markers (they gate the diff)
+    failed = [e["id"] for e in index if e["status"] == "error"]
+    violations = [e["id"] for e in index if e["status"] == "contract violated"]
     print("__JSON__" + json.dumps({
         "generated": len(index),
         "out_dir": OUT_DIR,
-        "failed": [e["id"] for e in index if e["status"] not in ("ok",)],
+        "failed": failed,
+        "violations": violations,
     }))
 
 

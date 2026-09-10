@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "0453559624eab9f9",
+  "geometry_hash": "fa48d09e828515c2",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 163,
-      "faces": 77,
-      "verts": 87
+      "edges": 75,
+      "faces": 34,
+      "verts": 43
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -19,29 +19,25 @@
   },
   "id": "multigroup-default",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 163,
-    "faces": 77,
-    "verts": 87,
+    "edges": 75,
+    "faces": 34,
+    "verts": 43,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "multigroup",
       "matgroup_counts": {
-        "door": 1,
+        "door": 9,
         "frame": 14,
-        "roof": 1,
-        "slabs": 38,
-        "walls": 22,
+        "walls": 10,
         "window": 1
       },
       "status": "ok",
@@ -50,7 +46,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "multigroup",
       "options": {}
     }
@@ -59,9 +55,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 163,
-        "faces": 77,
-        "verts": 87
+        "edges": 75,
+        "faces": 34,
+        "verts": 43
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -71,22 +67,20 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 1,
+        "door": 9,
         "frame": 14,
-        "roof": 1,
-        "slabs": 38,
-        "walls": 22,
+        "walls": 10,
         "window": 1
       },
       "invalid_index_faces": 0,
-      "num_groups": 6,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

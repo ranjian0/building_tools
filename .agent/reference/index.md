@@ -124,117 +124,123 @@ image size: 1280x800 -- 42 cases
 ## door-default
 
 - status: `ok`
-- faces: 65 -- geometry_hash: `ba49dbb37a2e9dfd`
+- faces: 22 -- geometry_hash: `39a2885c671af685`
 
 ![door-default](door-default/image.png)
 
 ## door-panels
 
 - status: `ok`
-- faces: 88 -- geometry_hash: `1fd53f33c165df7a`
+- faces: 45 -- geometry_hash: `78745179f68c42bf`
 
 ![door-panels](door-panels/image.png)
 
 ## door-louver
 
 - status: `ok`
-- faces: 119 -- geometry_hash: `ba4be5e646271aff`
+- faces: 76 -- geometry_hash: `48d4e938b6b54642`
 
 ![door-louver](door-louver/image.png)
 
 ## door-glass-panes
 
 - status: `ok`
-- faces: 88 -- geometry_hash: `c89f64a142df6038`
+- faces: 45 -- geometry_hash: `09afab203c22f74b`
 
 ![door-glass-panes](door-glass-panes/image.png)
 
 ## door-double
 
 - status: `ok`
-- faces: 66 -- geometry_hash: `362c42d8390f17ee`
+- faces: 23 -- geometry_hash: `0716bab0318c941e`
 
 ![door-double](door-double/image.png)
 
 ## door-arch
 
-- status: `step failed: error`
-- faces: None -- geometry_hash: `None`
+- status: `ok`
+- faces: 44 -- geometry_hash: `eb12595929a7883c`
+
+![door-arch](door-arch/image.png)
 
 ## window-default
 
 - status: `ok`
-- faces: 65 -- geometry_hash: `c73b037c57ce0b65`
+- faces: 22 -- geometry_hash: `def25cfdadb6ea5f`
 
 ![window-default](window-default/image.png)
 
 ## window-bar
 
 - status: `ok`
-- faces: 71 -- geometry_hash: `1b4f22ed69525b41`
+- faces: 28 -- geometry_hash: `265f4639c8e0b326`
 
 ![window-bar](window-bar/image.png)
 
 ## window-louver
 
 - status: `ok`
-- faces: 119 -- geometry_hash: `4f3f5b83bdf08d18`
+- faces: 76 -- geometry_hash: `1d2c4e5b353064c3`
 
 ![window-louver](window-louver/image.png)
 
 ## window-glass-panes
 
 - status: `ok`
-- faces: 88 -- geometry_hash: `ff3f7468651fa28b`
+- faces: 45 -- geometry_hash: `08f987660be83016`
 
 ![window-glass-panes](window-glass-panes/image.png)
 
 ## window-circular
 
 - status: `ok`
-- faces: 103 -- geometry_hash: `acabfeeadc618307`
+- faces: 60 -- geometry_hash: `d2f6ae0ce9abe3ab`
 
 ![window-circular](window-circular/image.png)
 
 ## multigroup-default
 
 - status: `ok`
-- faces: 77 -- geometry_hash: `0453559624eab9f9`
+- faces: 34 -- geometry_hash: `fa48d09e828515c2`
 
 ![multigroup-default](multigroup-default/image.png)
 
 ## multigroup-fills
 
 - status: `ok`
-- faces: 106 -- geometry_hash: `70f916a8f44cf6d2`
+- faces: 63 -- geometry_hash: `6461d74b0b613ec3`
 
 ![multigroup-fills](multigroup-fills/image.png)
 
 ## balcony-posts-wall
 
-- status: `ok`
+- status: `contract violated`
 - faces: 6 -- geometry_hash: `696a9cb143dee764`
+- problems: ["missing/empty matgroups: ['railing_posts']"] (known: ['balcony_railing_untagged'])
 
 ![balcony-posts-wall](balcony-posts-wall/image.png)
 
 ## balcony-rails-wall
 
-- status: `ok`
+- status: `contract violated`
 - faces: 6 -- geometry_hash: `696a9cb143dee764`
+- problems: ["missing/empty matgroups: ['railing_rails']"] (known: ['balcony_railing_untagged'])
 
 ![balcony-rails-wall](balcony-rails-wall/image.png)
 
 ## balcony-wallfill-wall
 
-- status: `ok`
+- status: `contract violated`
 - faces: 6 -- geometry_hash: `696a9cb143dee764`
+- problems: ["missing/empty matgroups: ['railing_walls']"] (known: ['balcony_railing_untagged'])
 
 ![balcony-wallfill-wall](balcony-wallfill-wall/image.png)
 
 ## balcony-inner-curved
 
-- status: `ok`
+- status: `contract violated`
 - faces: 50 -- geometry_hash: `ae77a2dcde0752f2`
+- problems: ["missing/empty matgroups: ['railing_posts']"] (known: ['balcony_railing_untagged', 'grouped_balcony_curved_platform'])
 
 ![balcony-inner-curved](balcony-inner-curved/image.png)
 

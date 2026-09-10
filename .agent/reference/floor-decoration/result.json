@@ -20,7 +20,7 @@
   "id": "floor-decoration",
   "image": "image.png",
   "known_issues": [
-    "non_manifold"
+    "decoration_no_columns_no_output"
   ],
   "mesh": {
     "edges": 68,

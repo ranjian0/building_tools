@@ -20,7 +20,7 @@
   "id": "balcony-posts-wall",
   "image": "image.png",
   "known_issues": [
-    "non_manifold"
+    "balcony_railing_untagged"
   ],
   "mesh": {
     "edges": 12,
@@ -77,7 +77,9 @@
       "flip_seams": 0
     },
     "object": "wall",
-    "ok": true,
-    "problems": []
+    "ok": false,
+    "problems": [
+      "missing/empty matgroups: ['railing_posts']"
+    ]
   }
 }

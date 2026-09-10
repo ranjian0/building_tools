@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "ba49dbb37a2e9dfd",
+  "geometry_hash": "39a2885c671af685",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 136,
-      "faces": 65,
-      "verts": 72
+      "edges": 48,
+      "faces": 22,
+      "verts": 28
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -19,29 +19,25 @@
   },
   "id": "door-default",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 136,
-    "faces": 65,
-    "verts": 72,
+    "edges": 48,
+    "faces": 22,
+    "verts": 28,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 1,
+        "door": 8,
         "frame": 7,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "status": "ok",
       "warnings": []
@@ -49,7 +45,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "door",
       "options": {}
     }
@@ -58,9 +54,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 136,
-        "faces": 65,
-        "verts": 72
+        "edges": 48,
+        "faces": 22,
+        "verts": 28
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -70,21 +66,19 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 1,
+        "door": 8,
         "frame": 7,
-        "roof": 1,
-        "slabs": 37,
-        "walls": 19
+        "walls": 7
       },
       "invalid_index_faces": 0,
-      "num_groups": 5,
+      "num_groups": 3,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

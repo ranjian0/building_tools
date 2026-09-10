@@ -85,6 +85,16 @@ door brown, frame near-black, window blues, balcony ochre, stairs tan —
 **untagged faces render bright red**, which makes contract violations
 visible at a glance.
 
+### Expectations (matgroup contract)
+
+Every feature case carries `expect: {"groups": [...]}` — the matgroups the
+feature must produce. A missing/empty expected group marks the case
+`contract violated` in the index; violations are **expected states** for
+cases with matching `known_issues` markers (they document current addon
+tagging gaps, e.g. `balcony_railing_untagged`), and the diff flags any
+*change* in them. Current known violations: the 4 `balcony-*` cases
+(railings never tagged).
+
 ## Agent loop (typical)
 
 ```bash

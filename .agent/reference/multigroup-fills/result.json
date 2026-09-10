@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "70f916a8f44cf6d2",
+  "geometry_hash": "6461d74b0b613ec3",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 231,
-      "faces": 106,
-      "verts": 128
+      "edges": 143,
+      "faces": 63,
+      "verts": 84
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,25 +23,24 @@
     "zero_width_window_fill"
   ],
   "mesh": {
-    "edges": 231,
-    "faces": 106,
-    "verts": 128,
+    "edges": 143,
+    "faces": 63,
+    "verts": 84,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "multigroup",
       "matgroup_counts": {
+        "door": 8,
         "door_panels": 4,
         "frame": 34,
-        "roof": 1,
-        "slabs": 38,
-        "walls": 22,
+        "walls": 10,
         "window": 1,
         "window_bars": 6
       },
@@ -51,7 +50,7 @@
   ],
   "steps": [
     {
-      "faces": "ground_front_wall",
+      "faces": "front_wall",
       "feature": "multigroup",
       "options": {
         "fill_type_door": "PANELS",
@@ -65,9 +64,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 231,
-        "faces": 106,
-        "verts": 128
+        "edges": 143,
+        "faces": 63,
+        "verts": 84
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -77,23 +76,22 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
+        "door": 8,
         "door_panels": 4,
         "frame": 34,
-        "roof": 1,
-        "slabs": 38,
-        "walls": 22,
+        "walls": 10,
         "window": 1,
         "window_bars": 6
       },
       "invalid_index_faces": 0,
-      "num_groups": 8,
+      "num_groups": 6,
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

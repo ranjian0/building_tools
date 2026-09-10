@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "acabfeeadc618307",
+  "geometry_hash": "d2f6ae0ce9abe3ab",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 232,
-      "faces": 103,
-      "verts": 130
+      "edges": 144,
+      "faces": 60,
+      "verts": 86
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -19,29 +19,25 @@
   },
   "id": "window-circular",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 232,
-    "faces": 103,
-    "verts": 130,
+    "edges": 144,
+    "faces": 60,
+    "verts": 86,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "window",
       "matgroup_counts": {
         "frame": 44,
-        "roof": 1,
-        "slabs": 36,
-        "walls": 21,
-        "window": 1
+        "walls": 9,
+        "window": 7
       },
       "status": "ok",
       "warnings": []
@@ -49,7 +45,7 @@
   ],
   "steps": [
     {
-      "faces": "upper_front_wall",
+      "faces": "front_wall",
       "feature": "window",
       "options": {
         "size_offset": {
@@ -66,9 +62,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 232,
-        "faces": 103,
-        "verts": 130
+        "edges": 144,
+        "faces": 60,
+        "verts": 86
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -79,20 +75,18 @@
       "all_tagged": true,
       "groups": {
         "frame": 44,
-        "roof": 1,
-        "slabs": 36,
-        "walls": 21,
-        "window": 1
+        "walls": 9,
+        "window": 7
       },
       "invalid_index_faces": 0,
-      "num_groups": 5,
+      "num_groups": 3,
       "untagged_faces": 0
     },
     "normals": {
       "consistent": true,
       "flip_seams": 0
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

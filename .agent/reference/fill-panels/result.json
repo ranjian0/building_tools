@@ -19,7 +19,9 @@
   },
   "id": "fill-panels",
   "image": "image.png",
-  "known_issues": [],
+  "known_issues": [
+    "panels_ignore_comp"
+  ],
   "mesh": {
     "edges": 60,
     "faces": 29,

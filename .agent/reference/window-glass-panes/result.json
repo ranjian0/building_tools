@@ -4,44 +4,40 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "ff3f7468651fa28b",
+  "geometry_hash": "08f987660be83016",
   "geometry_report": {
-    "clean": false,
+    "clean": true,
     "counts": {
-      "edges": 180,
-      "faces": 88,
-      "verts": 93
+      "edges": 92,
+      "faces": 45,
+      "verts": 49
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 1
+    "zero_area_faces": 0
   },
   "id": "window-glass-panes",
   "image": "image.png",
-  "known_issues": [
-    "non_manifold"
-  ],
+  "known_issues": [],
   "mesh": {
-    "edges": 180,
-    "faces": 88,
-    "verts": 93,
+    "edges": 92,
+    "faces": 45,
+    "verts": 49,
     "z_range": [
       0.0,
-      9.6
+      3.0
     ]
   },
-  "scenario": "floors_only",
+  "scenario": "wall",
   "step_results": [
     {
       "errors": [],
       "feature": "window",
       "matgroup_counts": {
         "frame": 8,
-        "roof": 1,
-        "slabs": 36,
-        "walls": 19,
-        "window": 8,
+        "walls": 6,
+        "window": 15,
         "window_panes": 16
       },
       "status": "ok",
@@ -50,7 +46,7 @@
   ],
   "steps": [
     {
-      "faces": "upper_front_wall",
+      "faces": "front_wall",
       "feature": "window",
       "options": {
         "fill_type": "GLASS_PANES"
@@ -59,36 +55,34 @@
   ],
   "validation": {
     "geometry": {
-      "clean": false,
+      "clean": true,
       "counts": {
-        "edges": 180,
-        "faces": 88,
-        "verts": 93
+        "edges": 92,
+        "faces": 45,
+        "verts": 49
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 1
+      "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "frame": 8,
-        "roof": 1,
-        "slabs": 36,
-        "walls": 19,
-        "window": 8,
+        "walls": 6,
+        "window": 15,
         "window_panes": 16
       },
       "invalid_index_faces": 0,
-      "num_groups": 6,
+      "num_groups": 4,
       "untagged_faces": 0
     },
     "normals": {
       "consistent": true,
       "flip_seams": 0
     },
-    "object": "building_001",
+    "object": "wall",
     "ok": true,
     "problems": []
   }

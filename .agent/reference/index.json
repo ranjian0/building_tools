@@ -104,9 +104,7 @@
       "geometry_hash": "b0b208f1cdb562bc",
       "id": "floor-columns",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
@@ -116,7 +114,7 @@
       "id": "floor-decoration",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "decoration_no_columns_no_output"
       ],
       "problems": [],
       "status": "ok"
@@ -158,142 +156,125 @@
       "status": "ok"
     },
     {
-      "faces": 65,
-      "geometry_hash": "ba49dbb37a2e9dfd",
+      "faces": 22,
+      "geometry_hash": "39a2885c671af685",
       "id": "door-default",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 88,
-      "geometry_hash": "1fd53f33c165df7a",
+      "faces": 45,
+      "geometry_hash": "78745179f68c42bf",
       "id": "door-panels",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "fill_drops_element_group"
       ],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 119,
-      "geometry_hash": "ba4be5e646271aff",
+      "faces": 76,
+      "geometry_hash": "48d4e938b6b54642",
       "id": "door-louver",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "fill_drops_element_group"
       ],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 88,
-      "geometry_hash": "c89f64a142df6038",
+      "faces": 45,
+      "geometry_hash": "09afab203c22f74b",
       "id": "door-glass-panes",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 66,
-      "geometry_hash": "362c42d8390f17ee",
+      "faces": 23,
+      "geometry_hash": "0716bab0318c941e",
       "id": "door-double",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": null,
-      "geometry_hash": null,
+      "faces": 44,
+      "geometry_hash": "eb12595929a7883c",
       "id": "door-arch",
-      "image": null,
+      "image": "image.png",
       "known_issues": [
-        "non_manifold",
         "flaky_arch_unpack"
       ],
       "problems": [],
-      "status": "step failed: error"
+      "status": "ok"
     },
     {
-      "faces": 65,
-      "geometry_hash": "c73b037c57ce0b65",
+      "faces": 22,
+      "geometry_hash": "def25cfdadb6ea5f",
       "id": "window-default",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 71,
-      "geometry_hash": "1b4f22ed69525b41",
+      "faces": 28,
+      "geometry_hash": "265f4639c8e0b326",
       "id": "window-bar",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 119,
-      "geometry_hash": "4f3f5b83bdf08d18",
+      "faces": 76,
+      "geometry_hash": "1d2c4e5b353064c3",
       "id": "window-louver",
       "image": "image.png",
       "known_issues": [
-        "non_manifold",
+        "fill_drops_element_group",
         "flaky_louver_max_empty"
       ],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 88,
-      "geometry_hash": "ff3f7468651fa28b",
+      "faces": 45,
+      "geometry_hash": "08f987660be83016",
       "id": "window-glass-panes",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 103,
-      "geometry_hash": "acabfeeadc618307",
+      "faces": 60,
+      "geometry_hash": "d2f6ae0ce9abe3ab",
       "id": "window-circular",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 77,
-      "geometry_hash": "0453559624eab9f9",
+      "faces": 34,
+      "geometry_hash": "fa48d09e828515c2",
       "id": "multigroup-default",
       "image": "image.png",
-      "known_issues": [
-        "non_manifold"
-      ],
+      "known_issues": [],
       "problems": [],
       "status": "ok"
     },
     {
-      "faces": 106,
-      "geometry_hash": "70f916a8f44cf6d2",
+      "faces": 63,
+      "geometry_hash": "6461d74b0b613ec3",
       "id": "multigroup-fills",
       "image": "image.png",
       "known_issues": [
@@ -308,10 +289,12 @@
       "id": "balcony-posts-wall",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "balcony_railing_untagged"
       ],
-      "problems": [],
-      "status": "ok"
+      "problems": [
+        "missing/empty matgroups: ['railing_posts']"
+      ],
+      "status": "contract violated"
     },
     {
       "faces": 6,
@@ -319,10 +302,12 @@
       "id": "balcony-rails-wall",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "balcony_railing_untagged"
       ],
-      "problems": [],
-      "status": "ok"
+      "problems": [
+        "missing/empty matgroups: ['railing_rails']"
+      ],
+      "status": "contract violated"
     },
     {
       "faces": 6,
@@ -330,10 +315,12 @@
       "id": "balcony-wallfill-wall",
       "image": "image.png",
       "known_issues": [
-        "non_manifold"
+        "balcony_railing_untagged"
       ],
-      "problems": [],
-      "status": "ok"
+      "problems": [
+        "missing/empty matgroups: ['railing_walls']"
+      ],
+      "status": "contract violated"
     },
     {
       "faces": 50,
@@ -341,12 +328,13 @@
       "id": "balcony-inner-curved",
       "image": "image.png",
       "known_issues": [
-        "non_manifold",
-        "inverted_normals",
+        "balcony_railing_untagged",
         "grouped_balcony_curved_platform"
       ],
-      "problems": [],
-      "status": "ok"
+      "problems": [
+        "missing/empty matgroups: ['railing_posts']"
+      ],
+      "status": "contract violated"
     },
     {
       "faces": 206,
@@ -389,7 +377,9 @@
       "geometry_hash": "6228abc314f25fce",
       "id": "fill-panels",
       "image": "image.png",
-      "known_issues": [],
+      "known_issues": [
+        "panels_ignore_comp"
+      ],
       "problems": [],
       "status": "ok"
     },
