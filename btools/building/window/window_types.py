@@ -33,6 +33,7 @@ from ..materialgroup import (
     map_new_faces,
     restore_wall_plane_faces,
 )
+from ..frame import add_sill
 
 
 def create_window(bm, faces, prop):
@@ -65,6 +66,7 @@ def create_window(bm, faces, prop):
     nulfaces = find_faces_without_matgroup(bm)
     add_faces_to_group(bm, nulfaces, MaterialGroup.WALLS)
     restore_wall_plane_faces(bm, planes)
+
     return True
 
 
@@ -196,6 +198,10 @@ def create_rectangular_frame(bm, face, prop):
     add_faces_to_group(bm, validate(frame_faces), MaterialGroup.FRAME)
     if prop.add_arch:
         add_faces_to_group(bm, [arch_face], MaterialGroup.WINDOW)
+
+    # -- protruding sill below the bottom frame member
+    from ..frame import add_sill
+    add_sill(bm, frame_faces, normal)
 
     return window_face, arch_face
 

@@ -138,6 +138,10 @@ def create_door_frame(bm, face, prop):
     if prop.add_arch:
         add_faces_to_group(bm, [arch_face], MaterialGroup.DOOR)
 
+    # -- protruding threshold at the door base
+    from ..frame import add_threshold
+    add_threshold(bm, frame_faces, normal)
+
     return door_face, arch_face
 
 
