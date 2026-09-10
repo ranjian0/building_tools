@@ -187,6 +187,7 @@ class TestWallElements(unittest.TestCase):
 
     def test_window_tags_wall_strips(self):
         # -- 5 untouched + 2 side strips + 1 restored = 8 (pre-fix: 7)
+        #    (sill below adds an extra frame face, so >= 8 not == 9)
         res = apply_feature(
             "window",
             WindowOptions(size_offset=SizeOffsetOptions(size=(2.4, 1.6))),

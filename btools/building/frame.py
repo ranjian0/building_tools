@@ -65,8 +65,8 @@ def add_frame_depth(
 
 
 def add_sill(
-    bm, frame_faces, frame_depth, wall_normal,
-    projection=0.075, thickness=0.04, group=None,
+    bm, frame_faces, wall_normal,
+    projection=0.075,
 ):
     """Protruding sill below the bottom frame member with a drip edge.
 
