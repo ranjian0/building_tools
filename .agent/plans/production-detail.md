@@ -79,8 +79,14 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] roof fascia band along the eave (roof_hangs bottom rim)
 - [x] gutters (half-round sweep on fascia) + downspouts at corners
       (prop add_gutters, default False; presets opt in)
-- [ ] gable ridge cap; verge boards on open gables
-- [ ] flat-roof parapet coping (bevel/chamfer the coping top)
+- [x] gable ridge cap; verge boards on open gables (add_ridge_cap,
+      default True; swept profiles along ridge/rake edges, ROOF-tagged)
+- [x] flat-roof parapet coping (coping_size chamfer on the ring's top
+      edges, applied when add_border)
+- [x] gutters rewritten (was a broken stub: invalid 2-vert faces at the
+      wall base): edges chained into side runs, oriented outward, hung
+      below the eave, gated to eave sides only (gable ends skipped);
+      chimney rewritten to sit on the largest slope face
 - [ ] cornice/string-course option on floor slabs (add_cornice, per slab line)
 - [ ] column base + capital options; decoration decoupled from slab_outset
 - [x] chimney (#183): masonry stack + cap + flue pot (prop add_chimney)
@@ -107,12 +113,16 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] probe hardening: wall_planes weighted by area (single-face walls
       lost to window-recess planes); counts_per_storey assigns by the
       floor below (nearest-center straddled mid-storey)
-- [ ] multigroup entry detail (threshold/hardware via frame.py helpers)
+- [x] multigroup entry detail: threshold + lever hardware wired into
+      create_multigroup_frame (add_hardware prop, default True);
+      add_hardware refactored to take frame_thickness/handle_height/
+      handle_style directly (usable without DoorProperty)
 - [ ] Detail level (Low/Medium/High) — scene setting + api param; gates
       bevels/hardware/gutters/cornices/chimney/glass thickness
-- [ ] re-tune all 8 presets on the new detail features (gutters on
-      suburban, cornices on apartment/office, chimney on suburban,
-      shopfront glass on corner shop, etc.)
+- [x] preset opt-ins: gutters on suburban/townhouse/mediterranean/
+      warehouse; chimney on suburban (flat-roof presets keep parapets)
+- [ ] remaining re-tune: cornices on apartment/office (needs cornice
+      feature), shopfront glass on corner shop
 - [ ] fake interiors: window material variant with emissive procedural
       interior (curtain/room mix) for night renders (toggle)
 - [ ] export operator: glTF (.glb) + FBX of the active building; applied

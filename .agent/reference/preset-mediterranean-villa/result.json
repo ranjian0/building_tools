@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "e6cafdc457700513",
+  "geometry_hash": "33a927c0df1c61ce",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 515,
-      "faces": 232,
-      "verts": 296
+      "edges": 608,
+      "faces": 272,
+      "verts": 358
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,12 +23,12 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 515,
-    "faces": 232,
-    "verts": 296,
+    "edges": 608,
+    "faces": 272,
+    "verts": 358,
     "z_range": [
       0.0,
-      7.95
+      8.0
     ]
   },
   "panel_paths": [
@@ -49,10 +49,10 @@
         "railing_posts": 24,
         "railing_rails": 24,
         "railing_walls": 6,
-        "roof": 4,
-        "roof_hangs": 8,
+        "roof": 8,
+        "roof_hangs": 38,
         "slabs": 25,
-        "walls": 44,
+        "walls": 50,
         "window": 4
       },
       "status": "ok",
@@ -64,9 +64,9 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 515,
-        "faces": 232,
-        "verts": 296
+        "edges": 608,
+        "faces": 272,
+        "verts": 358
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -82,10 +82,10 @@
         "railing_posts": 24,
         "railing_rails": 24,
         "railing_walls": 6,
-        "roof": 4,
-        "roof_hangs": 8,
+        "roof": 8,
+        "roof_hangs": 38,
         "slabs": 25,
-        "walls": 44,
+        "walls": 50,
         "window": 4
       },
       "invalid_index_faces": 0,

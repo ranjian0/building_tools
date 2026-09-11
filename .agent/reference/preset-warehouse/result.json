@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "1f0fa85476d83339",
+  "geometry_hash": "fdc7f04b3a942f28",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 540,
-      "faces": 230,
-      "verts": 334
+      "edges": 591,
+      "faces": 252,
+      "verts": 368
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,12 +23,12 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 540,
-    "faces": 230,
-    "verts": 334,
+    "edges": 591,
+    "faces": 252,
+    "verts": 368,
     "z_range": [
       0.0,
-      8.15
+      8.2
     ]
   },
   "panel_paths": [
@@ -45,9 +45,9 @@
       "matgroup_counts": {
         "door": 27,
         "frame": 88,
-        "roof": 2,
-        "roof_hangs": 12,
-        "walls": 59,
+        "roof": 6,
+        "roof_hangs": 26,
+        "walls": 63,
         "window": 6,
         "window_bars": 36
       },
@@ -60,9 +60,9 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 540,
-        "faces": 230,
-        "verts": 334
+        "edges": 591,
+        "faces": 252,
+        "verts": 368
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -74,9 +74,9 @@
       "groups": {
         "door": 27,
         "frame": 88,
-        "roof": 2,
-        "roof_hangs": 12,
-        "walls": 59,
+        "roof": 6,
+        "roof_hangs": 26,
+        "walls": 63,
         "window": 6,
         "window_bars": 36
       },

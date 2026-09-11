@@ -195,6 +195,21 @@ def create_multigroup_frame(bm, face, prop):
     if prop.add_arch:
         add_faces_to_group(bm, [arch_face], MaterialGroup.DOOR)
 
+    # -- production details: threshold under the door run, handles on the
+    #    leaves (frame faces walk adjacency; door leaf refs stay valid)
+    from ..frame import add_hardware, add_threshold
+
+    add_threshold(bm, validate(frame_faces), normal)
+    if prop.add_hardware:
+        for door in door_faces:
+            add_hardware(
+                bm,
+                door,
+                validate(frame_faces),
+                normal,
+                frame_thickness=prop.frame_thickness,
+            )
+
     return door_faces, window_faces, arch_face
 
 

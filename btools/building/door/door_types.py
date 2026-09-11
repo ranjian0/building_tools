@@ -159,7 +159,15 @@ def create_door_frame(bm, face, prop):
     if prop.add_hardware:
         from ..frame import add_hardware
 
-        add_hardware(bm, door_face, frame_faces, normal, prop)
+        add_hardware(
+            bm,
+            door_face,
+            frame_faces,
+            normal,
+            frame_thickness=prop.frame_thickness,
+            handle_height=prop.handle_height,
+            handle_style=prop.handle_style,
+        )
 
     return door_face, arch_face
 

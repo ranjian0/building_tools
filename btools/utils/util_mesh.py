@@ -516,12 +516,13 @@ def set_smooth_shading(bm, faces, smooth=True):
         f.smooth = smooth
 
 
-def sweep_profile_along_edges(bm, edges, profile, close_caps=True):
+def sweep_profile_along_edges(bm, edges, profile, close_caps=True, side_flip=False):
     """Sweep a closed 2D profile along a straight chain of edges.
 
     profile: list of (u, v) float offsets in the plane perpendicular to the
     run direction -- u = horizontal (right of travel), v = vertical (up).
     The chain must be straight (v1 handles no corners; callers split runs).
+    side_flip mirrors the u axis (for orienting profiles outward).
 
     Returns the created side faces.
     """
@@ -531,16 +532,26 @@ def sweep_profile_along_edges(bm, edges, profile, close_caps=True):
     if not edges or len(profile) < 3:
         return []
 
-    start_co = edges[0].verts[0].co.copy()
-    end_co = edges[-1].verts[1].co.copy()
-    run = (end_co - start_co).normalized()
+    # -- accept BMEdge (fixed winding) or (start_co, end_co) pairs
+    def _seg(e):
+        if hasattr(e, "verts"):
+            return e.verts[0].co.copy(), e.verts[1].co.copy()
+        return Vector(e[0]), Vector(e[1])
+
+    start_co, end_first = _seg(edges[0])
+    run = (end_first - start_co).normalized()
     up = Vector((0.0, 0.0, 1.0))
     side = run.cross(up).normalized()
+    if side_flip:
+        side = -side
 
     # -- ordered base points along the chain
     ordered = [start_co.copy()]
     for e in edges:
-        ordered.append(ordered[-1] + (e.verts[1].co - e.verts[0].co))
+        a, b = _seg(e)
+        if (a - ordered[-1]).length > (b - ordered[-1]).length:
+            a, b = b, a  # orient segment to continue the chain
+        ordered.append(ordered[-1] + (b - a))
 
     vert_grid = [
         [bm.verts.new(base + side * u + up * v) for (u, v) in profile]

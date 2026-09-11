@@ -37,6 +37,12 @@ class MultigroupProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet)
         description="Thickness of door/window Frame",
     )
 
+    add_hardware: BoolProperty(
+        name="Add Handle",
+        default=True,
+        description="Add lever handle hardware to the door leaf",
+    )
+
     frame_depth: FloatProperty(
         name="Frame Depth",
         step=1,

@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "26b22a8abf0a3e51",
+  "geometry_hash": "371fa14e43a5c750",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 880,
-      "faces": 435,
-      "verts": 459
+      "edges": 916,
+      "faces": 455,
+      "verts": 475
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 40,
-    "zero_area_faces": 13
+    "zero_area_faces": 10
   },
   "id": "preset-modern-villa",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 880,
-    "faces": 435,
-    "verts": 459,
+    "edges": 916,
+    "faces": 455,
+    "verts": 475,
     "z_range": [
       0.0,
       7.05
@@ -45,7 +45,7 @@
       "matgroup_counts": {
         "door": 17,
         "frame": 127,
-        "roof": 17,
+        "roof": 37,
         "slabs": 25,
         "walls": 79,
         "window": 58,
@@ -60,21 +60,21 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 880,
-        "faces": 435,
-        "verts": 459
+        "edges": 916,
+        "faces": 455,
+        "verts": 475
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 40,
-      "zero_area_faces": 13
+      "zero_area_faces": 10
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 17,
         "frame": 127,
-        "roof": 17,
+        "roof": 37,
         "slabs": 25,
         "walls": 79,
         "window": 58,

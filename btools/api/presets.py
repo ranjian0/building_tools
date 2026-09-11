@@ -78,6 +78,8 @@ _suburban = BuildingPreset(
         "height": 1.6,
         "thickness": 0.12,
         "outset": 0.15,
+        "add_gutters": True,
+        "add_chimney": True,
     },
     facade=[
         FacadeRule(
@@ -129,6 +131,7 @@ _townhouse = BuildingPreset(
         "height": 1.2,
         "thickness": 0.12,
         "outset": 0.12,
+        "add_gutters": True,
     },
     facade=[
         FacadeRule(
@@ -341,7 +344,13 @@ _mediterranean = BuildingPreset(
     reference="https://commons.wikimedia.org/wiki/File:(1)Mediterranean_house_Vaucluse.jpg",
     floorplan={"type": "RECTANGULAR", "width": 9.0, "length": 7.0},
     floors={"floor_count": 2, "floor_height": 3.0, "add_slab": True},
-    roof={"type": "HIP", "height": 1.4, "thickness": 0.15, "outset": 0.2},
+    roof={
+        "type": "HIP",
+        "height": 1.4,
+        "thickness": 0.15,
+        "outset": 0.2,
+        "add_gutters": True,
+    },
     facade=[
         FacadeRule(
             "door", "ground_front_wall", (0,), {"size_offset": {"size": [1.2, 2.2]}}
@@ -445,6 +454,7 @@ _warehouse = BuildingPreset(
         "height": 2.0,
         "thickness": 0.15,
         "outset": 0.2,
+        "add_gutters": True,
     },
     facade=[
         FacadeRule(

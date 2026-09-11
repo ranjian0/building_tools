@@ -143,7 +143,15 @@ def add_casing(bm, frame_faces, wall_normal, casing_width=0.06, casing_depth=0.0
     return faces
 
 
-def add_hardware(bm, door_face, frame_faces, wall_normal, prop):
+def add_hardware(
+    bm,
+    door_face,
+    frame_faces,
+    wall_normal,
+    frame_thickness,
+    handle_height=1.05,
+    handle_style="LEVER",
+):
     """Lever or bar-pull handle mounted on the door leaf.
 
     door_face anchors the leaf plane (the recessed face inside the frame);
@@ -159,13 +167,13 @@ def add_hardware(bm, door_face, frame_faces, wall_normal, prop):
 
     # -- latch position: measured from the OPENING edge (the frame ring's
     #    outer edge lies in the wall plane, frame_thickness outboard)
-    opening_x = max(frame_xs) - prop.frame_thickness
+    opening_x = max(frame_xs) - frame_thickness
     latch_x = opening_x - 0.05  # 50mm in from the latch-side jamb face
-    latch_z = min(frame_zs) + prop.handle_height
+    latch_z = min(frame_zs) + handle_height
     pos = x_axis * latch_x + z_axis * latch_z + n * leaf_d
     outward = n
 
-    if prop.handle_style == "BAR_PULL":
+    if handle_style == "BAR_PULL":
         # -- vertical bar pull (commercial style)
         bar_h = 0.3
         bar_w = 0.03

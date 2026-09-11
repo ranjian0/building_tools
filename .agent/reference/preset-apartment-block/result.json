@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "9585030a137894fe",
+  "geometry_hash": "b4fa6dd9b0c8e7b6",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 17011,
-      "faces": 6845,
-      "verts": 10183
+      "edges": 17085,
+      "faces": 6884,
+      "verts": 10222
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 352,
-    "zero_area_faces": 43
+    "non_manifold_edges": 357,
+    "zero_area_faces": 51
   },
   "id": "preset-apartment-block",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 17011,
-    "faces": 6845,
-    "verts": 10183,
+    "edges": 17085,
+    "faces": 6884,
+    "verts": 10222,
     "z_range": [
       0.0,
       16.2
@@ -44,12 +44,12 @@
       "feature": "preset:apartment-block",
       "matgroup_counts": {
         "balcony": 80,
-        "door": 1,
-        "frame": 846,
+        "door": 16,
+        "frame": 849,
         "railing_posts": 3360,
         "railing_rails": 384,
-        "roof": 17,
-        "slabs": 62,
+        "roof": 37,
+        "slabs": 63,
         "walls": 558,
         "window": 513,
         "window_panes": 1024
@@ -63,25 +63,25 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 17011,
-        "faces": 6845,
-        "verts": 10183
+        "edges": 17085,
+        "faces": 6884,
+        "verts": 10222
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 352,
-      "zero_area_faces": 43
+      "non_manifold_edges": 357,
+      "zero_area_faces": 51
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "balcony": 80,
-        "door": 1,
-        "frame": 846,
+        "door": 16,
+        "frame": 849,
         "railing_posts": 3360,
         "railing_rails": 384,
-        "roof": 17,
-        "slabs": 62,
+        "roof": 37,
+        "slabs": 63,
         "walls": 558,
         "window": 513,
         "window_panes": 1024
@@ -91,8 +91,8 @@
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
     "object": "building_001",
     "ok": true,

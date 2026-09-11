@@ -39,10 +39,14 @@ def create_roof(bm, faces, prop):
 
     # -- silhouette details
     if getattr(prop, "add_gutters", False):
-        eave = _find_eave_edges(bm, bm.faces)
-        add_gutters(bm, eave, radius=getattr(prop, "gutter_size", 0.04))
+        roof_faces = _roof_trim_faces(bm)
+        if roof_faces:
+            eave = _find_eave_edges(bm, roof_faces)
+            add_gutters(bm, eave, radius=getattr(prop, "gutter_size", 0.08))
     if getattr(prop, "add_chimney", False):
-        add_chimney(bm, bm.faces)
+        add_chimney(bm)
+    if getattr(prop, "add_ridge_cap", False) and prop.type in ("GABLE", "HIP"):
+        add_ridge_cap_and_verges(bm)
 
 
 @map_new_faces(MaterialGroup.ROOF)
@@ -64,6 +68,28 @@ def create_flat_roof(bm, faces, prop):
             bm, vec=(0, 0, -(prop.thickness - 0.0011)), verts=filter_geom(ret, BMVert)
         )
         bmesh.ops.delete(bm, geom=top_face, context="FACES")
+
+        # -- chamfer the coping ring's top edges
+        coping = getattr(prop, "coping_size", 0.02)
+        if coping > 0.001:
+            top_z = max(v.co.z for v in bm.verts)
+            edges = [
+                e
+                for e in bm.edges
+                if abs(e.verts[0].co.z - top_z) < 0.01
+                and abs(e.verts[1].co.z - top_z) < 0.01
+            ]
+            if edges:
+                bmesh.ops.bevel(
+                    bm,
+                    geom=edges,
+                    offset=coping,
+                    offset_type="OFFSET",
+                    segments=1,
+                    profile=0.5,
+                    affect="EDGES",
+                    clamp_overlap=True,
+                )
 
 
 def create_gable_roof(bm, faces, prop):
@@ -426,6 +452,55 @@ def gable_process_open(bm, roof_faces, prop):
     add_faces_to_group(bm, side_faces + linked_bot, MaterialGroup.ROOF_HANGS)
 
 
+def add_ridge_cap_and_verges(bm, cap_width=0.14, cap_height=0.05, board=0.06):
+    """Ridge cap along the roof's highest edge + verge boards on raking
+    edges of gable slopes (both tagged ROOF via the map_new_faces wrapper
+    of create_roof's callers)."""
+    from ...utils import sweep_profile_along_edges
+
+    roof_faces = _roof_trim_faces(bm)
+    if not roof_faces:
+        return
+    max_z = max(v.co.z for f in roof_faces for v in f.verts)
+    min_z = min(v.co.z for f in roof_faces for v in f.verts)
+
+    ridge, rakes = [], []
+    for f in roof_faces:
+        for e in f.edges:
+            z0, z1 = e.verts[0].co.z, e.verts[1].co.z
+            if abs(z0 - max_z) < 0.01 and abs(z1 - max_z) < 0.01:
+                ridge.append(e)
+            elif (
+                abs(z0 - max_z) < 0.01
+                and abs(z1 - min_z) < 0.01
+                or abs(z1 - max_z) < 0.01
+                and abs(z0 - min_z) < 0.01
+            ):
+                rakes.append(e)
+
+    ridge = validate(ridge)
+    if ridge:
+        cap = [
+            (-cap_width / 2, -0.02),
+            (0.0, cap_height),
+            (cap_width / 2, -0.02),
+        ]
+        faces = sweep_profile_along_edges(bm, ridge, cap, close_caps=True)
+        add_faces_to_group(bm, faces, MaterialGroup.ROOF)
+
+    rakes = validate(rakes)
+    if rakes:
+        board_profile = [
+            (-board / 2, -board * 0.4),
+            (board / 2, -board * 0.4),
+            (board / 2, board * 0.8),
+            (-board / 2, board * 0.8),
+        ]
+        for e in rakes:
+            faces = sweep_profile_along_edges(bm, [e], board_profile)
+            add_faces_to_group(bm, faces, MaterialGroup.ROOF)
+
+
 def extrude_and_outset(bm, faces, thickness, outset):
     """Extrude the given faces upwards and outset resulting side faces"""
     # -- extrude faces upwards
@@ -457,6 +532,23 @@ def extrude_and_outset(bm, faces, thickness, outset):
     return bmesh.ops.dissolve_faces(bm, faces=new_faces).get("region")
 
 
+def _roof_trim_faces(bm):
+    """Faces belonging to the ROOF or ROOF_HANGS material groups.
+
+    The layer stores the OBJECT's material-item index (generation order),
+    not the enum value -- resolve the wanted indices via bt_materials.
+    """
+    import bpy
+
+    layer = bm.faces.layers.int.get(".bt_material_group_index")
+    if layer is None:
+        return []
+    obj = bpy.context.object
+    names = [mt.name for mt in getattr(obj, "bt_materials", [])]
+    wanted = {names.index(n) for n in ("roof", "roof_hangs") if n in names}
+    return [f for f in bm.faces if f[layer] in wanted]
+
+
 def _find_eave_edges(bm, roof_faces):
     """Find horizontal edges at the lowest z of the given roof face set."""
     min_z = min(v.co.z for f in roof_faces for v in f.verts)
@@ -468,65 +560,198 @@ def _find_eave_edges(bm, roof_faces):
     return eave
 
 
+def _run_direction(axis, edges):
+    """Overall direction of a chained run along its axis (+1 / -1 oriented
+    by the bucket sort); unit vector."""
+    d = 1.0
+    if edges:
+        a, b = edges[0].verts[0].co, edges[-1].verts[1].co
+        if (b - a)[0 if axis == "x" else 1] < 0:
+            d = -1.0
+    return Vector((d, 0, 0)) if axis == "x" else Vector((0, d, 0))
+
+
+def _chain_runs(edges, tol=0.05):
+    """Bucket axis-aligned edges into straight runs by (axis, lateral pos).
+
+    Returns {("x", lateral): [edges sorted along x]}, ... for both axes.
+    """
+    buckets = {}
+    for e in edges:
+        d = e.verts[1].co - e.verts[0].co
+        # -- skip diagonal (mitred corner) edges: not gutter runs
+        if abs(d.x) > 2 * abs(d.y):
+            axis, lat = "x", 1
+        elif abs(d.y) > 2 * abs(d.x):
+            axis, lat = "y", 0
+        else:
+            continue
+        mid = (e.verts[0].co + e.verts[1].co) / 2
+        key = (axis, round(mid[lat] / tol))
+        buckets.setdefault(key, []).append(e)
+    runs = {}
+    for key, group in buckets.items():
+        axis = key[0]
+        lat_i = 1 if axis == "x" else 0
+        group.sort(key=lambda e: min(e.verts[0].co[lat_i], e.verts[1].co[lat_i]))
+        runs[key] = group
+    return runs
+
+
 def add_gutters(bm, eave_edges, radius=0.04):
-    """Half-round gutters along the eave edges."""
-    for e in eave_edges:
-        v0, v1 = e.verts
-        mid = (v0.co + v1.co) / 2
-        profile_segments = 6
-        verts_ring = []
-        for i in range(profile_segments):
-            angle = math.pi * i / (profile_segments - 1)
-            # -- half circle opening upward
-            local = Vector(
-                (
-                    math.cos(angle) * radius,
-                    math.sin(angle) * radius * 0.7,
-                    -math.sin(angle) * radius * 0.5,
-                )
-            )
-            verts_ring.append(bm.verts.new(mid + local))
-        if len(verts_ring) >= 2:
-            for i in range(len(verts_ring) - 1):
-                try:
-                    bm.faces.new((verts_ring[i], verts_ring[i + 1]))
-                except ValueError:
-                    pass
+    """Half-round gutters hung below the eave edges (tagged ROOF_HANGS).
+
+    Edges are chained into one straight run per building side; each tube
+    hangs fully OUTSIDE the eave line so it never intersects the wall
+    faces behind the trim.
+    """
+    from ...utils import sweep_profile_along_edges
+
+    if not eave_edges:
+        return
+
+    center = Vector(
+        (
+            sum(v.co.x for e in eave_edges for v in e.verts) / (2 * len(eave_edges)),
+            sum(v.co.y for e in eave_edges for v in e.verts) / (2 * len(eave_edges)),
+            0.0,
+        )
+    )
+
+    # -- slope facing directions: gutters belong only on EAVE sides (where
+    #    a roof slope drains toward the edge); gable/rake ends are skipped
+    eave_dirs = []
+    for f in _roof_trim_faces(bm):
+        n = f.normal
+        h = Vector((n.x, n.y, 0.0))
+        if 0.15 < abs(n.z) < 0.97 and h.length > 0.1:
+            eave_dirs.append(h.normalized())
+
+    r = radius
+    # -- tube hangs fully BELOW the eave line (a top lip above it grazes
+    #    the wall tops at corners)
+    profile = [
+        (0.15 * r, -0.01),
+        (0.15 * r, -r * 0.6),
+        (0.45 * r, -r),
+        (1.1 * r, -r * 1.2),
+        (1.75 * r, -r),
+        (2.1 * r, -r * 0.6),
+        (2.1 * r, -0.01),
+    ]
+
+    # -- wall extent per axis: gutter runs must not reach past the walls
+    #    into the rake/outset corners (gable end walls sliver there)
+    import bpy as _bpy
+
+    _obj = _bpy.context.object
+    _names = [mt.name for mt in getattr(_obj, "bt_materials", [])]
+    _layer = bm.faces.layers.int.get(".bt_material_group_index")
+    wall_lo, wall_hi = {}, {}
+    if _layer is not None:
+        wi = {i for i, n in enumerate(_names) if n == "walls"}
+        wverts = [v.co for f in bm.faces if f[_layer] in wi for v in f.verts]
+        if wverts:
+            wall_lo = {"x": min(v.x for v in wverts), "y": min(v.y for v in wverts)}
+            wall_hi = {"x": max(v.x for v in wverts), "y": max(v.y for v in wverts)}
+
+    runs = _chain_runs(eave_edges)
+    filtered = {}
+    for (axis, lat), run_edges in runs.items():
+        if axis in wall_lo:
+            ai = 0 if axis == "x" else 1
+            lo, hi = wall_lo[axis] - 0.02, wall_hi[axis] + 0.02
+            trimmed = [
+                e
+                for e in run_edges
+                if lo <= min(e.verts[0].co[ai], e.verts[1].co[ai])
+                and max(e.verts[0].co[ai], e.verts[1].co[ai]) <= hi
+            ]
+            if not trimmed:
+                continue
+            run_edges = trimmed
+        filtered[(axis, lat)] = run_edges
+
+    for (axis, lat), run_edges in filtered.items():
+        lat_i = 1 if axis == "x" else 0
+        first, last = run_edges[0], run_edges[-1]
+        mid = (first.verts[0].co + last.verts[1].co) / 2
+        mid[lat_i] = first.verts[0].co[lat_i]
+        run_dir = _run_direction(axis, run_edges)
+        side = Vector((run_dir.y, -run_dir.x, 0.0))
+        to_center = center - mid
+        flip = side.dot(to_center) > 0  # side must point AWAY from center
+        outward = -side if flip else side
+        # -- eave check: a slope must drain toward this side
+        if not any(d.dot(outward) > 0.5 for d in eave_dirs):
+            continue
+        faces = sweep_profile_along_edges(
+            bm, run_edges, profile, close_caps=True, side_flip=flip
+        )
+        add_faces_to_group(bm, faces, MaterialGroup.ROOF_HANGS)
 
 
-def add_chimney(bm, roof_faces, width=0.45, depth=0.45, height=1.2):
-    """Masonry chimney stack on the roof slope."""
+def add_chimney(bm, roof_faces=None, width=0.45, depth=0.45, height=1.2):
+    """Masonry chimney stack rising from a roof slope (tagged ROOF)."""
     import bmesh
+    from mathutils import Vector
 
-    xs = [v.co.x for f in roof_faces for v in f.verts]
-    ys = [v.co.y for f in roof_faces for v in f.verts]
-    zs = [v.co.z for f in roof_faces for v in f.verts]
-    cx = (min(xs) + max(xs)) / 2
-    cy = (min(ys) + max(ys)) / 2
-    roof_z = max(zs)
+    if roof_faces is None:
+        roof_faces = _roof_trim_faces(bm)
+    slopes = [
+        f for f in roof_faces if f.calc_area() > 1.0 and 0.15 < abs(f.normal.z) < 0.97
+    ]
+    if slopes:
+        slope = max(slopes, key=lambda f: f.calc_area())
+        c = slope.calc_center_median()
+        n = slope.normal.copy()
+    else:
+        # -- flat fallback: center of the roof top
+        tops = [f for f in roof_faces if f.normal.z > 0.9]
+        if not tops:
+            return
+        slope = max(tops, key=lambda f: f.calc_area())
+        c = slope.calc_center_median()
+        n = Vector((0.0, 0.0, 1.0))
 
-    bmesh.ops.create_cube(
+    base = c - n * 0.2  # sink into the slope
+    ret = bmesh.ops.create_cube(
         bm,
         size=1.0,
-        matrix=Matrix.Translation((cx + width * 0.3, cy, roof_z + height / 2))
+        matrix=Matrix.Translation(base + Vector((0, 0, height / 2)))
         @ Matrix.Scale(width, 4, Vector((1, 0, 0)))
         @ Matrix.Scale(depth, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(height, 4, Vector((0, 0, 1))),
+        @ Matrix.Scale(height + 0.4, 4, Vector((0, 0, 1))),
     )
-    # -- flue pot (octagonal cylinder)
+    add_faces_to_group(
+        bm, [f for v in ret["verts"] for f in v.link_faces], MaterialGroup.ROOF
+    )
+
+    # -- flue pot (octagonal cylinder) on the stack top
     pot_r = 0.08
     pot_h = 0.25
     segs = 8
-    pot_verts = []
+    top_z = base.z + height + 0.4
+    ring_bottom, ring_top = [], []
     for i in range(segs):
         a = 2 * math.pi * i / segs
-        pot_verts.append(
+        ring_bottom.append(
+            bm.verts.new((c.x + pot_r * math.cos(a), c.y + pot_r * math.sin(a), top_z))
+        )
+        ring_top.append(
             bm.verts.new(
                 (
-                    cx + width * 0.3 + pot_r * math.cos(a),
-                    cy + pot_r * math.sin(a),
-                    roof_z + height + pot_h,
+                    c.x + pot_r * math.cos(a),
+                    c.y + pot_r * math.sin(a),
+                    top_z + pot_h,
                 )
             )
         )
-    bmesh.ops.contextual_create(bm, geom=pot_verts)
+    pot_faces = []
+    for i in range(segs):
+        j = (i + 1) % segs
+        pot_faces.append(
+            bm.faces.new((ring_bottom[i], ring_bottom[j], ring_top[j], ring_top[i]))
+        )
+    pot_faces.append(bm.faces.new(ring_top))  # cap
+    add_faces_to_group(bm, pot_faces, MaterialGroup.ROOF)

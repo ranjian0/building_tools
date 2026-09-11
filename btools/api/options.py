@@ -195,6 +195,7 @@ class MultigroupOptions:
     frame_depth: float = 0.1
     dw_depth: float = 0.05
     add_arch: bool = False
+    add_hardware: bool = True
     components: str = "dw"
     window_height: float = 1.0
     show_door_fill: bool = False
@@ -223,6 +224,11 @@ class RoofOptions:
     height: float = 1.0
     add_border: bool = True
     border: float = 0.1
+    add_gutters: bool = False
+    gutter_size: float = 0.08
+    add_chimney: bool = False
+    add_ridge_cap: bool = True
+    coping_size: float = 0.02
 
 
 @dataclass

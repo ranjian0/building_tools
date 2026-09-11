@@ -33,7 +33,7 @@
 ## scenario-multi-storey
 
 - status: `ok`
-- faces: 60 -- geometry_hash: `251ca31659a2aaed`
+- faces: 68 -- geometry_hash: `fac8c04268e4e906`
 
 ![scenario-multi-storey image.png](scenario-multi-storey/image.png)
 
@@ -96,28 +96,28 @@
 ## roof-flat
 
 - status: `ok`
-- faces: 65 -- geometry_hash: `b35807cb98e40918`
+- faces: 85 -- geometry_hash: `24558f0f31aa5782`
 
 ![roof-flat image.png](roof-flat/image.png)
 
 ## roof-gable-open
 
 - status: `ok`
-- faces: 68 -- geometry_hash: `23907af2cc4b35c5`
+- faces: 88 -- geometry_hash: `714f62f424d9ff60`
 
 ![roof-gable-open image.png](roof-gable-open/image.png)
 
 ## roof-gable-box
 
 - status: `ok`
-- faces: 62 -- geometry_hash: `c19fe454c2c5d6f7`
+- faces: 70 -- geometry_hash: `d0ea30468f659b7a`
 
 ![roof-gable-box image.png](roof-gable-box/image.png)
 
 ## roof-hip
 
 - status: `ok`
-- faces: 60 -- geometry_hash: `50c518289104647a`
+- faces: 68 -- geometry_hash: `6345fa66d1f48309`
 
 ![roof-hip image.png](roof-hip/image.png)
 
@@ -201,14 +201,14 @@
 ## multigroup-default
 
 - status: `ok`
-- faces: 34 -- geometry_hash: `83c616358f94916d`
+- faces: 63 -- geometry_hash: `bbbc44fa95d82e84`
 
 ![multigroup-default image.png](multigroup-default/image.png)
 
 ## multigroup-fills
 
 - status: `ok`
-- faces: 63 -- geometry_hash: `0a116c4f79a37c7e`
+- faces: 84 -- geometry_hash: `530e05cd766079db`
 
 ![multigroup-fills image.png](multigroup-fills/image.png)
 
@@ -241,7 +241,7 @@
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `760a8b8e737d8c06`
+- faces: 775 -- geometry_hash: `0d25f290eb4ad159`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 
@@ -304,55 +304,55 @@
 ## preset-suburban-house
 
 - status: `ok`
-- faces: 266 -- geometry_hash: `09ea89aed3f124af`
+- faces: 313 -- geometry_hash: `663456fe2acd511c`
 
 ![preset-suburban-house image.png](preset-suburban-house/image.png)
 
 ## preset-townhouse
 
 - status: `ok`
-- faces: 216 -- geometry_hash: `d9980500677f3eae`
+- faces: 267 -- geometry_hash: `e09e1df2b71ff07b`
 
 ![preset-townhouse image.png](preset-townhouse/image.png)
 
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 6845 -- geometry_hash: `9585030a137894fe`
+- faces: 6884 -- geometry_hash: `b4fa6dd9b0c8e7b6`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 435 -- geometry_hash: `26b22a8abf0a3e51`
+- faces: 455 -- geometry_hash: `371fa14e43a5c750`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 
 ## preset-mediterranean-villa
 
 - status: `ok`
-- faces: 232 -- geometry_hash: `e6cafdc457700513`
+- faces: 272 -- geometry_hash: `33a927c0df1c61ce`
 
 ![preset-mediterranean-villa image.png](preset-mediterranean-villa/image.png)
 
 ## preset-corner-shop
 
 - status: `ok`
-- faces: 142 -- geometry_hash: `58a0a525700537fb`
+- faces: 191 -- geometry_hash: `d09f9a8e0302c50d`
 
 ![preset-corner-shop image.png](preset-corner-shop/image.png)
 
 ## preset-warehouse
 
 - status: `ok`
-- faces: 230 -- geometry_hash: `1f0fa85476d83339`
+- faces: 252 -- geometry_hash: `fdc7f04b3a942f28`
 
 ![preset-warehouse image.png](preset-warehouse/image.png)
 
 ## preset-office-block
 
 - status: `ok`
-- faces: 3721 -- geometry_hash: `cdff9bedbf74a404`
+- faces: 3762 -- geometry_hash: `8dfda32910c4e2cb`
 
 ![preset-office-block image.png](preset-office-block/image.png)

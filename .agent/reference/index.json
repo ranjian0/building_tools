@@ -45,8 +45,8 @@
       "status": "ok"
     },
     {
-      "faces": 60,
-      "geometry_hash": "251ca31659a2aaed",
+      "faces": 68,
+      "geometry_hash": "fac8c04268e4e906",
       "id": "scenario-multi-storey",
       "images": [
         "image.png"
@@ -146,8 +146,8 @@
       "status": "ok"
     },
     {
-      "faces": 65,
-      "geometry_hash": "b35807cb98e40918",
+      "faces": 85,
+      "geometry_hash": "24558f0f31aa5782",
       "id": "roof-flat",
       "images": [
         "image.png"
@@ -157,8 +157,8 @@
       "status": "ok"
     },
     {
-      "faces": 68,
-      "geometry_hash": "23907af2cc4b35c5",
+      "faces": 88,
+      "geometry_hash": "714f62f424d9ff60",
       "id": "roof-gable-open",
       "images": [
         "image.png"
@@ -168,8 +168,8 @@
       "status": "ok"
     },
     {
-      "faces": 62,
-      "geometry_hash": "c19fe454c2c5d6f7",
+      "faces": 70,
+      "geometry_hash": "d0ea30468f659b7a",
       "id": "roof-gable-box",
       "images": [
         "image.png"
@@ -179,8 +179,8 @@
       "status": "ok"
     },
     {
-      "faces": 60,
-      "geometry_hash": "50c518289104647a",
+      "faces": 68,
+      "geometry_hash": "6345fa66d1f48309",
       "id": "roof-hip",
       "images": [
         "image.png"
@@ -320,8 +320,8 @@
       "status": "ok"
     },
     {
-      "faces": 34,
-      "geometry_hash": "83c616358f94916d",
+      "faces": 63,
+      "geometry_hash": "bbbc44fa95d82e84",
       "id": "multigroup-default",
       "images": [
         "image.png"
@@ -331,8 +331,8 @@
       "status": "ok"
     },
     {
-      "faces": 63,
-      "geometry_hash": "0a116c4f79a37c7e",
+      "faces": 84,
+      "geometry_hash": "530e05cd766079db",
       "id": "multigroup-fills",
       "images": [
         "image.png"
@@ -389,7 +389,7 @@
     },
     {
       "faces": 775,
-      "geometry_hash": "760a8b8e737d8c06",
+      "geometry_hash": "0d25f290eb4ad159",
       "id": "balcony-inner-curved",
       "images": [
         "image.png"
@@ -489,8 +489,8 @@
       "status": "ok"
     },
     {
-      "faces": 266,
-      "geometry_hash": "09ea89aed3f124af",
+      "faces": 313,
+      "geometry_hash": "663456fe2acd511c",
       "id": "preset-suburban-house",
       "images": [
         "image.png"
@@ -500,8 +500,8 @@
       "status": "ok"
     },
     {
-      "faces": 216,
-      "geometry_hash": "d9980500677f3eae",
+      "faces": 267,
+      "geometry_hash": "e09e1df2b71ff07b",
       "id": "preset-townhouse",
       "images": [
         "image.png"
@@ -511,8 +511,8 @@
       "status": "ok"
     },
     {
-      "faces": 6845,
-      "geometry_hash": "9585030a137894fe",
+      "faces": 6884,
+      "geometry_hash": "b4fa6dd9b0c8e7b6",
       "id": "preset-apartment-block",
       "images": [
         "image.png"
@@ -522,8 +522,8 @@
       "status": "ok"
     },
     {
-      "faces": 435,
-      "geometry_hash": "26b22a8abf0a3e51",
+      "faces": 455,
+      "geometry_hash": "371fa14e43a5c750",
       "id": "preset-modern-villa",
       "images": [
         "image.png"
@@ -533,8 +533,8 @@
       "status": "ok"
     },
     {
-      "faces": 232,
-      "geometry_hash": "e6cafdc457700513",
+      "faces": 272,
+      "geometry_hash": "33a927c0df1c61ce",
       "id": "preset-mediterranean-villa",
       "images": [
         "image.png"
@@ -544,8 +544,8 @@
       "status": "ok"
     },
     {
-      "faces": 142,
-      "geometry_hash": "58a0a525700537fb",
+      "faces": 191,
+      "geometry_hash": "d09f9a8e0302c50d",
       "id": "preset-corner-shop",
       "images": [
         "image.png"
@@ -555,8 +555,8 @@
       "status": "ok"
     },
     {
-      "faces": 230,
-      "geometry_hash": "1f0fa85476d83339",
+      "faces": 252,
+      "geometry_hash": "fdc7f04b3a942f28",
       "id": "preset-warehouse",
       "images": [
         "image.png"
@@ -566,8 +566,8 @@
       "status": "ok"
     },
     {
-      "faces": 3721,
-      "geometry_hash": "cdff9bedbf74a404",
+      "faces": 3762,
+      "geometry_hash": "8dfda32910c4e2cb",
       "id": "preset-office-block",
       "images": [
         "image.png"

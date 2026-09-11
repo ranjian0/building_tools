@@ -67,6 +67,21 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Add a masonry chimney on the roof slope",
     )
 
+    add_ridge_cap: BoolProperty(
+        name="Ridge Cap",
+        default=True,
+        description="Cap the roof ridge and gable rake edges",
+    )
+
+    coping_size: FloatProperty(
+        name="Coping Chamfer",
+        min=0.0,
+        max=get_scaled_unit(0.1),
+        default=get_scaled_unit(0.02),
+        unit="LENGTH",
+        description="Chamfer the parapet coping top edges",
+    )
+
     height: FloatProperty(
         name="Height",
         min=get_scaled_unit(0.01),

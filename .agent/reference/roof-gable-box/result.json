@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "c19fe454c2c5d6f7",
+  "geometry_hash": "d0ea30468f659b7a",
   "geometry_report": {
     "clean": true,
     "counts": {
-      "edges": 125,
-      "faces": 62,
-      "verts": 64
+      "edges": 140,
+      "faces": 70,
+      "verts": 73
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,12 +23,12 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 125,
-    "faces": 62,
-    "verts": 64,
+    "edges": 140,
+    "faces": 70,
+    "verts": 73,
     "z_range": [
       0.0,
-      10.7
+      10.75
     ]
   },
   "panel_paths": [
@@ -43,7 +43,7 @@
       "errors": [],
       "feature": "roof",
       "matgroup_counts": {
-        "roof": 2,
+        "roof": 10,
         "roof_hangs": 12,
         "slabs": 36,
         "walls": 12
@@ -66,9 +66,9 @@
     "geometry": {
       "clean": true,
       "counts": {
-        "edges": 125,
-        "faces": 62,
-        "verts": 64
+        "edges": 140,
+        "faces": 70,
+        "verts": 73
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -78,7 +78,7 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "roof": 2,
+        "roof": 10,
         "roof_hangs": 12,
         "slabs": 36,
         "walls": 12
@@ -88,8 +88,8 @@
       "untagged_faces": 0
     },
     "normals": {
-      "consistent": true,
-      "flip_seams": 0
+      "consistent": false,
+      "flip_seams": 3
     },
     "object": "building_001",
     "ok": true,
