@@ -499,6 +499,7 @@ SMOKE_CODE = """\
 import bpy
 import json
 
+from building_tools.btools.api.checks import run_checks
 from building_tools.btools.api.presets import PRESETS, build_preset
 from building_tools.btools.api.validate import validate_object
 from building_tools.btools.building.default_materials import apply_default_materials
@@ -521,13 +522,65 @@ for pid in sorted(PRESETS):
         obj = bpy.data.objects.get(r.created_object or "")
         if obj:
             report = validate_object(obj, include_geometry=False)
-            entry["ok"] = report["ok"]
+            chk = run_checks(obj, preset.checks)
+            entry["ok"] = report["ok"] and chk["ok"]
             entry["groups"] = sorted(r.matgroup_counts)
-            if not report["ok"]:
+            if not chk["ok"]:
+                entry["check_failures"] = chk["failures"]
+                print("[smoke] %s CHECK FAILURES:" % pid)
+                for f in chk["failures"]:
+                    print("   ", json.dumps(f))
+            if not report["ok"] or not chk["ok"]:
                 results["failed"].append(entry)
         results["ok"].append(pid)
     results["total"] += 1
     print("[smoke] %s: %s" % (pid, r.status))
+
+print("__JSON__" + json.dumps(results))
+"""
+
+CHECK_CODE = """\
+import bpy
+import json
+
+from building_tools.btools.api.presets import PRESETS, check_preset
+from building_tools.btools.api.probe import ascii_elevation
+
+FILTER = {filt!r}
+ELEVATION = {elevation!r}
+WIDTH, HEIGHT = {width}, {height}
+
+results = {{"ok": [], "failed": [], "total": 0}}
+
+for pid in sorted(PRESETS):
+    if FILTER and FILTER not in pid:
+        continue
+    for o in list(bpy.data.objects):
+        bpy.data.objects.remove(o)
+    preset = PRESETS[pid]
+    outcome = check_preset(preset, assign_materials=True)
+    build, chk = outcome["build"], outcome["checks"]
+    entry = {{"id": pid, "build": build.status, "checks_ok": chk["ok"]}}
+    if not build.ok:
+        entry["error"] = build.errors[0] if build.errors else "unknown"
+        results["failed"].append(entry)
+    else:
+        if not chk["ok"]:
+            entry["failures"] = chk["failures"]
+            results["failed"].append(entry)
+            print("[check] %s FAILURES:" % pid)
+            for f in chk["failures"]:
+                print("   ", json.dumps(f))
+        else:
+            results["ok"].append(pid)
+    if ELEVATION:
+        obj = bpy.data.objects.get(build.created_object or "")
+        if obj:
+            print("=== %s (%s) ===" % (pid, ELEVATION))
+            print(ascii_elevation(obj, view=ELEVATION, width=WIDTH, height=HEIGHT))
+            print()
+    print("[check] %s: build=%s checks=%s" % (pid, build.status, chk["ok"]))
+    results["total"] += 1
 
 print("__JSON__" + json.dumps(results))
 """
@@ -647,6 +700,27 @@ def cmd_smoke(args):
         print("SMOKE FAILED: %s" % names)
         sys.exit(1)
     print("smoke passed (%d presets)" % payload.get("total", 0))
+
+
+def cmd_check(args):
+    """Build presets and run declarative geometry checks; exit 1 on fail."""
+    check_running(need=True)
+    code = CHECK_CODE.format(
+        filt=args.filter or "",
+        elevation=args.elevation,
+        width=args.width,
+        height=args.height,
+    )
+    status, output, dur = communicate(code, args.timeout)
+    payload = _emit_result(output, True)
+    failed = payload.get("failed", [])
+    if failed:
+        names = ", ".join(
+            f if isinstance(f, str) else f.get("id", "?") for f in failed
+        )
+        print("CHECK FAILED: %s" % names)
+        sys.exit(1)
+    print("checks passed (%d presets)" % payload.get("total", 0))
 
 
 def cmd_reference_generate(args):
@@ -848,6 +922,16 @@ def main():
     sp.add_argument("--filter", help="glob filter on preset ids")
     sp.add_argument("-t", "--timeout", type=int, default=900)
     sp.set_defaults(func=cmd_smoke)
+
+    sp = sub.add_parser("check", help="build presets + run declarative geometry checks; exit 1 on failure")
+    sp.add_argument("--filter", help="glob filter on preset ids")
+    sp.add_argument("--elevation", default=None,
+                    choices=["front", "back", "left", "right", "top", "iso"],
+                    help="also print an ASCII elevation per preset")
+    sp.add_argument("--width", type=int, default=200, help="ASCII grid width")
+    sp.add_argument("--height", type=int, default=100, help="ASCII grid height")
+    sp.add_argument("-t", "--timeout", type=int, default=900)
+    sp.set_defaults(func=cmd_check)
 
     sp = sub.add_parser("reference", help="golden reference corpus (JSON logs + deterministic renders)")
     ref = sp.add_subparsers(dest="reference_command", required=True)

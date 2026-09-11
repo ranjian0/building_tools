@@ -14,6 +14,10 @@ Example:
 Low-level runners live in `core.py`; validation helpers in `validate.py`.
 """
 
+from .checks import (  # noqa: F401 -- re-exported surface
+    CHECK_KINDS,
+    run_checks,
+)
 from .core import (  # noqa: F401 -- re-exported surface
     FEATURES,
     FaceTarget,
@@ -39,6 +43,16 @@ from .options import (
     RoofOptions,
     StairsOptions,
     WindowOptions,
+)
+from .probe import (  # noqa: F401 -- re-exported surface
+    ascii_elevation,
+    border_outsets,
+    elevation_bays,
+    group_protrusions,
+    interior_points,
+    intersection_report,
+    measure_object,
+    storey_bands,
 )
 
 

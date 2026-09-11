@@ -21,6 +21,7 @@ import tools
 try:
     import test_api
     import test_api_options
+    import test_api_probe
     import test_floorplan
     import test_floors
     import test_utils
@@ -47,6 +48,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_floors))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
+    suite.addTests(loader.loadTestsFromModule(test_api_probe))
     suite.addTests(loader.loadTestsFromModule(test_api))
 
     # initialize a runner, pass it your suite and run it

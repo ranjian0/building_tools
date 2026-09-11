@@ -52,6 +52,7 @@ class BuildingPreset:
     floors: dict = field(default_factory=dict)  # FloorOptions kwargs
     roof: dict = field(default_factory=dict)  # RoofOptions kwargs
     facade: list = field(default_factory=list)  # list[FacadeRule]
+    checks: list = field(default_factory=list)  # declarative geometry checks
 
 
 # ---------------------------------------------------------------- registry
@@ -166,6 +167,72 @@ _apartment = BuildingPreset(
             (1, 2, 3, 4),
             {"size_offset": {"size": [2.4, 0.2]}},
         ),
+    ],
+    checks=[
+        # -- structure: expected groups exist
+        {
+            "kind": "group_present",
+            "groups": [
+                "walls",
+                "slabs",
+                "roof",
+                "window",
+                "window_panes",
+                "door",
+                "frame",
+                "balcony",
+                "railing_posts",
+                "railing_rails",
+            ],
+        },
+        # -- nothing may interpenetrate: sills buried in balcony platforms,
+        #    railing posts through slabs, etc.
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["frame", "balcony"],
+                ["balcony", "frame"],
+                ["frame", "railing_posts"],
+                ["railing_posts", "frame"],
+                ["balcony", "slabs"],
+                ["slabs", "balcony"],
+            ],
+            "xfail": True,
+            "reason": "balcony/frame=15 railing_posts/frame=82 sample points "
+            "inside (sills/posts interpenetrate platforms)",
+        },
+        # -- every balconyed storey (1-4; ground has none) carries
+        #    comparable railing geometry
+        {
+            "kind": "count_per_storey",
+            "group": "railing_posts",
+            "min_each": 300,
+            "storeys": 4,
+            "skip_storeys": 1,
+            "xfail": True,
+            "reason": "storey_4 railing=158 vs 662 on storeys 1-3 "
+            "(partial top railing)",
+        },
+        # -- window bays and balcony cells line up on the front elevation
+        {
+            "kind": "bay_alignment",
+            "a": "window",
+            "b": "balcony",
+            "view": "front",
+            "tol": 0.35,
+            "tol_a": 1.6,
+            "xfail": True,
+            "reason": "balcony platform fragments [-3.5, 0] leave window bays "
+            "+/-5.43 uncovered",
+        },
+        # -- flat-roof parapet outsets equally on all four sides
+        {
+            "kind": "symmetric_outset",
+            "group": "roof",
+            "tol": 0.05,
+            "xfail": True,
+            "reason": "roof y_min outset 0.85 vs 0.15 elsewhere (parapet asymmetry)",
+        },
     ],
 )
 
@@ -474,3 +541,27 @@ def build_preset(
 def preset_items():
     """(id, label) pairs in registration order, for UI enums."""
     return [(p.id, p.label, p.description) for p in PRESETS.values()]
+
+
+def check_preset(preset, **build_kwargs):
+    """Build a preset and run its declarative geometry checks.
+
+    Returns {"build": OpResult, "checks": run_checks report}; the checks
+    report follows run_checks ({"ok", "failures", "results"}) and is
+    {"ok": False, "results": []} when the build itself fails.
+    """
+    from .checks import run_checks
+
+    res = build_preset(preset, **build_kwargs)
+    if not res.ok:
+        return {
+            "build": res,
+            "checks": {"ok": False, "failures": [], "results": []},
+        }
+    obj = bpy.data.objects.get(res.created_object or "")
+    report = (
+        run_checks(obj, preset.checks)
+        if obj
+        else {"ok": False, "failures": [], "results": []}
+    )
+    return {"build": res, "checks": report}
