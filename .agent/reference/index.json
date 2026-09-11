@@ -455,7 +455,7 @@
     },
     {
       "faces": 775,
-      "geometry_hash": "cde276ea481afa43",
+      "geometry_hash": "93d5863df950f4f7",
       "id": "balcony-inner-curved",
       "images": [
         "image.png",
@@ -600,7 +600,7 @@
     },
     {
       "faces": 5373,
-      "geometry_hash": "db2cddb47e75b187",
+      "geometry_hash": "63ed9242c77882a3",
       "id": "preset-apartment-block",
       "images": [
         "image.png",
@@ -613,7 +613,7 @@
     },
     {
       "faces": 375,
-      "geometry_hash": "957ef4907c7cb1db",
+      "geometry_hash": "3b5b1c5ad2d07379",
       "id": "preset-modern-villa",
       "images": [
         "image.png",
@@ -639,7 +639,7 @@
     },
     {
       "faces": 127,
-      "geometry_hash": "f7687548dbf83ace",
+      "geometry_hash": "c3a02aceb764485d",
       "id": "preset-corner-shop",
       "images": [
         "image.png",
@@ -665,7 +665,7 @@
     },
     {
       "faces": 3321,
-      "geometry_hash": "23ed0ce8aef17bc5",
+      "geometry_hash": "c4bd56430a0d1700",
       "id": "preset-office-block",
       "images": [
         "image.png",

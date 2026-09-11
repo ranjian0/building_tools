@@ -241,8 +241,17 @@ def render_case(obj, case_dir, case_id):
             case_dir, "image%s.png" % suffix)
         bpy.ops.render.render(write_still=True)
 
-    # -- EEVEE material render (shows PBR/transmission/glass)
+    # -- EEVEE material render (iso view, shows PBR/transmission/glass)
     scene.render.engine = "BLENDER_EEVEE"
+    cam.location = center + VIEW_DIRECTIONS[""] * (radius * 4 + 1)
+    look = (center - cam.location).normalized()
+    cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
+    bpy.context.view_layer.update()
+    inv = cam.matrix_world.inverted()
+    pts = [inv @ c for c in corners]
+    w = max(p.x for p in pts) - min(p.x for p in pts)
+    h = max(p.y for p in pts) - min(p.y for p in pts)
+    cam_data.ortho_scale = max(w, h * aspect) * 1.15
     scene.render.filepath = os.path.join(case_dir, "image-material.png")
     bpy.ops.render.render(write_still=True)
     scene.render.engine = "BLENDER_WORKBENCH"

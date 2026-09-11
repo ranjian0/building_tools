@@ -307,7 +307,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `cde276ea481afa43`
+- faces: 775 -- geometry_hash: `93d5863df950f4f7`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 ![balcony-inner-curved image-front.png](balcony-inner-curved/image-front.png)
@@ -406,7 +406,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 5373 -- geometry_hash: `db2cddb47e75b187`
+- faces: 5373 -- geometry_hash: `63ed9242c77882a3`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 ![preset-apartment-block image-front.png](preset-apartment-block/image-front.png)
@@ -415,7 +415,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 375 -- geometry_hash: `957ef4907c7cb1db`
+- faces: 375 -- geometry_hash: `3b5b1c5ad2d07379`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 ![preset-modern-villa image-front.png](preset-modern-villa/image-front.png)
@@ -433,7 +433,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## preset-corner-shop
 
 - status: `ok`
-- faces: 127 -- geometry_hash: `f7687548dbf83ace`
+- faces: 127 -- geometry_hash: `c3a02aceb764485d`
 
 ![preset-corner-shop image.png](preset-corner-shop/image.png)
 ![preset-corner-shop image-front.png](preset-corner-shop/image-front.png)
@@ -451,7 +451,7 @@ image size: 1280x800 -- 51 cases (iso / front / right)
 ## preset-office-block
 
 - status: `ok`
-- faces: 3321 -- geometry_hash: `23ed0ce8aef17bc5`
+- faces: 3321 -- geometry_hash: `c4bd56430a0d1700`
 
 ![preset-office-block image.png](preset-office-block/image.png)
 ![preset-office-block image-front.png](preset-office-block/image-front.png)
