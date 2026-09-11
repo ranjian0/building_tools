@@ -3,7 +3,7 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "error": null,
   "geometry_hash": "5a24bad0e065fe38",
   "geometry_report": {
     "clean": true,
@@ -18,7 +18,11 @@
     "zero_area_faces": 0
   },
   "id": "floorplan-circular",
-  "images": [],
+  "images": [
+    "image.png",
+    "image-front.png",
+    "image-right.png"
+  ],
   "known_issues": [],
   "mesh": {
     "edges": 32,

@@ -3,8 +3,8 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
-  "geometry_hash": "4ab6d00a2d69fdc7",
+  "error": null,
+  "geometry_hash": "957ef4907c7cb1db",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -18,7 +18,11 @@
     "zero_area_faces": 5
   },
   "id": "preset-modern-villa",
-  "images": [],
+  "images": [
+    "image.png",
+    "image-front.png",
+    "image-right.png"
+  ],
   "known_issues": [],
   "mesh": {
     "edges": 776,

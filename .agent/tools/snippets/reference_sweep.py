@@ -242,12 +242,10 @@ def render_case(obj, case_dir, case_id):
         bpy.ops.render.render(write_still=True)
 
     # -- EEVEE material render (shows PBR/transmission/glass)
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    scene.render.engine = "BLENDER_EEVEE"
     scene.render.filepath = os.path.join(case_dir, "image-material.png")
-    try:
-        bpy.ops.render.render(write_still=True)
-    except Exception:
-        pass  # EEVEE may not be available in all environments
+    bpy.ops.render.render(write_still=True)
+    scene.render.engine = "BLENDER_WORKBENCH"
 
     scene.collection.objects.unlink(cam)
     bpy.data.objects.remove(cam)
