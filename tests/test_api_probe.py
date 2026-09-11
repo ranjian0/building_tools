@@ -15,8 +15,8 @@ from btools.api import (
     WindowOptions,
     apply_feature,
     elevation_bays,
+    group_intersections,
     group_protrusions,
-    interior_points,
     measure_object,
     run_checks,
     storey_bands,
@@ -56,9 +56,9 @@ def make_overlapping_boxes(obj_name="overlap"):
 
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, size=1.0)
-    bmesh.ops.translate(bm, verts=bm.verts, vec=Vector((-0.3, 0, 0)))
+    bmesh.ops.translate(bm, verts=bm.verts, vec=Vector((-0.3, 0.1, 0.0)))
     bmesh.ops.create_cube(bm, size=1.0)
-    bmesh.ops.translate(bm, verts=bm.verts[-8:], vec=Vector((0.3, 0, 0)))
+    bmesh.ops.translate(bm, verts=bm.verts[-8:], vec=Vector((0.3, -0.1, 0.2)))
     bm.normal_update()
     bm.to_mesh(me)
     bm.free()
@@ -133,12 +133,37 @@ class TestProbes(unittest.TestCase):
         grid = "\n".join(lines[:30])
         self.assertIn(win_char[0][0], grid)
 
-    def test_interior_points_detects_interpenetration(self):
+    def test_group_intersections_detects_interpenetration(self):
         obj = make_overlapping_boxes()
-        self.assertGreater(interior_points(obj, "aaa", "bbb"), 0)
-        self.assertGreater(interior_points(obj, "bbb", "aaa"), 0)
+        self.assertGreater(group_intersections(obj, "aaa", "bbb"), 0)
+        self.assertGreater(group_intersections(obj, "bbb", "aaa"), 0)
         report = measure_object(obj)
         self.assertIn("counts", report)
+
+    def test_touching_boxes_do_not_intersect(self):
+        """Coplanar touching is not interpenetration (posts on platforms)."""
+        import bmesh
+
+        me = bpy.data.meshes.new("touch_mesh")
+        obj = bpy.data.objects.new("touch", me)
+        bpy.context.scene.collection.objects.link(obj)
+        bm = bmesh.new()
+        bmesh.ops.create_cube(bm, size=1.0)
+        bmesh.ops.translate(bm, verts=bm.verts, vec=Vector((0, 0, 0.5)))
+        bmesh.ops.create_cube(bm, size=1.0)
+        bmesh.ops.translate(bm, verts=bm.verts[-8:], vec=Vector((0, 0, 1.5)))
+        bm.normal_update()
+        bm.to_mesh(me)
+        bm.free()
+        attr = me.attributes.new(".bt_material_group_index", "INT", "FACE")
+        attr.data.foreach_set("value", [0] * 6 + [1] * 6)
+        me.update()
+        if hasattr(obj, "bt_materials"):
+            for name in ("aaa", "bbb"):
+                mt = obj.bt_materials.add()
+                mt.name = name
+        self.assertEqual(group_intersections(obj, "aaa", "bbb"), 0)
+        self.assertEqual(group_intersections(obj, "bbb", "aaa"), 0)
 
     def test_counts_per_storey(self):
         res = apply_feature("floorplan", FloorplanOptions(width=8, length=6))

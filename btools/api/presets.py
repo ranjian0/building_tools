@@ -151,6 +151,18 @@ _apartment = BuildingPreset(
             (0,),
             {"size_offset": {"size": [2.4, 2.6]}},
         ),
+        # -- balconies BEFORE windows: the storey face is still unsplit,
+        #    so each balcony is one clean platform (no fragmented strips);
+        #    array count/width mirror the window grid (14m / 4 = 3.5m bays)
+        FacadeRule(
+            "balcony",
+            "front_walls",
+            (1, 2, 3, 4),
+            {
+                "size_offset": {"size": [3.3, 0.2]},
+                "array": {"count": 4},
+            },
+        ),
         FacadeRule(
             "window",
             "walls",
@@ -160,12 +172,6 @@ _apartment = BuildingPreset(
                 "array": {"count": 4},
                 "size_offset": {"size": [1.6, 1.4]},
             },
-        ),
-        FacadeRule(
-            "balcony",
-            "front_walls",
-            (1, 2, 3, 4),
-            {"size_offset": {"size": [2.4, 0.2]}},
         ),
     ],
     checks=[
@@ -185,21 +191,20 @@ _apartment = BuildingPreset(
                 "railing_rails",
             ],
         },
-        # -- nothing may interpenetrate: sills buried in balcony platforms,
-        #    railing posts through slabs, etc.
+        # -- nothing may interpenetrate (exact edge-triangle crossings;
+        #    coplanar attachment seams and boundary grazes excluded)
         {
             "kind": "no_intersection",
             "pairs": [
-                ["frame", "balcony"],
-                ["balcony", "frame"],
+                ["walls", "balcony"],
+                ["balcony", "walls"],
+                ["railing_posts", "balcony"],
+                ["balcony", "railing_posts"],
                 ["frame", "railing_posts"],
-                ["railing_posts", "frame"],
+                ["frame", "balcony"],
                 ["balcony", "slabs"],
                 ["slabs", "balcony"],
             ],
-            "xfail": True,
-            "reason": "balcony/frame=15 railing_posts/frame=82 sample points "
-            "inside (sills/posts interpenetrate platforms)",
         },
         # -- every balconyed storey (1-4; ground has none) carries
         #    comparable railing geometry
@@ -209,9 +214,6 @@ _apartment = BuildingPreset(
             "min_each": 300,
             "storeys": 4,
             "skip_storeys": 1,
-            "xfail": True,
-            "reason": "storey_4 railing=158 vs 662 on storeys 1-3 "
-            "(partial top railing)",
         },
         # -- window bays and balcony cells line up on the front elevation
         {
@@ -221,18 +223,9 @@ _apartment = BuildingPreset(
             "view": "front",
             "tol": 0.35,
             "tol_a": 1.6,
-            "xfail": True,
-            "reason": "balcony platform fragments [-3.5, 0] leave window bays "
-            "+/-5.43 uncovered",
         },
         # -- flat-roof parapet outsets equally on all four sides
-        {
-            "kind": "symmetric_outset",
-            "group": "roof",
-            "tol": 0.05,
-            "xfail": True,
-            "reason": "roof y_min outset 0.85 vs 0.15 elsewhere (parapet asymmetry)",
-        },
+        {"kind": "symmetric_outset", "group": "roof", "tol": 0.05},
     ],
 )
 

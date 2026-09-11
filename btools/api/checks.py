@@ -123,7 +123,8 @@ def _check_symmetric_outset(obj, check):
     outsets = probe.border_outsets(obj, check.get("group", "roof"))
     if not outsets:
         return False, {"error": "empty outset report"}
-    vals = [v for v in outsets.values()]
+    # symmetry = equal magnitudes (sides carry opposite signs by construction)
+    vals = [abs(v) for v in outsets.values()]
     spread = max(vals) - min(vals)
     return spread <= tol, {"outsets": outsets, "spread": round(spread, 4), "tol": tol}
 

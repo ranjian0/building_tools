@@ -56,7 +56,9 @@ The live-session toolkit lives in `.agent/tools/`:
 ```bash
 .agent/tools/bt start        # GUI Blender on the 4K monitor (factory startup)
 .agent/tools/bt reload       # hot-reload the addon from the working tree
-.agent/tools/bt smoke        # build all 8 presets + validate — MANDATORY after building-code changes
+.agent/tools/bt smoke        # build all 8 presets + validate + geometry checks — MANDATORY after building-code changes
+.agent/tools/bt check --filter apartment          # declarative geometry checks for one preset
+.agent/tools/bt check --elevation front           # ... plus an ASCII elevation readable as text
 .agent/tools/bt api door --object wall --faces 1 --options '{"fill_type": "PANELS"}'
 .agent/tools/bt validate --object wall --expect '{"groups": ["door", "frame"]}'
 .agent/tools/bt scenario multi_storey
@@ -69,13 +71,40 @@ The live-session toolkit lives in `.agent/tools/`:
 Full reference: `.agent/tools/README.md` (session protocol, snippets,
 Blender 5.1 gotchas).
 
+## Geometry validation for agents (the reliable loop)
+
+Agents without vision cannot trust image interpretation, and matgroup
+counts are too coarse to catch spatial bugs. The reliable feedback loop
+is **measurement** (`btools/api/probe.py`) + **declarative checks**
+(`btools/api/checks.py`):
+
+- `probe.measure_object(obj)` — storey bands, elevation bays (anchored
+  on dominant wall planes), frame protrusions past wall planes, roof
+  border outsets, per-storey group counts.
+- `probe.group_intersections(a, b)` — EXACT edge-triangle crossings
+  (immune to ray-parity leaks on open meshes and to coplanar touching;
+  known limit: purely volumetric overlaps with only edge-on-plane
+  contact read as 0).
+- `probe.ascii_elevation(obj, view)` — raycast character grid (one char
+  per matgroup + legend) readable directly in tool output. This is the
+  agent's "eyes"; use `bt check --elevation front` to inspect a preset.
+- `run_checks(obj, preset.checks)` — kinds: group_present,
+  no_intersection, count_per_storey, bay_alignment, protrusion_range,
+  symmetric_outset. `xfail: true` documents known defects with measured
+  reasons; flip it off when fixed.
+
+`bt smoke` runs every preset's checks (exit 1 on violation); `bt check`
+re-runs them with failure details and optional ASCII views. When fixing
+geometry: write the failing check first, then fix until it passes.
+
 ## Mandatory workflow for any change
 
 1. Make the change.
 2. `just format && just check && just lint`
-3. `just test` — all tests must pass (46 as of the api work; count drifts).
-4. **`bt smoke`** — build all 8 presets + validate matgroup contracts;
-   exit 1 on any failure. Run after ANY change to building code.
+3. `just test` — all tests must pass (60 as of the probe work; count drifts).
+4. **`bt smoke`** — build all 8 presets + validate matgroup contracts +
+   geometry checks; exit 1 on any failure. Run after ANY change to
+   building code.
 5. For anything geometry/visual: verify in the live session —
 
    ```bash
@@ -86,8 +115,9 @@ Blender 5.1 gotchas).
    bt exec viewport_setup.py && bt screenshot check
    ```
 
-   `bt api`/`bt validate`/`bt scenario` emit JSON + exit codes — branch on
-   those, not on prose. Use screenshots only for genuine visual judgment.
+   `bt api`/`bt validate`/`bt scenario`/`bt check` emit JSON + exit
+   codes — branch on those, not on prose. Use screenshots only for
+   genuine visual judgment.
 
 ## Reference corpus (regression baseline)
 

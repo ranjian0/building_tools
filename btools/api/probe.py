@@ -32,9 +32,6 @@ _VIEWS = {
     ),
 }
 
-# offset direction for inside-volume parity casts (skews to miss edges)
-_PARITY_DIR = Vector((0.4121, 0.5732, 0.7078)).normalized()
-
 
 def _load(obj):
     """(bm, {group_name: [BMFace]}); bm must be freed by the caller."""
@@ -257,14 +254,34 @@ def group_protrusions(obj, group="frame", planes_group="walls"):
 
 
 def border_outsets(obj, group="roof"):
-    """Per-side extents of a group's bbox beyond the walls' bbox (plan)."""
+    """Per-side extents of a group's bbox beyond the wall planes (plan).
+
+    Anchors on dominant wall PLANES, not the walls-group bbox: protruding
+    features tagged as walls (balcony sides) would otherwise pollute the
+    reference and fake asymmetry.
+    """
+    # -- outermost wall plane per horizontal direction
+    # outermost extents: the -axis extreme is the MIN anchor among planes
+    # facing -axis, the +axis extreme is the MAX among +facing planes
+    # (internal back-facing planes must not win)
+    anchors = {"x": ([], []), "y": ([], [])}
+    for p in wall_planes(obj, "walls"):
+        n = p["normal"]
+        for axis_i, axis in ((0, "x"), (1, "y")):
+            if abs(n[axis_i]) < 0.9:
+                continue
+            anchors[axis][0 if n[axis_i] < 0 else 1].append(n[axis_i] * p["d"])
+    try:
+        wx0, wx1 = min(anchors["x"][0]), max(anchors["x"][1])
+        wy0, wy1 = min(anchors["y"][0]), max(anchors["y"][1])
+    except ValueError:
+        return {}
+
     bm, groups = _load(obj)
     try:
-        wverts = [v for f in groups.get("walls", []) for v in f.verts]
         gverts = [v for f in groups.get(group, []) for v in f.verts]
-        if not wverts or not gverts:
+        if not gverts:
             return {}
-        (wx0, wx1), (wy0, wy1), _ = _bbox(wverts)
         (gx0, gx1), (gy0, gy1), _ = _bbox(gverts)
         return {
             "x_min": round(gx0 - wx0, 4),
@@ -294,73 +311,125 @@ def _group_tree_polygons(obj, group):
         bm.free()
 
 
-def _parity_walk(tree, origin, direction=None, limit=512):
-    """Number of ray crossings from origin along direction (closed mesh)."""
-    direction = direction or _PARITY_DIR
-    origin = origin + direction * 1e-6
-    hits = 0
-    for _ in range(limit):
-        loc, _, _, _ = tree.ray_cast(origin, direction)
-        if loc is None:
-            return hits
-        hits += 1
-        origin = loc + direction * 1e-5
-    return hits
+def _triangulate(poly, verts):
+    """Fan-triangulate a polygon (index list) into (i0, i1, i2) triples."""
+    return [(poly[0], poly[i], poly[i + 1]) for i in range(1, len(poly) - 1)]
 
 
-def _sample_points(bm_faces, max_points=1500):
-    """Centroid + edge midpoints of faces, capped by even stride.
+def _seg_tri_cross(p0, p1, tri, verts, eps=1e-9, shrink=0.94):
+    """True when segment p0-p1 properly crosses triangle (coplanar and
+    boundary grazes excluded via a shrunk test triangle)."""
+    (i0, i1, i2) = tri
+    v0, v1, v2 = verts[i0], verts[i1], verts[i2]
+    if shrink < 1.0:
+        cen = (v0 + v1 + v2) / 3
+        v0 = cen + (v0 - cen) * shrink
+        v1 = cen + (v1 - cen) * shrink
+        v2 = cen + (v2 - cen) * shrink
+    e1, e2 = v1 - v0, v2 - v0
+    d = p1 - p0
+    n = e1.cross(e2)
+    denom = n.dot(d)
+    if abs(denom) < eps:  # parallel/coplanar: touching, not crossing
+        return False
+    t = n.dot(v0 - p0) / denom
+    if t < eps or t > 1 - eps:
+        return False
+    h = p0 + d * t - v0
+    u, v = e1.dot(h), e2.dot(h)
+    # barycentric (u, v) via 2x2 solve on the triangle's parametric plane
+    det = e1.dot(e1) * e2.dot(e2) - (e1.dot(e2)) ** 2
+    if abs(det) < eps:
+        return False
+    uu, vv = e1.dot(e1), e2.dot(e2)
+    uv = e1.dot(e2)
+    bu = (uu * v - uv * u) / det
+    bv = (vv * u - uv * v) / det
+    return bu >= -eps and bv >= -eps and bu + bv <= 1 + eps
 
-    The cap bounds parity-cast runtime on dense groups (railing posts on
-    big presets) while staying deterministic.
+
+def _face_edges(f):
+    """[(va, vb)] vertex-coordinate pairs for a bmesh face's edges."""
+    return [(e.verts[0].co, e.verts[1].co) for e in f.edges]
+
+
+def group_intersections(obj, group_a, group_b, max_crossings=50):
+    """Count proper edge-triangle crossings between two matgroups.
+
+    Exact geometry (no closed-volume assumptions, immune to ray-parity
+    leaks on open meshes and to coplanar touching): a crossing needs an
+    edge of one group to pierce a triangle of the other with vertices on
+    both sides. Counting stops early at max_crossings (bounded runtime);
+    the boolean answer is what matters.
     """
-    pts = []
-    for f in bm_faces:
-        pts.append(f.calc_center_median())
-        for e in f.edges:
-            pts.append((e.verts[0].co + e.verts[1].co) / 2)
-    if len(pts) > max_points:
-        stride = len(pts) / max_points
-        pts = [pts[int(i * stride)] for i in range(max_points)]
-    return pts
-
-
-def interior_points(obj, inner, outer):
-    """Count of `inner` group sample points strictly inside the `outer`
-    group's closed volume (odd ray parity).
-
-    Positive counts mean the two groups interpenetrate: e.g. a window
-    sill buried inside a balcony platform. Touching-only geometry
-    contributes only boundary-coincident points, which parity casts
-    (offset from surfaces) usually miss.
-    """
-    verts, polys = _group_tree_polygons(obj, outer)
-    if not polys:
-        return 0
-    tree = BVHTree.FromPolygons(verts, polys, all_triangles=False, epsilon=0.0)
-
     bm, groups = _load(obj)
     try:
-        pts = _sample_points(groups.get(inner, []))
+        faces_a = groups.get(group_a, [])
+        faces_b = groups.get(group_b, [])
+        if not faces_a or not faces_b:
+            return 0
+
+        # -- group B as a triangle soup + global bbox for broad-phase
+        verts_b, tris_b = [], []
+        for f in faces_b:
+            base = len(verts_b)
+            verts_b.extend(v.co.copy() for v in f.verts)
+            poly = list(range(base, base + len(f.verts)))
+            tris_b.extend(_triangulate(poly, verts_b))
+        if not tris_b:
+            return 0
+        bverts_flat = [verts_b[i] for t in tris_b for i in t]
+        bb_lo = Vector(
+            (
+                min(v.x for v in bverts_flat),
+                min(v.y for v in bverts_flat),
+                min(v.z for v in bverts_flat),
+            )
+        )
+        bb_hi = Vector(
+            (
+                max(v.x for v in bverts_flat),
+                max(v.y for v in bverts_flat),
+                max(v.z for v in bverts_flat),
+            )
+        )
+
+        crossings = 0
+        for f in faces_a:
+            c = f.calc_center_median()
+            r = max((v.co - c).length for v in f.verts)
+            if (
+                c.x - r > bb_hi.x
+                or c.x + r < bb_lo.x
+                or c.y - r > bb_hi.y
+                or c.y + r < bb_lo.y
+                or c.z - r > bb_hi.z
+                or c.z + r < bb_lo.z
+            ):
+                continue  # A face nowhere near B: skip its edges
+            for p0, p1 in _face_edges(f):
+                for t in tris_b:
+                    if _seg_tri_cross(p0, p1, t, verts_b):
+                        crossings += 1
+                        if crossings >= max_crossings:
+                            return crossings
+        return crossings
     finally:
         bm.free()
 
-    inside = 0
-    for p in pts:
-        if _parity_walk(tree, p) % 2 == 1:
-            inside += 1
-    return inside
-
 
 def intersection_report(obj, pairs):
-    """Interpenetration counts for matgroup pairs.
+    """Proper-interpenetration counts for matgroup pairs.
 
-    pairs: list of [inner, outer] (both directions reported).
-    Returns {"inner/outer": count}.
+    pairs: list of [a, b]; each pair is tested symmetrically (edges of a
+    piercing b, then b piercing a) with the max reported.
+    Returns {"a/b": count}.
     """
     report = {}
     for a, b in pairs:
-        report["%s/%s" % (a, b)] = interior_points(obj, a, b)
+        ab = group_intersections(obj, a, b)
+        ba = group_intersections(obj, b, a) if ab < 50 else 0
+        report["%s/%s" % (a, b)] = max(ab, ba)
     return report
 
 

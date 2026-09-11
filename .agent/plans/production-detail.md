@@ -87,7 +87,18 @@ and production export — for both archviz renders and game-engine workflows.
 - [ ] dormers — DEFERRED (roof-intersection complexity; follow-up)
 - [ ] tests + corpus + commit
 
-### Phase 5 — Presets & production workflow — REMAINING
+### Phase 5 — Presets & production workflow — PARTIAL
+- [x] geometry validation layer for agents: probe API (measurements,
+      exact interpenetration, ASCII elevations), declarative preset
+      checks, bt check + smoke gating (apartment-block carries 6 checks,
+      all passing)
+- [x] apartment-block balcony redesign: balconies applied BEFORE window
+      splits (clean ungrouped platforms, array mirrors the window grid
+      14m/4=3.5m bays); storey-4 fragment + railing deficit fixed;
+      parapet "asymmetry" was a measurement artifact (walls-bbox
+      pollution) — probes now anchor on wall planes
+- [ ] extend declarative checks to the other 7 presets
+- [ ] multigroup entry detail (threshold/hardware via frame.py helpers)
 - [ ] Detail level (Low/Medium/High) — scene setting + api param; gates
       bevels/hardware/gutters/cornices/chimney/glass thickness
 - [ ] re-tune all 8 presets on the new detail features (gutters on
