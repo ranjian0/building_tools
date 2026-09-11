@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "cf806b534f3ef0e8",
+  "geometry_hash": "bc5a0f0b7c55ea9b",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 442,
-      "faces": 202,
-      "verts": 242
+      "edges": 566,
+      "faces": 266,
+      "verts": 314
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 4,
+    "non_manifold_edges": 36,
     "zero_area_faces": 2
   },
   "id": "preset-suburban-house",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 442,
-    "faces": 202,
-    "verts": 242,
+    "edges": 566,
+    "faces": 266,
+    "verts": 314,
     "z_range": [
       0.0,
       8.121
@@ -44,11 +44,11 @@
       "feature": "preset:suburban-house",
       "matgroup_counts": {
         "door": 2,
-        "frame": 74,
+        "frame": 114,
         "roof": 3,
         "roof_hangs": 12,
         "slabs": 25,
-        "walls": 78,
+        "walls": 102,
         "window": 8
       },
       "status": "ok",
@@ -60,24 +60,24 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 442,
-        "faces": 202,
-        "verts": 242
+        "edges": 566,
+        "faces": 266,
+        "verts": 314
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 4,
+      "non_manifold_edges": 36,
       "zero_area_faces": 2
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 2,
-        "frame": 74,
+        "frame": 114,
         "roof": 3,
         "roof_hangs": 12,
         "slabs": 25,
-        "walls": 78,
+        "walls": 102,
         "window": 8
       },
       "invalid_index_faces": 0,

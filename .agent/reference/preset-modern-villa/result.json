@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "4ab6d00a2d69fdc7",
+  "geometry_hash": "e2690d7b14f38a69",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 776,
-      "faces": 375,
-      "verts": 403
+      "edges": 883,
+      "faces": 436,
+      "verts": 461
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 4,
-    "zero_area_faces": 5
+    "non_manifold_edges": 41,
+    "zero_area_faces": 9
   },
   "id": "preset-modern-villa",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 776,
-    "faces": 375,
-    "verts": 403,
+    "edges": 883,
+    "faces": 436,
+    "verts": 461,
     "z_range": [
       0.0,
       7.05
@@ -44,10 +44,10 @@
       "feature": "preset:modern-villa",
       "matgroup_counts": {
         "door": 2,
-        "frame": 82,
+        "frame": 127,
         "roof": 17,
         "slabs": 25,
-        "walls": 79,
+        "walls": 95,
         "window": 58,
         "window_panes": 112
       },
@@ -60,23 +60,23 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 776,
-        "faces": 375,
-        "verts": 403
+        "edges": 883,
+        "faces": 436,
+        "verts": 461
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 4,
-      "zero_area_faces": 5
+      "non_manifold_edges": 41,
+      "zero_area_faces": 9
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 2,
-        "frame": 82,
+        "frame": 127,
         "roof": 17,
         "slabs": 25,
-        "walls": 79,
+        "walls": 95,
         "window": 58,
         "window_panes": 112
       },

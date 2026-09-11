@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "8add832b5c2a49c7",
+  "geometry_hash": "0c566f6dd55f0577",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 13295,
-      "faces": 5373,
-      "verts": 8015
+      "edges": 13806,
+      "faces": 5692,
+      "verts": 8271
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 30
+    "non_manifold_edges": 256,
+    "zero_area_faces": 44
   },
   "id": "preset-apartment-block",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 13295,
-    "faces": 5373,
-    "verts": 8015,
+    "edges": 13806,
+    "faces": 5692,
+    "verts": 8271,
     "z_range": [
       0.0,
       16.2
@@ -45,12 +45,12 @@
       "matgroup_counts": {
         "balcony": 4,
         "door": 1,
-        "frame": 526,
+        "frame": 846,
         "railing_posts": 2144,
         "railing_rails": 368,
         "roof": 17,
         "slabs": 62,
-        "walls": 714,
+        "walls": 713,
         "window": 513,
         "window_panes": 1024
       },
@@ -63,26 +63,26 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 13295,
-        "faces": 5373,
-        "verts": 8015
+        "edges": 13806,
+        "faces": 5692,
+        "verts": 8271
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 30
+      "non_manifold_edges": 256,
+      "zero_area_faces": 44
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "balcony": 4,
         "door": 1,
-        "frame": 526,
+        "frame": 846,
         "railing_posts": 2144,
         "railing_rails": 368,
         "roof": 17,
         "slabs": 62,
-        "walls": 714,
+        "walls": 713,
         "window": 513,
         "window_panes": 1024
       },
@@ -92,7 +92,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 16
+      "flip_seams": 14
     },
     "object": "building_001",
     "ok": true,

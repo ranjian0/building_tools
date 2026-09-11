@@ -128,7 +128,22 @@ def create_arch(bm, top_edges, frame_faces, arch_prop, frame_thickness, xyz):
         new_face = get_bottom_faces(new_edge.link_faces).pop()
         arch_frame_faces.append(new_face)
 
+    # -- smooth-shade arc segments (prevents faceting at resolution 24)
+    for f in [arch_face] + list(arch_frame_faces):
+        if f is not None and f.is_valid:
+            f.smooth = True
+
     return arch_face, arch_frame_faces
+
+
+def smooth_arch_faces(bm, arch_face, arch_frame_faces):
+    """Smooth-shade arc faces so curved segments don't render faceted."""
+    from ..utils import set_smooth_shading
+
+    all_arc_faces = [arch_face] + list(arch_frame_faces)
+    for f in all_arc_faces:
+        if f is not None and f.is_valid:
+            set_smooth_shading(bm, [f])
 
 
 @map_new_faces(MaterialGroup.DOOR_PANES)

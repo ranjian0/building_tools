@@ -35,6 +35,40 @@ class WindowProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
         description="Type of window",
     )
 
+    add_bevel: BoolProperty(
+        name="Bevel Frame",
+        default=True,
+        description="Chamfer frame edges for a manufactured profile",
+    )
+    bevel_width: FloatProperty(
+        name="Bevel Width",
+        min=get_scaled_unit(0.001),
+        max=get_scaled_unit(0.01),
+        default=get_scaled_unit(0.003),
+        unit="LENGTH",
+        description="Frame edge chamfer width",
+    )
+    add_casing: BoolProperty(
+        name="Add Casing",
+        default=False,
+        description="Decorative trim ring around the opening",
+    )
+    casing_width: FloatProperty(
+        name="Casing Width",
+        min=get_scaled_unit(0.02),
+        max=get_scaled_unit(0.15),
+        default=get_scaled_unit(0.06),
+        unit="LENGTH",
+        description="Width of the trim ring on the wall",
+    )
+    casing_depth: FloatProperty(
+        name="Casing Depth",
+        min=get_scaled_unit(0.005),
+        max=get_scaled_unit(0.05),
+        default=get_scaled_unit(0.015),
+        unit="LENGTH",
+        description="How proud the casing stands from the wall",
+    )
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=get_scaled_unit(0.01),

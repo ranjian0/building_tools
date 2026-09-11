@@ -143,6 +143,24 @@ def create_door_frame(bm, face, prop):
 
     add_threshold(bm, frame_faces, normal)
 
+    # -- casing (before bevel: casing walks frame face adjacency)
+    if prop.add_casing:
+        from ..frame import add_casing
+
+        add_casing(
+            bm,
+            frame_faces,
+            normal,
+            casing_width=prop.casing_width,
+            casing_depth=prop.casing_depth,
+        )
+
+    # -- hardware (door face must still be valid here)
+    if prop.add_hardware:
+        from ..frame import add_hardware
+
+        add_hardware(bm, door_face, frame_faces, normal, prop)
+
     return door_face, arch_face
 
 

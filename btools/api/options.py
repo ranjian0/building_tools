@@ -123,12 +123,20 @@ class DoorOptions:
     louver_fill: FillLouverOptions = field(default_factory=FillLouverOptions)
     glass_fill: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
 
-    frame_thickness: float = 0.1
-    frame_depth: float = 0.1
-    door_depth: float = 0.05
+    frame_thickness: float = 0.06
+    frame_depth: float = 0.05
+    door_depth: float = 0.045
     add_arch: bool = False
     fill_type: DoorFillType = DoorFillType.NONE
     double_door: bool = False
+    add_bevel: bool = False
+    bevel_width: float = 0.003
+    add_casing: bool = False
+    casing_width: float = 0.06
+    casing_depth: float = 0.015
+    add_hardware: bool = True
+    handle_height: float = 1.05
+    handle_style: str = "LEVER"
 
 
 class WindowType(Enum):
@@ -153,12 +161,17 @@ class WindowOptions:
     glass_fill: FillGlassPaneOptions = field(default_factory=FillGlassPaneOptions)
 
     type: WindowType = WindowType.RECTANGULAR
-    frame_thickness: float = 0.1
-    frame_depth: float = 0.1
+    frame_thickness: float = 0.06
+    frame_depth: float = 0.05
     window_depth: float = 0.05
-    resolution: int = 20
+    resolution: int = 32
     add_arch: bool = False
     fill_type: WindowFillType = WindowFillType.NONE
+    add_bevel: bool = False
+    bevel_width: float = 0.003
+    add_casing: bool = False
+    casing_width: float = 0.06
+    casing_depth: float = 0.015
 
 
 @dataclass

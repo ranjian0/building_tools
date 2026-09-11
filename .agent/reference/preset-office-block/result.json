@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "d0930dec4b962de2",
+  "geometry_hash": "292cb4a1c1da2202",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 6871,
-      "faces": 3321,
-      "verts": 3551
+      "edges": 7511,
+      "faces": 3721,
+      "verts": 3871
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 33
+    "non_manifold_edges": 320,
+    "zero_area_faces": 52
   },
   "id": "preset-office-block",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 6871,
-    "faces": 3321,
-    "verts": 3551,
+    "edges": 7511,
+    "faces": 3721,
+    "verts": 3871,
     "z_range": [
       0.0,
       19.45
@@ -44,7 +44,7 @@
       "feature": "preset:office-block",
       "matgroup_counts": {
         "door": 1,
-        "frame": 654,
+        "frame": 1054,
         "roof": 17,
         "slabs": 74,
         "walls": 654,
@@ -60,20 +60,20 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 6871,
-        "faces": 3321,
-        "verts": 3551
+        "edges": 7511,
+        "faces": 3721,
+        "verts": 3871
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 33
+      "non_manifold_edges": 320,
+      "zero_area_faces": 52
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 1,
-        "frame": 654,
+        "frame": 1054,
         "roof": 17,
         "slabs": 74,
         "walls": 654,

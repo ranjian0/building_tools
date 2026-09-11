@@ -216,10 +216,9 @@ def fill_bar(bm, face, prop):
         )
         create_bar_from_face(bm, face, transform, transform_space, -depth)
 
-    # -- vertical
-    eps = 0.015
+    # -- vertical (bars pass through horizontals at full depth)
     offset = width / (prop.bar_count_y + 1)
-    depth = face.normal * (prop.bar_depth - eps)
+    depth = face.normal * prop.bar_depth
     for i in range(prop.bar_count_y):
         item_off = xyz[0] * (-width / 2 + ((i + 1) * offset))
         transform = Matrix.Translation(depth + item_off) @ Matrix.Scale(

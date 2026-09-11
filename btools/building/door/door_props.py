@@ -22,6 +22,59 @@ class DoorProperty(bpy.types.PropertyGroup, ArrayGetSet, SizeOffsetGetSet):
     louver_fill: PointerProperty(type=FillLouver)
     glass_fill: PointerProperty(type=FillGlassPanes)
 
+    add_bevel: BoolProperty(
+        name="Bevel Frame",
+        default=True,
+        description="Chamfer frame edges for a manufactured profile",
+    )
+    bevel_width: FloatProperty(
+        name="Bevel Width",
+        min=get_scaled_unit(0.001),
+        max=get_scaled_unit(0.01),
+        default=get_scaled_unit(0.003),
+        unit="LENGTH",
+        description="Frame edge chamfer width",
+    )
+    add_casing: BoolProperty(
+        name="Add Casing",
+        default=False,
+        description="Decorative trim ring around the opening",
+    )
+    casing_width: FloatProperty(
+        name="Casing Width",
+        min=get_scaled_unit(0.02),
+        max=get_scaled_unit(0.15),
+        default=get_scaled_unit(0.06),
+        unit="LENGTH",
+        description="Width of the trim ring on the wall",
+    )
+    casing_depth: FloatProperty(
+        name="Casing Depth",
+        min=get_scaled_unit(0.005),
+        max=get_scaled_unit(0.05),
+        default=get_scaled_unit(0.015),
+        unit="LENGTH",
+        description="How proud the casing stands from the wall",
+    )
+    add_hardware: BoolProperty(
+        name="Add Handle",
+        default=True,
+        description="Add lever handle hardware to the door leaf",
+    )
+    handle_height: FloatProperty(
+        name="Handle Height",
+        min=get_scaled_unit(0.5),
+        max=get_scaled_unit(1.5),
+        default=get_scaled_unit(1.05),
+        unit="LENGTH",
+        description="Height of the handle from the floor",
+    )
+    handle_style: EnumProperty(
+        name="Handle Style",
+        items=[("LEVER", "Lever", "", 0), ("BAR_PULL", "Bar Pull", "", 1)],
+        default="LEVER",
+        description="Style of door handle",
+    )
     frame_thickness: FloatProperty(
         name="Frame Thickness",
         min=get_scaled_unit(0.01),

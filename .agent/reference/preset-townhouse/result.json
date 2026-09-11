@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "fd547c5cb6ee8317",
+  "geometry_hash": "d9980500677f3eae",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 404,
-      "faces": 186,
-      "verts": 219
+      "edges": 452,
+      "faces": 216,
+      "verts": 243
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
+    "non_manifold_edges": 24,
     "zero_area_faces": 0
   },
   "id": "preset-townhouse",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 404,
-    "faces": 186,
-    "verts": 219,
+    "edges": 452,
+    "faces": 216,
+    "verts": 243,
     "z_range": [
       0.0,
       10.92
@@ -44,7 +44,7 @@
       "feature": "preset:townhouse",
       "matgroup_counts": {
         "door": 1,
-        "frame": 62,
+        "frame": 92,
         "roof": 2,
         "roof_hangs": 12,
         "slabs": 38,
@@ -58,22 +58,22 @@
   "steps": [],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 404,
-        "faces": 186,
-        "verts": 219
+        "edges": 452,
+        "faces": 216,
+        "verts": 243
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
+      "non_manifold_edges": 24,
       "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 1,
-        "frame": 62,
+        "frame": 92,
         "roof": 2,
         "roof_hangs": 12,
         "slabs": 38,

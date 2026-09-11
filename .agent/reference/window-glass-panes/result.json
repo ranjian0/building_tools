@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "993064b83dae175e",
+  "geometry_hash": "129690088e283388",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 92,
-      "faces": 45,
-      "verts": 49
+      "edges": 100,
+      "faces": 50,
+      "verts": 53
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
+    "non_manifold_edges": 4,
     "zero_area_faces": 0
   },
   "id": "window-glass-panes",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 92,
-    "faces": 45,
-    "verts": 49,
+    "edges": 100,
+    "faces": 50,
+    "verts": 53,
     "z_range": [
       0.0,
       3.0
@@ -43,7 +43,7 @@
       "errors": [],
       "feature": "window",
       "matgroup_counts": {
-        "frame": 8,
+        "frame": 13,
         "walls": 13,
         "window": 8,
         "window_panes": 16
@@ -69,21 +69,21 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 92,
-        "faces": 45,
-        "verts": 49
+        "edges": 100,
+        "faces": 50,
+        "verts": 53
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
+      "non_manifold_edges": 4,
       "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "frame": 8,
+        "frame": 13,
         "walls": 13,
         "window": 8,
         "window_panes": 16

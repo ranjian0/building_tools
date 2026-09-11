@@ -190,8 +190,8 @@
       "status": "ok"
     },
     {
-      "faces": 27,
-      "geometry_hash": "d86f4031d89f7d1b",
+      "faces": 51,
+      "geometry_hash": "b1c6794ec515106f",
       "id": "door-default",
       "images": [
         "image.png"
@@ -201,8 +201,8 @@
       "status": "ok"
     },
     {
-      "faces": 50,
-      "geometry_hash": "86d495f2de6f1382",
+      "faces": 66,
+      "geometry_hash": "9965ec32cb838e11",
       "id": "door-panels",
       "images": [
         "image.png"
@@ -214,8 +214,8 @@
       "status": "ok"
     },
     {
-      "faces": 81,
-      "geometry_hash": "49dfd17ef70c2ad5",
+      "faces": 105,
+      "geometry_hash": "497320bed013d06f",
       "id": "door-louver",
       "images": [
         "image.png"
@@ -227,8 +227,8 @@
       "status": "ok"
     },
     {
-      "faces": 50,
-      "geometry_hash": "28217dc54793fca0",
+      "faces": 67,
+      "geometry_hash": "9d34c015ee3b6e8d",
       "id": "door-glass-panes",
       "images": [
         "image.png"
@@ -238,8 +238,8 @@
       "status": "ok"
     },
     {
-      "faces": 28,
-      "geometry_hash": "98538500f980d113",
+      "faces": 52,
+      "geometry_hash": "50929be8d507eed0",
       "id": "door-double",
       "images": [
         "image.png"
@@ -249,8 +249,8 @@
       "status": "ok"
     },
     {
-      "faces": 49,
-      "geometry_hash": "1f3426f007e9421b",
+      "faces": 73,
+      "geometry_hash": "7a465de4e878041a",
       "id": "door-arch",
       "images": [
         "image.png"
@@ -262,8 +262,8 @@
       "status": "ok"
     },
     {
-      "faces": 22,
-      "geometry_hash": "6314e3aa72be0ff3",
+      "faces": 27,
+      "geometry_hash": "0777e3a04b4133c2",
       "id": "window-default",
       "images": [
         "image.png"
@@ -273,8 +273,8 @@
       "status": "ok"
     },
     {
-      "faces": 28,
-      "geometry_hash": "4c14d36773202b5d",
+      "faces": 33,
+      "geometry_hash": "1525de3aee310808",
       "id": "window-bar",
       "images": [
         "image.png"
@@ -284,8 +284,8 @@
       "status": "ok"
     },
     {
-      "faces": 76,
-      "geometry_hash": "ec9645c9f6ebfe33",
+      "faces": 81,
+      "geometry_hash": "794e5aa170a7273f",
       "id": "window-louver",
       "images": [
         "image.png"
@@ -298,8 +298,8 @@
       "status": "ok"
     },
     {
-      "faces": 45,
-      "geometry_hash": "993064b83dae175e",
+      "faces": 50,
+      "geometry_hash": "129690088e283388",
       "id": "window-glass-panes",
       "images": [
         "image.png"
@@ -309,8 +309,8 @@
       "status": "ok"
     },
     {
-      "faces": 60,
-      "geometry_hash": "b0c162fc5a8a918d",
+      "faces": 84,
+      "geometry_hash": "723e1be9e8af7f02",
       "id": "window-circular",
       "images": [
         "image.png"
@@ -332,7 +332,7 @@
     },
     {
       "faces": 63,
-      "geometry_hash": "fd20a5d391aea3da",
+      "geometry_hash": "0a116c4f79a37c7e",
       "id": "multigroup-fills",
       "images": [
         "image.png"
@@ -389,7 +389,7 @@
     },
     {
       "faces": 775,
-      "geometry_hash": "b36106231e33e4c6",
+      "geometry_hash": "cde276ea481afa43",
       "id": "balcony-inner-curved",
       "images": [
         "image.png"
@@ -479,7 +479,7 @@
     },
     {
       "faces": 12,
-      "geometry_hash": "38efe1d061bc8d47",
+      "geometry_hash": "e07059b4b64a18e4",
       "id": "fill-bar",
       "images": [
         "image.png"
@@ -489,8 +489,8 @@
       "status": "ok"
     },
     {
-      "faces": 202,
-      "geometry_hash": "cf806b534f3ef0e8",
+      "faces": 266,
+      "geometry_hash": "bc5a0f0b7c55ea9b",
       "id": "preset-suburban-house",
       "images": [
         "image.png"
@@ -500,8 +500,8 @@
       "status": "ok"
     },
     {
-      "faces": 186,
-      "geometry_hash": "fd547c5cb6ee8317",
+      "faces": 216,
+      "geometry_hash": "d9980500677f3eae",
       "id": "preset-townhouse",
       "images": [
         "image.png"
@@ -511,8 +511,8 @@
       "status": "ok"
     },
     {
-      "faces": 5373,
-      "geometry_hash": "8add832b5c2a49c7",
+      "faces": 5692,
+      "geometry_hash": "0c566f6dd55f0577",
       "id": "preset-apartment-block",
       "images": [
         "image.png"
@@ -522,8 +522,8 @@
       "status": "ok"
     },
     {
-      "faces": 375,
-      "geometry_hash": "4ab6d00a2d69fdc7",
+      "faces": 436,
+      "geometry_hash": "e2690d7b14f38a69",
       "id": "preset-modern-villa",
       "images": [
         "image.png"
@@ -533,8 +533,8 @@
       "status": "ok"
     },
     {
-      "faces": 188,
-      "geometry_hash": "ff9710edf3f2b9ef",
+      "faces": 232,
+      "geometry_hash": "0fc4681e6a4015e7",
       "id": "preset-mediterranean-villa",
       "images": [
         "image.png"
@@ -544,8 +544,8 @@
       "status": "ok"
     },
     {
-      "faces": 127,
-      "geometry_hash": "f7687548dbf83ace",
+      "faces": 142,
+      "geometry_hash": "58a0a525700537fb",
       "id": "preset-corner-shop",
       "images": [
         "image.png"
@@ -555,8 +555,8 @@
       "status": "ok"
     },
     {
-      "faces": 176,
-      "geometry_hash": "7c3453aa89eef5d1",
+      "faces": 230,
+      "geometry_hash": "c23040d9868ef1b9",
       "id": "preset-warehouse",
       "images": [
         "image.png"
@@ -566,8 +566,8 @@
       "status": "ok"
     },
     {
-      "faces": 3321,
-      "geometry_hash": "d0930dec4b962de2",
+      "faces": 3721,
+      "geometry_hash": "292cb4a1c1da2202",
       "id": "preset-office-block",
       "images": [
         "image.png"

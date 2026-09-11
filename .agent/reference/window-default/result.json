@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "6314e3aa72be0ff3",
+  "geometry_hash": "0777e3a04b4133c2",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 48,
-      "faces": 22,
-      "verts": 28
+      "edges": 56,
+      "faces": 27,
+      "verts": 32
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
+    "non_manifold_edges": 4,
     "zero_area_faces": 0
   },
   "id": "window-default",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 48,
-    "faces": 22,
-    "verts": 28,
+    "edges": 56,
+    "faces": 27,
+    "verts": 32,
     "z_range": [
       0.0,
       3.0
@@ -43,7 +43,7 @@
       "errors": [],
       "feature": "window",
       "matgroup_counts": {
-        "frame": 8,
+        "frame": 13,
         "walls": 13,
         "window": 1
       },
@@ -67,21 +67,21 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 48,
-        "faces": 22,
-        "verts": 28
+        "edges": 56,
+        "faces": 27,
+        "verts": 32
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
+      "non_manifold_edges": 4,
       "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "frame": 8,
+        "frame": 13,
         "walls": 13,
         "window": 1
       },

@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "ff9710edf3f2b9ef",
+  "geometry_hash": "0fc4681e6a4015e7",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 423,
-      "faces": 188,
-      "verts": 240
+      "edges": 515,
+      "faces": 232,
+      "verts": 296
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 10,
+    "non_manifold_edges": 26,
     "zero_area_faces": 2
   },
   "id": "preset-mediterranean-villa",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 423,
-    "faces": 188,
-    "verts": 240,
+    "edges": 515,
+    "faces": 232,
+    "verts": 296,
     "z_range": [
       0.0,
       7.95
@@ -45,14 +45,14 @@
       "matgroup_counts": {
         "balcony": 5,
         "door": 2,
-        "frame": 42,
+        "frame": 62,
         "railing_posts": 24,
         "railing_rails": 24,
         "railing_walls": 6,
         "roof": 4,
         "roof_hangs": 8,
         "slabs": 25,
-        "walls": 44,
+        "walls": 68,
         "window": 4
       },
       "status": "ok",
@@ -64,13 +64,13 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 423,
-        "faces": 188,
-        "verts": 240
+        "edges": 515,
+        "faces": 232,
+        "verts": 296
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 10,
+      "non_manifold_edges": 26,
       "zero_area_faces": 2
     },
     "matgroups": {
@@ -78,14 +78,14 @@
       "groups": {
         "balcony": 5,
         "door": 2,
-        "frame": 42,
+        "frame": 62,
         "railing_posts": 24,
         "railing_rails": 24,
         "railing_walls": 6,
         "roof": 4,
         "roof_hangs": 8,
         "slabs": 25,
-        "walls": 44,
+        "walls": 68,
         "window": 4
       },
       "invalid_index_faces": 0,

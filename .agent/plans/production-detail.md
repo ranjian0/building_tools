@@ -49,25 +49,31 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] reference corpus + thumbs regen; commit
 
 ### Phase 1 — Foundation utilities
-- [ ] util_mesh: `bevel_edges(bm, edges, width, segments)` with clamping
-- [ ] util_mesh: `set_smooth_shading(bm, faces, angle)` for arcs/cylinders
-- [ ] util_mesh: `sweep_profile(bm, edge_run, profile_verts, normal)` —
-      simple straight-run profile sweep (fascia/sill/gutter building block)
-- [ ] scope `remove_doubles(dist=0.01)` in fill_types down to 0.0001
-- [ ] gate + commit
+- [x] util_mesh: `bevel_edges(bm, edges, width, segments)` with clamping
+- [x] util_mesh: `set_smooth_shading(bm, faces, angle)` for arcs/cylinders
+- [x] util_mesh: `sweep_profile_along_edges(bm, edge_run, profile, normal)`
+      (used by gutters/fascia)
+- [x] scope `remove_doubles(dist=0.01)` in fill_types down to 0.0001
+- [x] gate + commit
 
-### Phase 2 — Opening details — REMAINING
-- [ ] window sill: protruding sill member (75mm projection, 50mm high,
+### Phase 2 — Opening details — MOSTLY DONE (frame bevels deferred)
+- [x] window sill: protruding sill member (75mm projection, 50mm high,
       25mm drip lip) under the bottom frame member
-- [ ] door threshold: low sill member at the door opening base
-- [ ] casing option (add_casing): trim ring proud of the wall (60mm wide,
-      15mm proud) around door/window
-- [ ] frame edge bevels (2-5mm) via the Phase-1 utility
-- [ ] mullion joinery: vertical bars pass through horizontals (depth overlap
-      instead of the 15mm z-offset hack)
-- [ ] door hardware (add_hardware): rose + lever on the leaf
-- [ ] arch default resolution bump + smooth shading on arcs
-- [ ] tests: sill/threshold/hardware presence per case; corpus update; commit
+- [x] door threshold: low sill member at the door opening base
+- [x] casing option (add_casing): trim ring proud of the wall (60mm wide,
+      15mm proud) around door/window; coplanar wall-strip extrusion
+      (recessed opening face excluded)
+- [ ] frame edge bevels — BLOCKED: `bmesh.ops.bevel` rebuilds every face
+      incident to beveled edges' verts, invalidating the opening-face
+      reference the fill step needs. Props/options exist (add_bevel,
+      default False); needs a bevel-after-fill + re-tag design.
+- [x] mullion joinery: vertical bars pass through horizontals (full-depth
+      bars, 15mm z-fudge removed)
+- [x] door hardware (add_hardware): rose + lever on the leaf, positioned
+      from the frame ring extents (latch-side, handle_height above floor);
+      BAR_PULL variant for commercial doors
+- [x] arch default resolution bump + smooth shading on arcs
+- [x] tests: sill/threshold/hardware presence per case; corpus update; commit
 
 ### Phase 4 — Silhouette tier — PARTIAL (gutters/chimney props; cornice/columns deferred)
 - [x] roof fascia band along the eave (roof_hangs bottom rim)

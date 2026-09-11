@@ -100,7 +100,11 @@ def _mat_roof(mat):
     brick.inputs["Mortar Size"].default_value = 0.012
     brick.inputs["Color1"].default_value = _rgb(color)
     brick.inputs["Color2"].default_value = (
-        color[0] * 0.8, color[1] * 0.75, color[2] * 0.72, 1.0)
+        color[0] * 0.8,
+        color[1] * 0.75,
+        color[2] * 0.72,
+        1.0,
+    )
     brick.inputs["Mortar"].default_value = (0.12, 0.10, 0.09, 1.0)
     nt.links.new(mapping.outputs["Vector"], brick.inputs["Vector"])
     nt.links.new(brick.outputs["Color"], bsdf.inputs["Base Color"])
@@ -129,7 +133,11 @@ def _mat_door(mat):
 
     ramp = nt.nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.elements[0].color = (
-        color[0] * 0.7, color[1] * 0.7, color[2] * 0.7, 1.0)
+        color[0] * 0.7,
+        color[1] * 0.7,
+        color[2] * 0.7,
+        1.0,
+    )
     ramp.color_ramp.elements[1].color = _rgb(color)
     nt.links.new(wave.outputs["Fac"], ramp.inputs["Fac"])
     nt.links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])

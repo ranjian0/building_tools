@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "1f3426f007e9421b",
+  "geometry_hash": "7a465de4e878041a",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 106,
-      "faces": 49,
-      "verts": 60
+      "edges": 166,
+      "faces": 73,
+      "verts": 100
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 4,
-    "zero_area_faces": 3
+    "zero_area_faces": 2
   },
   "id": "door-arch",
   "images": [
@@ -25,9 +25,9 @@
     "flaky_arch_unpack"
   ],
   "mesh": {
-    "edges": 106,
-    "faces": 49,
-    "verts": 60,
+    "edges": 166,
+    "faces": 73,
+    "verts": 100,
     "z_range": [
       0.0,
       3.0
@@ -45,7 +45,7 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 3,
+        "door": 27,
         "frame": 25,
         "walls": 21
       },
@@ -72,19 +72,19 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 106,
-        "faces": 49,
-        "verts": 60
+        "edges": 166,
+        "faces": 73,
+        "verts": 100
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 4,
-      "zero_area_faces": 3
+      "zero_area_faces": 2
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 3,
+        "door": 27,
         "frame": 25,
         "walls": 21
       },
@@ -94,7 +94,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 13
+      "flip_seams": 6
     },
     "object": "wall",
     "ok": true,

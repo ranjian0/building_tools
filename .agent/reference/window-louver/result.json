@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "ec9645c9f6ebfe33",
+  "geometry_hash": "794e5aa170a7273f",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 166,
-      "faces": 76,
-      "verts": 92
+      "edges": 174,
+      "faces": 81,
+      "verts": 96
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
+    "non_manifold_edges": 4,
     "zero_area_faces": 0
   },
   "id": "window-louver",
@@ -26,9 +26,9 @@
     "flaky_louver_max_empty"
   ],
   "mesh": {
-    "edges": 166,
-    "faces": 76,
-    "verts": 92,
+    "edges": 174,
+    "faces": 81,
+    "verts": 96,
     "z_range": [
       0.0,
       3.0
@@ -46,7 +46,7 @@
       "errors": [],
       "feature": "window",
       "matgroup_counts": {
-        "frame": 12,
+        "frame": 17,
         "walls": 13,
         "window_louvers": 51
       },
@@ -71,21 +71,21 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 166,
-        "faces": 76,
-        "verts": 92
+        "edges": 174,
+        "faces": 81,
+        "verts": 96
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
+      "non_manifold_edges": 4,
       "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "frame": 12,
+        "frame": 17,
         "walls": 13,
         "window_louvers": 51
       },

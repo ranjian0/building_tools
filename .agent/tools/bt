@@ -641,7 +641,10 @@ def cmd_smoke(args):
     payload = _emit_result(output, True)
     failed = payload.get("failed", [])
     if failed:
-        print("SMOKE FAILED: %s" % ", ".join(failed))
+        names = ", ".join(
+            f if isinstance(f, str) else f.get("id", "?") for f in failed
+        )
+        print("SMOKE FAILED: %s" % names)
         sys.exit(1)
     print("smoke passed (%d presets)" % payload.get("total", 0))
 

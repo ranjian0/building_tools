@@ -4,17 +4,17 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "f7687548dbf83ace",
+  "geometry_hash": "58a0a525700537fb",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 277,
-      "faces": 127,
-      "verts": 151
+      "edges": 301,
+      "faces": 142,
+      "verts": 163
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
+    "non_manifold_edges": 12,
     "zero_area_faces": 0
   },
   "id": "preset-corner-shop",
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 277,
-    "faces": 127,
-    "verts": 151,
+    "edges": 301,
+    "faces": 142,
+    "verts": 163,
     "z_range": [
       0.0,
       7.6
@@ -44,7 +44,7 @@
       "feature": "preset:corner-shop",
       "matgroup_counts": {
         "door": 1,
-        "frame": 38,
+        "frame": 53,
         "roof": 17,
         "slabs": 26,
         "walls": 41,
@@ -57,22 +57,22 @@
   "steps": [],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 277,
-        "faces": 127,
-        "verts": 151
+        "edges": 301,
+        "faces": 142,
+        "verts": 163
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
+      "non_manifold_edges": 12,
       "zero_area_faces": 0
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "door": 1,
-        "frame": 38,
+        "frame": 53,
         "roof": 17,
         "slabs": 26,
         "walls": 41,

@@ -124,77 +124,77 @@
 ## door-default
 
 - status: `ok`
-- faces: 27 -- geometry_hash: `d86f4031d89f7d1b`
+- faces: 51 -- geometry_hash: `b1c6794ec515106f`
 
 ![door-default image.png](door-default/image.png)
 
 ## door-panels
 
 - status: `ok`
-- faces: 50 -- geometry_hash: `86d495f2de6f1382`
+- faces: 66 -- geometry_hash: `9965ec32cb838e11`
 
 ![door-panels image.png](door-panels/image.png)
 
 ## door-louver
 
 - status: `ok`
-- faces: 81 -- geometry_hash: `49dfd17ef70c2ad5`
+- faces: 105 -- geometry_hash: `497320bed013d06f`
 
 ![door-louver image.png](door-louver/image.png)
 
 ## door-glass-panes
 
 - status: `ok`
-- faces: 50 -- geometry_hash: `28217dc54793fca0`
+- faces: 67 -- geometry_hash: `9d34c015ee3b6e8d`
 
 ![door-glass-panes image.png](door-glass-panes/image.png)
 
 ## door-double
 
 - status: `ok`
-- faces: 28 -- geometry_hash: `98538500f980d113`
+- faces: 52 -- geometry_hash: `50929be8d507eed0`
 
 ![door-double image.png](door-double/image.png)
 
 ## door-arch
 
 - status: `ok`
-- faces: 49 -- geometry_hash: `1f3426f007e9421b`
+- faces: 73 -- geometry_hash: `7a465de4e878041a`
 
 ![door-arch image.png](door-arch/image.png)
 
 ## window-default
 
 - status: `ok`
-- faces: 22 -- geometry_hash: `6314e3aa72be0ff3`
+- faces: 27 -- geometry_hash: `0777e3a04b4133c2`
 
 ![window-default image.png](window-default/image.png)
 
 ## window-bar
 
 - status: `ok`
-- faces: 28 -- geometry_hash: `4c14d36773202b5d`
+- faces: 33 -- geometry_hash: `1525de3aee310808`
 
 ![window-bar image.png](window-bar/image.png)
 
 ## window-louver
 
 - status: `ok`
-- faces: 76 -- geometry_hash: `ec9645c9f6ebfe33`
+- faces: 81 -- geometry_hash: `794e5aa170a7273f`
 
 ![window-louver image.png](window-louver/image.png)
 
 ## window-glass-panes
 
 - status: `ok`
-- faces: 45 -- geometry_hash: `993064b83dae175e`
+- faces: 50 -- geometry_hash: `129690088e283388`
 
 ![window-glass-panes image.png](window-glass-panes/image.png)
 
 ## window-circular
 
 - status: `ok`
-- faces: 60 -- geometry_hash: `b0c162fc5a8a918d`
+- faces: 84 -- geometry_hash: `723e1be9e8af7f02`
 
 ![window-circular image.png](window-circular/image.png)
 
@@ -208,7 +208,7 @@
 ## multigroup-fills
 
 - status: `ok`
-- faces: 63 -- geometry_hash: `fd20a5d391aea3da`
+- faces: 63 -- geometry_hash: `0a116c4f79a37c7e`
 
 ![multigroup-fills image.png](multigroup-fills/image.png)
 
@@ -241,7 +241,7 @@
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `b36106231e33e4c6`
+- faces: 775 -- geometry_hash: `cde276ea481afa43`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 
@@ -297,62 +297,62 @@
 ## fill-bar
 
 - status: `ok`
-- faces: 12 -- geometry_hash: `38efe1d061bc8d47`
+- faces: 12 -- geometry_hash: `e07059b4b64a18e4`
 
 ![fill-bar image.png](fill-bar/image.png)
 
 ## preset-suburban-house
 
 - status: `ok`
-- faces: 202 -- geometry_hash: `cf806b534f3ef0e8`
+- faces: 266 -- geometry_hash: `bc5a0f0b7c55ea9b`
 
 ![preset-suburban-house image.png](preset-suburban-house/image.png)
 
 ## preset-townhouse
 
 - status: `ok`
-- faces: 186 -- geometry_hash: `fd547c5cb6ee8317`
+- faces: 216 -- geometry_hash: `d9980500677f3eae`
 
 ![preset-townhouse image.png](preset-townhouse/image.png)
 
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 5373 -- geometry_hash: `8add832b5c2a49c7`
+- faces: 5692 -- geometry_hash: `0c566f6dd55f0577`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 375 -- geometry_hash: `4ab6d00a2d69fdc7`
+- faces: 436 -- geometry_hash: `e2690d7b14f38a69`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 
 ## preset-mediterranean-villa
 
 - status: `ok`
-- faces: 188 -- geometry_hash: `ff9710edf3f2b9ef`
+- faces: 232 -- geometry_hash: `0fc4681e6a4015e7`
 
 ![preset-mediterranean-villa image.png](preset-mediterranean-villa/image.png)
 
 ## preset-corner-shop
 
 - status: `ok`
-- faces: 127 -- geometry_hash: `f7687548dbf83ace`
+- faces: 142 -- geometry_hash: `58a0a525700537fb`
 
 ![preset-corner-shop image.png](preset-corner-shop/image.png)
 
 ## preset-warehouse
 
 - status: `ok`
-- faces: 176 -- geometry_hash: `7c3453aa89eef5d1`
+- faces: 230 -- geometry_hash: `c23040d9868ef1b9`
 
 ![preset-warehouse image.png](preset-warehouse/image.png)
 
 ## preset-office-block
 
 - status: `ok`
-- faces: 3321 -- geometry_hash: `d0930dec4b962de2`
+- faces: 3721 -- geometry_hash: `292cb4a1c1da2202`
 
 ![preset-office-block image.png](preset-office-block/image.png)

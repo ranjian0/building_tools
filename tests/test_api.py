@@ -212,6 +212,88 @@ class TestWallElements(unittest.TestCase):
         self.assertGreater(res.matgroup_counts.get("balcony", 0), 0)
 
 
+class TestOpeningDetails(unittest.TestCase):
+    """Casing / hardware / sill detail options must build and tag cleanly."""
+
+    def setUp(self):
+        clean_scene()
+        self.obj = make_wall()
+
+    def _apply(self, feature, options):
+        return apply_feature(
+            feature, options, FaceTarget(self.obj, [front_face(self.obj)])
+        )
+
+    def test_door_hardware_adds_faces(self):
+        plain = self._apply(
+            "door", DoorOptions(size_offset=SizeOffsetOptions(size=(1.5, 2.4)))
+        )
+        self.assertTrue(plain.ok, plain.errors)
+        with_hw = self._apply(
+            "door",
+            DoorOptions(
+                size_offset=SizeOffsetOptions(size=(1.5, 2.4)), add_hardware=True
+            ),
+        )
+        self.assertTrue(with_hw.ok, with_hw.errors)
+        # rose (18 faces) + lever cube (6) live inside the door group
+        self.assertGreater(
+            with_hw.matgroup_counts.get("door", 0),
+            plain.matgroup_counts.get("door", 0),
+        )
+        report = validate_object(
+            self.obj, expect={"groups": ["door", "frame"]}, include_geometry=False
+        )
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_door_bar_pull_style(self):
+        res = self._apply(
+            "door",
+            DoorOptions(
+                size_offset=SizeOffsetOptions(size=(1.5, 2.4)),
+                add_hardware=True,
+                handle_style="BAR_PULL",
+            ),
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertGreater(res.matgroup_counts.get("door", 0), 0)
+
+    def test_door_casing_builds(self):
+        res = self._apply(
+            "door",
+            DoorOptions(
+                size_offset=SizeOffsetOptions(size=(1.5, 2.4)), add_casing=True
+            ),
+        )
+        self.assertTrue(res.ok, res.errors)
+        report = validate_object(
+            self.obj, expect={"groups": ["door", "frame"]}, include_geometry=False
+        )
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_window_casing_builds(self):
+        res = self._apply(
+            "window",
+            WindowOptions(
+                size_offset=SizeOffsetOptions(size=(2.4, 1.6)), add_casing=True
+            ),
+        )
+        self.assertTrue(res.ok, res.errors)
+        report = validate_object(
+            self.obj, expect={"groups": ["window", "frame"]}, include_geometry=False
+        )
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_window_sill_proud_of_wall(self):
+        res = self._apply(
+            "window", WindowOptions(size_offset=SizeOffsetOptions(size=(2.4, 1.6)))
+        )
+        self.assertTrue(res.ok, res.errors)
+        # sill projects past the wall face plane (front face at y = -0.2)
+        front_y = min(v.co.y for v in self.obj.data.vertices)
+        self.assertLess(front_y, -0.2 - 1e-6)
+
+
 class TestPresets(unittest.TestCase):
     """Every bundled preset must build and satisfy the matgroup contract."""
 

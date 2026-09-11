@@ -198,8 +198,20 @@ def create_rectangular_frame(bm, face, prop):
     if prop.add_arch:
         add_faces_to_group(bm, [arch_face], MaterialGroup.WINDOW)
 
-        # -- protruding sill below the bottom frame member
-        add_sill(bm, frame_faces, normal)
+    # -- protruding sill below the bottom frame member
+    add_sill(bm, validate(frame_faces), normal)
+
+    # -- casing
+    if prop.add_casing:
+        from ..frame import add_casing
+
+        add_casing(
+            bm,
+            validate(frame_faces),
+            normal,
+            casing_width=prop.casing_width,
+            casing_depth=prop.casing_depth,
+        )
 
     return window_face, arch_face
 

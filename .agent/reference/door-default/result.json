@@ -4,13 +4,13 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "d86f4031d89f7d1b",
+  "geometry_hash": "b1c6794ec515106f",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 56,
-      "faces": 27,
-      "verts": 32
+      "edges": 116,
+      "faces": 51,
+      "verts": 72
     },
     "loose_edges": 0,
     "loose_verts": 0,
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 56,
-    "faces": 27,
-    "verts": 32,
+    "edges": 116,
+    "faces": 51,
+    "verts": 72,
     "z_range": [
       0.0,
       3.0
@@ -43,7 +43,7 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 2,
+        "door": 26,
         "frame": 10,
         "walls": 15
       },
@@ -69,9 +69,9 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 56,
-        "faces": 27,
-        "verts": 32
+        "edges": 116,
+        "faces": 51,
+        "verts": 72
       },
       "loose_edges": 0,
       "loose_verts": 0,
@@ -81,7 +81,7 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 2,
+        "door": 26,
         "frame": 10,
         "walls": 15
       },
