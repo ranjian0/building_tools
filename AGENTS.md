@@ -57,8 +57,10 @@ Blender 5.1 gotchas).
 
 1. Make the change.
 2. `just format && just check && just lint`
-3. `just test` — all tests must pass (42 as of the api work; count drifts).
-4. For anything geometry/visual: verify in the live session —
+3. `just test` — all tests must pass (46 as of the api work; count drifts).
+4. **`bt smoke`** — build all 8 presets + validate matgroup contracts;
+   exit 1 on any failure. Run after ANY change to building code.
+5. For anything geometry/visual: verify in the live session —
 
    ```bash
    bt restart && bt reload
