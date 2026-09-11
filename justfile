@@ -37,16 +37,11 @@ lint:
 build:
     uv run python scripts/make-release.py
 
-# build the release zip from the latest commit
-build-dev:
+
+# dev testing
+dev:
     uv run python scripts/make-release.py latest
-
-# install the dev build into blender
-install-dev:
-    blender -P scripts/install-dev-addon.py
-
-# build-dev + install-dev
-dev: build-dev install-dev
+    blender -P scripts/install-dev-addon.py dev.blend
 
 # serve docs locally (jekyll)
 web-serve:

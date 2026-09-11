@@ -133,6 +133,7 @@ dmypy.json
 # Blender
 *.blend
 *.blend1
+!dev.blend
 
 *.txt
 *.zip
