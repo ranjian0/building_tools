@@ -226,18 +226,23 @@ def render_case(obj, case_dir, case_id):
     panel_paths = []
     for label, direction in VIEW_DIRECTIONS:
         # -- iso uses EEVEE (PBR materials, soft shadows for depth);
-        #    ortho elevations use workbench FLAT (clean matgroup reading,
-        #    no shadow noise)
+        #    ortho elevations use workbench STUDIO (directional shading,
+        #    cavity edges, readable matgroup colors, no cast shadows)
         is_iso = label == "iso"
         scene.render.engine = "BLENDER_EEVEE" if is_iso else "BLENDER_WORKBENCH"
         if not is_iso:
             shading = scene.display.shading
             if hasattr(shading, "lighting"):
-                shading.lighting = "FLAT"
+                shading.lighting = "STUDIO"
             elif hasattr(shading, "light"):
-                shading.light = "FLAT"
+                shading.light = "STUDIO"
             shading.color_type = "MATERIAL"
             shading.show_cavity = True
+            shading.cavity_type = "BOTH"
+            shading.cavity_ridge_factor = 1.5
+            shading.cavity_valley_factor = 1.5
+            shading.studiolight_intensity = 1.0
+            shading.show_specular_highlight = False
 
         cam.location = center + direction * (radius * 4 + 1)
         look = (center - cam.location).normalized()

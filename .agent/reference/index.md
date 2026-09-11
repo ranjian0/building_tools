@@ -318,14 +318,14 @@
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 5373 -- geometry_hash: `93449b73ac27fa42`
+- faces: 5373 -- geometry_hash: `8add832b5c2a49c7`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 375 -- geometry_hash: `335bffa11833ef54`
+- faces: 375 -- geometry_hash: `4ab6d00a2d69fdc7`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 
@@ -353,6 +353,6 @@
 ## preset-office-block
 
 - status: `ok`
-- faces: 3321 -- geometry_hash: `4223cdca5ec6bff5`
+- faces: 3321 -- geometry_hash: `d0930dec4b962de2`
 
 ![preset-office-block image.png](preset-office-block/image.png)

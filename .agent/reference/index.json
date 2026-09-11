@@ -512,7 +512,7 @@
     },
     {
       "faces": 5373,
-      "geometry_hash": "93449b73ac27fa42",
+      "geometry_hash": "8add832b5c2a49c7",
       "id": "preset-apartment-block",
       "images": [
         "image.png"
@@ -523,7 +523,7 @@
     },
     {
       "faces": 375,
-      "geometry_hash": "335bffa11833ef54",
+      "geometry_hash": "4ab6d00a2d69fdc7",
       "id": "preset-modern-villa",
       "images": [
         "image.png"
@@ -567,7 +567,7 @@
     },
     {
       "faces": 3321,
-      "geometry_hash": "4223cdca5ec6bff5",
+      "geometry_hash": "d0930dec4b962de2",
       "id": "preset-office-block",
       "images": [
         "image.png"
