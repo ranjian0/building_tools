@@ -576,7 +576,7 @@ def reference_generate(out_dir, filt, timeout):
     check_running(need=True)
     code = REFERENCE_CODE_TMPL.format(
         cases=CASES_FILE, out=out_dir, scenarios=os.path.join(SNIPPETS, "scenarios"),
-        filt=filt or "", img_w=1280, img_h=800,
+        filt=filt or "", img_w=640, img_h=640,
     ) + open(SWEEP_FILE).read()
     os.makedirs(out_dir, exist_ok=True)
     status, output, dur = communicate(code, timeout)
@@ -678,7 +678,7 @@ def cmd_reference_diff(args):
     new_ids = set(new_cases)
 
     os.makedirs(DIFF_DIR, exist_ok=True)
-    pixel_threshold = 1280 * 800 * 0.01  # 1% of pixels (fuzz-filtered)
+    pixel_threshold = 1280 * 1280 * 0.01  # 1% of pixels (fuzz-filtered)
     severe, visual, minor = [], [], []
     for cid in sorted(base_ids - new_ids):
         severe.append((cid, ["REMOVED"]))

@@ -179,7 +179,7 @@ VIEW_DIRECTIONS = [
     ("iso",   Vector((1.0, -1.0, 0.85)).normalized()),  # 3/4 ortho
 ]
 
-VIEW_SIZE = 512  # per-panel square; composite = 2x * 2y
+VIEW_SIZE = 640  # per-panel square; composite = 1280x1280
 
 
 def render_case(obj, case_dir, case_id):
@@ -201,10 +201,19 @@ def render_case(obj, case_dir, case_id):
     # -- ensure lighting
     if not any(o.type == "LIGHT" for o in scene.objects):
         sun_data = bpy.data.lights.new("ref_sun", type="SUN")
-        sun_data.energy = 3.0
+        sun_data.energy = 1.5
+        sun_data.angle = math.radians(15)
         sun = bpy.data.objects.new("ref_sun", sun_data)
         scene.collection.objects.link(sun)
         sun.rotation_euler = (0.8, 0.2, 0.5)
+        # -- soft ambient fill from the opposite side
+        fill_data = bpy.data.lights.new("ref_fill", type="AREA")
+        fill_data.energy = 200.0
+        fill_data.size = 8.0
+        fill = bpy.data.objects.new("ref_fill", fill_data)
+        scene.collection.objects.link(fill)
+        fill.location = (-6, 6, 8)
+        fill.rotation_euler = (-0.6, 0.3, -0.5)
 
     scene.camera = cam
     scene.render.engine = "BLENDER_EEVEE"

@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "a2c20730bb05ac2f",
+  "geometry_hash": "957ef4907c7cb1db",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -15,7 +15,7 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 4,
-    "zero_area_faces": 8
+    "zero_area_faces": 5
   },
   "id": "preset-modern-villa",
   "images": [
@@ -67,7 +67,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 4,
-      "zero_area_faces": 8
+      "zero_area_faces": 5
     },
     "matgroups": {
       "all_tagged": true,
