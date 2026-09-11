@@ -96,6 +96,23 @@ _suburban = BuildingPreset(
             "window", "side_walls", (0, 1), {"size_offset": {"size": [1.2, 1.4]}}
         ),
     ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "group_present", "groups": ["door", "slabs", "roof_hangs"]},
+        {"kind": "count_per_storey", "group": "window", "min_each": 2, "storeys": 2},
+    ],
 )
 
 _townhouse = BuildingPreset(
@@ -126,6 +143,29 @@ _townhouse = BuildingPreset(
         FacadeRule(
             "window", "side_walls", (1, 2), {"size_offset": {"size": [1.2, 1.6]}}
         ),
+    ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "group_present", "groups": ["door", "slabs", "roof_hangs"]},
+        {
+            "kind": "count_per_storey",
+            "group": "window",
+            "min_each": 2,
+            "storeys": 2,
+            "skip_storeys": 1,
+        },
     ],
 )
 
@@ -275,6 +315,23 @@ _modern_villa = BuildingPreset(
             {"size_offset": {"size": [2.0, 1.4]}},
         ),
     ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "group_present", "groups": ["door", "slabs", "window_panes"]},
+        {"kind": "count_per_storey", "group": "window", "min_each": 2, "storeys": 2},
+    ],
 )
 
 _mediterranean = BuildingPreset(
@@ -298,6 +355,26 @@ _mediterranean = BuildingPreset(
         FacadeRule(
             "window", "side_walls", (0, 1), {"size_offset": {"size": [1.4, 1.6]}}
         ),
+    ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {
+            "kind": "group_present",
+            "groups": ["door", "balcony", "slabs", "railing_walls", "roof_hangs"],
+        },
+        {"kind": "count_per_storey", "group": "window", "min_each": 2, "storeys": 2},
     ],
 )
 
@@ -328,6 +405,29 @@ _corner_shop = BuildingPreset(
             (1,),
             {"array": {"count": 3}, "size_offset": {"size": [1.4, 1.6]}},
         ),
+    ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "group_present", "groups": ["door", "slabs"]},
+        {
+            "kind": "count_per_storey",
+            "group": "window",
+            "min_each": 3,
+            "storeys": 1,
+            "skip_storeys": 1,
+        },
     ],
 )
 
@@ -364,6 +464,29 @@ _warehouse = BuildingPreset(
             },
         ),
     ],
+    checks=[
+        {
+            "kind": "group_present",
+            "groups": [
+                "walls",
+                "roof",
+                "frame",
+                "window",
+                "door",
+                "window_bars",
+                "roof_hangs",
+            ],
+        },
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_bars"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "symmetric_outset", "group": "roof", "tol": 0.05},
+    ],
 )
 
 _office = BuildingPreset(
@@ -398,6 +521,29 @@ _office = BuildingPreset(
                 "size_offset": {"size": [1.8, 1.6]},
             },
         ),
+    ],
+    checks=[
+        {"kind": "group_present", "groups": ["walls", "roof", "frame", "window"]},
+        # NOTE: walls/frame is exempt -- sills/thresholds are proud trim
+        # that crosses jamb edges at the opening seam (T-junction class,
+        # advisory per AGENTS.md); element-element pairs carry the signal
+        {
+            "kind": "no_intersection",
+            "pairs": [
+                ["walls", "door"],
+                ["walls", "window_panes"],
+                ["roof", "walls"],
+                ["roof_hangs", "walls"],
+            ],
+        },
+        {"kind": "group_present", "groups": ["door", "slabs", "window_panes"]},
+        {
+            "kind": "count_per_storey",
+            "group": "window",
+            "min_each": 4,
+            "storeys": 5,
+            "skip_storeys": 1,
+        },
     ],
 )
 

@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "292cb4a1c1da2202",
+  "geometry_hash": "cdff9bedbf74a404",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -15,7 +15,7 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 320,
-    "zero_area_faces": 52
+    "zero_area_faces": 48
   },
   "id": "preset-office-block",
   "images": [
@@ -67,7 +67,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 320,
-      "zero_area_faces": 52
+      "zero_area_faces": 48
     },
     "matgroups": {
       "all_tagged": true,

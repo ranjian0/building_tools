@@ -108,7 +108,7 @@ class TestProbes(unittest.TestCase):
         self.assertAlmostEqual(bays[0]["z_max"] - bays[0]["z_min"], 1.6, delta=0.15)
 
         protr = group_protrusions(obj, "frame")
-        front = [p for p in protr if abs(p["normal"][1]) > 0.9]
+        front = [p for p in protr if p["normal"][1] < -0.9]  # viewer-facing
         self.assertTrue(front, protr)
         # sill lip past the wall plane: 75mm projection from the
         # 50mm-recessed frame = ~25mm visible

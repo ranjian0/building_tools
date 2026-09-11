@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "0fc4681e6a4015e7",
+  "geometry_hash": "e6cafdc457700513",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -44,7 +44,7 @@
       "feature": "preset:mediterranean-villa",
       "matgroup_counts": {
         "balcony": 5,
-        "door": 2,
+        "door": 26,
         "frame": 62,
         "railing_posts": 24,
         "railing_rails": 24,
@@ -52,7 +52,7 @@
         "roof": 4,
         "roof_hangs": 8,
         "slabs": 25,
-        "walls": 68,
+        "walls": 44,
         "window": 4
       },
       "status": "ok",
@@ -77,7 +77,7 @@
       "all_tagged": true,
       "groups": {
         "balcony": 5,
-        "door": 2,
+        "door": 26,
         "frame": 62,
         "railing_posts": 24,
         "railing_rails": 24,
@@ -85,7 +85,7 @@
         "roof": 4,
         "roof_hangs": 8,
         "slabs": 25,
-        "walls": 68,
+        "walls": 44,
         "window": 4
       },
       "invalid_index_faces": 0,

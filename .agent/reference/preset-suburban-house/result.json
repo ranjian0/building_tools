@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "bc5a0f0b7c55ea9b",
+  "geometry_hash": "09ea89aed3f124af",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -43,12 +43,12 @@
       "errors": [],
       "feature": "preset:suburban-house",
       "matgroup_counts": {
-        "door": 2,
+        "door": 26,
         "frame": 114,
         "roof": 3,
         "roof_hangs": 12,
         "slabs": 25,
-        "walls": 102,
+        "walls": 78,
         "window": 8
       },
       "status": "ok",
@@ -72,12 +72,12 @@
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 2,
+        "door": 26,
         "frame": 114,
         "roof": 3,
         "roof_hangs": 12,
         "slabs": 25,
-        "walls": 102,
+        "walls": 78,
         "window": 8
       },
       "invalid_index_faces": 0,

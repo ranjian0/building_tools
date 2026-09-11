@@ -114,16 +114,16 @@ def counts_per_storey(obj, group, bands=None):
         centers = [f.calc_center_median().z for f in groups.get(group, [])]
     finally:
         bm.free()
+    # -- assign each face to the band whose floor (slab) is at or below it:
+    #    boundaries are band z positions, so a face just under the next slab
+    #    stays in its own storey (nearest-center assignment straddles mid-storey)
+    zs = sorted(b["z"] for b in bands)
     counts = {}
     for z in centers:
-        band_i = min(
-            range(len(bands)), key=lambda i: abs(bands[i]["z"] - z), default=None
-        )
-        if band_i is None:
-            continue
-        # only count faces reasonably near their band (within 1.5 storeys)
-        if abs(bands[band_i]["z"] - z) > 2.0:
-            continue
+        band_i = 0
+        for i, bz in enumerate(zs):
+            if z >= bz - 0.15:  # slab tolerance: faces in the slab count below
+                band_i = i
         counts.setdefault("storey_%d" % band_i, 0)
         counts["storey_%d" % band_i] += 1
     return counts
@@ -198,10 +198,11 @@ def elevation_bays(obj, group, view="front", tol=0.2):
 
 
 def wall_planes(obj, group="walls", tol=0.05):
-    """Domininant planes of a group's faces.
+    """Dominant planes of a group's faces.
 
-    Clusters faces by (rounded normal, rounded plane offset); returns
-    [{"normal": [x,y,z], "d": plane_offset, "count"}] sorted by count.
+    Clusters faces by (rounded normal, rounded plane offset) and weights
+    by AREA (a single big wall face outranks many small recess faces).
+    Returns [{"normal", "d", "count", "area"}] sorted by area.
     """
     bm, groups = _load(obj)
     try:
@@ -210,19 +211,30 @@ def wall_planes(obj, group="walls", tol=0.05):
             n = f.normal
             d = sum(v.co.dot(n) for v in f.verts) / len(f.verts)
             key = (round(n.x, 2), round(n.y, 2), round(n.z, 2), round(d, 2))
-            rec = planes.setdefault(key, {"n": n.copy(), "ds": [], "count": 0})
+            rec = planes.setdefault(
+                key, {"n": n.copy(), "ds": [], "count": 0, "area": 0.0}
+            )
             rec["ds"].append(d)
             rec["count"] += 1
+            rec["area"] += f.calc_area()
         out = []
         for key, rec in planes.items():
-            if rec["count"] < 2:
-                continue
             n = rec["n"]
             d = sum(rec["ds"]) / len(rec["ds"])
             out.append(
-                {"normal": [n.x, n.y, n.z], "d": round(d, 4), "count": rec["count"]}
+                {
+                    "normal": [n.x, n.y, n.z],
+                    "d": round(d, 4),
+                    "count": rec["count"],
+                    "area": round(rec["area"], 4),
+                }
             )
-        return sorted(out, key=lambda p: -p["count"])[:12]
+        out.sort(key=lambda p: -p["area"])
+        # -- keep planes with meaningful extent (>= 25% of the largest)
+        if out:
+            top = out[0]["area"]
+            out = [p for p in out if p["area"] >= top * 0.25]
+        return out[:12]
     finally:
         bm.free()
 

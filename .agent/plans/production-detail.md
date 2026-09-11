@@ -97,7 +97,16 @@ and production export — for both archviz renders and game-engine workflows.
       14m/4=3.5m bays); storey-4 fragment + railing deficit fixed;
       parapet "asymmetry" was a measurement artifact (walls-bbox
       pollution) — probes now anchor on wall planes
-- [ ] extend declarative checks to the other 7 presets
+- [x] extend declarative checks to the other 7 presets (group_present,
+      no_intersection on element pairs, count_per_storey, symmetric_outset
+      for the warehouse); all 8 green via bt check/smoke
+- [x] door detail fixes found by the sweep: handle positioned from the
+      opening edge (was 70mm from the wall plane, rose buried in the
+      jamb); hardware/threshold/sill/casing faces now explicitly tagged
+      (were falling to the -1 sentinel -> WALLS)
+- [x] probe hardening: wall_planes weighted by area (single-face walls
+      lost to window-recess planes); counts_per_storey assigns by the
+      floor below (nearest-center straddled mid-storey)
 - [ ] multigroup entry detail (threshold/hardware via frame.py helpers)
 - [ ] Detail level (Low/Medium/High) — scene setting + api param; gates
       bevels/hardware/gutters/cornices/chimney/glass thickness
