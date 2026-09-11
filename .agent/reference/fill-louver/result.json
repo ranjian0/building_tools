@@ -3,7 +3,7 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
   "geometry_hash": "069641f4e6ef1582",
   "geometry_report": {
     "clean": false,
@@ -18,11 +18,7 @@
     "zero_area_faces": 10
   },
   "id": "fill-louver",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
   "mesh": {
     "edges": 160,

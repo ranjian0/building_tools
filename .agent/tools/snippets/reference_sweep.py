@@ -181,7 +181,7 @@ VIEW_DIRECTIONS = {
 
 
 def render_case(obj, case_dir, case_id):
-    """Deterministic workbench renders (iso + front + right elevations)."""
+    """Deterministic renders: workbench FLAT (iso/front/right) + EEVEE material."""
     assign_matgroup_materials(obj)
 
     corners = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
@@ -213,6 +213,15 @@ def render_case(obj, case_dir, case_id):
     scene.render.image_settings.file_format = "PNG"
 
     aspect = IMG_W / IMG_H
+
+    # -- ensure basic lighting for EEVEE material render
+    if not any(o.type == "LIGHT" for o in scene.objects):
+        sun_data = bpy.data.lights.new("ref_sun", type="SUN")
+        sun_data.energy = 3.0
+        sun = bpy.data.objects.new("ref_sun", sun_data)
+        scene.collection.objects.link(sun)
+        sun.rotation_euler = (0.8, 0.2, 0.5)
+
     for suffix, direction in VIEW_DIRECTIONS.items():
         cam.location = center + direction * (radius * 4 + 1)
         # -- to_track_quat aims -Z along the given vector: it must point from
@@ -231,6 +240,14 @@ def render_case(obj, case_dir, case_id):
         scene.render.filepath = os.path.join(
             case_dir, "image%s.png" % suffix)
         bpy.ops.render.render(write_still=True)
+
+    # -- EEVEE material render (shows PBR/transmission/glass)
+    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    scene.render.filepath = os.path.join(case_dir, "image-material.png")
+    try:
+        bpy.ops.render.render(write_still=True)
+    except Exception:
+        pass  # EEVEE may not be available in all environments
 
     scene.collection.objects.unlink(cam)
     bpy.data.objects.remove(cam)
@@ -320,11 +337,16 @@ def _run_case_once(case):
         )
         entry["geometry_report"] = geometry_report(obj)
         try:
+            # -- apply default BT_ materials so material bugs surface here
+            from building_tools.btools.building.default_materials import (
+                apply_default_materials,
+            )
+            apply_default_materials(obj)
             render_case(obj, os.path.join(OUT_DIR, case["id"]), case["id"])
             entry["images"] = ["image.png", "image-front.png", "image-right.png"]
         except Exception as exc:  # noqa: BLE001
             entry["images"] = []
-            entry["error"] = "render failed: %s" % exc
+            entry["error"] = "render/materials failed: %s" % exc
     else:
         entry["mesh"] = None
         entry["geometry_hash"] = None

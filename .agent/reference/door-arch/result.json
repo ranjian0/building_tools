@@ -3,33 +3,29 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
-  "geometry_hash": "19c6bf8ecbaa2ba5",
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "1f3426f007e9421b",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 98,
-      "faces": 44,
-      "verts": 56
+      "edges": 106,
+      "faces": 49,
+      "verts": 60
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 1
+    "non_manifold_edges": 4,
+    "zero_area_faces": 3
   },
   "id": "door-arch",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [
     "flaky_arch_unpack"
   ],
   "mesh": {
-    "edges": 98,
-    "faces": 44,
-    "verts": 56,
+    "edges": 106,
+    "faces": 49,
+    "verts": 60,
     "z_range": [
       0.0,
       3.0
@@ -41,9 +37,9 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 2,
-        "frame": 22,
-        "walls": 20
+        "door": 3,
+        "frame": 25,
+        "walls": 21
       },
       "status": "ok",
       "warnings": []
@@ -68,21 +64,21 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 98,
-        "faces": 44,
-        "verts": 56
+        "edges": 106,
+        "faces": 49,
+        "verts": 60
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 1
+      "non_manifold_edges": 4,
+      "zero_area_faces": 3
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 2,
-        "frame": 22,
-        "walls": 20
+        "door": 3,
+        "frame": 25,
+        "walls": 21
       },
       "invalid_index_faces": 0,
       "num_groups": 3,
@@ -90,7 +86,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 12
+      "flip_seams": 13
     },
     "object": "wall",
     "ok": true,

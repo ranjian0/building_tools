@@ -3,31 +3,27 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
-  "geometry_hash": "7f5efadd23543cf6",
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "28217dc54793fca0",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 92,
-      "faces": 45,
-      "verts": 49
+      "edges": 100,
+      "faces": 50,
+      "verts": 53
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 0
+    "non_manifold_edges": 4,
+    "zero_area_faces": 1
   },
   "id": "door-glass-panes",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
   "mesh": {
-    "edges": 92,
-    "faces": 45,
-    "verts": 49,
+    "edges": 100,
+    "faces": 50,
+    "verts": 53,
     "z_range": [
       0.0,
       3.0
@@ -39,10 +35,10 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 8,
+        "door": 9,
         "door_panes": 16,
-        "frame": 7,
-        "walls": 14
+        "frame": 10,
+        "walls": 15
       },
       "status": "ok",
       "warnings": []
@@ -65,24 +61,24 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 92,
-        "faces": 45,
-        "verts": 49
+        "edges": 100,
+        "faces": 50,
+        "verts": 53
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 0
+      "non_manifold_edges": 4,
+      "zero_area_faces": 1
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 8,
+        "door": 9,
         "door_panes": 16,
-        "frame": 7,
-        "walls": 14
+        "frame": 10,
+        "walls": 15
       },
       "invalid_index_faces": 0,
       "num_groups": 4,
@@ -90,7 +86,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 3
+      "flip_seams": 4
     },
     "object": "wall",
     "ok": true,

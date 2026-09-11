@@ -3,31 +3,27 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
-  "geometry_hash": "e12c19b1a2ea06a6",
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "98538500f980d113",
   "geometry_report": {
-    "clean": true,
+    "clean": false,
     "counts": {
-      "edges": 51,
-      "faces": 23,
-      "verts": 30
+      "edges": 59,
+      "faces": 28,
+      "verts": 34
     },
     "loose_edges": 0,
     "loose_verts": 0,
-    "non_manifold_edges": 0,
-    "zero_area_faces": 0
+    "non_manifold_edges": 5,
+    "zero_area_faces": 2
   },
   "id": "door-double",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
   "mesh": {
-    "edges": 51,
-    "faces": 23,
-    "verts": 30,
+    "edges": 59,
+    "faces": 28,
+    "verts": 34,
     "z_range": [
       0.0,
       3.0
@@ -39,9 +35,9 @@
       "errors": [],
       "feature": "door",
       "matgroup_counts": {
-        "door": 2,
-        "frame": 7,
-        "walls": 14
+        "door": 3,
+        "frame": 10,
+        "walls": 15
       },
       "status": "ok",
       "warnings": []
@@ -64,23 +60,23 @@
   ],
   "validation": {
     "geometry": {
-      "clean": true,
+      "clean": false,
       "counts": {
-        "edges": 51,
-        "faces": 23,
-        "verts": 30
+        "edges": 59,
+        "faces": 28,
+        "verts": 34
       },
       "loose_edges": 0,
       "loose_verts": 0,
-      "non_manifold_edges": 0,
-      "zero_area_faces": 0
+      "non_manifold_edges": 5,
+      "zero_area_faces": 2
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
-        "door": 2,
-        "frame": 7,
-        "walls": 14
+        "door": 3,
+        "frame": 10,
+        "walls": 15
       },
       "invalid_index_faces": 0,
       "num_groups": 3,
@@ -88,7 +84,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 3
+      "flip_seams": 4
     },
     "object": "wall",
     "ok": true,

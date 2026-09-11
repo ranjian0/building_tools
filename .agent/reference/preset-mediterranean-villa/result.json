@@ -3,25 +3,93 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "preset failed: error",
-  "geometry_hash": null,
-  "geometry_report": null,
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "ff9710edf3f2b9ef",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 423,
+      "faces": 188,
+      "verts": 240
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 10,
+    "zero_area_faces": 2
+  },
   "id": "preset-mediterranean-villa",
   "images": [],
   "known_issues": [],
-  "mesh": null,
+  "mesh": {
+    "edges": 423,
+    "faces": 188,
+    "verts": 240,
+    "z_range": [
+      0.0,
+      7.95
+    ]
+  },
   "scenario": null,
   "step_results": [
     {
-      "errors": [
-        "StopIteration: "
-      ],
+      "errors": [],
       "feature": "preset:mediterranean-villa",
-      "matgroup_counts": {},
-      "status": "error",
+      "matgroup_counts": {
+        "balcony": 5,
+        "door": 2,
+        "frame": 42,
+        "railing_posts": 24,
+        "railing_rails": 24,
+        "railing_walls": 6,
+        "roof": 4,
+        "roof_hangs": 8,
+        "slabs": 25,
+        "walls": 44,
+        "window": 4
+      },
+      "status": "ok",
       "warnings": []
     }
   ],
   "steps": [],
-  "validation": null
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 423,
+        "faces": 188,
+        "verts": 240
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 10,
+      "zero_area_faces": 2
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "balcony": 5,
+        "door": 2,
+        "frame": 42,
+        "railing_posts": 24,
+        "railing_rails": 24,
+        "railing_walls": 6,
+        "roof": 4,
+        "roof_hangs": 8,
+        "slabs": 25,
+        "walls": 44,
+        "window": 4
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 11,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 1
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
 }

@@ -3,25 +3,85 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "preset failed: error",
-  "geometry_hash": null,
-  "geometry_report": null,
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "cf806b534f3ef0e8",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 442,
+      "faces": 202,
+      "verts": 242
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 4,
+    "zero_area_faces": 2
+  },
   "id": "preset-suburban-house",
   "images": [],
   "known_issues": [],
-  "mesh": null,
+  "mesh": {
+    "edges": 442,
+    "faces": 202,
+    "verts": 242,
+    "z_range": [
+      0.0,
+      8.121
+    ]
+  },
   "scenario": null,
   "step_results": [
     {
-      "errors": [
-        "StopIteration: "
-      ],
+      "errors": [],
       "feature": "preset:suburban-house",
-      "matgroup_counts": {},
-      "status": "error",
+      "matgroup_counts": {
+        "door": 2,
+        "frame": 74,
+        "roof": 3,
+        "roof_hangs": 12,
+        "slabs": 25,
+        "walls": 78,
+        "window": 8
+      },
+      "status": "ok",
       "warnings": []
     }
   ],
   "steps": [],
-  "validation": null
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 442,
+        "faces": 202,
+        "verts": 242
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 4,
+      "zero_area_faces": 2
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 2,
+        "frame": 74,
+        "roof": 3,
+        "roof_hangs": 12,
+        "slabs": 25,
+        "walls": 78,
+        "window": 8
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 7,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 1
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
 }

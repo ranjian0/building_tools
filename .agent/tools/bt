@@ -495,6 +495,43 @@ def cmd_scenario(args):
 REFERENCE_DIR = os.path.join(REPO_DIR, ".agent", "reference")
 SWEEP_FILE = os.path.join(SNIPPETS, "reference_sweep.py")
 CASES_FILE = os.path.join(SNIPPETS, "reference_cases.py")
+SMOKE_CODE = """\
+import bpy
+import json
+
+from building_tools.btools.api.presets import PRESETS, build_preset
+from building_tools.btools.api.validate import validate_object
+from building_tools.btools.building.default_materials import apply_default_materials
+
+FILTER = {filt!r}
+results = {{"ok": [], "failed": [], "total": 0}}
+
+for pid in sorted(PRESETS):
+    if FILTER and FILTER not in pid:
+        continue
+    for o in list(bpy.data.objects):
+        bpy.data.objects.remove(o)
+    preset = PRESETS[pid]
+    r = build_preset(preset, assign_materials=True)
+    entry = {{"id": pid, "status": r.status}}
+    if not r.ok:
+        entry["error"] = r.errors[0] if r.errors else "unknown"
+        results["failed"].append(entry)
+    else:
+        obj = bpy.data.objects.get(r.created_object or "")
+        if obj:
+            report = validate_object(obj, include_geometry=False)
+            entry["ok"] = report["ok"]
+            entry["groups"] = sorted(r.matgroup_counts)
+            if not report["ok"]:
+                results["failed"].append(entry)
+        results["ok"].append(pid)
+    results["total"] += 1
+    print("[smoke] %s: %s" % (pid, r.status))
+
+print("__JSON__" + json.dumps(results))
+"""
+
 THUMBS_FILE = os.path.join(SNIPPETS, "preset_thumbs.py")
 DIFF_DIR = os.path.join(OUT_DIR, "reference-diff")
 
@@ -570,6 +607,20 @@ def cmd_thumbs(args):
     if not output.endswith("\n"):
         sys.stdout.write("\n")
     sys.exit(status)
+
+
+def cmd_smoke(args):
+    """Build all presets, validate matgroup contracts, render; exit 1 on fail."""
+    check_running(need=True)
+    filt = args.filter or ""
+    code = SMOKE_CODE.format(filt=filt)
+    status, output, dur = communicate(code, args.timeout)
+    payload = _emit_result(output, True)
+    failed = payload.get("failed", [])
+    if failed:
+        print("SMOKE FAILED: %s" % ", ".join(failed))
+        sys.exit(1)
+    print("smoke passed (%d presets)" % payload.get("total", 0))
 
 
 def cmd_reference_generate(args):
@@ -766,6 +817,11 @@ def main():
     sp = sub.add_parser("thumbs", help="render building-preset thumbnails into btools/presets/thumbs")
     sp.add_argument("-t", "--timeout", type=int, default=900)
     sp.set_defaults(func=cmd_thumbs)
+
+    sp = sub.add_parser("smoke", help="build all presets + validate + render; exit 1 on failure")
+    sp.add_argument("--filter", help="glob filter on preset ids")
+    sp.add_argument("-t", "--timeout", type=int, default=900)
+    sp.set_defaults(func=cmd_smoke)
 
     sp = sub.add_parser("reference", help="golden reference corpus (JSON logs + deterministic renders)")
     ref = sp.add_subparsers(dest="reference_command", required=True)

@@ -3,7 +3,7 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": null,
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
   "geometry_hash": "c19fe454c2c5d6f7",
   "geometry_report": {
     "clean": true,
@@ -18,11 +18,7 @@
     "zero_area_faces": 0
   },
   "id": "roof-gable-box",
-  "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
-  ],
+  "images": [],
   "known_issues": [],
   "mesh": {
     "edges": 125,

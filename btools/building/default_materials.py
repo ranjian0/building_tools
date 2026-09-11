@@ -51,7 +51,7 @@ def _principled(mat):
 
 
 def _base_nodes(mat, color, roughness, metallic=0.0):
-    """Principled + object-mapped noise bump; returns the bsdf node."""
+    """Principled + object-mapped noise bump; returns (bsdf, coord, mapping)."""
     nt = mat.node_tree
     bsdf = _principled(mat)
     bsdf.inputs["Base Color"].default_value = _rgb(color)
@@ -62,7 +62,6 @@ def _base_nodes(mat, color, roughness, metallic=0.0):
     mapping = nt.nodes.new("ShaderNodeMapping")
     objinfo = nt.nodes.new("ShaderNodeObjectInfo")
     nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
-    # -- per-object random rotation/offset breaks tiling repetition
     nt.links.new(objinfo.outputs["Random"], mapping.inputs["Rotation"])
     noise = nt.nodes.new("ShaderNodeTexNoise")
     noise.inputs["Scale"].default_value = 18.0
@@ -72,11 +71,11 @@ def _base_nodes(mat, color, roughness, metallic=0.0):
     bump.inputs["Strength"].default_value = 0.15
     nt.links.new(noise.outputs["Fac"], bump.inputs["Height"])
     nt.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-    return bsdf, noise
+    return bsdf, coord, mapping
 
 
 def _mat_stucco(mat):
-    bsdf = _base_nodes(mat, MATGROUP_COLORS["walls"], 0.85)
+    bsdf, _, _ = _base_nodes(mat, MATGROUP_COLORS["walls"], 0.85)
     bsdf.inputs["Specular IOR Level"].default_value = 0.2
 
 
@@ -86,27 +85,26 @@ def _mat_concrete(mat, color=None):
 
 def _mat_roof(mat):
     color = MATGROUP_COLORS["roof"]
-    bsdf = _base_nodes(mat, color, 0.7)
     nt = mat.node_tree
+    bsdf = _principled(mat)
+    bsdf.inputs["Roughness"].default_value = 0.7
+
+    coord = nt.nodes.new("ShaderNodeTexCoord")
+    mapping = nt.nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (1.0, 4.0, 1.0)
+    nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+
     brick = nt.nodes.new("ShaderNodeTexBrick")
     brick.offset = 0.5
     brick.inputs["Scale"].default_value = 6.0
     brick.inputs["Mortar Size"].default_value = 0.012
     brick.inputs["Color1"].default_value = _rgb(color)
     brick.inputs["Color2"].default_value = (
-        color[0] * 0.8,
-        color[1] * 0.75,
-        color[2] * 0.72,
-        1.0,
-    )
+        color[0] * 0.8, color[1] * 0.75, color[2] * 0.72, 1.0)
     brick.inputs["Mortar"].default_value = (0.12, 0.10, 0.09, 1.0)
-    # -- stretch along the roof slope for a tile/seam reading
-    mapping = nt.nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (1.0, 4.0, 1.0)
-    coord = next(n for n in nt.nodes if n.type == "TEX_COORDINATE")
-    nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     nt.links.new(mapping.outputs["Vector"], brick.inputs["Vector"])
     nt.links.new(brick.outputs["Color"], bsdf.inputs["Base Color"])
+
     bump = nt.nodes.new("ShaderNodeBump")
     bump.inputs["Strength"].default_value = 0.3
     nt.links.new(brick.outputs["Fac"], bump.inputs["Height"])
@@ -115,23 +113,23 @@ def _mat_roof(mat):
 
 def _mat_door(mat):
     color = MATGROUP_COLORS["door"]
-    bsdf = _base_nodes(mat, color, 0.45)
     nt = mat.node_tree
+    bsdf = _principled(mat)
+    bsdf.inputs["Roughness"].default_value = 0.45
+
+    coord = nt.nodes.new("ShaderNodeTexCoord")
+    mapping = nt.nodes.new("ShaderNodeMapping")
+    mapping.inputs["Scale"].default_value = (0.3, 0.3, 4.0)
+    nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
+
     wave = nt.nodes.new("ShaderNodeTexWave")
     wave.inputs["Scale"].default_value = 8.0
     wave.inputs["Distortion"].default_value = 6.0
-    mapping = nt.nodes.new("ShaderNodeMapping")
-    mapping.inputs["Scale"].default_value = (0.3, 0.3, 4.0)
-    coord = next(n for n in nt.nodes if n.type == "TEX_COORDINATE")
-    nt.links.new(coord.outputs["Object"], mapping.inputs["Vector"])
     nt.links.new(mapping.outputs["Vector"], wave.inputs["Vector"])
+
     ramp = nt.nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.elements[0].color = (
-        color[0] * 0.7,
-        color[1] * 0.7,
-        color[2] * 0.7,
-        1.0,
-    )
+        color[0] * 0.7, color[1] * 0.7, color[2] * 0.7, 1.0)
     ramp.color_ramp.elements[1].color = _rgb(color)
     nt.links.new(wave.outputs["Fac"], ramp.inputs["Fac"])
     nt.links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
@@ -142,7 +140,7 @@ def _mat_frame(mat):
 
 
 def _mat_glass(mat, color=None):
-    bsdf = _base_nodes(mat, color or MATGROUP_COLORS["window"], 0.05)
+    bsdf = _base_nodes(mat, color or MATGROUP_COLORS["window"], 0.05)[0]
     bsdf.inputs["Transmission Weight"].default_value = 1.0
     bsdf.inputs["IOR"].default_value = 1.52
 
@@ -190,7 +188,7 @@ def _material(name):
     if builder:
         builder(mat)
     else:
-        bsdf = _base_nodes(mat, color, 0.8)
+        bsdf, _, _ = _base_nodes(mat, color, 0.8)
         del bsdf
 
     mat.diffuse_color = _rgb(color)  # workbench / viewport display color

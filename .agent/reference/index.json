@@ -1,288 +1,287 @@
 {
   "cases": [
     {
-      "faces": 12,
-      "geometry_hash": "38efe1d061bc8d47",
-      "id": "fill-bar",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 6,
+      "geometry_hash": "696a9cb143dee764",
+      "id": "scenario-wall",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 50,
+      "geometry_hash": "ae77a2dcde0752f2",
+      "id": "scenario-curved-wall",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 1,
+      "geometry_hash": "274dfbcafe0bcb4b",
+      "id": "scenario-floorplan",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 49,
+      "geometry_hash": "6a35d08351c2e850",
+      "id": "scenario-floors-only",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": 60,
-      "geometry_hash": "50c518289104647a",
-      "id": "roof-hip",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "geometry_hash": "251ca31659a2aaed",
+      "id": "scenario-multi-storey",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": 44,
-      "geometry_hash": "19c6bf8ecbaa2ba5",
-      "id": "door-arch",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "flaky_arch_unpack"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 65,
-      "geometry_hash": "b35807cb98e40918",
-      "id": "roof-flat",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 1,
+      "geometry_hash": "5a24bad0e065fe38",
+      "id": "floorplan-circular",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": 28,
-      "geometry_hash": "4c14d36773202b5d",
-      "id": "window-bar",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 5,
+      "geometry_hash": "36e1aded8a4a87a1",
+      "id": "floorplan-composite",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": 23,
-      "geometry_hash": "e12c19b1a2ea06a6",
-      "id": "door-double",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 7,
+      "geometry_hash": "8d8321ddda67589c",
+      "id": "floorplan-h-shaped",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": 76,
-      "geometry_hash": "a545cadf0e703119",
-      "id": "door-louver",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "fill_drops_element_group"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 45,
-      "geometry_hash": "0c61d2962d1e33dd",
-      "id": "door-panels",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "fill_drops_element_group"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 70,
-      "geometry_hash": "069641f4e6ef1582",
-      "id": "fill-louver",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 2,
+      "geometry_hash": "fb09b2c9a688e09c",
+      "id": "floorplan-random",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 29,
-      "geometry_hash": "6228abc314f25fce",
-      "id": "fill-panels",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "panels_ignore_comp"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 22,
-      "geometry_hash": "4983cb85a16d457f",
-      "id": "door-default",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 207,
-      "geometry_hash": "d7740a83db49826d",
-      "id": "stairs-slope",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 73,
-      "geometry_hash": "1d487bd0456723bd",
-      "id": "floor-columns",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": 17,
       "geometry_hash": "407b34a973c223b7",
       "id": "floor-count-1",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 6,
-      "geometry_hash": "696a9cb143dee764",
-      "id": "scenario-wall",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 206,
-      "geometry_hash": "f49fca28353759a8",
-      "id": "stairs-filled",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 76,
-      "geometry_hash": "ec9645c9f6ebfe33",
-      "id": "window-louver",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "fill_drops_element_group",
-        "flaky_louver_max_empty"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 62,
-      "geometry_hash": "c19fe454c2c5d6f7",
-      "id": "roof-gable-box",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 209,
-      "geometry_hash": "b3674892e3b71201",
-      "id": "stairs-blocked",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 22,
-      "geometry_hash": "6314e3aa72be0ff3",
-      "id": "window-default",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": 13,
       "geometry_hash": "5c3db702b4dbea79",
       "id": "floor-slabs-off",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 73,
+      "geometry_hash": "1d487bd0456723bd",
+      "id": "floor-columns",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 33,
+      "geometry_hash": "642d6f8514143c04",
+      "id": "floor-decoration",
+      "images": [],
+      "known_issues": [
+        "decoration_no_columns_no_output"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 65,
+      "geometry_hash": "b35807cb98e40918",
+      "id": "roof-flat",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 68,
+      "geometry_hash": "23907af2cc4b35c5",
+      "id": "roof-gable-open",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 62,
+      "geometry_hash": "c19fe454c2c5d6f7",
+      "id": "roof-gable-box",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 60,
+      "geometry_hash": "50c518289104647a",
+      "id": "roof-hip",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 27,
+      "geometry_hash": "d86f4031d89f7d1b",
+      "id": "door-default",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 50,
+      "geometry_hash": "86d495f2de6f1382",
+      "id": "door-panels",
+      "images": [],
+      "known_issues": [
+        "fill_drops_element_group"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 81,
+      "geometry_hash": "49dfd17ef70c2ad5",
+      "id": "door-louver",
+      "images": [],
+      "known_issues": [
+        "fill_drops_element_group"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 50,
+      "geometry_hash": "28217dc54793fca0",
+      "id": "door-glass-panes",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 28,
+      "geometry_hash": "98538500f980d113",
+      "id": "door-double",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 49,
+      "geometry_hash": "1f3426f007e9421b",
+      "id": "door-arch",
+      "images": [],
+      "known_issues": [
+        "flaky_arch_unpack"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 22,
+      "geometry_hash": "6314e3aa72be0ff3",
+      "id": "window-default",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 28,
+      "geometry_hash": "4c14d36773202b5d",
+      "id": "window-bar",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 76,
+      "geometry_hash": "ec9645c9f6ebfe33",
+      "id": "window-louver",
+      "images": [],
+      "known_issues": [
+        "fill_drops_element_group",
+        "flaky_louver_max_empty"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 45,
+      "geometry_hash": "993064b83dae175e",
+      "id": "window-glass-panes",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 60,
+      "geometry_hash": "b0c162fc5a8a918d",
+      "id": "window-circular",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 34,
+      "geometry_hash": "83c616358f94916d",
+      "id": "multigroup-default",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 63,
+      "geometry_hash": "fd20a5d391aea3da",
+      "id": "multigroup-fills",
+      "images": [],
+      "known_issues": [
+        "zero_width_window_fill"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": null,
@@ -296,353 +295,186 @@
       "status": "step failed: error"
     },
     {
-      "faces": 68,
-      "geometry_hash": "23907af2cc4b35c5",
-      "id": "roof-gable-open",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 60,
-      "geometry_hash": "b0c162fc5a8a918d",
-      "id": "window-circular",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 45,
-      "geometry_hash": "7f5efadd23543cf6",
-      "id": "door-glass-panes",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 29,
-      "geometry_hash": "769e1826c0ea22ad",
-      "id": "fill-glass-panes",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 33,
-      "geometry_hash": "642d6f8514143c04",
-      "id": "floor-decoration",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "decoration_no_columns_no_output"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 2,
-      "geometry_hash": "fb09b2c9a688e09c",
-      "id": "floorplan-random",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 63,
-      "geometry_hash": "fd20a5d391aea3da",
-      "id": "multigroup-fills",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [
-        "zero_width_window_fill"
-      ],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": null,
-      "geometry_hash": null,
-      "id": "preset-townhouse",
-      "images": [],
-      "known_issues": [],
-      "problems": [],
-      "status": "preset failed: error"
-    },
-    {
-      "faces": null,
-      "geometry_hash": null,
-      "id": "preset-warehouse",
-      "images": [],
-      "known_issues": [],
-      "problems": [],
-      "status": "preset failed: error"
-    },
-    {
-      "faces": 101,
-      "geometry_hash": "cb46a1a9010fa196",
-      "id": "stairs-no-landing",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
       "faces": 315,
       "geometry_hash": "3becddba45cdfde8",
       "id": "balcony-posts-wall",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": 95,
       "geometry_hash": "84bee869c71dddf3",
       "id": "balcony-rails-wall",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 1,
-      "geometry_hash": "5a24bad0e065fe38",
-      "id": "floorplan-circular",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 7,
-      "geometry_hash": "8d8321ddda67589c",
-      "id": "floorplan-h-shaped",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 34,
-      "geometry_hash": "83c616358f94916d",
-      "id": "multigroup-default",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": null,
-      "geometry_hash": null,
-      "id": "preset-corner-shop",
       "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "preset failed: error"
-    },
-    {
-      "faces": 1,
-      "geometry_hash": "274dfbcafe0bcb4b",
-      "id": "scenario-floorplan",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 45,
-      "geometry_hash": "993064b83dae175e",
-      "id": "window-glass-panes",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 5,
-      "geometry_hash": "36e1aded8a4a87a1",
-      "id": "floorplan-composite",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": null,
-      "geometry_hash": null,
-      "id": "preset-modern-villa",
-      "images": [],
-      "known_issues": [],
-      "problems": [],
-      "status": "preset failed: error"
-    },
-    {
-      "faces": null,
-      "geometry_hash": null,
-      "id": "preset-office-block",
-      "images": [],
-      "known_issues": [],
-      "problems": [],
-      "status": "preset failed: error"
-    },
-    {
-      "faces": 775,
-      "geometry_hash": "cde276ea481afa43",
-      "id": "balcony-inner-curved",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 50,
-      "geometry_hash": "ae77a2dcde0752f2",
-      "id": "scenario-curved-wall",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
-    },
-    {
-      "faces": 49,
-      "geometry_hash": "6a35d08351c2e850",
-      "id": "scenario-floors-only",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
-      "known_issues": [],
-      "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
       "faces": 65,
       "geometry_hash": "f4506ac89f12c67c",
       "id": "balcony-wallfill-wall",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": null,
-      "geometry_hash": null,
+      "faces": 775,
+      "geometry_hash": "b36106231e33e4c6",
+      "id": "balcony-inner-curved",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 206,
+      "geometry_hash": "f49fca28353759a8",
+      "id": "stairs-filled",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 209,
+      "geometry_hash": "b3674892e3b71201",
+      "id": "stairs-blocked",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 207,
+      "geometry_hash": "d7740a83db49826d",
+      "id": "stairs-slope",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 101,
+      "geometry_hash": "cb46a1a9010fa196",
+      "id": "stairs-no-landing",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 29,
+      "geometry_hash": "6228abc314f25fce",
+      "id": "fill-panels",
+      "images": [],
+      "known_issues": [
+        "panels_ignore_comp"
+      ],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 29,
+      "geometry_hash": "769e1826c0ea22ad",
+      "id": "fill-glass-panes",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 70,
+      "geometry_hash": "069641f4e6ef1582",
+      "id": "fill-louver",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 12,
+      "geometry_hash": "38efe1d061bc8d47",
+      "id": "fill-bar",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 202,
+      "geometry_hash": "cf806b534f3ef0e8",
       "id": "preset-suburban-house",
       "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "preset failed: error"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": 60,
-      "geometry_hash": "251ca31659a2aaed",
-      "id": "scenario-multi-storey",
-      "images": [
-        "image.png",
-        "image-front.png",
-        "image-right.png"
-      ],
+      "faces": 186,
+      "geometry_hash": "fd547c5cb6ee8317",
+      "id": "preset-townhouse",
+      "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "ok"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": null,
-      "geometry_hash": null,
+      "faces": 5373,
+      "geometry_hash": "58cbab715325f227",
       "id": "preset-apartment-block",
       "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "preset failed: error"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     },
     {
-      "faces": null,
-      "geometry_hash": null,
+      "faces": 375,
+      "geometry_hash": "4ab6d00a2d69fdc7",
+      "id": "preset-modern-villa",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 188,
+      "geometry_hash": "ff9710edf3f2b9ef",
       "id": "preset-mediterranean-villa",
       "images": [],
       "known_issues": [],
       "problems": [],
-      "status": "preset failed: error"
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 127,
+      "geometry_hash": "9a9d162480cf1601",
+      "id": "preset-corner-shop",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 176,
+      "geometry_hash": "7c3453aa89eef5d1",
+      "id": "preset-warehouse",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
+    },
+    {
+      "faces": 3321,
+      "geometry_hash": "4a0b7e726d3a84ec",
+      "id": "preset-office-block",
+      "images": [],
+      "known_issues": [],
+      "problems": [],
+      "status": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')"
     }
   ],
   "image_size": [

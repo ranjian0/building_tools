@@ -3,25 +3,85 @@
     "addon_version": "1.0.13",
     "blender": "5.1.2"
   },
-  "error": "preset failed: error",
-  "geometry_hash": null,
-  "geometry_report": null,
+  "error": "render/materials failed: bpy_struct: item.attr = val: enum \"BLENDER_EEVEE_NEXT\" not found in ('BLENDER_EEVEE', 'BLENDER_WORKBENCH', 'CYCLES')",
+  "geometry_hash": "7c3453aa89eef5d1",
+  "geometry_report": {
+    "clean": false,
+    "counts": {
+      "edges": 432,
+      "faces": 176,
+      "verts": 270
+    },
+    "loose_edges": 0,
+    "loose_verts": 0,
+    "non_manifold_edges": 5,
+    "zero_area_faces": 2
+  },
   "id": "preset-warehouse",
   "images": [],
   "known_issues": [],
-  "mesh": null,
+  "mesh": {
+    "edges": 432,
+    "faces": 176,
+    "verts": 270,
+    "z_range": [
+      0.0,
+      8.15
+    ]
+  },
   "scenario": null,
   "step_results": [
     {
-      "errors": [
-        "StopIteration: "
-      ],
+      "errors": [],
       "feature": "preset:warehouse",
-      "matgroup_counts": {},
-      "status": "error",
+      "matgroup_counts": {
+        "door": 3,
+        "frame": 58,
+        "roof": 2,
+        "roof_hangs": 12,
+        "walls": 59,
+        "window": 6,
+        "window_bars": 36
+      },
+      "status": "ok",
       "warnings": []
     }
   ],
   "steps": [],
-  "validation": null
+  "validation": {
+    "geometry": {
+      "clean": false,
+      "counts": {
+        "edges": 432,
+        "faces": 176,
+        "verts": 270
+      },
+      "loose_edges": 0,
+      "loose_verts": 0,
+      "non_manifold_edges": 5,
+      "zero_area_faces": 2
+    },
+    "matgroups": {
+      "all_tagged": true,
+      "groups": {
+        "door": 3,
+        "frame": 58,
+        "roof": 2,
+        "roof_hangs": 12,
+        "walls": 59,
+        "window": 6,
+        "window_bars": 36
+      },
+      "invalid_index_faces": 0,
+      "num_groups": 8,
+      "untagged_faces": 0
+    },
+    "normals": {
+      "consistent": false,
+      "flip_seams": 1
+    },
+    "object": "building_001",
+    "ok": true,
+    "problems": []
+  }
 }
