@@ -216,7 +216,6 @@ def render_case(obj, case_dir, case_id):
         fill.rotation_euler = (-0.6, 0.3, -0.5)
 
     scene.camera = cam
-    scene.render.engine = "BLENDER_EEVEE"
     scene.render.resolution_x = VIEW_SIZE
     scene.render.resolution_y = VIEW_SIZE
     scene.render.resolution_percentage = 100
@@ -224,10 +223,22 @@ def render_case(obj, case_dir, case_id):
     scene.render.image_settings.file_format = "PNG"
 
     aspect = 1.0  # square panels
-    panels = []
-
     panel_paths = []
     for label, direction in VIEW_DIRECTIONS:
+        # -- iso uses EEVEE (PBR materials, soft shadows for depth);
+        #    ortho elevations use workbench FLAT (clean matgroup reading,
+        #    no shadow noise)
+        is_iso = label == "iso"
+        scene.render.engine = "BLENDER_EEVEE" if is_iso else "BLENDER_WORKBENCH"
+        if not is_iso:
+            shading = scene.display.shading
+            if hasattr(shading, "lighting"):
+                shading.lighting = "FLAT"
+            elif hasattr(shading, "light"):
+                shading.light = "FLAT"
+            shading.color_type = "MATERIAL"
+            shading.show_cavity = True
+
         cam.location = center + direction * (radius * 4 + 1)
         look = (center - cam.location).normalized()
         cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
