@@ -19,9 +19,7 @@
   },
   "id": "floor-decoration",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [
     "decoration_no_columns_no_output"
@@ -35,6 +33,12 @@
       5.8
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/floor-decoration/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floor-decoration/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floor-decoration/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floor-decoration/_view_iso.png"
+  ],
   "scenario": "floorplan",
   "step_results": [
     {

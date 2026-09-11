@@ -19,9 +19,7 @@
   },
   "id": "door-panels",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [
     "fill_drops_element_group"
@@ -35,6 +33,12 @@
       3.0
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/door-panels/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/door-panels/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/door-panels/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/door-panels/_view_iso.png"
+  ],
   "scenario": "wall",
   "step_results": [
     {

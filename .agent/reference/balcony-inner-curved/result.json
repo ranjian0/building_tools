@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "93d5863df950f4f7",
+  "geometry_hash": "760a8b8e737d8c06",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -19,9 +19,7 @@
   },
   "id": "balcony-inner-curved",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [],
   "mesh": {
@@ -33,6 +31,12 @@
       3.0
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/balcony-inner-curved/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/balcony-inner-curved/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/balcony-inner-curved/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/balcony-inner-curved/_view_iso.png"
+  ],
   "scenario": "curved_wall",
   "step_results": [
     {

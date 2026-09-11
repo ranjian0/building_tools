@@ -19,9 +19,7 @@
   },
   "id": "floorplan-composite",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [],
   "mesh": {
@@ -33,6 +31,12 @@
       0.0
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/floorplan-composite/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floorplan-composite/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floorplan-composite/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/floorplan-composite/_view_iso.png"
+  ],
   "scenario": null,
   "step_results": [
     {

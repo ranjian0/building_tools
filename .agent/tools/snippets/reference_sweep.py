@@ -1,7 +1,7 @@
 """Reference corpus sweep engine. Runs INSIDE the Blender session.
 
 `bt reference generate` prepends config globals (CASES_PATH, OUT_DIR, FILTER,
-IMG_W, IMG_H) and execs this file. For every case in the manifest:
+execs this file. For every case in the manifest:
 clean scene -> run scenario -> apply steps -> validate -> render -> log.
 
 Writes OUT_DIR/<case-id>/result.json + iso/front/right renders, plus index.json/index.md.
@@ -23,7 +23,6 @@ from building_tools.btools.api.core import OPTION_TYPES, options_from_dict
 from building_tools.btools.api.select import select as select_faces
 from building_tools.btools.api.validate import geometry_report, validate_object
 
-IMG_SIZE = (IMG_W, IMG_H)
 ISO_DIR = Vector((1.0, -1.0, 0.85)).normalized()
 
 
@@ -173,16 +172,19 @@ def assign_matgroup_materials(obj):
                 "untagged_%d" % g, UNTAGGED_COLOR)
 
 
-VIEW_DIRECTIONS = {
-    "": Vector((1.0, -1.0, 0.85)).normalized(),   # iso
-    "-front": Vector((0.0, -1.0, 0.0)),           # elevation: sees -Y face
-    "-right": Vector((1.0, 0.0, 0.0)),            # elevation: sees +X face
-}
+VIEW_DIRECTIONS = [
+    ("front", Vector((0.0, -1.0, 0.0))),           # elevation: sees -Y face
+    ("right", Vector((1.0, 0.0, 0.0))),            # elevation: sees +X face
+    ("top",   Vector((0.0, 0.0, 1.0))),            # plan: bird's eye
+    ("iso",   Vector((1.0, -1.0, 0.85)).normalized()),  # 3/4 ortho
+]
+
+VIEW_SIZE = 512  # per-panel square; composite = 2x * 2y
 
 
 def render_case(obj, case_dir, case_id):
-    """Deterministic renders: workbench FLAT (iso/front/right) + EEVEE material."""
-    assign_matgroup_materials(obj)
+    """Four EEVEE renders (front/right/top/iso) stitched into one square image."""
+    apply_pbr_materials(obj)
 
     corners = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
     mins = Vector((min(c.x for c in corners), min(c.y for c in corners), min(c.z for c in corners)))
@@ -196,25 +198,7 @@ def render_case(obj, case_dir, case_id):
     cam = bpy.data.objects.new("ref_cam", cam_data)
     scene.collection.objects.link(cam)
 
-    # -- render settings once; camera moved per view
-    scene.camera = cam
-    scene.render.engine = "BLENDER_WORKBENCH"
-    shading = scene.display.shading
-    # -- attr renamed between blender versions (lighting -> light)
-    if hasattr(shading, "lighting"):
-        shading.lighting = "FLAT"
-    elif hasattr(shading, "light"):
-        shading.light = "FLAT"
-    shading.color_type = "MATERIAL"
-    shading.show_cavity = True
-    scene.render.resolution_x, scene.render.resolution_y = IMG_SIZE
-    scene.render.resolution_percentage = 100
-    scene.render.film_transparent = False
-    scene.render.image_settings.file_format = "PNG"
-
-    aspect = IMG_W / IMG_H
-
-    # -- ensure basic lighting for EEVEE material render
+    # -- ensure lighting
     if not any(o.type == "LIGHT" for o in scene.objects):
         sun_data = bpy.data.lights.new("ref_sun", type="SUN")
         sun_data.energy = 3.0
@@ -222,43 +206,39 @@ def render_case(obj, case_dir, case_id):
         scene.collection.objects.link(sun)
         sun.rotation_euler = (0.8, 0.2, 0.5)
 
-    for suffix, direction in VIEW_DIRECTIONS.items():
+    scene.camera = cam
+    scene.render.engine = "BLENDER_EEVEE"
+    scene.render.resolution_x = VIEW_SIZE
+    scene.render.resolution_y = VIEW_SIZE
+    scene.render.resolution_percentage = 100
+    scene.render.film_transparent = False
+    scene.render.image_settings.file_format = "PNG"
+
+    aspect = 1.0  # square panels
+    panels = []
+
+    panel_paths = []
+    for label, direction in VIEW_DIRECTIONS:
         cam.location = center + direction * (radius * 4 + 1)
-        # -- to_track_quat aims -Z along the given vector: it must point from
-        #    the camera TOWARD the target, not outward
         look = (center - cam.location).normalized()
         cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
         bpy.context.view_layer.update()
 
-        # -- fit: project bbox corners into camera space, cover both axes
         inv = cam.matrix_world.inverted()
         pts = [inv @ c for c in corners]
         w = max(p.x for p in pts) - min(p.x for p in pts)
         h = max(p.y for p in pts) - min(p.y for p in pts)
-        cam_data.ortho_scale = max(w, h * aspect) * 1.15
+        cam_data.ortho_scale = max(w, h) * 1.15
 
-        scene.render.filepath = os.path.join(
-            case_dir, "image%s.png" % suffix)
+        panel_path = os.path.join(case_dir, "_view_%s.png" % label)
+        scene.render.filepath = panel_path
         bpy.ops.render.render(write_still=True)
-
-    # -- EEVEE material render (iso view, shows PBR/transmission/glass)
-    scene.render.engine = "BLENDER_EEVEE"
-    cam.location = center + VIEW_DIRECTIONS[""] * (radius * 4 + 1)
-    look = (center - cam.location).normalized()
-    cam.rotation_euler = look.to_track_quat("-Z", "Y").to_euler()
-    bpy.context.view_layer.update()
-    inv = cam.matrix_world.inverted()
-    pts = [inv @ c for c in corners]
-    w = max(p.x for p in pts) - min(p.x for p in pts)
-    h = max(p.y for p in pts) - min(p.y for p in pts)
-    cam_data.ortho_scale = max(w, h * aspect) * 1.15
-    scene.render.filepath = os.path.join(case_dir, "image-material.png")
-    bpy.ops.render.render(write_still=True)
-    scene.render.engine = "BLENDER_WORKBENCH"
+        panel_paths.append(panel_path)
 
     scene.collection.objects.unlink(cam)
     bpy.data.objects.remove(cam)
     purge_orphans()
+    return panel_paths
 
 
 # ---------------------------------------------------------------- sweep
@@ -274,6 +254,91 @@ def run_case(case, retries=1):
         print("[sweep]   retry %d for %s (previous error: %s)"
               % (attempt, case["id"], entry["error"][:60]))
         # fall through and rerun
+
+
+MATGROUP_COLORS = {
+    "walls": (0.66, 0.63, 0.59),
+    "slabs": (0.52, 0.52, 0.55),
+    "columns": (0.60, 0.60, 0.62),
+    "roof": (0.60, 0.27, 0.19),
+    "roof_hangs": (0.42, 0.19, 0.14),
+    "door": (0.43, 0.27, 0.12),
+    "door_panels": (0.56, 0.37, 0.19),
+    "door_panes": (0.56, 0.37, 0.19),
+    "door_louvers": (0.56, 0.37, 0.19),
+    "frame": (0.13, 0.13, 0.14),
+    "window": (0.42, 0.65, 0.82),
+    "window_bars": (0.13, 0.13, 0.14),
+    "window_panes": (0.56, 0.76, 0.88),
+    "window_louvers": (0.56, 0.76, 0.88),
+    "balcony": (0.78, 0.64, 0.28),
+    "railing_posts": (0.25, 0.25, 0.28),
+    "railing_walls": (0.36, 0.39, 0.43),
+    "railing_rails": (0.25, 0.25, 0.28),
+    "stairs": (0.63, 0.56, 0.46),
+    "custom": (0.65, 0.45, 0.65),
+}
+FALLBACK_COLOR = (0.50, 0.50, 0.50)
+UNTAGGED_COLOR = (0.90, 0.10, 0.10)
+
+
+def apply_pbr_materials(obj):
+    """Assign BT_ PBR materials per face by matgroup.
+
+    Self-contained: creates materials inline without importing from the
+    addon (avoids stale-copy shadowing issues in the session).
+    """
+    me = obj.data
+    me.materials.clear()
+
+    group_names = [mt.name for mt in getattr(obj, "bt_materials", [])]
+    layer = me.attributes.get(".bt_material_group_index")
+
+    default = bpy.data.materials.new("pbr_default")
+    default.use_nodes = True
+    me.materials.append(default)
+
+    untagged = bpy.data.materials.new("pbr_untagged")
+    untagged.use_nodes = True
+    bsdf = next(
+        (n for n in untagged.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None
+    )
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = (0.9, 0.1, 0.1, 1.0)
+    me.materials.append(untagged)
+    untagged_index = len(me.materials) - 1
+
+    if layer is None:
+        return
+
+    vals = [0] * len(me.polygons)
+    layer.data.foreach_get("value", vals)
+
+    slots = {}
+    for i, g in enumerate(vals):
+        if 0 <= g < len(group_names):
+            gi = g
+        else:
+            me.polygons[i].material_index = untagged_index
+            continue
+        if gi not in slots:
+            name = "pbr_" + group_names[gi]
+            mat = bpy.data.materials.get(name)
+            if mat is None:
+                mat = bpy.data.materials.new(name)
+                mat.use_nodes = True
+                bsdf = next(
+                    (n for n in mat.node_tree.nodes
+                     if n.type == "BSDF_PRINCIPLED"), None
+                )
+                if bsdf:
+                    color = MATGROUP_COLORS.get(
+                        group_names[gi], FALLBACK_COLOR)
+                    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+                    bsdf.inputs["Roughness"].default_value = 0.8
+            me.materials.append(mat)
+            slots[gi] = len(me.materials) - 1
+        me.polygons[i].material_index = slots[gi]
 
 
 def _run_case_once(case):
@@ -344,22 +409,21 @@ def _run_case_once(case):
         )
         entry["geometry_report"] = geometry_report(obj)
         try:
-            # -- apply default BT_ materials so material bugs surface here
-            from building_tools.btools.building.default_materials import (
-                apply_default_materials,
+            apply_pbr_materials(obj)
+            panel_paths = render_case(
+                obj, os.path.join(OUT_DIR, case["id"]), case["id"]
             )
-            apply_default_materials(obj)
-            render_case(obj, os.path.join(OUT_DIR, case["id"]), case["id"])
-            entry["images"] = ["image.png", "image-front.png", "image-right.png"]
+            entry["panel_paths"] = panel_paths
+            entry["images"] = ["image.png"]
         except Exception as exc:  # noqa: BLE001
-            entry["images"] = []
+            entry["panel_paths"] = []
             entry["error"] = "render/materials failed: %s" % exc
     else:
         entry["mesh"] = None
         entry["geometry_hash"] = None
         entry["validation"] = None
         entry["geometry_report"] = None
-        entry["images"] = []
+        entry["panel_paths"] = []
 
     import building_tools
 
@@ -413,11 +477,11 @@ def main():
         index = [by_id[k] for k in sorted(by_id, key=lambda s: (len(s), s))]
 
     with open(os.path.join(OUT_DIR, "index.json"), "w") as f:
-        json.dump({"image_size": list(IMG_SIZE), "cases": index}, f, indent=2, sort_keys=True)
+        json.dump({"cases": index}, f, indent=2, sort_keys=True)
 
     # -- human-browsable gallery
     lines = ["# Reference corpus", "",
-             "image size: %dx%d -- %d cases (iso / front / right)" % (IMG_W, IMG_H, len(cases)), ""]
+             "%d cases -- single 2x2 composite per case (EEVEE)" % len(cases), ""]
     for e in index:
         lines.append("## %s" % e["id"])
         lines.append("")

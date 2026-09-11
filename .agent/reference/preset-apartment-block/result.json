@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "63ed9242c77882a3",
+  "geometry_hash": "0f1845b4dc6e690e",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -15,13 +15,11 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 51
+    "zero_area_faces": 49
   },
   "id": "preset-apartment-block",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [],
   "mesh": {
@@ -33,6 +31,12 @@
       16.2
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-apartment-block/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-apartment-block/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-apartment-block/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-apartment-block/_view_iso.png"
+  ],
   "scenario": null,
   "step_results": [
     {
@@ -66,7 +70,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 51
+      "zero_area_faces": 49
     },
     "matgroups": {
       "all_tagged": true,

@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "c4bd56430a0d1700",
+  "geometry_hash": "cb8311376ef9023d",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -15,13 +15,11 @@
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 0,
-    "zero_area_faces": 40
+    "zero_area_faces": 51
   },
   "id": "preset-office-block",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [],
   "mesh": {
@@ -33,6 +31,12 @@
       19.45
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-office-block/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-office-block/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-office-block/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-office-block/_view_iso.png"
+  ],
   "scenario": null,
   "step_results": [
     {
@@ -63,7 +67,7 @@
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 0,
-      "zero_area_faces": 40
+      "zero_area_faces": 51
     },
     "matgroups": {
       "all_tagged": true,

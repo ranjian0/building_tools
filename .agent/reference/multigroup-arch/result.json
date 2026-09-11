@@ -7,11 +7,11 @@
   "geometry_hash": null,
   "geometry_report": null,
   "id": "multigroup-arch",
-  "images": [],
   "known_issues": [
     "multigroup_arch_broken"
   ],
   "mesh": null,
+  "panel_paths": [],
   "scenario": "wall",
   "step_results": [
     {

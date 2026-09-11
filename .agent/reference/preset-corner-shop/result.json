@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "c3a02aceb764485d",
+  "geometry_hash": "f7687548dbf83ace",
   "geometry_report": {
     "clean": true,
     "counts": {
@@ -19,9 +19,7 @@
   },
   "id": "preset-corner-shop",
   "images": [
-    "image.png",
-    "image-front.png",
-    "image-right.png"
+    "image.png"
   ],
   "known_issues": [],
   "mesh": {
@@ -33,6 +31,12 @@
       7.6
     ]
   },
+  "panel_paths": [
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-corner-shop/_view_front.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-corner-shop/_view_right.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-corner-shop/_view_top.png",
+    "/home/ranjian0/Development/building_tools/.agent/reference/preset-corner-shop/_view_iso.png"
+  ],
   "scenario": null,
   "step_results": [
     {

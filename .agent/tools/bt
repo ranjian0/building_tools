@@ -549,6 +549,28 @@ IMG_W, IMG_H = {img_w}, {img_h}
 """
 
 
+def _stitch_composites(out_dir):
+    """Stitch per-case _view_*.png panels into image.png (2x2 grid)."""
+    for case_dir in sorted(os.listdir(out_dir)):
+        cdir = os.path.join(out_dir, case_dir)
+        if not os.path.isdir(cdir):
+            continue
+        panels = sorted(
+            os.path.join(cdir, f)
+            for f in os.listdir(cdir)
+            if f.startswith("_view_") and f.endswith(".png")
+        )
+        if len(panels) < 2:
+            continue
+        out = os.path.join(cdir, "image.png")
+        subprocess.run(
+            ["montage"] + panels + ["-tile", "2x2", "-geometry", "+0+0", out],
+            check=True, timeout=60,
+        )
+        for p in panels:
+            os.remove(p)
+
+
 def reference_generate(out_dir, filt, timeout):
     """Run the sweep in the session; returns parsed summary (never exits)."""
     check_running(need=True)
@@ -558,6 +580,7 @@ def reference_generate(out_dir, filt, timeout):
     ) + open(SWEEP_FILE).read()
     os.makedirs(out_dir, exist_ok=True)
     status, output, dur = communicate(code, timeout)
+    _stitch_composites(out_dir)
     return _emit_result(output, False)
 
 

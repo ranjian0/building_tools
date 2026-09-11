@@ -17,6 +17,7 @@ lint = [
     "ruff>=0.16.6",
     "fake-bpy-module-latest>=20260909",
     "bpy==5.1.2",
+    "pillow>=12.3.0",
 ]
 dev = [
     "numpy>=2.5.3",
