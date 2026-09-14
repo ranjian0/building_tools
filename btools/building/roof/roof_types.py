@@ -39,6 +39,9 @@ def create_roof(bm, faces, prop):
     elif prop.type == "FLAT_TOP":
         add_material_group(MaterialGroup.ROOF_HANGS)
         create_flat_top_roof(bm, faces, prop)
+    elif prop.type == "MANSARD":
+        add_material_group(MaterialGroup.ROOF_HANGS)
+        create_mansard_roof(bm, faces, prop)
 
     # -- silhouette details
     if getattr(prop, "add_gutters", False):
@@ -366,6 +369,83 @@ def create_flat_top_roof(bm, faces, prop):
             if f is not None:
                 add_faces_to_group(bm, [f], MaterialGroup.ROOF)
     return roof_faces
+
+
+def _ring_edges(ring_verts):
+    """Boundary edges connecting consecutive ring verts (post-join)."""
+    edges = []
+    n = len(ring_verts)
+    for i in range(n):
+        a, b = ring_verts[i], ring_verts[(i + 1) % n]
+        shared = set(a.link_edges) & set(b.link_edges)
+        if not shared:
+            raise ValueError("ring verts not connected by an edge")
+        edges.append(shared.pop())
+    return edges
+
+
+def create_mansard_roof(bm, faces, prop):
+    """Create a mansard roof: steep lower band up to a break ring, hip tier
+    above it (reuses the flat-top truncation machinery)."""
+    # -- create base for the roof
+    roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
+    faces = roof_hang(bm, faces, prop.thickness, prop.outset)
+
+    faces, median, original_edges, points = _prepare_skeleton_base(bm, faces)
+
+    # -- compute straight skeleton
+    skeleton = skeletonize(points, [])
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+
+    max_height = max(arc.height for arc in skeleton)
+    lower_scale = slope_to_height_scale(prop, max_height)
+    apex_z = max_height * lower_scale
+    break_z = min(prop.lower_height, apex_z)
+
+    segments, heights, rings = _truncate_skeleton(
+        skeleton, points, break_z / lower_scale, lower_scale
+    )
+    skeleton_edges, ring_verts = _build_truncated_skeleton_mesh(
+        bm, segments, rings, heights, original_edges, median
+    )
+
+    # -- lower band faces first: while no upper-tier edges exist, the
+    #    boundary walks cannot leave the lower band
+    create_skeleton_faces(bm, original_edges, skeleton_edges)
+
+    if break_z >= apex_z - 1e-6:
+        # -- break at/above the apex: degenerate upper tier, cap instead
+        for rvs in ring_verts:
+            rvs = validate(rvs)
+            if len(rvs) >= 3:
+                f = bm.faces.new(rvs)
+                if f is not None:
+                    add_faces_to_group(bm, [f], MaterialGroup.ROOF)
+        return
+
+    for rvs in ring_verts:
+        rvs = validate(rvs)
+        if len(rvs) < 3:
+            continue
+        rvs = rvs[::-1]  # rings come out CCW; the skeleton wants CW
+        try:
+            ring_edges = _ring_edges(rvs)
+        except ValueError:
+            continue
+        ring_points = [(v.co.x, v.co.y) for v in rvs]
+
+        upper_skeleton = skeletonize(ring_points, [])
+        upper_max = max(arc.height for arc in upper_skeleton)
+        upper_scale = prop.upper_height / upper_max
+        base = Vector((0.0, 0.0, median.z + break_z))
+        upper_edges = create_skeleton_verts_and_edges(
+            bm,
+            upper_skeleton,
+            ring_edges,
+            base,
+            lambda arc, s=upper_scale: arc.height * s,
+        )
+        create_skeleton_faces(bm, ring_edges, upper_edges)
 
 
 def sort_verts_by_loops(face):

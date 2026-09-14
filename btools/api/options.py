@@ -209,6 +209,7 @@ class RoofType(Enum):
     GABLE = "GABLE"
     HIP = "HIP"
     FLAT_TOP = "FLAT_TOP"
+    MANSARD = "MANSARD"
 
 
 class GableRoofType(Enum):
@@ -233,6 +234,8 @@ class RoofOptions:
     slope_angle: float = 0.6108652  # math.radians(35), pitch of the roof planes
     slope_percentage: float = 70.0
     flat_height: float = 0.8
+    lower_height: float = 0.8
+    upper_height: float = 0.4
     add_border: bool = True
     border: float = 0.1
     add_gutters: bool = False

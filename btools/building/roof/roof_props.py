@@ -12,6 +12,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("GABLE", "Gable", "", 1),
         ("HIP", "Hip", "", 2),
         ("FLAT_TOP", "Flat Top", "", 3),
+        ("MANSARD", "Mansard", "", 4),
     ]
     type: EnumProperty(
         name="Roof Type",
@@ -133,6 +134,24 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of the flat top section (flat-top roof)",
     )
 
+    lower_height: FloatProperty(
+        name="Lower Height",
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(10.0),
+        default=get_scaled_unit(0.8),
+        unit="LENGTH",
+        description="Height of the steep lower band (mansard roof)",
+    )
+
+    upper_height: FloatProperty(
+        name="Upper Height",
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(10.0),
+        default=get_scaled_unit(0.4),
+        unit="LENGTH",
+        description="Height of the upper tier above the break (mansard roof)",
+    )
+
     add_border: BoolProperty(
         name="Add Border",
         default=True,
@@ -176,6 +195,14 @@ class RoofProperty(bpy.types.PropertyGroup):
             col.prop(self, "outset")
             self._draw_slope(col)
             col.prop(self, "flat_height")
+
+        elif self.type == "MANSARD":
+            col = box.column(align=True)
+            col.prop(self, "thickness")
+            col.prop(self, "outset")
+            self._draw_slope(col)
+            col.prop(self, "lower_height")
+            col.prop(self, "upper_height")
 
         else:
             col = box.column(align=True)

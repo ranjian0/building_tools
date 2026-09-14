@@ -191,5 +191,71 @@ class TestFlatTopRoof(unittest.TestCase):
         self.assertTrue(report["ok"], report["problems"])
 
 
+class TestMansardRoof(unittest.TestCase):
+    def setUp(self):
+        clean_scene()
+
+    def _roof_group_zs(self, obj):
+        zs = [
+            obj.data.vertices[i].co.z
+            for p in group_faces(obj, "roof")
+            for i in p.vertices
+        ]
+        return sorted(round(z, 4) for z in zs)
+
+    def test_mansard_two_tiers(self):
+        # -- 45deg lower band to a 2m break, 1m hip tier above it
+        obj, res = build_roof(
+            10,
+            10,
+            type="MANSARD",
+            slope_mode="ANGLE",
+            slope_angle=math.radians(45.0),
+            lower_height=2.0,
+            upper_height=1.0,
+        )
+        self.assertTrue(res.ok, res.errors)
+        # -- eave 0.1 + 2.0 break + 1.0 apex = 3.1 total rise
+        self.assertAlmostEqual(group_z_delta(obj, "roof"), 3.0, places=3)
+        zs = self._roof_group_zs(obj)
+        self.assertIn(2.1, zs)  # break ring
+        self.assertAlmostEqual(zs[-1], 3.1, places=3)  # apex
+        # -- square: 4 lower trapezoids + 4 upper slopes
+        self.assertEqual(len(group_faces(obj, "roof")), 8)
+        report = validate_object(obj, expect={"groups": ["roof", "roof_hangs"]})
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_mansard_break_above_apex_falls_back(self):
+        # -- lower_height above the apex: no break, plain full hip
+        obj, res = build_roof(
+            10,
+            10,
+            type="MANSARD",
+            slope_mode="ANGLE",
+            slope_angle=math.radians(45.0),
+            lower_height=9.0,
+            upper_height=1.0,
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertAlmostEqual(group_z_delta(obj, "roof"), 5.1, places=3)
+        report = validate_object(obj, expect={"groups": ["roof", "roof_hangs"]})
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_mansard_rectangle(self):
+        obj, res = build_roof(
+            20,
+            10,
+            type="MANSARD",
+            slope_mode="ANGLE",
+            slope_angle=math.radians(60.0),
+            lower_height=2.6,
+            upper_height=0.8,
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertAlmostEqual(group_z_delta(obj, "roof"), 3.4, places=2)
+        report = validate_object(obj, expect={"groups": ["roof", "roof_hangs"]})
+        self.assertTrue(report["ok"], report["problems"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -18,6 +18,8 @@ class OpResult:
     matgroup_counts: dict = field(default_factory=dict)
     errors: list = field(default_factory=list)
     warnings: list = field(default_factory=list)
+    # -- seeded-randomization trace: [(path, decision, value), ...]
+    decisions: list = field(default_factory=list)
 
     @property
     def ok(self):
@@ -33,4 +35,5 @@ class OpResult:
             "matgroup_counts": self.matgroup_counts,
             "errors": self.errors,
             "warnings": self.warnings,
+            "decisions": self.decisions,
         }

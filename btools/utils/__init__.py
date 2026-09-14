@@ -7,4 +7,5 @@ from .util_geometry import *
 from .util_material import *
 from .util_mesh import *
 from .util_object import *
+from .util_offsets import offset_polygons as offset_polygons
 from .util_skeleton import skeletonize as skeletonize

@@ -13,8 +13,13 @@ class Ray(namedtuple("Ray", "p v")):
     __slots__ = ()
 
 
-class Segment(namedtuple("Segment", "p v")):
-    """A line segment from ``p`` to ``p + v`` (``0 <= u <= 1``)."""
+class Segment(namedtuple("Segment", "p v edge_id")):
+    """A line segment from ``p`` to ``p + v`` (``0 <= u <= 1``).
+
+    ``edge_id`` is the contour edge index: edge i ends at contour point i
+    (holes continue the numbering). It keeps OriginalEdge and vertex edge
+    references equality-consistent and lets consumers (offsets, roofs)
+    refer back to source edges."""
 
     __slots__ = ()
 
@@ -112,7 +117,7 @@ class EdgeEvent(
 
 OriginalEdge = namedtuple("OriginalEdge", "edge bisector_left, bisector_right")
 
-Subtree = namedtuple("Subtree", "source, height, sinks")
+Subtree = namedtuple("Subtree", "source, height, sinks, faces", defaults=((), ()))
 
 
 class LAVertex:
@@ -270,12 +275,18 @@ class SLAV:
         contours = [normalize_contour(polygon)]
         contours.extend([normalize_contour(hole) for hole in holes])
 
-        self._lavs = [LAV.from_polygon(contour, self) for contour in contours]
+        self._lavs = []
+        next_edge_id = 0
+        for contour in contours:
+            self._lavs.append(LAV.from_polygon(contour, self, next_edge_id))
+            next_edge_id += len(contour)
 
-        # store original polygon edges for calculating split events
+        # store original polygon edges for calculating split events.
+        # vertex.edge_left IS the edge ending at vertex.point, so reusing it
+        # keeps OriginalEdge and vertex references equal (incl. edge_id)
         self._original_edges = [
             OriginalEdge(
-                Segment(vertex.prev.point, vertex.point - vertex.prev.point),
+                vertex.edge_left,
                 vertex.prev.bisector,
                 vertex.bisector,
             )
@@ -301,6 +312,9 @@ class SLAV:
 
     def handle_edge_event(self, event, zero_gradient):
         sinks = []
+        # -- every arc source->sink is the death trace of the sink's
+        #    wavefront vertex, flanked by that vertex's two edge faces
+        arc_faces = []
         events = []
 
         lav = event.vertex_a.lav
@@ -308,6 +322,7 @@ class SLAV:
             self._lavs.remove(lav)
             for vertex in list(lav):
                 sinks.append(vertex.point)
+                arc_faces.append((vertex.edge_left.edge_id, vertex.edge_right.edge_id))
                 vertex.invalidate()
         else:
             new_vertex = lav.unify(
@@ -316,6 +331,12 @@ class SLAV:
             if lav.head in (event.vertex_a, event.vertex_b):
                 lav.head = new_vertex
             sinks.extend((event.vertex_a.point, event.vertex_b.point))
+            arc_faces.append(
+                (event.vertex_a.edge_left.edge_id, event.vertex_a.edge_right.edge_id)
+            )
+            arc_faces.append(
+                (event.vertex_b.edge_left.edge_id, event.vertex_b.edge_right.edge_id)
+            )
             next_event = new_vertex.next_event()
             if next_event is not None:
                 events.append(next_event)
@@ -341,12 +362,16 @@ class SLAV:
             event.intersection_point.x = midpoint.x
             event.intersection_point.y = midpoint.y
 
-        return (Subtree(event.intersection_point, event.distance, sinks), events)
+        return (
+            Subtree(event.intersection_point, event.distance, sinks, arc_faces),
+            events,
+        )
 
     def handle_split_event(self, event):
         lav = event.vertex.lav
 
         sinks = [event.vertex.point]
+        arc_faces = [(event.vertex.edge_left.edge_id, event.vertex.edge_right.edge_id)]
         vertices = []
         x = None  # right vertex
         y = None  # left vertex
@@ -417,7 +442,11 @@ class SLAV:
                 self._lavs.append(l)
                 vertices.append(l.head)
             else:
-                sinks.append(l.head.next.point)
+                sink_vertex = l.head.next
+                sinks.append(sink_vertex.point)
+                arc_faces.append(
+                    (sink_vertex.edge_left.edge_id, sink_vertex.edge_right.edge_id)
+                )
                 for v in list(l):
                     v.invalidate()
 
@@ -428,7 +457,10 @@ class SLAV:
                 events.append(next_event)
 
         event.vertex.invalidate()
-        return (Subtree(event.intersection_point, event.distance, sinks), events)
+        return (
+            Subtree(event.intersection_point, event.distance, sinks, arc_faces),
+            events,
+        )
 
 
 class LAV:
@@ -438,14 +470,17 @@ class LAV:
         self._len = 0
 
     @classmethod
-    def from_polygon(cls, polygon, slav):
+    def from_polygon(cls, polygon, slav, start_edge_id=0):
         lav = cls(slav)
-        for prev, point, next in window(polygon):
+        n = len(polygon)
+        for i, (prev, point, next) in enumerate(window(polygon)):
             lav._len += 1
+            # -- edge i ends at contour point i; the wrap edge (from the
+            #    last point back to the first) is edge 0
             vertex = LAVertex(
                 point,
-                Segment(prev, point - prev),
-                Segment(point, next - point),
+                Segment(prev, point - prev, start_edge_id + i),
+                Segment(point, next - point, start_edge_id + (i + 1) % n),
             )
             vertex.lav = lav
             if lav.head is None:

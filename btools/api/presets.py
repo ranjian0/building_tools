@@ -33,12 +33,17 @@ class FacadeRule:
                (ground included)
     options -- feature options (kwargs for the feature's options dataclass);
                array count/spread handles repetition within a face
+    variations -- per-option pools drawn once per target face from the
+               preset's seeded rng (build_preset(seed=...)); plain
+               top-level option names only (e.g. {"fill_type":
+               ["BAR", "GLASS_PANES"]}). Without a seed these are ignored.
     """
 
     feature: str
     faces: str
     storeys: tuple = ()
     options: dict = field(default_factory=dict)
+    variations: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -583,16 +588,27 @@ def _scale(plan_kwargs, width_scale, depth_scale):
 
 
 def build_preset(
-    preset, floors=None, width_scale=1.0, depth_scale=1.0, assign_materials=True
+    preset,
+    floors=None,
+    width_scale=1.0,
+    depth_scale=1.0,
+    assign_materials=True,
+    seed=None,
 ):
     """Build a complete building from a preset recipe.
 
     floors       -- floor-count override (default: preset value)
     width/depth  -- uniform scale multipliers for the floorplan footprint
     assign_materials -- apply default BT_<group> materials when done
+    seed         -- enable seeded randomization: per-face draws from
+                   FacadeRule.variations; same seed => identical building,
+                   the decision log lands on result.decisions
 
     Returns OpResult; result.created_object is the finished building.
     """
+    from ..utils.randomizer import BToolsRandom
+
+    rng = BToolsRandom(seed) if seed is not None else None
     summaries = []
 
     def record(feature, res):
@@ -637,9 +653,8 @@ def build_preset(
             if not res.ok:
                 return res
 
-        for rule in preset.facade:
+        for rule_idx, rule in enumerate(preset.facade):
             storeys = rule.storeys if rule.storeys else tuple(range(floor_count))
-            options = options_from_dict(OPTION_TYPES[rule.feature], dict(rule.options))
             faces = select(
                 obj,
                 rule.faces,
@@ -658,10 +673,34 @@ def build_preset(
                     }
                 )
                 continue
-            res = apply_feature(rule.feature, options, FaceTarget(obj, faces))
-            record(rule.feature, res)
-            if not res.ok:
-                return res
+
+            if rng is not None and rule.variations:
+                # -- per-face application: each face draws its own values
+                #    from the rule's variation pools
+                for face_pos, face_idx in enumerate(faces):
+                    rule_options = dict(rule.options)
+                    for opt_name, pool in rule.variations.items():
+                        rule_options[opt_name] = rng.choice(
+                            ("facade", rule.feature, rule_idx, face_pos, opt_name),
+                            pool,
+                        )
+                    options = options_from_dict(
+                        OPTION_TYPES[rule.feature], rule_options
+                    )
+                    res = apply_feature(
+                        rule.feature, options, FaceTarget(obj, [face_idx])
+                    )
+                    record(rule.feature, res)
+                    if not res.ok:
+                        return res
+            else:
+                options = options_from_dict(
+                    OPTION_TYPES[rule.feature], dict(rule.options)
+                )
+                res = apply_feature(rule.feature, options, FaceTarget(obj, faces))
+                record(rule.feature, res)
+                if not res.ok:
+                    return res
 
         report = validate_object(obj, include_geometry=False)
         if assign_materials:
@@ -675,6 +714,7 @@ def build_preset(
             created_object=obj.name,
             matgroup_counts=report["matgroups"]["groups"],
             warnings=report["problems"],
+            decisions=rng.decisions if rng is not None else [],
         )
 
     try:

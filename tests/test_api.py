@@ -19,6 +19,7 @@ from btools.api import (
     WindowOptions,
     apply_feature,
 )
+from btools.api.presets import BuildingPreset, FacadeRule, build_preset
 from btools.api.validate import validate_object
 
 
@@ -161,6 +162,63 @@ class TestApiSmoke(unittest.TestCase):
     def test_unknown_feature_raises(self):
         with self.assertRaises(ValueError):
             apply_feature("nonsense", None)
+
+
+class TestPresetSeeds(unittest.TestCase):
+    """Seeded randomization in build_preset (#163 seedian integration)."""
+
+    @classmethod
+    def setUpClass(cls):
+        # -- ensure all property groups (and their pointer targets) exist
+        import test_api_options
+
+        test_api_options.register_all()
+
+    def setUp(self):
+        clean_scene()
+
+    @staticmethod
+    def _preset():
+        return BuildingPreset(
+            id="seed-test",
+            label="Seed Test",
+            floorplan={"type": "RECTANGULAR", "width": 8.0, "length": 6.0},
+            floors={"floor_count": 2, "floor_height": 3.0},
+            facade=[
+                FacadeRule(
+                    "window",
+                    "front_walls",
+                    (1,),
+                    {"array": {"count": 2}, "size_offset": {"size": [1.2, 1.4]}},
+                    variations={"fill_type": ["BAR", "GLASS_PANES"]},
+                ),
+                FacadeRule(
+                    "window",
+                    "side_walls",
+                    (0, 1),
+                    {"size_offset": {"size": [1.2, 1.4]}},
+                    variations={"fill_type": ["BAR", "GLASS_PANES", "LOUVER"]},
+                ),
+            ],
+        )
+
+    def test_seed_reproducible(self):
+        r1 = build_preset(self._preset(), seed="s1")
+        r2 = build_preset(self._preset(), seed="s1")
+        self.assertTrue(r1.ok, r1.errors)
+        self.assertEqual(r1.matgroup_counts, r2.matgroup_counts)
+        self.assertEqual(r1.decisions, r2.decisions)
+        # -- one draw per matched face (1 front + 4 side)
+        self.assertEqual(len(r1.decisions), 5)
+        for path, decision, value in r1.decisions:
+            self.assertEqual(decision, "choice")
+            self.assertTrue(path.startswith("facade/window/"))
+            self.assertIn(value, ("BAR", "GLASS_PANES", "LOUVER"))
+
+    def test_seedless_has_no_decisions(self):
+        r = build_preset(self._preset())
+        self.assertTrue(r.ok, r.errors)
+        self.assertEqual(r.decisions, [])
 
 
 class TestWallElements(unittest.TestCase):
