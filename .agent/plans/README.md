@@ -18,6 +18,13 @@ Source repo: https://github.com/ranjian0/building_tools
   reference: procedural building-modeling algorithms (skeleton family,
   grammars, layout partitioning, GIS/LoD pipelines) mapped to open issues
   with an adopt-first ranking.
+- [adopt-first-roadmap](adopt-first-roadmap.md) — detailed implementation
+  plan for the research adopt-first list: skeleton-roof refactor + face
+  tagging, seedian RNG (#163), Laycock-Day roof styles (#40/PR230),
+  slope-driven + weighted skeleton (#208), mitered offsets, skeleton
+  robustness (#149), facade rule DSL, interiors stack (#202/#217),
+  batch/GIS pipeline (#214/#173). Milestones M0-M6 with per-item effort,
+  tests, and code refs.
 
 ## Status Snapshot (2026-09)
 
