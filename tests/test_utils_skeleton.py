@@ -102,6 +102,37 @@ class TestSkeletonize(unittest.TestCase):
         for f in pairs:
             self.assertTrue(all(0 <= e < 8 for e in f), f)
 
+    def test_weighted_unit_weights_match_unweighted(self):
+        # -- weights of 1.0 must reproduce the classic path exactly
+        square = [(0, 0), (0, 10), (10, 10), (10, 0)]
+        plain = _snap(btools.utils.skeletonize(square, []))
+        weighted = _snap(btools.utils.skeletonize(square, [], weights=[1.0] * 4))
+        self.assertEqual(plain, weighted)
+
+    def test_weighted_rectangle_ridge(self):
+        # -- rect [(0,0),(0,10),(20,10),(20,0)]: edges 0/2 long, 1/3 short.
+        #    ridge z = w_long * W/2; ridge length = L - w_long*W/w_short
+        rect = [(0, 0), (0, 10), (20, 10), (20, 0)]
+
+        # -- longs 45deg (w=1), shorts 63.43deg (w=2): ridge 15 long at z 5
+        arcs = btools.utils.skeletonize(rect, [], weights=[1.0, 2.0, 1.0, 2.0])
+        peaks = sorted((round(a.source.x, 3), round(a.height, 3)) for a in arcs)
+        self.assertEqual(peaks, [(2.5, 5.0), (17.5, 5.0)])
+
+        # -- longs steep (w=2), shorts shallow (w=1): the ridge collapses
+        #    to zero length -- a single pyramid peak at z 10 (possibly
+        #    reported as two coincident subtrees)
+        arcs = btools.utils.skeletonize(rect, [], weights=[2.0, 1.0, 2.0, 1.0])
+        peaks = sorted(
+            (round(a.source.x, 3), round(a.source.y, 3), round(a.height, 3))
+            for a in arcs
+        )
+        self.assertLessEqual(len(peaks), 2)
+        for x, y, h in peaks:
+            self.assertAlmostEqual(x, 10.0, places=3)
+            self.assertAlmostEqual(y, 5.0, places=3)
+            self.assertAlmostEqual(h, 10.0, places=3)
+
 
 if __name__ == "__main__":
     unittest.main()

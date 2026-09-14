@@ -257,5 +257,70 @@ class TestMansardRoof(unittest.TestCase):
         self.assertTrue(report["ok"], report["problems"])
 
 
+class TestWeightedRoofs(unittest.TestCase):
+    """Per-edge pitch (weighted skeleton) and the half-hip roof type.
+
+    make_footprint sorts to a clockwise contour starting at the +x+y
+    corner, so on a width x length footprint the edge order is
+    (long, short, long, short)."""
+
+    def setUp(self):
+        clean_scene()
+
+    def _ridge_x_extent(self, obj):
+        """Span of the roof group's highest vertices along x."""
+        polys = group_faces(obj, "roof")
+        zs = [obj.data.vertices[i].co.z for p in polys for i in p.vertices]
+        top = max(zs)
+        tops = [
+            obj.data.vertices[i].co.x
+            for p in polys
+            for i in p.vertices
+            if abs(obj.data.vertices[i].co.z - top) < 1e-3
+        ]
+        return max(tops) - min(tops)
+
+    def test_hip_edge_weights(self):
+        # -- longs 30deg, shorts 63.43deg (cycles to all four edges):
+        #    ridge height is set by the long planes: 5.1 * tan(30)
+        obj, res = build_roof(
+            20, 10, type="HIP", edge_weights="30,63.43", add_ridge_cap=False
+        )
+        self.assertTrue(res.ok, res.errors)
+        expected = 5.1 * math.tan(math.radians(30))
+        self.assertAlmostEqual(group_z_delta(obj, "roof"), expected, places=3)
+        report = validate_object(obj, expect={"groups": ["roof", "roof_hangs"]})
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_half_hip_ridge_extends(self):
+        # -- 45deg, outset 0.1 -> outset rect 20.2 x 10.2:
+        #    full hip ridge = 10.0; fraction 0.5 -> w_short = 2 -> 15.1
+        hip, res = build_roof(
+            20,
+            10,
+            type="HALF_HIP",
+            slope_mode="ANGLE",
+            slope_angle=math.radians(45),
+            ridge_fraction=0.0,
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertAlmostEqual(self._ridge_x_extent(hip), 10.0, places=2)
+
+        half, res = build_roof(
+            20,
+            10,
+            type="HALF_HIP",
+            slope_mode="ANGLE",
+            slope_angle=math.radians(45),
+            ridge_fraction=0.5,
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertAlmostEqual(self._ridge_x_extent(half), 15.1, places=2)
+        # -- ridge height unchanged (set by the long planes): 5.1
+        self.assertAlmostEqual(group_z_delta(half, "roof"), 5.1, places=3)
+        report = validate_object(half, expect={"groups": ["roof", "roof_hangs"]})
+        self.assertTrue(report["ok"], report["problems"])
+
+
 if __name__ == "__main__":
     unittest.main()

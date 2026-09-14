@@ -13,6 +13,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("HIP", "Hip", "", 2),
         ("FLAT_TOP", "Flat Top", "", 3),
         ("MANSARD", "Mansard", "", 4),
+        ("HALF_HIP", "Half Hip", "", 5),
     ]
     type: EnumProperty(
         name="Roof Type",
@@ -152,6 +153,23 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of the upper tier above the break (mansard roof)",
     )
 
+    ridge_fraction: FloatProperty(
+        name="Ridge Fraction",
+        min=0.0,
+        max=0.95,
+        default=0.5,
+        description="0 = full hip, towards 1 extends the ridge like a gable "
+        "(half-hip roof)",
+    )
+
+    edge_weights: bpy.props.StringProperty(
+        name="Edge Pitches",
+        description="Comma-separated per-edge pitch angles in degrees, contour "
+        "order (cycles when fewer than the edge count). Overrides the "
+        "uniform slope for hip-style roofs",
+        default="",
+    )
+
     add_border: BoolProperty(
         name="Add Border",
         default=True,
@@ -204,11 +222,19 @@ class RoofProperty(bpy.types.PropertyGroup):
             col.prop(self, "lower_height")
             col.prop(self, "upper_height")
 
+        elif self.type == "HALF_HIP":
+            col = box.column(align=True)
+            col.prop(self, "thickness")
+            col.prop(self, "outset")
+            self._draw_slope(col)
+            col.prop(self, "ridge_fraction")
+
         else:
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
             self._draw_slope(col)
+            col.prop(self, "edge_weights")
 
     def _draw_slope(self, col):
         col.prop(self, "slope_mode", text="Slope")

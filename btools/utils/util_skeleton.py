@@ -75,6 +75,27 @@ def _point_line_distance(pt, line):
     return abs(_cross(line.v.normalized(), pt - line.p))
 
 
+def _weighted_bisector(dir_left, dir_right, weight_left, weight_right):
+    """Bisector direction of two wavefront edges with multiplicative
+    weights (Biedl/Held/Huber/Kaaser/Palfrader; CGAL convention).
+
+    weight w = tan(pitch): the edge's offset line moves inward at speed
+    1/w and the wavefront vertex height equals its time. The vertex
+    velocity v solves n_L . v = 1/w_L, n_R . v = 1/w_R over the unit
+    inward normals (right-hand normals for clockwise contours).
+    """
+    nl = Vector((dir_left.y, -dir_left.x))
+    nr = Vector((dir_right.y, -dir_right.x))
+    det = nl.x * nr.y - nr.x * nl.y
+    if det == 0:
+        # parallel edges: the weighted bisector degenerates to the
+        # angular one
+        return -dir_left + dir_right
+    pl = Vector((nl.y, -nl.x))
+    pr = Vector((nr.y, -nr.x))
+    return (pr / weight_left - pl / weight_right) / det
+
+
 def window(lst):
     prevs, items, nexts = it.tee(lst, 3)
     prevs = it.islice(it.cycle(prevs), len(lst) - 1, None)
@@ -121,7 +142,9 @@ Subtree = namedtuple("Subtree", "source, height, sinks, faces", defaults=((), ()
 
 
 class LAVertex:
-    def __init__(self, point, edge_left, edge_right, direction_vectors=None):
+    def __init__(
+        self, point, edge_left, edge_right, direction_vectors=None, weights=None
+    ):
         self.point = point
         self.edge_left = edge_left
         self.edge_right = edge_right
@@ -137,9 +160,25 @@ class LAVertex:
             direction_vectors = creator_vectors
 
         self._is_reflex = _cross(*direction_vectors) < 0
+        self._w_left = weights[edge_left.edge_id] if weights is not None else 1.0
+        self._w_right = weights[edge_right.edge_id] if weights is not None else 1.0
+
+        if weights is None:
+            bisector_v = creator_vectors[0] + creator_vectors[1]
+        else:
+            bisector_v = _weighted_bisector(
+                self._left_normalized,
+                self._right_normalized,
+                self._w_left,
+                self._w_right,
+            )
+            # -- keep the weighted direction oriented like the angular one,
+            #    so the reflex flip below stays meaningful
+            if bisector_v.dot(creator_vectors[0] + creator_vectors[1]) < 0:
+                bisector_v = -bisector_v
         self._bisector = Ray(
             self.point.copy(),
-            (creator_vectors[0] + creator_vectors[1]) * (-1 if self.is_reflex else 1),
+            bisector_v * (-1 if self.is_reflex else 1),
         )
 
     @property
@@ -153,6 +192,10 @@ class LAVertex:
     @property
     def original_edges(self):
         return self.lav._slav._original_edges
+
+    @property
+    def slav_weights(self):
+        return self.lav._slav._weights if self.lav is not None else None
 
     def next_event(self):
         events = []
@@ -203,9 +246,15 @@ class LAVertex:
                     if not (xleft and xright and xedge):
                         continue
 
+                    weights = self.slav_weights
+                    w_opp = weights[edge.edge.edge_id] if weights is not None else 1.0
                     events.append(
                         SplitEvent(
-                            _point_line_distance(b, edge.edge), b, 0, self, edge.edge
+                            w_opp * _point_line_distance(b, edge.edge),
+                            b,
+                            0,
+                            self,
+                            edge.edge,
                         )
                     )
 
@@ -215,7 +264,7 @@ class LAVertex:
         if i_prev is not None:
             events.append(
                 EdgeEvent(
-                    _point_line_distance(i_prev, self.edge_left),
+                    self._w_left * _point_line_distance(i_prev, self.edge_left),
                     i_prev,
                     1,
                     self.prev,
@@ -225,7 +274,7 @@ class LAVertex:
         if i_next is not None:
             events.append(
                 EdgeEvent(
-                    _point_line_distance(i_next, self.edge_right),
+                    self._w_right * _point_line_distance(i_next, self.edge_right),
                     i_next,
                     1,
                     self,
@@ -271,9 +320,14 @@ class LAVertex:
 
 
 class SLAV:
-    def __init__(self, polygon, holes):
+    def __init__(self, polygon, holes, weights=None):
         contours = [normalize_contour(polygon)]
         contours.extend([normalize_contour(hole) for hole in holes])
+
+        # -- per-edge multiplicative weights (CGAL convention: w = tan of
+        #    pitch; inset speed 1/w; vertex height = time), indexed by
+        #    edge id. None keeps the classic unweighted path.
+        self._weights = list(weights) if weights is not None else None
 
         self._lavs = []
         next_edge_id = 0
@@ -412,10 +466,16 @@ class SLAV:
             return (None, [])
 
         v1 = LAVertex(
-            event.intersection_point, event.vertex.edge_left, event.opposite_edge
+            event.intersection_point,
+            event.vertex.edge_left,
+            event.opposite_edge,
+            weights=self._weights,
         )
         v2 = LAVertex(
-            event.intersection_point, event.opposite_edge, event.vertex.edge_right
+            event.intersection_point,
+            event.opposite_edge,
+            event.vertex.edge_right,
+            weights=self._weights,
         )
 
         v1.prev = event.vertex.prev
@@ -481,6 +541,7 @@ class LAV:
                 point,
                 Segment(prev, point - prev, start_edge_id + i),
                 Segment(point, next - point, start_edge_id + (i + 1) % n),
+                weights=slav._weights,
             )
             vertex.lav = lav
             if lav.head is None:
@@ -515,6 +576,7 @@ class LAV:
             vertex_a.edge_left,
             vertex_b.edge_right,
             (vertex_b.bisector.v.normalized(), vertex_a.bisector.v.normalized()),
+            weights=self._slav._weights,
         )
         replacement.lav = self
 
@@ -585,7 +647,7 @@ class EventQueue:
             print(item[2])
 
 
-def skeletonize(polygon, holes=None, zero_gradient=False):
+def skeletonize(polygon, holes=None, zero_gradient=False, weights=None):
     """
     Compute the straight skeleton of a polygon.
 
@@ -593,13 +655,19 @@ def skeletonize(polygon, holes=None, zero_gradient=False):
     Holes is a list of the contours of the holes, the vertices of which should be in clockwise order.
     Zero gradient is an option to control the gradient between sinks and original_edges (produces gable roof)
 
+    weights -- optional per-edge multiplicative weights (CGAL convention:
+    w = tan of the roof pitch; the edge's offset line moves inward at
+    speed 1/w and every wavefront vertex height equals its arrival time).
+    Indexed by edge id: edge i ends at contour point i, holes continue
+    the numbering. With weights, arc heights are already roof heights.
+
     Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
     where source is the highest points, height is its height, and sinks are the point connected to the source.
     """
     if holes is None:
         holes = []
 
-    slav = SLAV(polygon, holes)
+    slav = SLAV(polygon, holes, weights)
     output = []
     prioque = EventQueue()
 

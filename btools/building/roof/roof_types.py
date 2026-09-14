@@ -42,6 +42,9 @@ def create_roof(bm, faces, prop):
     elif prop.type == "MANSARD":
         add_material_group(MaterialGroup.ROOF_HANGS)
         create_mansard_roof(bm, faces, prop)
+    elif prop.type == "HALF_HIP":
+        add_material_group(MaterialGroup.ROOF_HANGS)
+        create_half_hip_roof(bm, faces, prop)
 
     # -- silhouette details
     if getattr(prop, "add_gutters", False):
@@ -112,6 +115,25 @@ def slope_to_height_scale(prop, max_arc_height):
     return prop.height / max_arc_height
 
 
+def resolve_edge_weights(prop, edge_count):
+    """Parse the edge_weights option into skeleton weights.
+
+    Accepts a comma-separated pitch string ("45,30,45,30", degrees) or a
+    sequence of pitches; values cycle when fewer than edge_count are given.
+    Returns tan(pitch) weights, or None when unset.
+    """
+    raw = getattr(prop, "edge_weights", None)
+    if not raw:
+        return None
+    if isinstance(raw, str):
+        values = [float(v) for v in raw.strip("[]() ").replace(",", " ").split()]
+    else:
+        values = [float(v) for v in raw]
+    if not values:
+        return None
+    return [math.tan(math.radians(values[i % len(values)])) for i in range(edge_count)]
+
+
 def _prepare_skeleton_base(bm, faces):
     """Dissolve the base into one face and clean its outline.
 
@@ -136,22 +158,29 @@ def build_skeleton_roof(bm, faces, prop, zero_gradient=False):
     """Shared skeleton-roof pipeline (hip/gable and derived styles).
 
     Lifts every skeleton arc by ``arc.height * scale`` where ``scale``
-    resolves from the slope mode (height / angle / percentage).
+    resolves from the slope mode (height / angle / percentage). With
+    per-edge weights (edge_weights option), arc heights already are roof
+    heights (w = tan of pitch) and no scale is applied.
 
     Returns (skeleton, original_edges, roof_faces, median) for the callers'
     finishing passes."""
     faces, median, original_edges, points = _prepare_skeleton_base(bm, faces)
 
     # -- compute straight skeleton
-    skeleton = skeletonize(points, [], zero_gradient=zero_gradient)
+    weights = resolve_edge_weights(prop, len(points))
+    skeleton = skeletonize(points, [], zero_gradient=zero_gradient, weights=weights)
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
-    max_height = max(arc.height for arc in skeleton)
-    scale = slope_to_height_scale(prop, max_height)
+    if weights is not None:
+        height_fn = lambda arc: arc.height
+    else:
+        max_height = max(arc.height for arc in skeleton)
+        scale = slope_to_height_scale(prop, max_height)
+        height_fn = lambda arc, s=scale: arc.height * s
 
     # -- create edges and vertices
     skeleton_edges = create_skeleton_verts_and_edges(
-        bm, skeleton, original_edges, median, lambda arc: arc.height * scale
+        bm, skeleton, original_edges, median, height_fn
     )
 
     # -- create faces
@@ -192,6 +221,59 @@ def create_hip_roof(bm, faces, prop):
     roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
     faces = roof_hang(bm, faces, prop.thickness, prop.outset)
     build_skeleton_roof(bm, faces, prop)
+
+
+def _half_hip_weights(points, base_weight, ridge_fraction):
+    """Weights for a half-hip (jerkinhead) roof.
+
+    Edges perpendicular to the footprint's long axis (the roof "ends")
+    get a steeper pitch so their wavefronts cut in less and the ridge
+    runs longer than a full hip: ridge = L - W * (1 - ridge_fraction),
+    with ridge_fraction 0 = full hip and -> 1 approaching a gable.
+    """
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    axis_x = (max(xs) - min(xs)) >= (max(ys) - min(ys))
+    axis = Vector((1.0, 0.0)) if axis_x else Vector((0.0, 1.0))
+    end_scale = 1.0 / max(1.0 - ridge_fraction, 0.05)
+    n = len(points)
+    weights = []
+    for i in range(n):
+        x0, y0 = points[i - 1]
+        x1, y1 = points[i]
+        d = Vector((x1 - x0, y1 - y0))
+        if d.length == 0.0:
+            weights.append(base_weight)
+            continue
+        is_end = abs(d.normalized().dot(axis)) < 0.5
+        weights.append(base_weight * end_scale if is_end else base_weight)
+    return weights
+
+
+def create_half_hip_roof(bm, faces, prop):
+    """Create a half-hip (jerkinhead) roof: a hip whose end faces are
+    steepened so the ridge runs longer (ridge_fraction 0 = hip)."""
+    # -- create base for the roof
+    roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
+    faces = roof_hang(bm, faces, prop.thickness, prop.outset)
+    faces, median, original_edges, points = _prepare_skeleton_base(bm, faces)
+
+    n_edges = len(points)
+    per_edge = resolve_edge_weights(prop, n_edges)
+    if per_edge is not None:
+        weights = per_edge
+    else:
+        # -- main pitch from the slope mode (over an unweighted probe)
+        probe = skeletonize(points, [])
+        base_weight = slope_to_height_scale(prop, max(arc.height for arc in probe))
+        weights = _half_hip_weights(points, base_weight, prop.ridge_fraction)
+
+    skeleton = skeletonize(points, [], weights=weights)
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+    skeleton_edges = create_skeleton_verts_and_edges(
+        bm, skeleton, original_edges, median, lambda arc: arc.height
+    )
+    create_skeleton_faces(bm, original_edges, skeleton_edges)
 
 
 def _pt_key(p):

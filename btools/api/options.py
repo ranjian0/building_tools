@@ -210,6 +210,7 @@ class RoofType(Enum):
     HIP = "HIP"
     FLAT_TOP = "FLAT_TOP"
     MANSARD = "MANSARD"
+    HALF_HIP = "HALF_HIP"
 
 
 class GableRoofType(Enum):
@@ -236,6 +237,8 @@ class RoofOptions:
     flat_height: float = 0.8
     lower_height: float = 0.8
     upper_height: float = 0.4
+    ridge_fraction: float = 0.5
+    edge_weights: str | None = None  # comma-separated per-edge pitch degrees
     add_border: bool = True
     border: float = 0.1
     add_gutters: bool = False
