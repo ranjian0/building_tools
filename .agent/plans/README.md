@@ -14,6 +14,10 @@ Source repo: https://github.com/ranjian0/building_tools
 - [building-presets](building-presets.md) — complete-building presets
   (`btools/api/presets.py`) + Building Presets panel + thumbnails.
   **Done (v1)**.
+- [research-building-algorithms](research-building-algorithms.md) — research
+  reference: procedural building-modeling algorithms (skeleton family,
+  grammars, layout partitioning, GIS/LoD pipelines) mapped to open issues
+  with an adopt-first ranking.
 
 ## Status Snapshot (2026-09)
 
