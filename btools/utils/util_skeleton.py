@@ -652,8 +652,64 @@ class EventQueue:
             print(item[2])
 
 
+def _point_in_polygon(p, contour):
+    """Ray-cast containment (winding independent)."""
+    x, y = p.x, p.y
+    inside = False
+    n = len(contour)
+    for i in range(n):
+        x0, y0 = contour[i - 1]
+        x1, y1 = contour[i]
+        if (y0 > y) != (y1 > y):
+            xint = x0 + (y - y0) * (x1 - x0) / (y1 - y0)
+            if x < xint:
+                inside = not inside
+    return inside
+
+
+def _dist_to_contour(p, contour):
+    """Distance from p to the nearest contour SEGMENT."""
+    best = math.inf
+    n = len(contour)
+    for i in range(n):
+        x0, y0 = contour[i - 1]
+        x1, y1 = contour[i]
+        dx, dy = x1 - x0, y1 - y0
+        seg2 = dx * dx + dy * dy
+        if seg2 == 0.0:
+            best = min(best, math.hypot(p.x - x0, p.y - y0))
+        else:
+            t = max(0.0, min(1.0, ((p.x - x0) * dx + (p.y - y0) * dy) / seg2))
+            best = min(best, math.hypot(p.x - (x0 + t * dx), p.y - (y0 + t * dy)))
+    return best
+
+
+def _lav_vertices(lav, cap):
+    """Bounded, de-duplicated vertex iteration: split-event surgery can
+    leave linked lists that never return to head, which would spin
+    forever; a healthy LAV never exceeds the input vertex count."""
+    out = []
+    seen = set()
+    cur = lav.head
+    if cur is None:
+        return out
+    steps = 0
+    while steps < cap:
+        steps += 1
+        if id(cur) not in seen:
+            seen.add(id(cur))
+            out.append(cur)
+        cur = cur.next
+        if cur is None or cur == lav.head:
+            break
+    return out
+
+
 def _run_slav(polygon, holes, zero_gradient, weights):
     """Run the wavefront simulation; returns (subtrees, normalized contours)."""
+    normalized = [normalize_contour(polygon)] + [normalize_contour(h) for h in holes]
+    total_verts = max(4, sum(len(c) for c in normalized))
+
     slav = SLAV(polygon, holes, weights)
     output = []
     prioque = EventQueue()
@@ -663,7 +719,15 @@ def _run_slav(polygon, holes, zero_gradient, weights):
             v = vertex.next_event()
             prioque.put(v)
 
+    # -- hard iteration bound: degenerate wavefronts can generate
+    #    zero-progress event cycles forever; breaking out leaves the
+    #    leftovers to the terminal drain below
+    max_events = 2000 + 50 * total_verts * total_verts
+    processed = 0
     while not (prioque.empty() or slav.empty()):
+        if processed > max_events:
+            break
+        processed += 1
         i = prioque.get()
         if isinstance(i, EdgeEvent):
             if not i.vertex_a.is_valid or not i.vertex_b.is_valid:
@@ -680,7 +744,91 @@ def _run_slav(polygon, holes, zero_gradient, weights):
         if arc is not None:
             output.append(arc)
 
-    normalized = [normalize_contour(polygon)] + [normalize_contour(h) for h in holes]
+    # -- terminal drain (item 5 follow-up): vertices still alive when the
+    #    queue emptied belong to no-event chains the Felkel event set
+    #    cannot represent -- apse chains (bisectors fanning at a common
+    #    center) and diverging-bisector reflex chains. Close them
+    #    geometrically: pairwise intersections of their bisectors give
+    #    candidate meeting points; the one with the deepest clearance
+    #    over the contour edge lines becomes the synthetic collapse source
+    #    (unweighted runs only -- weighted times are not distances).
+    if weights is None:
+        leftovers = [
+            v
+            for lav in list(slav)
+            for v in _lav_vertices(lav, total_verts + 8)
+            if v.is_valid
+        ]
+        if len(leftovers) >= 2:
+            lines = _edge_lines(normalized)
+
+            def clearance(pt):
+                # -- the collapse point must respect every contour edge
+                #    (incl. holes), not just the leftovers' own faces
+                return min(
+                    abs((pt.x - x0) * dy - (pt.y - y0) * dx) for x0, y0, dx, dy in lines
+                )
+
+            candidates = []
+            xs = [x for c in normalized for x, y in c]
+            ys = [y for c in normalized for x, y in c]
+            pad = max(max(xs) - min(xs), max(ys) - min(ys), 1.0)
+            lo_x, hi_x = min(xs) - pad, max(xs) + pad
+            lo_y, hi_y = min(ys) - pad, max(ys) + pad
+            for a, b in it.combinations(leftovers, 2):
+                res = _line_line_intersect(a.bisector, b.bisector)
+                if res is not None:
+                    p = res[0]
+                    # -- near-parallel bisectors meet absurdly far out;
+                    #    the collapse point is within the neighborhood
+                    if lo_x <= p.x <= hi_x and lo_y <= p.y <= hi_y:
+                        candidates.append(p)
+            cx = sum(v.point.x for v in leftovers) / len(leftovers)
+            cy = sum(v.point.y for v in leftovers) / len(leftovers)
+            candidates.append(Vector((cx, cy)))
+
+            # -- candidates must lie in the material region (or on the
+            #    boundary -- apse centers sit on the discretized chain);
+            #    far-out intersections of near-parallel bisectors and
+            #    hole-interior points are invalid
+            def candidate_ok(p):
+                if any(_point_in_polygon(p, h) for h in normalized[1:]):
+                    return False
+                return (
+                    _point_in_polygon(p, normalized[0])
+                    or _dist_to_contour(p, normalized[0]) <= 1e-3
+                )
+
+            filtered = [p for p in candidates if candidate_ok(p)]
+            if filtered:
+                candidates = filtered
+
+            source = max(candidates, key=clearance)
+            height = clearance(source)
+            sinks = [v.point for v in leftovers]
+            arc_faces = [(v.edge_left.edge_id, v.edge_right.edge_id) for v in leftovers]
+            output.append(Subtree(source, height, sinks, arc_faces))
+
+            # -- a drained run is degenerate: per-LAV event arcs can carry
+            #    times past the true contour meeting (events computed on
+            #    one LAV ignore the other contour's wavefront). The drain
+            #    height approximates the max inscribed radius; clamp event
+            #    times to it (topology/meshing untouched) and drop sources
+            #    sitting inside a hole outright
+            if len(normalized) > 1:
+                output = [
+                    a
+                    for a in output
+                    if not any(_point_in_polygon(a.source, h) for h in normalized[1:])
+                ]
+            output = _cleanup_subtrees(output)
+            output = [
+                Subtree(a.source, min(a.height, height), a.sinks, a.faces)
+                if a.height > height
+                else a
+                for a in output
+            ]
+
     return output, normalized
 
 
@@ -720,7 +868,7 @@ def _cleanup_subtrees(
     for arc in subtrees:
         sinks, faces = [], []
         for s, f in zip(arc.sinks, arc.faces):
-            if (s - arc.source).length <= 1e-6:
+            if (s - arc.source).length <= 1e-4:
                 continue  # self arc (symmetric-tie artifact)
             sinks.append(s)
             faces.append(f)

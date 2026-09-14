@@ -292,13 +292,22 @@ def _truncate_skeleton(skeleton, base_points, cap_t, scale):
       above-cut component, ordered around their centroid)
     """
     # -- outline points sit at the base (height 0); Subtree.height is the
-    #    SOURCE's height, so sinks on the outline must not inherit it
-    base = {(round(x, 6), round(y, 6)) for x, y in base_points}
+    #    SOURCE's height, so sinks on the outline must not inherit it.
+    #    Skeleton points are float32 Vectors while the contour is float64,
+    #    so match by distance rather than exact keys.
+    base_vecs = [Vector((float(x), float(y))) for x, y in base_points]
+
+    def on_base(p):
+        for v in base_vecs:
+            if (p - v).length <= 1e-5:
+                return True
+        return False
+
     sink_h = {}
     for arc in skeleton:
         for s in arc.sinks:
             k = _pt_key(s)
-            if k in base:
+            if on_base(s):
                 sink_h[k] = 0.0
             else:
                 sink_h[k] = min(sink_h.get(k, math.inf), arc.height)

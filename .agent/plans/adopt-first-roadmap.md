@@ -413,16 +413,26 @@ count; offset at max height → degenerate empty (guard).
 
 ## Item 5: Skeleton robustness — bpypolyskel techniques (#149)
 
-**Status (partial, 2026-09):** structural fixes landed — 2-LAV collapse
-records both vertices' face pairs; self-arc cleanup; consistency checker
-(`_skeleton_problems`) + deterministic jitter-ladder retry with
-ghost-filtered retry outputs and base-point snapping. Adversarial corpus
-(stars/apses/H/40 randoms): roofs build 0/52 failures (regression-locked
-in `tests/test_roofs.py::TestAdversarialRoofs`); skeleton consistency
-22→13/54 failing. Remaining: tie-degenerate stars + no-event reflex
-chains still yield incomplete skeletons (offsets on those shapes return
-no rings — documented in `util_offsets`); needs true multi-edge event
-handling (kinetic triangulation class) as a follow-up.
+**Status (complete, 2026-09):** the adversarial corpus (stars/apses/
+H/rings/40 randoms) is fully green — skeleton consistency 0/54 failing,
+offsets 0/51, roofs 0/52 (regression-locked in
+`tests/test_roofs.py::TestAdversarialRoofs` and
+`tests/test_offsets.py`). Landed across two passes:
+
+1. Structural: 2-LAV collapse records both vertices' face pairs;
+   self-arc cleanup (1e-4); consistency checker
+   (`_skeleton_problems`) + deterministic jitter-ladder retry with
+   ghost-filtered retry outputs and base-point snapping; consecutive
+   crossing pairing in offsets.
+2. Follow-up: **terminal drain** — when the event queue empties with
+   living vertices (apse chains, no-event reflex chains), their
+   bisectors' pairwise intersections give the collapse structure
+   (bounded to the footprint neighborhood, material-region only);
+   drained runs clamp event times to the drain height (approximate max
+   inscribed radius) and drop hole-interior sources. Geometric sink
+   times in offsets (distance to flanking edge lines — immune to
+   merged-birth points and float32 rounding). Hard iteration bound on
+   the event loop (zero-progress cycles can otherwise spin forever).
 
 **Goal.** Fix the Felkel-algorithm failure classes behind #149 (hip roof
 failure on complex polygons).

@@ -65,6 +65,66 @@ class TestOffsetPolygons(unittest.TestCase):
         with self.assertRaises(ValueError):
             btools.utils.offset_polygons(sk, self.SQUARE, 0.0)
 
+    def test_star_offsets(self):
+        # -- tie-degenerate tangential star: the correct skeleton is the
+        #    center fan; offsets at any depth must give one closed ring
+        import math
+
+        pts = []
+        for i in range(16):
+            r = 6.0 if i % 2 == 0 else 2.5
+            a = 2 * math.pi * i / 16
+            pts.append((r * math.cos(a), r * math.sin(a)))
+        area = (
+            sum(
+                pts[i][0] * pts[(i + 1) % 16][1] - pts[(i + 1) % 16][0] * pts[i][1]
+                for i in range(16)
+            )
+            / 2
+        )
+        if area > 0:
+            pts = pts[::-1]
+
+        sk = btools.utils.skeletonize(pts, [])
+        max_h = max(a.height for a in sk)
+        for frac in (0.15, 0.5, 0.9):
+            rings = btools.utils.offset_polygons(sk, pts, max_h * frac)
+            self.assertEqual(len(rings), 1, frac)
+            self.assertGreaterEqual(len(rings[0]), 8, frac)
+            self.assertLess(signed_area(rings[0]), 0.0, frac)  # clockwise
+
+    def test_apse_offsets(self):
+        # -- semicircular protrusion (multi-edge-collapse class): the
+        #    terminal drain closes it; the offset ring must follow the bump
+        import math
+
+        segs, r, w, h = 16, 2.0, 10.0, 8.0
+        pts = [(-w / 2, -h / 2), (-w / 2, h / 2)]
+        for i in range(segs + 1):
+            a = math.pi / 2 - math.pi * i / segs
+            pts.append((w / 2 + r * math.cos(a), r * math.sin(a)))
+        pts.append((w / 2, -h / 2))
+        area = (
+            sum(
+                pts[i][0] * pts[(i + 1) % len(pts)][1]
+                - pts[(i + 1) % len(pts)][0] * pts[i][1]
+                for i in range(len(pts))
+            )
+            / 2
+        )
+        if area > 0:
+            pts = pts[::-1]
+
+        sk = btools.utils.skeletonize(pts, [])
+        covered = {e for arc in sk for f in arc.faces for e in f}
+        self.assertEqual(covered, set(range(len(pts))))
+        rings = btools.utils.offset_polygons(sk, pts, 0.5)
+        self.assertEqual(len(rings), 1)
+        xs = [p.x for p in rings[0]]
+        # -- the bump apex offsets inward by ~0.5 (within the 16-segment
+        #    discretization slack of the arc)
+        self.assertAlmostEqual(max(xs), (w / 2 + r) - 0.5, delta=0.03)
+
 
 if __name__ == "__main__":
     unittest.main()

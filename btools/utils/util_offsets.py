@@ -9,23 +9,43 @@ mitered offsets by construction (Palfrader & Held 2015).
 Requires the arc face adjacency from ``util_skeleton.Subtree.faces``
 (edge ids: edge i ends at contour point i, holes continue the numbering).
 
-Known limitation: tie-degenerate footprints (exact-symmetric stars,
-apses, constant-thickness shapes) can produce structurally incomplete
-skeletons (missing arcs / uncovered faces); their level sets then fail
-to close and ``offset_polygons`` returns fewer (or no) rings. Roofs on
-the same footprints remain valid -- meshing does not depend on face
-coverage. Hardening the simulation for these classes needs multi-edge
-event handling (see the adopt-first roadmap, item 5 follow-up).
+Robustness notes: sink times are geometric (distance to the sink's own
+flanking edge lines), so merged-vertex birth points and float32 rounding
+in the skeleton Vectors do not disturb the level sets; degenerate inputs
+(tie-symmetric stars, apses, rings with holes) are closed by the
+skeleton's terminal drain before the level-set walk.
 """
 
 import math
 from collections import defaultdict
+
+from mathutils import Vector
 
 __all__ = ["offset_polygons"]
 
 
 def _pt_key(p):
     return (round(p.x, 6), round(p.y, 6))
+
+
+# -- skeleton points are float32 Vectors while callers pass float64
+#    contours; exact key matching straddles rounding boundaries
+_BASE_TOL = 1e-5
+
+
+def _base_matcher(base_points):
+    """Fast-ish tolerance membership test for contour points."""
+    vectors = [Vector((float(x), float(y))) for x, y in base_points]
+    if not vectors:
+        return lambda p: False
+
+    def matches(p):
+        for v in vectors:
+            if (p - v).length <= _BASE_TOL:
+                return True
+        return False
+
+    return matches
 
 
 def _signed_area(ring):
@@ -38,12 +58,51 @@ def _signed_area(ring):
     return total / 2.0
 
 
+def _edge_lines_by_id(base_points):
+    """{edge_id: (x0, y0, dx, dy)} unit-direction lines, contour order.
+
+    Edge i runs from base_points[i-1] to base_points[i]; holes continue
+    the numbering."""
+    lines = {}
+    edge_id = 0
+    for contour in base_points:
+        n = len(contour)
+        for i in range(n):
+            x0, y0 = contour[i - 1]
+            x1, y1 = contour[i]
+            dx, dy = x1 - x0, y1 - y0
+            length = math.hypot(dx, dy) or 1.0
+            lines[edge_id] = (x0, y0, dx / length, dy / length)
+            edge_id += 1
+    return lines
+
+
+def _line_distance(p, line):
+    x0, y0, dx, dy = line
+    return abs((p.x - x0) * dy - (p.y - y0) * dx)
+
+
+def _as_contours(base_points):
+    """A single contour or a list of contours (incl. holes) -> list."""
+    if not base_points:
+        return []
+    first = base_points[0]
+    if (
+        len(first) == 2
+        and isinstance(first[0], (int, float))
+        and isinstance(first[1], (int, float))
+    ):
+        return [base_points]
+    return list(base_points)
+
+
 def offset_polygons(skeleton, base_points, distance):
     """Closed interior offset ring(s) at skeleton-time ``distance``.
 
     skeleton    -- output of ``btools.utils.skeletonize`` (Subtree list)
-    base_points -- the contour points the skeleton was built from
-                   (outline sinks sit at height 0)
+    base_points -- the contour(s) the skeleton was built from (a single
+                   contour or a list of contours incl. holes); outline
+                   edge i ends at contour point i
     distance    -- offset distance in the skeleton's time units
 
     Returns a list of rings (lists of 2D points, clockwise like the input);
@@ -51,18 +110,26 @@ def offset_polygons(skeleton, base_points, distance):
     """
     if distance <= 0.0:
         raise ValueError("offset distance must be positive")
-    base = {(round(float(x), 6), round(float(y), 6)) for x, y in base_points}
+    contours = _as_contours(base_points)
+    on_base = _base_matcher([pt for c in contours for pt in c])
+    lines = _edge_lines_by_id(contours)
 
-    # -- per-point heights: sources use their arc's height, sinks the min
-    #    over the arcs containing them; outline points sit at height 0
+    def sink_time(s, faces):
+        """A sink's time is geometric: its distance to its own flanking
+        edge lines (0 on the outline; the birth time of merged vertices --
+        independent of arc bookkeeping and float32 rounding)."""
+        ds = [_line_distance(s, lines[e]) for e in faces if e in lines]
+        return min(ds) if ds else 0.0
+
     sink_h = {}
     for arc in skeleton:
-        for s in arc.sinks:
+        for s, faces in zip(arc.sinks, arc.faces):
             k = _pt_key(s)
-            if k in base:
+            if on_base(s):
                 sink_h[k] = 0.0
             else:
-                sink_h[k] = min(sink_h.get(k, math.inf), arc.height)
+                t = sink_time(s, faces)
+                sink_h[k] = min(sink_h.get(k, math.inf), t)
 
     # -- crossings on arcs spanning `distance`, tagged with flanking faces
     crossings = []  # (point, face_a, face_b)
@@ -81,15 +148,8 @@ def offset_polygons(skeleton, base_points, distance):
         return []
 
     # -- edge geometry for projection ordering (edge i runs from
-    #    base_points[i-1] to base_points[i])
-    edges = {}
-    n_pts = len(base_points)
-    for i in range(n_pts):
-        x0, y0 = base_points[i - 1]
-        x1, y1 = base_points[i]
-        dx, dy = x1 - x0, y1 - y0
-        length = math.hypot(dx, dy) or 1.0
-        edges[i] = (x0, y0, dx / length, dy / length)
+    #    contour[i-1] to contour[i]; holes continue the numbering)
+    edges = lines
 
     # -- per-face segments: a face's crossings are paired consecutively
     #    along its edge direction (a face crossed 2k times contributes k
