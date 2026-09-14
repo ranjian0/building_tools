@@ -8,6 +8,14 @@ mitered offsets by construction (Palfrader & Held 2015).
 
 Requires the arc face adjacency from ``util_skeleton.Subtree.faces``
 (edge ids: edge i ends at contour point i, holes continue the numbering).
+
+Known limitation: tie-degenerate footprints (exact-symmetric stars,
+apses, constant-thickness shapes) can produce structurally incomplete
+skeletons (missing arcs / uncovered faces); their level sets then fail
+to close and ``offset_polygons`` returns fewer (or no) rings. Roofs on
+the same footprints remain valid -- meshing does not depend on face
+coverage. Hardening the simulation for these classes needs multi-edge
+event handling (see the adopt-first roadmap, item 5 follow-up).
 """
 
 import math
@@ -72,25 +80,41 @@ def offset_polygons(skeleton, base_points, distance):
     if not crossings:
         return []
 
-    # -- per-face segments: a face crossed by the level set exactly twice
-    #    contributes the segment between the two crossings; rings are the
-    #    cycles of the resulting crossing graph (each crossing joins the
-    #    two faces flanking its arc)
+    # -- edge geometry for projection ordering (edge i runs from
+    #    base_points[i-1] to base_points[i])
+    edges = {}
+    n_pts = len(base_points)
+    for i in range(n_pts):
+        x0, y0 = base_points[i - 1]
+        x1, y1 = base_points[i]
+        dx, dy = x1 - x0, y1 - y0
+        length = math.hypot(dx, dy) or 1.0
+        edges[i] = (x0, y0, dx / length, dy / length)
+
+    # -- per-face segments: a face's crossings are paired consecutively
+    #    along its edge direction (a face crossed 2k times contributes k
+    #    segments); rings are the cycles of the crossing graph
     by_face = defaultdict(list)
     for idx, (_pt, f0, f1) in enumerate(crossings):
         by_face[f0].append(idx)
         by_face[f1].append(idx)
 
     adj = defaultdict(set)
-    for idxs in by_face.values():
-        if len(idxs) != 2:
-            continue  # face not crossed exactly once (degenerate at d)
-        i, j = idxs
-        pti, ptj = crossings[i][0], crossings[j][0]
-        if (pti - ptj).length < 1e-9:
-            continue  # zero-length segment at a coincident event point
-        adj[i].add(j)
-        adj[j].add(i)
+    for face_id, idxs in by_face.items():
+        if len(idxs) < 2 or face_id not in edges:
+            continue
+        ex, ey, edx, edy = edges[face_id]
+        idxs.sort(
+            key=lambda i: (
+                (crossings[i][0].x - ex) * edx + (crossings[i][0].y - ey) * edy
+            )
+        )
+        for a, b in zip(idxs[0::2], idxs[1::2]):
+            pti, ptj = crossings[a][0], crossings[b][0]
+            if (pti - ptj).length < 1e-9:
+                continue  # zero-length segment at a coincident event point
+            adj[a].add(b)
+            adj[b].add(a)
 
     rings = []
     visited = set()

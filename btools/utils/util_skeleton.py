@@ -1,7 +1,10 @@
 """Adapted from https://github.com/yonghah/polyskel"""
 
+import hashlib
 import heapq
 import itertools as it
+import math
+import random
 from collections import namedtuple
 
 from mathutils import Vector
@@ -502,11 +505,13 @@ class SLAV:
                 self._lavs.append(l)
                 vertices.append(l.head)
             else:
-                sink_vertex = l.head.next
-                sinks.append(sink_vertex.point)
-                arc_faces.append(
-                    (sink_vertex.edge_left.edge_id, sink_vertex.edge_right.edge_id)
-                )
+                # -- a collapsed 2-vertex LAV: BOTH vertices die here, so
+                #    both edge pairs must be recorded for face coverage
+                for sink_vertex in (l.head, l.head.next):
+                    sinks.append(sink_vertex.point)
+                    arc_faces.append(
+                        (sink_vertex.edge_left.edge_id, sink_vertex.edge_right.edge_id)
+                    )
                 for v in list(l):
                     v.invalidate()
 
@@ -647,26 +652,8 @@ class EventQueue:
             print(item[2])
 
 
-def skeletonize(polygon, holes=None, zero_gradient=False, weights=None):
-    """
-    Compute the straight skeleton of a polygon.
-
-    The polygon should be given as a list of vertices in counter-clockwise order.
-    Holes is a list of the contours of the holes, the vertices of which should be in clockwise order.
-    Zero gradient is an option to control the gradient between sinks and original_edges (produces gable roof)
-
-    weights -- optional per-edge multiplicative weights (CGAL convention:
-    w = tan of the roof pitch; the edge's offset line moves inward at
-    speed 1/w and every wavefront vertex height equals its arrival time).
-    Indexed by edge id: edge i ends at contour point i, holes continue
-    the numbering. With weights, arc heights are already roof heights.
-
-    Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
-    where source is the highest points, height is its height, and sinks are the point connected to the source.
-    """
-    if holes is None:
-        holes = []
-
+def _run_slav(polygon, holes, zero_gradient, weights):
+    """Run the wavefront simulation; returns (subtrees, normalized contours)."""
     slav = SLAV(polygon, holes, weights)
     output = []
     prioque = EventQueue()
@@ -693,4 +680,197 @@ def skeletonize(polygon, holes=None, zero_gradient=False, weights=None):
         if arc is not None:
             output.append(arc)
 
-    return output
+    normalized = [normalize_contour(polygon)] + [normalize_contour(h) for h in holes]
+    return output, normalized
+
+
+def _edge_lines(normalized_contours):
+    """[(p, v)] unit-direction edge lines in contour order."""
+    lines = []
+    for contour in normalized_contours:
+        n = len(contour)
+        for i in range(n):
+            x0, y0 = contour[i - 1]
+            x1, y1 = contour[i]
+            dx, dy = x1 - x0, y1 - y0
+            length = math.hypot(dx, dy) or 1.0
+            lines.append((x0, y0, dx / length, dy / length))
+    return lines
+
+
+def _cleanup_subtrees(
+    subtrees, normalized_contours=None, weights=None, ghost_filter=False
+):
+    """Drop degenerate artifacts from a skeleton run:
+
+    - self arcs (source == sink within epsilon -- symmetric-tie artifact)
+    - ghost arcs (unit weights only): a source's time must equal its
+      perpendicular distance to the nearest contour edge line; arcs whose
+      height is unreachable that way come from invalid tie sequences
+    Returns the cleaned list (Subtree sinks/faces stay parallel)."""
+    scale = 1.0
+    lines = []
+    if ghost_filter and normalized_contours and weights is None:
+        lines = _edge_lines(normalized_contours)
+        if lines:
+            scale = max(max(abs(x0), abs(y0)) for x0, y0, _dx, _dy in lines) or 1.0
+    tol = max(1e-3, 1e-4 * scale)
+
+    cleaned = []
+    for arc in subtrees:
+        sinks, faces = [], []
+        for s, f in zip(arc.sinks, arc.faces):
+            if (s - arc.source).length <= 1e-6:
+                continue  # self arc (symmetric-tie artifact)
+            sinks.append(s)
+            faces.append(f)
+        if not sinks:
+            continue
+        if lines:
+            nearest = min(
+                abs(
+                    (arc.source.y - y0) * dx - (arc.source.x - x0) * dy
+                )  # cross product = perpendicular distance to the line
+                for x0, y0, dx, dy in lines
+            )
+            if arc.height > nearest + tol:
+                continue  # ghost arc: time unreachable from any edge line
+        cleaned.append(Subtree(arc.source, arc.height, sinks, faces))
+    return cleaned
+
+
+def _skeleton_problems(subtrees, normalized_contours):
+    """Consistency report for a skeleton run (roadmap item 5).
+
+    Checks the contract the meshing and offsets rely on: every contour
+    edge is covered by some arc's flanking faces, face ids are in range,
+    and no arc has a non-positive height."""
+    edge_count = sum(len(c) for c in normalized_contours)
+    covered = set()
+    problems = []
+    for i, arc in enumerate(subtrees):
+        if arc.height < -1e-9:
+            problems.append("arc %d: non-positive height %.6g" % (i, arc.height))
+        if not arc.sinks:
+            problems.append("arc %d: no sinks" % i)
+        for f in arc.faces:
+            for e in f:
+                if not 0 <= e < edge_count:
+                    problems.append("arc %d: face id %r out of range" % (i, e))
+                else:
+                    covered.add(e)
+    missing = sorted(set(range(edge_count)) - covered)
+    if subtrees and missing:
+        problems.append("edges not covered by any arc: %s" % missing[:8])
+    if not subtrees and edge_count:
+        problems.append("empty skeleton")
+    return problems
+
+
+def _jitter_contours(contours, seed, magnitude):
+    """Deterministic micro-jitter that breaks exact-tie degeneracies.
+
+    The Felkel/Obdrzalek simulation cannot represent simultaneous
+    (multi-edge) events: symmetric inputs leave edges that never die.
+    A hash-seeded uniform jitter of ~1e-6 splits the ties into a valid
+    event sequence whose skeleton approximates the degenerate one far
+    below the meshing tolerance."""
+    rng = random.Random(seed)
+    out = []
+    for contour in contours:
+        out.append(
+            [
+                (
+                    x + rng.uniform(-magnitude, magnitude),
+                    y + rng.uniform(-magnitude, magnitude),
+                )
+                for x, y in contour
+            ]
+        )
+    return out
+
+
+def _snap_to_base_points(subtrees, base_contours, tolerance=1e-3):
+    """Replace output points that sit on (jittered) outline positions with
+    the exact input points, so meshing/offsets keep their base linkage
+    (tolerance matches utils.equal's default)."""
+    base = [(x, y) for contour in base_contours for x, y in contour]
+
+    def snap(pt):
+        for x, y in base:
+            if abs(pt.x - x) <= tolerance and abs(pt.y - y) <= tolerance:
+                return Vector((x, y))
+        return pt
+
+    snapped = []
+    for arc in subtrees:
+        snapped.append(
+            Subtree(
+                snap(arc.source),
+                arc.height,
+                [snap(s) for s in arc.sinks],
+                arc.faces,
+            )
+        )
+    return snapped
+
+
+def skeletonize(polygon, holes=None, zero_gradient=False, weights=None):
+    """
+    Compute the straight skeleton of a polygon.
+
+    The polygon should be given as a list of vertices in counter-clockwise order.
+    Holes is a list of the contours of the holes, the vertices of which should be in clockwise order.
+    Zero gradient is an option to control the gradient between sinks and original_edges (produces gable roof)
+
+    weights -- optional per-edge multiplicative weights (CGAL convention:
+    w = tan of the roof pitch; the edge's offset line moves inward at
+    speed 1/w and every wavefront vertex height equals its arrival time).
+    Indexed by edge id: edge i ends at contour point i, holes continue
+    the numbering. With weights, arc heights are already roof heights.
+
+    Degenerate inputs (exact ties from symmetric footprints -- stars,
+    apses, constant-thickness shapes) are retried on a deterministic
+    micro-jittered copy of the contour; the result approximates the true
+    skeleton far below the meshing tolerance.
+
+    Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
+    where source is the highest points, height is its height, and sinks are the point connected to the source.
+    """
+    if holes is None:
+        holes = []
+
+    subtrees, normalized = _run_slav(polygon, holes, zero_gradient, weights)
+    subtrees = _cleanup_subtrees(subtrees, normalized, weights)
+    problems = _skeleton_problems(subtrees, normalized)
+
+    attempts = 0
+    while problems and attempts < 3:
+        digest = hashlib.blake2b(
+            repr([(round(x, 9), round(y, 9)) for c in normalized for x, y in c]).encode(
+                "utf-8"
+            ),
+            digest_size=8,
+        ).hexdigest()
+        seed = "%s:%d" % (digest, attempts)
+        # -- jitter ladder: start far below the meshing tolerance and
+        #    escalate to break wider geometric ties
+        magnitude = (1e-6 * 100**attempts) * max(
+            1.0,
+            max((max(x for x, _ in c) - min(x for x, _ in c)) for c in normalized),
+        )
+        jittered = _jitter_contours(normalized, seed, magnitude)
+        re_subtrees, re_normalized = _run_slav(
+            jittered[0], jittered[1:], zero_gradient, weights
+        )
+        re_subtrees = _cleanup_subtrees(
+            re_subtrees, re_normalized, weights, ghost_filter=True
+        )
+        re_problems = _skeleton_problems(re_subtrees, re_normalized)
+        if not re_problems:
+            return _snap_to_base_points(re_subtrees, normalized)
+        if len(re_problems) < len(problems):
+            subtrees, problems = re_subtrees, re_problems
+        attempts += 1
+
+    return subtrees

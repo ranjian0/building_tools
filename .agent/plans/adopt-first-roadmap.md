@@ -413,6 +413,17 @@ count; offset at max height → degenerate empty (guard).
 
 ## Item 5: Skeleton robustness — bpypolyskel techniques (#149)
 
+**Status (partial, 2026-09):** structural fixes landed — 2-LAV collapse
+records both vertices' face pairs; self-arc cleanup; consistency checker
+(`_skeleton_problems`) + deterministic jitter-ladder retry with
+ghost-filtered retry outputs and base-point snapping. Adversarial corpus
+(stars/apses/H/40 randoms): roofs build 0/52 failures (regression-locked
+in `tests/test_roofs.py::TestAdversarialRoofs`); skeleton consistency
+22→13/54 failing. Remaining: tie-degenerate stars + no-event reflex
+chains still yield incomplete skeletons (offsets on those shapes return
+no rings — documented in `util_offsets`); needs true multi-edge event
+handling (kinetic triangulation class) as a follow-up.
+
 **Goal.** Fix the Felkel-algorithm failure classes behind #149 (hip roof
 failure on complex polygons).
 

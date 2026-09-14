@@ -322,5 +322,121 @@ class TestWeightedRoofs(unittest.TestCase):
         self.assertTrue(report["ok"], report["problems"])
 
 
+def _cw(pts):
+    area = (
+        sum(
+            pts[i][0] * pts[(i + 1) % len(pts)][1]
+            - pts[(i + 1) % len(pts)][0] * pts[i][1]
+            for i in range(len(pts))
+        )
+        / 2
+    )
+    return pts[::-1] if area > 0 else pts
+
+
+def _star(n, r1, r2):
+    pts = []
+    for i in range(n):
+        r = r1 if i % 2 == 0 else r2
+        a = 2 * math.pi * i / n
+        pts.append((r * math.cos(a), r * math.sin(a)))
+    return _cw(pts)
+
+
+def _apse(segs=16, r=2.0, w=10.0, h=8.0):
+    pts = [(-w / 2, -h / 2), (-w / 2, h / 2)]
+    for i in range(segs + 1):
+        a = math.pi / 2 - math.pi * i / segs
+        pts.append((w / 2, r * math.sin(a)))
+    pts.append((w / 2, -h / 2))
+    return _cw(pts)
+
+
+def _random_poly(seed, n=14):
+    import random as _random
+
+    rng = _random.Random(seed)
+    angles = sorted(rng.uniform(0, 2 * math.pi) for _ in range(n))
+    return _cw(
+        [
+            (rng.uniform(2, 8) * math.cos(a), rng.uniform(2, 8) * math.sin(a))
+            for a in angles
+        ]
+    )
+
+
+def _make_poly_footprint(pts):
+    """Bare upward-facing polygon footprint at z=0."""
+    me = bpy.data.meshes.new("adv")
+    obj = bpy.data.objects.new("adv", me)
+    bpy.context.scene.collection.objects.link(obj)
+    bm = bmesh.new()
+    vs = [bm.verts.new((x, y, 0.0)) for x, y in pts]
+    bm.faces.new(vs)
+    bm.normal_update()
+    bm.to_mesh(me)
+    bm.free()
+    return obj
+
+
+class TestAdversarialRoofs(unittest.TestCase):
+    """#149 class: complex footprints must build valid hip roofs.
+
+    The meshing path (boundary walks + vert snapping) is robust even where
+    the wavefront simulation is structurally incomplete (tie-degenerate
+    stars, apses, no-event reflex chains) -- these lock that guarantee."""
+
+    def setUp(self):
+        clean_scene()
+
+    CASES = [
+        ("star8", _star(8, 6.0, 2.5)),
+        ("star16", _star(16, 6.0, 2.5)),
+        ("star16deep", _star(16, 6.0, 1.2)),
+        ("apse16", _apse(16)),
+        ("apse8r1", _apse(8, 1.0)),
+        (
+            "hshape",
+            _cw(
+                [
+                    (0, 0),
+                    (0, 3),
+                    (2, 3),
+                    (2, 5),
+                    (0, 5),
+                    (0, 8),
+                    (5, 8),
+                    (5, 5),
+                    (3, 5),
+                    (3, 3),
+                    (5, 3),
+                    (5, 0),
+                ]
+            ),
+        ),
+        ("rand2", _random_poly(2)),
+        ("rand13", _random_poly(13)),
+    ]
+
+    def test_complex_footprints_build(self):
+        for name, pts in self.CASES:
+            with self.subTest(shape=name):
+                obj = _make_poly_footprint(pts)
+                res = apply_feature(
+                    "roof",
+                    RoofOptions(
+                        type="HIP",
+                        slope_mode="ANGLE",
+                        slope_angle=math.radians(40),
+                        add_ridge_cap=False,
+                    ),
+                    FaceTarget(obj, [0]),
+                )
+                self.assertTrue(res.ok, (name, res.errors[:1]))
+                report = validate_object(obj, include_geometry=False)
+                self.assertTrue(report["ok"], (name, report["problems"]))
+                self.assertGreaterEqual(len(group_faces(obj, "roof")), 4, name)
+
+
 if __name__ == "__main__":
     unittest.main()

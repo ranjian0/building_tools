@@ -44,10 +44,18 @@ class TestSkeletonize(unittest.TestCase):
         self.assertEqual(heights, {5.0})
 
     def test_hole(self):
+        # -- symmetric ring: the exact-tie degeneracy engages the jitter
+        #    retry, producing a structurally complete skeleton (every hole
+        #    and outline edge covered by some arc's faces, no ghost arcs
+        #    above the channel half-width)
         outer = [(0, 0), (0, 20), (20, 20), (20, 0)]
         hole = [(5, 5), (15, 5), (15, 15), (5, 15)]
         arcs = btools.utils.skeletonize(outer, [hole])
-        self.assertEqual(len(arcs), 2)
+        self.assertGreaterEqual(len(arcs), 2)
+        covered = {e for arc in arcs for f in arc.faces for e in f}
+        self.assertEqual(covered, set(range(8)))
+        for arc in arcs:
+            self.assertLessEqual(arc.height, 2.5 + 1e-3, arc.height)
 
     def test_deterministic(self):
         square = [(0, 0), (0, 10), (10, 10), (10, 0)]
