@@ -33,7 +33,7 @@
 ## scenario-multi-storey
 
 - status: `ok`
-- faces: 68 -- geometry_hash: `fac8c04268e4e906`
+- faces: 68 -- geometry_hash: `dbca02305e5d3601`
 
 ![scenario-multi-storey image.png](scenario-multi-storey/image.png)
 
@@ -110,14 +110,14 @@
 ## roof-gable-box
 
 - status: `ok`
-- faces: 70 -- geometry_hash: `d0ea30468f659b7a`
+- faces: 70 -- geometry_hash: `83a22ff8dc8022d8`
 
 ![roof-gable-box image.png](roof-gable-box/image.png)
 
 ## roof-hip
 
 - status: `ok`
-- faces: 68 -- geometry_hash: `6345fa66d1f48309`
+- faces: 68 -- geometry_hash: `2e473e4be715f81e`
 
 ![roof-hip image.png](roof-hip/image.png)
 
@@ -241,7 +241,7 @@
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `0d25f290eb4ad159`
+- faces: 775 -- geometry_hash: `cde276ea481afa43`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 
@@ -304,7 +304,7 @@
 ## preset-suburban-house
 
 - status: `ok`
-- faces: 313 -- geometry_hash: `663456fe2acd511c`
+- faces: 313 -- geometry_hash: `3f1e7aa16e15c13d`
 
 ![preset-suburban-house image.png](preset-suburban-house/image.png)
 
@@ -318,14 +318,14 @@
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 6884 -- geometry_hash: `b4fa6dd9b0c8e7b6`
+- faces: 6886 -- geometry_hash: `c93288fa41eb7a0c`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 455 -- geometry_hash: `371fa14e43a5c750`
+- faces: 455 -- geometry_hash: `53c5720fc9b4ee19`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 
@@ -353,6 +353,6 @@
 ## preset-office-block
 
 - status: `ok`
-- faces: 3762 -- geometry_hash: `8dfda32910c4e2cb`
+- faces: 3762 -- geometry_hash: `31db36880ce4fb83`
 
 ![preset-office-block image.png](preset-office-block/image.png)

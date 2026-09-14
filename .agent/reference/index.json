@@ -46,7 +46,7 @@
     },
     {
       "faces": 68,
-      "geometry_hash": "fac8c04268e4e906",
+      "geometry_hash": "dbca02305e5d3601",
       "id": "scenario-multi-storey",
       "images": [
         "image.png"
@@ -169,7 +169,7 @@
     },
     {
       "faces": 70,
-      "geometry_hash": "d0ea30468f659b7a",
+      "geometry_hash": "83a22ff8dc8022d8",
       "id": "roof-gable-box",
       "images": [
         "image.png"
@@ -180,7 +180,7 @@
     },
     {
       "faces": 68,
-      "geometry_hash": "6345fa66d1f48309",
+      "geometry_hash": "2e473e4be715f81e",
       "id": "roof-hip",
       "images": [
         "image.png"
@@ -389,7 +389,7 @@
     },
     {
       "faces": 775,
-      "geometry_hash": "0d25f290eb4ad159",
+      "geometry_hash": "cde276ea481afa43",
       "id": "balcony-inner-curved",
       "images": [
         "image.png"
@@ -490,7 +490,7 @@
     },
     {
       "faces": 313,
-      "geometry_hash": "663456fe2acd511c",
+      "geometry_hash": "3f1e7aa16e15c13d",
       "id": "preset-suburban-house",
       "images": [
         "image.png"
@@ -511,8 +511,8 @@
       "status": "ok"
     },
     {
-      "faces": 6884,
-      "geometry_hash": "b4fa6dd9b0c8e7b6",
+      "faces": 6886,
+      "geometry_hash": "c93288fa41eb7a0c",
       "id": "preset-apartment-block",
       "images": [
         "image.png"
@@ -523,7 +523,7 @@
     },
     {
       "faces": 455,
-      "geometry_hash": "371fa14e43a5c750",
+      "geometry_hash": "53c5720fc9b4ee19",
       "id": "preset-modern-villa",
       "images": [
         "image.png"
@@ -567,7 +567,7 @@
     },
     {
       "faces": 3762,
-      "geometry_hash": "8dfda32910c4e2cb",
+      "geometry_hash": "31db36880ce4fb83",
       "id": "preset-office-block",
       "images": [
         "image.png"

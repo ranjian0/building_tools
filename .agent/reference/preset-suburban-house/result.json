@@ -4,7 +4,7 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "663456fe2acd511c",
+  "geometry_hash": "3f1e7aa16e15c13d",
   "geometry_report": {
     "clean": false,
     "counts": {
@@ -86,7 +86,7 @@
     },
     "normals": {
       "consistent": false,
-      "flip_seams": 8
+      "flip_seams": 9
     },
     "object": "building_001",
     "ok": true,
