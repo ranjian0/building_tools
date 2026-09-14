@@ -24,6 +24,8 @@ try:
     import test_api_probe
     import test_floorplan
     import test_floors
+    import test_randomizer
+    import test_roofs
     import test_utils
     import test_utils_skeleton
 except Exception:
@@ -47,6 +49,8 @@ def main():
     # add tests to the test suite
     suite.addTests(loader.loadTestsFromModule(test_utils))
     suite.addTests(loader.loadTestsFromModule(test_utils_skeleton))
+    suite.addTests(loader.loadTestsFromModule(test_randomizer))
+    suite.addTests(loader.loadTestsFromModule(test_roofs))
     suite.addTests(loader.loadTestsFromModule(test_floors))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
     suite.addTests(loader.loadTestsFromModule(test_api_options))

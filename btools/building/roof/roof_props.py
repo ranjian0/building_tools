@@ -1,3 +1,5 @@
+import math
+
 import bpy
 from bpy.props import BoolProperty, EnumProperty, FloatProperty
 
@@ -9,6 +11,7 @@ class RoofProperty(bpy.types.PropertyGroup):
         ("FLAT", "Flat", "", 0),
         ("GABLE", "Gable", "", 1),
         ("HIP", "Hip", "", 2),
+        ("FLAT_TOP", "Flat Top", "", 3),
     ]
     type: EnumProperty(
         name="Roof Type",
@@ -91,6 +94,45 @@ class RoofProperty(bpy.types.PropertyGroup):
         description="Height of entire roof",
     )
 
+    slope_modes = [
+        ("HEIGHT", "Height", "", 0),
+        ("ANGLE", "Angle", "", 1),
+        ("PERCENTAGE", "Percentage", "", 2),
+    ]
+    slope_mode: EnumProperty(
+        name="Slope Mode",
+        items=slope_modes,
+        default="HEIGHT",
+        description="Drive the roof pitch by total height, slope angle, or percentage",
+    )
+
+    slope_angle: FloatProperty(
+        name="Slope Angle",
+        min=math.radians(5.0),
+        max=math.radians(75.0),
+        default=math.radians(35.0),
+        subtype="ANGLE",
+        description="Pitch angle of the roof planes",
+    )
+
+    slope_percentage: FloatProperty(
+        name="Slope",
+        min=5.0,
+        max=500.0,
+        default=70.0,
+        subtype="PERCENTAGE",
+        description="Pitch percentage of the roof planes (100% equals 45 degrees)",
+    )
+
+    flat_height: FloatProperty(
+        name="Flat Height",
+        min=get_scaled_unit(0.01),
+        max=get_scaled_unit(10.0),
+        default=get_scaled_unit(0.8),
+        unit="LENGTH",
+        description="Height of the flat top section (flat-top roof)",
+    )
+
     add_border: BoolProperty(
         name="Add Border",
         default=True,
@@ -126,10 +168,26 @@ class RoofProperty(bpy.types.PropertyGroup):
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
-            col.prop(self, "height")
+            self._draw_slope(col)
+
+        elif self.type == "FLAT_TOP":
+            col = box.column(align=True)
+            col.prop(self, "thickness")
+            col.prop(self, "outset")
+            self._draw_slope(col)
+            col.prop(self, "flat_height")
 
         else:
             col = box.column(align=True)
             col.prop(self, "thickness")
             col.prop(self, "outset")
+            self._draw_slope(col)
+
+    def _draw_slope(self, col):
+        col.prop(self, "slope_mode", text="Slope")
+        if self.slope_mode == "HEIGHT":
             col.prop(self, "height")
+        elif self.slope_mode == "ANGLE":
+            col.prop(self, "slope_angle")
+        else:
+            col.prop(self, "slope_percentage")

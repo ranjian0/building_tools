@@ -36,6 +36,9 @@ def create_roof(bm, faces, prop):
     elif prop.type == "HIP":
         add_material_group(MaterialGroup.ROOF_HANGS)
         create_hip_roof(bm, faces, prop)
+    elif prop.type == "FLAT_TOP":
+        add_material_group(MaterialGroup.ROOF_HANGS)
+        create_flat_top_roof(bm, faces, prop)
 
     # -- silhouette details
     if getattr(prop, "add_gutters", False):
@@ -92,6 +95,67 @@ def create_flat_roof(bm, faces, prop):
                 )
 
 
+def slope_to_height_scale(prop, max_arc_height):
+    """Uniform height multiplier (skeleton time -> Z) for the slope mode.
+
+    HEIGHT      -> tallest arc reaches prop.height (original behavior)
+    ANGLE       -> tan(slope_angle): every plane rises at the given pitch
+    PERCENTAGE  -> rise/run as a fraction (100% = 45 degrees)
+    """
+    if prop.slope_mode == "ANGLE":
+        return math.tan(prop.slope_angle)
+    if prop.slope_mode == "PERCENTAGE":
+        return prop.slope_percentage / 100.0
+    return prop.height / max_arc_height
+
+
+def _prepare_skeleton_base(bm, faces):
+    """Dissolve the base into one face and clean its outline.
+
+    Returns (faces, median, original_edges, points) with points in the
+    clockwise order the straight skeleton requires."""
+    if len(faces) > 1:
+        faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
+    face = faces[-1]
+    median = face.calc_center_median()
+
+    # -- remove verts that are between two parallel edges
+    dissolve_lone_verts(bm, face, list(face.edges))
+    original_edges = validate(face.edges)
+
+    # -- get verts in anti-clockwise order (required by straight skeleton)
+    verts = [v for v in sort_verts_by_loops(face)]
+    points = [v.co.to_tuple()[:2] for v in verts]
+    return faces, median, original_edges, points
+
+
+def build_skeleton_roof(bm, faces, prop, zero_gradient=False):
+    """Shared skeleton-roof pipeline (hip/gable and derived styles).
+
+    Lifts every skeleton arc by ``arc.height * scale`` where ``scale``
+    resolves from the slope mode (height / angle / percentage).
+
+    Returns (skeleton, original_edges, roof_faces, median) for the callers'
+    finishing passes."""
+    faces, median, original_edges, points = _prepare_skeleton_base(bm, faces)
+
+    # -- compute straight skeleton
+    skeleton = skeletonize(points, [], zero_gradient=zero_gradient)
+    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
+
+    max_height = max(arc.height for arc in skeleton)
+    scale = slope_to_height_scale(prop, max_height)
+
+    # -- create edges and vertices
+    skeleton_edges = create_skeleton_verts_and_edges(
+        bm, skeleton, original_edges, median, lambda arc: arc.height * scale
+    )
+
+    # -- create faces
+    roof_faces = create_skeleton_faces(bm, original_edges, skeleton_edges)
+    return skeleton, original_edges, roof_faces, median
+
+
 def create_gable_roof(bm, faces, prop):
     """Create gable roof"""
     # -- create initial outset for box gable roof
@@ -112,33 +176,7 @@ def create_gable_roof(bm, faces, prop):
         bmesh.ops.delete(bm, geom=faces, context="FACES")
         faces = filter_geom(ret, BMFace)
 
-    # -- dissolve if faces are many
-    if len(faces) > 1:
-        faces = bmesh.ops.dissolve_faces(bm, faces=faces, use_verts=True).get("region")
-    face = faces[-1]
-    median = face.calc_center_median()
-
-    # -- remove verts that are between two parallel edges
-    dissolve_lone_verts(bm, face, list(face.edges))
-    original_edges = validate(face.edges)
-
-    # -- get verts in anti-clockwise order (required by straight skeleton)
-    verts = [v for v in sort_verts_by_loops(face)]
-    points = [v.co.to_tuple()[:2] for v in verts]
-
-    # -- compute straight skeleton
-    skeleton = skeletonize(points, [], zero_gradient=True)
-    bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
-
-    height_scale = prop.height / max([arc.height for arc in skeleton])
-
-    # -- create edges and vertices
-    skeleton_edges = create_skeleton_verts_and_edges(
-        bm, skeleton, original_edges, median, height_scale
-    )
-
-    # -- create faces
-    roof_faces = create_skeleton_faces(bm, original_edges, skeleton_edges)
+    _, _, roof_faces, _ = build_skeleton_roof(bm, faces, prop, zero_gradient=True)
     if prop.gable_type == "OPEN":
         gable_process_open(bm, roof_faces, prop)
     elif prop.gable_type == "BOX":
@@ -150,30 +188,184 @@ def create_hip_roof(bm, faces, prop):
     # -- create base for hip roof
     roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
     faces = roof_hang(bm, faces, prop.thickness, prop.outset)
-    face = faces[-1]
-    median = face.calc_center_median()
+    build_skeleton_roof(bm, faces, prop)
 
-    # -- remove verts that are between two parallel edges
-    dissolve_lone_verts(bm, face, list(face.edges))
-    original_edges = validate(face.edges)
 
-    # -- get verts in anti-clockwise order
-    verts = [v for v in sort_verts_by_loops(face)]
-    points = [v.co.to_tuple()[:2] for v in verts]
+def _pt_key(p):
+    return (round(p.x, 6), round(p.y, 6))
+
+
+def _truncate_skeleton(skeleton, base_points, cap_t, scale):
+    """Cut a straight skeleton at time ``cap_t`` (flat-top roofs).
+
+    Arcs above the cut are dropped; arcs crossing it are shortened to their
+    level-set crossing point. Returns (segments, heights, rings):
+
+    - segments: [(Vector2, Vector2)] surviving edges
+    - heights: {pt_key: absolute Z} for every kept point and crossing
+    - rings: [[Vector2]] closed cap rings (crossings around each
+      above-cut component, ordered around their centroid)
+    """
+    # -- outline points sit at the base (height 0); Subtree.height is the
+    #    SOURCE's height, so sinks on the outline must not inherit it
+    base = {(round(x, 6), round(y, 6)) for x, y in base_points}
+    sink_h = {}
+    for arc in skeleton:
+        for s in arc.sinks:
+            k = _pt_key(s)
+            if k in base:
+                sink_h[k] = 0.0
+            else:
+                sink_h[k] = min(sink_h.get(k, math.inf), arc.height)
+    source_h = {_pt_key(arc.source): arc.height for arc in skeleton}
+
+    high = set()
+    for arc in skeleton:
+        if arc.height > cap_t:
+            high.add(_pt_key(arc.source))
+        for s in arc.sinks:
+            if sink_h[_pt_key(s)] > cap_t:
+                high.add(_pt_key(s))
+
+    # -- connected components of the above-cut point graph
+    adj = {k: set() for k in high}
+    for arc in skeleton:
+        ks = _pt_key(arc.source)
+        for s in arc.sinks:
+            ksnk = _pt_key(s)
+            if ks in high and ksnk in high:
+                adj[ks].add(ksnk)
+                adj[ksnk].add(ks)
+    comp_of, comps = {}, []
+    for k in high:
+        if k in comp_of:
+            continue
+        cid = len(comps)
+        comps.append([])
+        stack = [k]
+        comp_of[k] = cid
+        while stack:
+            u = stack.pop()
+            comps[cid].append(u)
+            for w in adj[u]:
+                if w not in comp_of:
+                    comp_of[w] = cid
+                    stack.append(w)
+
+    def crossing(src, snk, t_src, t_snk):
+        f = (cap_t - t_snk) / (t_src - t_snk)
+        return snk + (src - snk) * f
+
+    segments = []
+    heights = {}
+    ring_pts = [[] for _ in comps]
+    cap_z = cap_t * scale
+
+    for arc in skeleton:
+        t_src = source_h[_pt_key(arc.source)]
+        for s in arc.sinks:
+            t_snk = sink_h[_pt_key(s)]
+            if t_src > cap_t and t_snk > cap_t:
+                continue  # fully above the cut
+            if t_src <= cap_t and t_snk <= cap_t:
+                segments.append((arc.source, s))
+                heights.setdefault(_pt_key(arc.source), t_src * scale)
+                heights.setdefault(_pt_key(s), t_snk * scale)
+            elif t_src > cap_t:
+                c = crossing(arc.source, s, t_src, t_snk)
+                segments.append((c, s))
+                heights.setdefault(_pt_key(s), t_snk * scale)
+                heights.setdefault(_pt_key(c), cap_z)
+                ring_pts[comp_of[_pt_key(arc.source)]].append(c)
+            else:
+                c = crossing(arc.source, s, t_src, t_snk)
+                segments.append((arc.source, c))
+                heights.setdefault(_pt_key(arc.source), t_src * scale)
+                heights.setdefault(_pt_key(c), cap_z)
+                ring_pts[comp_of[_pt_key(s)]].append(c)
+
+    rings = []
+    for pts in ring_pts:
+        if len(pts) < 3:
+            continue
+        cx = sum(p.x for p in pts) / len(pts)
+        cy = sum(p.y for p in pts) / len(pts)
+        pts.sort(key=lambda p: math.atan2(p.y - cy, p.x - cx))
+        rings.append(pts)
+    return segments, heights, rings
+
+
+def _build_truncated_skeleton_mesh(
+    bm, segments, rings, heights, original_edges, median
+):
+    """Mesh a truncated skeleton: segments + cap rings.
+
+    Returns (skeleton_edges, ring_verts) with ring edges included in the
+    edge graph so the boundary walk in create_skeleton_faces closes the
+    slope faces against the cap ring."""
+    skeleton_edges = []
+    skeleton_verts = []
+    O_verts = list({v for e in original_edges for v in e.verts})
+
+    def vert_for(p):
+        v = vert_at_loc(p, O_verts + skeleton_verts)
+        if not v:
+            z = heights[_pt_key(p)]
+            v = make_vert(bm, Vector((p.x, p.y, median.z + z)))
+            skeleton_verts.append(v)
+        return v
+
+    for p1, p2 in segments:
+        v1, v2 = vert_for(p1), vert_for(p2)
+        if v1 == v2:
+            continue
+        geom = bmesh.ops.contextual_create(bm, geom=[v1, v2]).get("edges")
+        skeleton_edges.extend(geom)
+
+    ring_verts = []
+    for ring in rings:
+        rvs = [vert_for(p) for p in ring]
+        for i in range(len(rvs)):
+            skeleton_edges.append(bm.edges.new((rvs[i], rvs[(i + 1) % len(rvs)])))
+        ring_verts.append(rvs)
+
+    skeleton_edges = validate(skeleton_edges)
+    S_verts = list({v for e in skeleton_edges for v in e.verts} - set(O_verts))
+    return join_intersections_and_get_skeleton_edges(
+        bm, S_verts, skeleton_edges
+    ), ring_verts
+
+
+def create_flat_top_roof(bm, faces, prop):
+    """Create a flat-top (truncated hip) roof"""
+    # -- create base for the roof
+    roof_hang = map_new_faces(MaterialGroup.ROOF_HANGS)(extrude_and_outset)
+    faces = roof_hang(bm, faces, prop.thickness, prop.outset)
+
+    faces, median, original_edges, points = _prepare_skeleton_base(bm, faces)
 
     # -- compute straight skeleton
     skeleton = skeletonize(points, [])
     bmesh.ops.delete(bm, geom=faces, context="FACES_ONLY")
 
-    height_scale = prop.height / max([arc.height for arc in skeleton])
+    max_height = max(arc.height for arc in skeleton)
+    scale = slope_to_height_scale(prop, max_height)
+    cap = min(prop.flat_height, max_height * scale)
 
-    # -- create edges and vertices
-    skeleton_edges = create_skeleton_verts_and_edges(
-        bm, skeleton, original_edges, median, height_scale
+    segments, heights, rings = _truncate_skeleton(skeleton, points, cap / scale, scale)
+    skeleton_edges, ring_verts = _build_truncated_skeleton_mesh(
+        bm, segments, rings, heights, original_edges, median
     )
+    roof_faces = create_skeleton_faces(bm, original_edges, skeleton_edges)
 
-    # -- create faces
-    create_skeleton_faces(bm, original_edges, skeleton_edges)
+    # -- cap faces over the truncation rings
+    for rvs in ring_verts:
+        rvs = validate(rvs)
+        if len(rvs) >= 3:
+            f = bm.faces.new(rvs)
+            if f is not None:
+                add_faces_to_group(bm, [f], MaterialGroup.ROOF)
+    return roof_faces
 
 
 def sort_verts_by_loops(face):
@@ -206,8 +398,11 @@ def vert_at_loc(loc, verts, loc_z=None):
     return None
 
 
-def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height_scale):
-    """Create the vertices and edges from output of straight skeleton"""
+def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height_fn):
+    """Create the vertices and edges from output of straight skeleton.
+
+    height_fn(arc) gives the absolute Z lift for an arc's source point;
+    sink points take the minimum over the arcs that contain them."""
     skeleton_edges = []
     skeleton_verts = []
     O_verts = list({v for e in original_edges for v in e.verts})
@@ -215,16 +410,15 @@ def create_skeleton_verts_and_edges(bm, skeleton, original_edges, median, height
         source = arc.source
         vsource = vert_at_loc(source, O_verts + skeleton_verts)
         if not vsource:
-            source_height = [arc.height for arc in skeleton if arc.source == source]
-            ht = source_height.pop() * height_scale
+            source_height = [height_fn(a) for a in skeleton if a.source == source]
+            ht = source_height.pop()
             vsource = make_vert(bm, Vector((source.x, source.y, median.z + ht)))
             skeleton_verts.append(vsource)
 
         for sink in arc.sinks:
             vs = vert_at_loc(sink, O_verts + skeleton_verts)
             if not vs:
-                sink_height = min([arc.height for arc in skeleton if sink in arc.sinks])
-                ht = height_scale * sink_height
+                ht = min(height_fn(a) for a in skeleton if sink in a.sinks)
                 vs = make_vert(bm, Vector((sink.x, sink.y, median.z + ht)))
             skeleton_verts.append(vs)
 
