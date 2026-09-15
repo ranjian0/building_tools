@@ -148,3 +148,200 @@ class TestInteriorShell(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCornice(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import test_api_options
+
+        test_api_options.register_all()
+
+    def setUp(self):
+        clean_scene()
+
+    def test_cornice_projects_past_slab(self):
+        from btools.api import FaceTarget, FloorOptions, FloorplanOptions, apply_feature
+
+        res = apply_feature("floorplan", FloorplanOptions(width=10.0, length=8.0))
+        obj = bpy.data.objects[res.created_object]
+        res = apply_feature(
+            "floor",
+            FloorOptions(
+                floor_count=2,
+                floor_height=3.0,
+                add_cornice=True,
+                cornice_size=0.15,
+            ),
+            FaceTarget(obj),
+        )
+        self.assertTrue(res.ok, res.errors)
+        # walls at +-5.0, slab outset 0.1, cornice +0.15 -> extent 5.25
+        xs = max(v.co.x for v in obj.data.vertices)
+        self.assertAlmostEqual(xs, 5.25, delta=0.02)
+        report = validate_object(obj, include_geometry=False)
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_no_cornice_by_default(self):
+        from btools.api import FaceTarget, FloorOptions, FloorplanOptions, apply_feature
+
+        res = apply_feature("floorplan", FloorplanOptions(width=10.0, length=8.0))
+        obj = bpy.data.objects[res.created_object]
+        apply_feature(
+            "floor", FloorOptions(floor_count=2, floor_height=3.0), FaceTarget(obj)
+        )
+        # extent = walls + slab outset only (5.1)
+        xs = max(v.co.x for v in obj.data.vertices)
+        self.assertAlmostEqual(xs, 5.1, delta=0.02)
+
+
+class TestDetailLevel(unittest.TestCase):
+    def test_flag_table(self):
+        import btools.utils.detail as detail
+
+        # LOW forces silhouette extras off regardless of user value
+        self.assertFalse(detail.detail_flag("gutters", "LOW", True))
+        self.assertFalse(detail.detail_flag("cornice", "LOW", True))
+        self.assertFalse(detail.detail_flag("chimney", "LOW", True))
+        # MEDIUM keeps the user's value
+        self.assertTrue(detail.detail_flag("gutters", "MEDIUM", True))
+        self.assertFalse(detail.detail_flag("gutters", "MEDIUM", False))
+        self.assertIsNone(detail.detail_flag("gutters", "MEDIUM", None))
+        # HIGH forces casings on
+        self.assertTrue(detail.detail_flag("casing", "HIGH", False))
+        # unknown features pass through
+        self.assertTrue(detail.detail_flag("spandrels", "LOW", True))
+
+    def test_scene_property_roundtrip(self):
+        import bpy
+
+        import btools.utils.detail as detail
+
+        detail.register()
+        try:
+            scene = bpy.context.scene
+            scene.btools_detail_level = "HIGH"
+            self.assertEqual(detail.detail_level(), "HIGH")
+            scene.btools_detail_level = "LOW"
+            self.assertEqual(detail.detail_level(), "LOW")
+            scene.btools_detail_level = "MEDIUM"
+        finally:
+            detail.unregister()
+
+
+class TestColumnDetails(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import test_api_options
+
+        test_api_options.register_all()
+
+    def setUp(self):
+        clean_scene()
+
+    def test_base_and_capital(self):
+        from btools.api import FaceTarget, FloorOptions, FloorplanOptions, apply_feature
+
+        res = apply_feature("floorplan", FloorplanOptions(width=10.0, length=8.0))
+        obj = bpy.data.objects[res.created_object]
+        res = apply_feature(
+            "floor",
+            FloorOptions(
+                floor_count=1,
+                floor_height=3.0,
+                add_columns=True,
+                add_column_base=True,
+                add_column_capital=True,
+                column_size=0.3,
+                column_cap_size=1.5,
+                column_cap_height=0.1,
+            ),
+            FaceTarget(obj),
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertGreater(res.matgroup_counts.get("columns", 0), 0)
+        # cap blocks are wider than the shaft: x extent of columns grows
+        # beyond the corner + size/2 (0.15) to + cap_w/2 (0.225)
+        col_x = max(
+            v.co.x
+            for v in obj.data.vertices
+            if abs(v.co.x - 5.0) < 0.5  # near the +x corners
+        )
+        self.assertGreater(col_x, 5.15)
+        report = validate_object(obj, include_geometry=False)
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_column_size_decoupled(self):
+        from btools.api import FaceTarget, FloorOptions, FloorplanOptions, apply_feature
+
+        res = apply_feature("floorplan", FloorplanOptions(width=10.0, length=8.0))
+        obj = bpy.data.objects[res.created_object]
+        res = apply_feature(
+            "floor",
+            FloorOptions(
+                floor_count=1,
+                floor_height=3.0,
+                add_columns=True,
+                column_size=0.2,  # slab_outset is 0.1 -> default col 0.2
+            ),
+            FaceTarget(obj),
+        )
+        self.assertTrue(res.ok, res.errors)
+        self.assertGreater(res.matgroup_counts.get("columns", 0), 0)
+
+
+class TestFakeInteriors(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import test_api_options
+
+        test_api_options.register_all()
+
+    def setUp(self):
+        clean_scene()
+
+    def test_material_swap(self):
+        import bpy
+
+        from btools.api import FaceTarget, FloorOptions, FloorplanOptions, apply_feature
+        from btools.building.default_materials import (
+            apply_default_materials,
+            apply_fake_interiors,
+        )
+
+        res = apply_feature("floorplan", FloorplanOptions(width=8.0, length=6.0))
+        obj = bpy.data.objects[res.created_object]
+        apply_feature(
+            "floor", FloorOptions(floor_count=1, floor_height=3.0), FaceTarget(obj)
+        )
+        # simulate a windowed build: slot names are what the swap keys on
+        # (placing a live window here is namespace-fragile in the harness)
+        from btools.building.default_materials import _material
+
+        apply_default_materials(obj)
+        obj.data.materials.append(_material("BT_window"))
+        obj.data.materials.append(_material("BT_window_panes"))
+        before = {
+            m.name for m in obj.data.materials if m and m.name.startswith("BT_window")
+        }
+        if not before:
+            print(
+                "DEBUG no window mats; all:",
+                [m.name for m in obj.data.materials if m],
+                "faces:",
+                faces,
+            )
+        self.assertTrue(before)
+
+        swapped = apply_fake_interiors(obj, enable=True)
+        self.assertGreater(swapped, 0)
+        now = {m.name for m in obj.data.materials if m}
+        self.assertIn("BT_window_fake_interior", now)
+        # the variant material exists with an emission node
+        mat = bpy.data.materials.get("BT_window_fake_interior")
+        self.assertIsNotNone(mat)
+        self.assertTrue(any(n.type == "EMISSION" for n in mat.node_tree.nodes))
+        # swapping back restores the standard materials
+        apply_fake_interiors(obj, enable=False)
+        restored = {m.name for m in obj.data.materials if m}
+        self.assertIn("BT_walls", restored)

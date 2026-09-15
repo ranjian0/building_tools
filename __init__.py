@@ -150,6 +150,7 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.prop(context.scene, "btools_detail_level", text="")
 
         # Draw Operators
         # ``````````````
@@ -167,6 +168,7 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         layout.separator(factor=1)
         col = layout.column(align=True)
         col.operator("btools.batch_generate")
+        col.operator("btools.export_building")
 
         col = layout.column(align=True)
         row = col.row(align=True)
@@ -273,6 +275,8 @@ def register():
 
     register_building()
     register_ui()
+    from .btools.utils import detail
+    detail.register()
     bpy.types.Scene.btools_preset = PointerProperty(type=BTOOLS_PresetSettings)
 
 
@@ -284,6 +288,8 @@ def unregister():
         pass # XXX script_watcher dev environment
 
     del bpy.types.Scene.btools_preset
+    from .btools.utils import detail
+    detail.unregister()
     unregister_building()
     unregister_ui()
 

@@ -63,10 +63,11 @@ and production export — for both archviz renders and game-engine workflows.
 - [x] casing option (add_casing): trim ring proud of the wall (60mm wide,
       15mm proud) around door/window; coplanar wall-strip extrusion
       (recessed opening face excluded)
-- [ ] frame edge bevels — BLOCKED: `bmesh.ops.bevel` rebuilds every face
-      incident to beveled edges' verts, invalidating the opening-face
-      reference the fill step needs. Props/options exist (add_bevel,
-      default False); needs a bevel-after-fill + re-tag design.
+- [x] frame edge bevels — DONE (bevel-after-fill design): bevel runs
+      AFTER fill_face so the opening-face reference is never needed;
+      `bevel_frame_edges` (util_mesh) re-tags rebuilt faces by dominant
+      region group; `_opening_region` (window/door types) collects the
+      fill fragments + frame ring via shared edges.
 - [x] mullion joinery: vertical bars pass through horizontals (full-depth
       bars, 15mm z-fudge removed)
 - [x] door hardware (add_hardware): rose + lever on the leaf, positioned
@@ -87,11 +88,17 @@ and production export — for both archviz renders and game-engine workflows.
       wall base): edges chained into side runs, oriented outward, hung
       below the eave, gated to eave sides only (gable ends skipped);
       chimney rewritten to sit on the largest slope face
-- [ ] cornice/string-course option on floor slabs (add_cornice, per slab line)
-- [ ] column base + capital options; decoration decoupled from slab_outset
+- [x] cornice/string-course on floor slabs (add_cornice + cornice_size;
+      stepped molding swept along each slab ring rim via
+      sweep_profile_along_edges, axis-bucketed runs oriented outward;
+      tagged SLABS; gated off at detail level LOW)
+- [x] column base + capital options (add_column_base/add_column_capital
+      + column_cap_size/height on plain columns; column_size decouples
+      the shaft from slab_outset)
 - [x] chimney (#183): masonry stack + cap + flue pot (prop add_chimney)
 - [ ] dormers — DEFERRED (roof-intersection complexity; follow-up)
-- [ ] tests + corpus + commit
+- [x] tests + corpus + commit (cornice/column/bevel/fake-interior tests
+      in test_interiors.py + test_api.py)
 
 ### Phase 5 — Presets & production workflow — PARTIAL
 - [x] geometry validation layer for agents: probe API (measurements,
@@ -117,21 +124,47 @@ and production export — for both archviz renders and game-engine workflows.
       create_multigroup_frame (add_hardware prop, default True);
       add_hardware refactored to take frame_thickness/handle_height/
       handle_style directly (usable without DoorProperty)
-- [ ] Detail level (Low/Medium/High) — scene setting + api param; gates
-      bevels/hardware/gutters/cornices/chimney/glass thickness
 - [x] preset opt-ins: gutters on suburban/townhouse/mediterranean/
       warehouse; chimney on suburban (flat-roof presets keep parapets)
-- [ ] remaining re-tune: cornices on apartment/office (needs cornice
-      feature), shopfront glass on corner shop
-- [ ] fake interiors: window material variant with emissive procedural
-      interior (curtain/room mix) for night renders (toggle)
-- [ ] export operator: glTF (.glb) + FBX of the active building; applied
-      transforms; semantic material slot names from matgroups
+- [x] Detail level (Low/Medium/High) — Scene.btools_detail_level +
+      btools/utils/detail.py flag table; LOW forces silhouette extras
+      (gutters/chimney/ridge_cap/cornice) off, HIGH forces casings on;
+      wired into create_roof, add_cornice, create_door, create_window
+- [ ] cornices on apartment/office presets (feature exists; preset
+      opt-in remains)
+- [x] shopfront glass on corner shop (glass_fill_window panes on the
+      ground multigroup)
+- [x] fake interiors: BT_window_fake_interior material (emissive
+      curtain/room glow behind semi-transparent glass, camera-ray mixed)
+      + apply_fake_interiors(obj, enable) slot swap; the cheap
+      night-render fallback next to the real wall_thickness interiors
+- [x] export operator: BTOOLS_OT_export_building (glb/fbx, file dialog,
+      applied transforms via a temp duplicate so the scene object is
+      untouched, semantic BT_<group> slots from the matgroup layer);
+      btools/building/export/ + api helpers export_object /
+      prepare_export_object / semantic_slot_names
 - [ ] tests + corpus + docs (README feature list) + commit
 
 ## Deferred / follow-ups
-- Wall thickness (single-sided extrusion is structural; high effort)
+- ~~Wall thickness~~ — DONE via the adopt-first roadmap item 7
+  (`wall_thickness` on floors: double-shell inner skin + per-storey
+  floors; interiors partitions feature with treemap rooms + skeleton
+  core ring; see adopt-first-roadmap.md)
 - Dormers (roof intersections)
 - Mitred gutter corners (v1 gutters join with elbows)
 - LOD generation
 - True arches on multigroup (multigroup_arch_broken)
+
+## Remaining work order (2026-09 review)
+
+Ranked by value/effort; implement in this order:
+1. **Export operator** (glTF/FBX) — production-workflow capstone;
+   matgroups -> semantic material slots is nearly free
+2. **Cornice feature** (`add_cornice`) — slab-line sweep reusing the
+   gutter/ridge-cap machinery; unblocks the apartment/office re-tune
+3. **Detail level (Low/Med/High)** — cross-cutting gate; lands after
+   cornice so it has something to gate
+4. **Frame bevels** — bevel-after-fill + re-tag design (unblocks the
+   existing add_bevel props)
+5. Polish: column base/capital, shopfront glass on corner shop,
+   fake-interiors emissive material

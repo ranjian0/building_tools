@@ -35,6 +35,10 @@ from ..materialgroup import (
 
 
 def create_door(bm, faces, prop):
+    from ...utils import detail
+
+    if detail.detail_flag("casing", detail.detail_level(), None):
+        prop.add_casing = True
     """Create door from face selection"""
     # -- source wall planes, for the wall-strip restore pass at the end
     planes = [(f.calc_center_median().copy(), f.normal.copy()) for f in faces]
@@ -58,6 +62,12 @@ def create_door(bm, faces, prop):
             create_door_fill(bm, door, prop)
             if prop.add_arch:
                 fill_arch(bm, arch, prop)
+            if getattr(prop, "add_bevel", False):
+                # -- after the fill: preserves the fill's face reference
+                from ...utils import bevel_frame_edges
+                from .door_types import _opening_region as _region
+
+                bevel_frame_edges(bm, _region(bm, door), prop.bevel_width)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
     nulfaces = find_faces_without_matgroup(bm)
@@ -178,6 +188,17 @@ def add_door_depth(bm, door, depth, normal):
         return door_faces[0], frame_faces
     else:
         return door, []
+
+
+def _opening_region(bm, opening_face):
+    """Faces of one opening region: the opening (fill) face plus every
+    edge-linked face (fill fragments + frame ring)."""
+    region = [opening_face]
+    for e in opening_face.edges:
+        for f in e.link_faces:
+            if f.is_valid and f not in region:
+                region.append(f)
+    return region
 
 
 def create_door_fill(bm, face, prop):

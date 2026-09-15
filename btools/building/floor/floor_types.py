@@ -16,6 +16,7 @@ from ...utils import (
     is_parallel,
     offset_polygons,
     skeletonize,
+    sweep_profile_along_edges,
     vec_equal,
 )
 from ..materialgroup import MaterialGroup, add_faces_to_group
@@ -30,6 +31,99 @@ def create_floors(bm, faces, prop):
     add_faces_to_group(bm, slabs, MaterialGroup.SLABS)
     add_faces_to_group(bm, walls, MaterialGroup.WALLS)
     add_faces_to_group(bm, roof, MaterialGroup.ROOF)
+
+    add_cornice(bm, prop)
+
+
+def add_cornice(bm, prop):
+    """String-course cornice band along every slab line (production-detail
+    phase 4).
+
+    A stepped molding profile is swept along the slab ring's top rim
+    (already at the slab outset), projecting ``cornice_size`` further
+    out and hanging below the seam. Runs are chained per building side
+    (axis-aligned v1, like the gutter machinery) and oriented outward.
+    Faces are tagged SLABS so they follow the concrete material slot.
+    """
+    if not getattr(prop, "add_cornice", False):
+        return
+    if not prop.add_slab:
+        return  # cornices live on slab lines
+
+    from ...utils import detail
+
+    if not detail.detail_flag("cornice", detail.detail_level(), True):
+        return
+
+    layer = bm.faces.layers.int.get(".bt_material_group_index")
+    if layer is None:
+        return
+    names = _matgroup_names()
+    if "slabs" not in names:
+        return
+    slab_idx = names.index("slabs")
+
+    size = prop.cornice_size
+    step = prop.slab_thickness + prop.floor_height
+    seam_z = lambda k: k * step + prop.slab_thickness
+
+    center = calc_verts_median([v for f in bm.faces for v in f.verts])
+    profile = [
+        (0.0, 0.0),
+        (size, 0.0),
+        (size, -size * 0.45),
+        (size * 0.55, -size * 0.45),
+        (size * 0.55, -size * 0.7),
+        (0.0, -size * 0.7),
+    ]
+
+    for k in range(1, prop.floor_count + 1):
+        z = seam_z(k - 1) + prop.floor_height  # top of the k-th wall band
+        rim = [
+            e
+            for e in bm.edges
+            if abs(e.verts[0].co.z - z) < 1e-3
+            and abs(e.verts[1].co.z - z) < 1e-3
+            and any(f[layer] == slab_idx for f in e.link_faces)
+        ]
+        for run in _chain_axis_runs(rim).values():
+            if len(run) < 1:
+                continue
+            mid = (run[0].verts[0].co + run[0].verts[1].co) / 2
+            outward = mid - Vector((center.x, center.y, 0.0))
+            run_dir = run[-1].verts[1].co - run[0].verts[0].co
+            side = run_dir.cross(Vector((0.0, 0.0, 1.0)))
+            flip = side.dot(outward) < 0
+            faces = sweep_profile_along_edges(
+                bm, run, profile, close_caps=True, side_flip=flip
+            )
+            add_faces_to_group(bm, faces, MaterialGroup.SLABS)
+
+
+def _chain_axis_runs(edges, tol=0.05):
+    """Bucket axis-aligned horizontal edges into straight runs per side
+    (same bucketing idea as the roof gutter machinery)."""
+    runs = {}
+    for e in edges:
+        d = e.verts[1].co - e.verts[0].co
+        if abs(d.x) > 2 * abs(d.y):
+            key = ("x", round(e.verts[0].co.y / tol))
+        elif abs(d.y) > 2 * abs(d.x):
+            key = ("y", round(e.verts[0].co.x / tol))
+        else:
+            continue
+        runs.setdefault(key, []).append(e)
+    for key, group in runs.items():
+        axis_i = 0 if key[0] == "x" else 1
+        group.sort(key=lambda e: min(e.verts[0].co[axis_i], e.verts[1].co[axis_i]))
+    return runs
+
+
+def _matgroup_names():
+    import bpy
+
+    obj = bpy.context.object
+    return [mt.name for mt in getattr(obj, "bt_materials", [])]
 
 
 def add_interior_shell(bm, prop):
@@ -226,7 +320,6 @@ def create_columns(bm, face, prop):
     decoration_nb = prop.decoration_nb
 
     col_w = 2 * prop.slab_outset
-    pos_h = prop.floor_height / 2 + (prop.slab_thickness if prop.add_slab else 0)
 
     center = calc_verts_median(face.verts)
     ref_vectors = []
@@ -252,17 +345,48 @@ def create_columns(bm, face, prop):
         # loop for each floor
         for i in range(prop.floor_count):
             if not prop.add_decoration:
+                col_w_i = col_w
+                size = getattr(prop, "column_size", 0.0)
+                if size and size > 0.0:
+                    col_w_i = size  # decoupled from slab_outset
+                z_base = (
+                    v.co.z
+                    + (prop.slab_thickness if prop.add_slab else 0.0) * (i + 1)
+                    + i * prop.floor_height
+                )
+                shaft_h = prop.floor_height
+                cap_h = 0.0
+                if getattr(prop, "add_column_base", False) or getattr(
+                    prop, "add_column_capital", False
+                ):
+                    cap_h = prop.column_cap_height
+                    shaft_h = prop.floor_height - 2 * cap_h
+
                 cube = create_cube_without_faces(
                     bm,
-                    (col_w, col_w, prop.floor_height),
-                    (
-                        v.co.x,
-                        v.co.y,
-                        v.co.z + (pos_h * (i + 1)) + ((prop.floor_height / 2) * i),
-                    ),
+                    (col_w_i, col_w_i, shaft_h),
+                    (v.co.x, v.co.y, z_base + shaft_h / 2),
                     bottom=True,
                 )
                 res.extend(cube.get("verts"))
+
+                cap_w = col_w_i * prop.column_cap_size
+                if getattr(prop, "add_column_base", False):
+                    base = create_cube_without_faces(
+                        bm,
+                        (cap_w, cap_w, cap_h),
+                        (v.co.x, v.co.y, z_base + cap_h / 2),
+                        bottom=True,
+                    )
+                    res.extend(base.get("verts"))
+                if getattr(prop, "add_column_capital", False):
+                    cap = create_cube_without_faces(
+                        bm,
+                        (cap_w, cap_w, cap_h),
+                        (v.co.x, v.co.y, z_base + shaft_h + cap_h + cap_h / 2),
+                        bottom=True,
+                    )
+                    res.extend(cap.get("verts"))
             else:
                 first_plane = create_plane(
                     bm,

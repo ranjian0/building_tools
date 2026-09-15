@@ -27,6 +27,16 @@ from ..materialgroup import (
 
 def create_roof(bm, faces, prop):
     """Create roof types"""
+    from ...utils import detail
+
+    level = detail.detail_level()
+    if not detail.detail_flag("ridge_cap", level, True):
+        prop.add_ridge_cap = False
+    if not detail.detail_flag("chimney", level, True):
+        prop.add_chimney = False
+    if not detail.detail_flag("gutters", level, True):
+        prop.add_gutters = False
+
     select(faces, False)
     if prop.type == "FLAT":
         create_flat_roof(bm, faces, prop)

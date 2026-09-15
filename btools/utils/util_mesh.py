@@ -601,3 +601,61 @@ def sweep_profile_along_edges(bm, edges, profile, close_caps=True, side_flip=Fal
 
     recalc_face_normals_component(bm, faces)
     return faces
+
+
+def bevel_frame_edges(bm, region_faces, width, segments=1):
+    """Bevel the opening edges of a frame region, preserving matgroup tags.
+
+    The production-detail blocker was that bevel-before-fill destroys the
+    opening-face reference; running it AFTER the fill is placed removes
+    that dependency -- but bevel rebuilds faces incident to the beveled
+    edges' verts (including fill faces). Rebuilt faces are re-tagged by
+    inheritance: coplanar neighbors pass their group through, everything
+    else becomes the frame group of ``region_faces``.
+
+    region_faces: faces of one opening region (frame + fill), used to
+    find the frame/fill boundary edges and the fallback group.
+    """
+    layer = bm.faces.layers.int.get(".bt_material_group_index")
+    if layer is None or not region_faces or width <= 0.0:
+        return []
+
+    groups = {f[layer] for f in region_faces if f.is_valid}
+    groups.discard(-1)
+    if not groups:
+        return []
+    from collections import Counter
+
+    fallback = Counter(f[layer] for f in region_faces if f.is_valid).most_common(1)[0][
+        0
+    ]
+
+    region = {f for f in region_faces if f.is_valid}
+    # -- boundary edges: link exactly two region faces with DIFFERENT
+    #    groups (frame <-> fill seams), non-vertical-in-plane seams only
+    boundary = []
+    for f in region:
+        for e in f.edges:
+            linked = [nf for nf in e.link_faces if nf in region]
+            if len(linked) == 2 and linked[0][layer] != linked[1][layer]:
+                if e not in boundary:
+                    boundary.append(e)
+    if not boundary:
+        return []
+
+    res = bmesh.ops.bevel(
+        bm,
+        geom=list(boundary),
+        offset=width,
+        offset_type="OFFSET",
+        segments=segments,
+        profile=0.5,
+        affect="EDGES",
+        clamp_overlap=True,
+    )
+    from bmesh.types import BMFace
+
+    new_faces = [f for f in res.get("faces", []) if isinstance(f, BMFace)]
+    for f in new_faces:
+        f[layer] = fallback
+    return new_faces

@@ -391,3 +391,52 @@ class TestPresets(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestFrameBevels(unittest.TestCase):
+    """add_bevel: bevel-after-fill keeps the matgroup contract."""
+
+    def setUp(self):
+        clean_scene()
+
+    def test_window_bevel(self):
+        obj = make_wall()
+        before = apply_feature(
+            "window",
+            WindowOptions(
+                size_offset=SizeOffsetOptions(size=(2.0, 1.6)),
+                fill_type="GLASS_PANES",
+            ),
+            FaceTarget(obj, [front_face(obj)]),
+        )
+        self.assertTrue(before.ok, before.errors)
+        plain_edges = len(obj.data.edges)
+
+        clean_scene()
+        obj2 = make_wall()
+        after = apply_feature(
+            "window",
+            WindowOptions(
+                size_offset=SizeOffsetOptions(size=(2.0, 1.6)),
+                fill_type="GLASS_PANES",
+                add_bevel=True,
+                bevel_width=0.004,
+            ),
+            FaceTarget(obj2, [front_face(obj2)]),
+        )
+        self.assertTrue(after.ok, after.errors)
+        # bevel adds chamfer faces -> more edges than the plain build
+        self.assertGreater(len(obj2.data.edges), plain_edges)
+        report = validate_object(obj2, include_geometry=False)
+        self.assertTrue(report["ok"], report["problems"])
+
+    def test_default_off_is_plain(self):
+        clean_scene()
+        plain = make_wall()
+        r = apply_feature(
+            "window",
+            WindowOptions(size_offset=SizeOffsetOptions(size=(2.0, 1.6))),
+            FaceTarget(plain, [front_face(plain)]),
+        )
+        self.assertTrue(r.ok, r.errors)
+        self.assertFalse(r.warnings)

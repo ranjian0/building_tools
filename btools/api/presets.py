@@ -443,7 +443,17 @@ _corner_shop = BuildingPreset(
             "multigroup",
             "ground_front_wall",
             (0,),
-            {"size_offset": {"size": [4.0, 2.8]}},
+            {
+                "size_offset": {"size": [4.0, 2.8]},
+                # -- glazed shopfront: the window half of the multigroup
+                #    gets glass panes
+                "glass_fill_window": {
+                    "pane_count_x": 4,
+                    "pane_count_y": 2,
+                    "pane_margin": 0.05,
+                    "pane_depth": 0.02,
+                },
+            },
         ),
         FacadeRule(
             "window",

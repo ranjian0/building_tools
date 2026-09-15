@@ -153,6 +153,44 @@ def _mat_glass(mat, color=None):
     bsdf.inputs["IOR"].default_value = 1.52
 
 
+def _mat_glass_fake_interior(mat, color=None):
+    """Glass with a faked emissive interior (curtain/room mix) for night
+    renders of single-skin buildings -- the cheap fallback next to the
+    real interiors (wall_thickness)."""
+    import random
+
+    bsdf = _base_nodes(mat, color or (0.9, 0.85, 0.7), 0.6)[0]
+    bsdf.inputs["Transmission Weight"].default_value = 0.15
+    bsdf.inputs["IOR"].default_value = 1.52
+    bsdf.inputs["Roughness"].default_value = 0.4
+
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    emit = nodes.new("ShaderNodeEmission")
+    emit.location = (-200, -300)
+    # warm interior glow, slightly randomized per material instance
+    rng = random.Random(hash(mat.name) & 0xFFFFFFFF)
+    strength = 1.5 + rng.uniform(0.0, 2.5)
+    emit.inputs["Color"].default_value = (
+        1.0,
+        0.85 + rng.uniform(-0.05, 0.05),
+        0.65,
+        1.0,
+    )
+    emit.inputs["Strength"].default_value = strength
+    light_path = nodes.new("ShaderNodeLightPath")
+    light_path.location = (-400, -450)
+    mix = nodes.new("ShaderNodeMixShader")
+    mix.location = (-50, -250)
+    links.new(light_path.outputs["Is Camera Ray"], mix.inputs["Fac"])
+    links.new(emit.outputs["Emission"], mix.inputs[1])
+    # camera sees the glow; other rays see the glass
+    out = next(n for n in nodes if n.type == "OUTPUT_MATERIAL")
+    glass_socket = out.inputs["Surface"].links[0].from_socket
+    links.new(glass_socket, mix.inputs[2])
+    links.new(mix.outputs["Shader"], out.inputs["Surface"])
+
+
 def _mat_railing(mat, color=None):
     _base_nodes(mat, color or MATGROUP_COLORS["railing_posts"], 0.35, metallic=0.9)
 
@@ -172,6 +210,7 @@ _BUILDERS = {
     "window_bars": _mat_frame,
     "window_panes": lambda m: _mat_glass(m, (0.56, 0.76, 0.88)),
     "window_louvers": lambda m: _mat_glass(m, (0.56, 0.76, 0.88)),
+    "window_fake_interior": _mat_glass_fake_interior,
     "balcony": lambda m: _mat_concrete(m, MATGROUP_COLORS["balcony"]),
     "railing_posts": _mat_railing,
     "railing_walls": lambda m: _mat_railing(m, MATGROUP_COLORS["railing_walls"]),
@@ -246,3 +285,22 @@ def apply_default_materials(obj, untagged=True):
             me.polygons[i].material_index = slot_for(g)
         else:
             me.polygons[i].material_index = untagged_index
+
+
+def apply_fake_interiors(obj, enable=True):
+    """Swap window materials to the emissive fake-interior variant (or
+    back). Returns the number of affected material slots."""
+    if not enable:
+        apply_default_materials(obj)
+        return 0
+    me = obj.data
+    count = 0
+    for i, slot in enumerate(me.materials):
+        if slot is None:
+            continue
+        if slot.name.startswith(("BT_window", "BT_door_panes")):
+            group = slot.name.removeprefix("BT_")
+            if group in ("window", "window_panes", "window_louvers", "door_panes"):
+                me.materials[i] = _material("BT_window_fake_interior")
+                count += 1
+    return count

@@ -3,6 +3,7 @@ import bmesh
 from ...utils import (
     XYDir,
     arc_edge,
+    bevel_frame_edges,
     calc_edge_median,
     calc_face_dimensions,
     clamp,
@@ -36,6 +37,10 @@ from ..materialgroup import (
 
 
 def create_window(bm, faces, prop):
+    from ...utils import detail
+
+    if detail.detail_flag("casing", detail.detail_level(), None):
+        prop.add_casing = True
     """Generate a window"""
     # -- source wall planes, for the wall-strip restore pass at the end
     planes = [(f.calc_center_median().copy(), f.normal.copy()) for f in faces]
@@ -60,6 +65,10 @@ def create_window(bm, faces, prop):
                 fill_face(bm, window, prop, "WINDOW")
                 if prop.add_arch:
                     fill_arch(bm, arch, prop)
+                if getattr(prop, "add_bevel", False):
+                    # -- AFTER the fill: the original blocker was that
+                    #    bevel invalidated the fill's face reference
+                    bevel_frame_edges(bm, _opening_region(bm, window), prop.bevel_width)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.0001)
 
     nulfaces = find_faces_without_matgroup(bm)
@@ -67,6 +76,18 @@ def create_window(bm, faces, prop):
     restore_wall_plane_faces(bm, planes)
 
     return True
+
+
+def _opening_region(bm, opening_face):
+    """Faces of one opening region: the opening (fill) face plus every
+    edge-linked face (the coplanar fill fragments and the perpendicular
+    frame ring)."""
+    region = [opening_face]
+    for e in opening_face.edges:
+        for f in e.link_faces:
+            if f.is_valid and f not in region:
+                region.append(f)
+    return region
 
 
 @map_new_faces(MaterialGroup.WALLS)

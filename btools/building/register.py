@@ -6,6 +6,8 @@ from .balcony import register_balcony, unregister_balcony
 from .batch import register_batch, unregister_batch
 from .customobj import register_custom, unregister_custom
 from .door import register_door, unregister_door
+from .export import register as register_export
+from .export import unregister as unregister_export
 from .fill import register_fill, unregister_fill
 from .floor import register_floor, unregister_floor
 from .floorplan import register_floorplan, unregister_floorplan
@@ -29,6 +31,7 @@ classes = (
 register_funcs = (
     register_custom,
     register_batch,
+    register_export,
     register_material,
     register_removegeom,
     register_railing,
@@ -47,6 +50,7 @@ register_funcs = (
 unregister_funcs = (
     unregister_custom,
     unregister_batch,
+    unregister_export,
     unregister_material,
     unregister_removegeom,
     unregister_railing,

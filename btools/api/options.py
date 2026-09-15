@@ -100,6 +100,13 @@ class FloorOptions:
     slab_thickness: float = 0.2
     slab_outset: float = 0.1
     wall_thickness: float = 0.0  # >0 creates the double-shell interior
+    add_cornice: bool = False
+    cornice_size: float = 0.12
+    column_size: float = 0.0  # 0 = follow 2x slab outset
+    add_column_base: bool = False
+    add_column_capital: bool = False
+    column_cap_size: float = 1.4  # multiple of column size
+    column_cap_height: float = 0.08
 
     add_decoration: bool = False
     alternate_decoration: bool = False
