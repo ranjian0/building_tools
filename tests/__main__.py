@@ -21,6 +21,7 @@ import tools
 try:
     import test_api
     import test_api_options
+    import test_facade
     import test_api_probe
     import test_floorplan
     import test_floors
@@ -56,6 +57,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_offsets))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
+    suite.addTests(loader.loadTestsFromModule(test_facade))
     suite.addTests(loader.loadTestsFromModule(test_api_probe))
     suite.addTests(loader.loadTestsFromModule(test_api))
 

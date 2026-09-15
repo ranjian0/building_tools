@@ -4,18 +4,18 @@
     "blender": "5.1.2"
   },
   "error": null,
-  "geometry_hash": "c93288fa41eb7a0c",
+  "geometry_hash": "6475963d4e1a6bae",
   "geometry_report": {
     "clean": false,
     "counts": {
-      "edges": 17090,
-      "faces": 6886,
-      "verts": 10225
+      "edges": 17087,
+      "faces": 6885,
+      "verts": 10223
     },
     "loose_edges": 0,
     "loose_verts": 0,
     "non_manifold_edges": 356,
-    "zero_area_faces": 60
+    "zero_area_faces": 50
   },
   "id": "preset-apartment-block",
   "images": [
@@ -23,9 +23,9 @@
   ],
   "known_issues": [],
   "mesh": {
-    "edges": 17090,
-    "faces": 6886,
-    "verts": 10225,
+    "edges": 17087,
+    "faces": 6885,
+    "verts": 10223,
     "z_range": [
       0.0,
       16.2
@@ -44,7 +44,7 @@
       "feature": "preset:apartment-block",
       "matgroup_counts": {
         "balcony": 80,
-        "door": 18,
+        "door": 17,
         "frame": 849,
         "railing_posts": 3360,
         "railing_rails": 384,
@@ -63,20 +63,20 @@
     "geometry": {
       "clean": false,
       "counts": {
-        "edges": 17090,
-        "faces": 6886,
-        "verts": 10225
+        "edges": 17087,
+        "faces": 6885,
+        "verts": 10223
       },
       "loose_edges": 0,
       "loose_verts": 0,
       "non_manifold_edges": 356,
-      "zero_area_faces": 60
+      "zero_area_faces": 50
     },
     "matgroups": {
       "all_tagged": true,
       "groups": {
         "balcony": 80,
-        "door": 18,
+        "door": 17,
         "frame": 849,
         "railing_posts": 3360,
         "railing_rails": 384,

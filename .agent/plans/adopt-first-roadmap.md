@@ -492,10 +492,25 @@ closed faces (probe: zero non-manifold edges).
 
 ## Item 6: Facade rule DSL — CGA subset as Python rules
 
+**Status (complete, 2026-09):** v1 landed as `btools/api/facade.py` +
+FacadeRule extensions. `bays` (int or "fill" with stretched
+`bay_width`), `align` (shared per-face grid cache — wall faces persist
+across applies so indices are stable), `where` (bay_index parity/
+position conditions), per-bay seeded variations. Uniform grids map onto
+the array mechanism (count = grid.count, one edit session); the per-bay
+path (where/variations) re-locates the target wall fragment by plane +
+containment after each split. Apartment-block migrated to `align`
+(geometry-neutral at default scale — verified against the baseline;
+door-count delta is documented session noise). Bonus: fixed a latent
+`_prop_instance` bug where stale scene ID-property values (e.g.
+size_offset.offset) leaked between apply_feature calls. Tests:
+`tests/test_facade.py` (bay math, parity, seeded per-bay,
+alignment-under-scaling). v2 text DSL deferred.
+
 **Goal.** The facade multiplier: component splits + float/repeat bay splits
 over our existing selectors/matgroup contract (Wonka 2003; Müller 2006;
-Eger & Mote 2022's rules-as-functions pattern; Schwarz & Müller SA15 course
-as the blueprint).
+Eger & Mote 2022's rules-as-functions pattern; Schwarz & Müller SA15
+course as the blueprint).
 
 **Current state.** `FacadeRule(feature, faces, storeys, options)` +
 `BuildingPreset.facade` (presets.py:26-55) already *is* the seed: selectors

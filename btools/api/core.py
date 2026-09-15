@@ -101,14 +101,27 @@ class FaceTarget:
 @contextmanager
 def _prop_instance(prop_cls, name):
     """Yield a PropertyGroup instance attached to the scene (scene-attach
-    pattern used by the ops and tests). Detached on exit."""
+    pattern used by the ops and tests). Detached on exit.
+
+    Blender can resurrect ID-property values from a previous cycle of the
+    same (class, name) pair on the scene -- e.g. a size_offset written by
+    an earlier apply_feature. Purging them restores the declared
+    defaults; init() (which runs after this) sets its own ID-props."""
     try:
         bpy.utils.register_class(prop_cls)
     except ValueError:
         pass  # already registered (addon loaded)
     setattr(bpy.types.Scene, name, bpy.props.PointerProperty(type=prop_cls))
     try:
-        yield getattr(bpy.context.scene, name)
+        inst = getattr(bpy.context.scene, name)
+        for key in list(inst.keys()):
+            if key == "rna_type":
+                continue
+            try:
+                del inst[key]
+            except (KeyError, TypeError):
+                pass
+        yield inst
     finally:
         delattr(bpy.types.Scene, name)
 

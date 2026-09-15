@@ -241,7 +241,7 @@
 ## balcony-inner-curved
 
 - status: `ok`
-- faces: 775 -- geometry_hash: `cde276ea481afa43`
+- faces: 775 -- geometry_hash: `8a2b86ec5c267d64`
 
 ![balcony-inner-curved image.png](balcony-inner-curved/image.png)
 
@@ -318,14 +318,14 @@
 ## preset-apartment-block
 
 - status: `ok`
-- faces: 6886 -- geometry_hash: `c93288fa41eb7a0c`
+- faces: 6885 -- geometry_hash: `6475963d4e1a6bae`
 
 ![preset-apartment-block image.png](preset-apartment-block/image.png)
 
 ## preset-modern-villa
 
 - status: `ok`
-- faces: 455 -- geometry_hash: `53c5720fc9b4ee19`
+- faces: 455 -- geometry_hash: `0728435e7aa38b34`
 
 ![preset-modern-villa image.png](preset-modern-villa/image.png)
 
@@ -353,6 +353,6 @@
 ## preset-office-block
 
 - status: `ok`
-- faces: 3762 -- geometry_hash: `31db36880ce4fb83`
+- faces: 3762 -- geometry_hash: `7a41ea1e01077fe8`
 
 ![preset-office-block image.png](preset-office-block/image.png)
