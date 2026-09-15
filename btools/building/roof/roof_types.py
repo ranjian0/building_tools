@@ -889,8 +889,11 @@ def extrude_and_outset(bm, faces, thickness, outset):
     link_faces = [f for e in top_face.edges for f in e.link_faces if f is not top_face]
     bmesh.ops.inset_region(bm, faces=link_faces, depth=outset, use_even_offset=True)
 
-    # -- cleanup hidden faces
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    # -- cleanup hidden faces (scoped: a blanket recalc reorients
+    #    disconnected components such as interior skins)
+    from ...utils import recalc_face_normals_component
+
+    recalc_face_normals_component(bm, [top_face])
     bmesh.ops.delete(bm, geom=faces, context="FACES")
 
     new_faces = list({f for e in top_face.edges for f in e.link_faces})

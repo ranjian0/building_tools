@@ -516,6 +516,30 @@ def set_smooth_shading(bm, faces, smooth=True):
         f.smooth = smooth
 
 
+def recalc_face_normals_component(bm, seed_faces):
+    """Recalc the edge-connected component(s) containing the seed faces.
+
+    Scoped replacement for recalc_face_normals(bm, faces=bm.faces): a
+    blanket recalc also reorients DISCONNECTED components (interior
+    skins authored to face the rooms), arbitrarily."""
+    seen = set()
+    stack = [f for f in seed_faces if f.is_valid]
+    comp = []
+    while stack:
+        f = stack.pop()
+        if f in seen:
+            continue
+        seen.add(f)
+        comp.append(f)
+        for e in f.edges:
+            for nf in e.link_faces:
+                if nf not in seen:
+                    stack.append(nf)
+    if comp:
+        bmesh.ops.recalc_face_normals(bm, faces=comp)
+    return comp
+
+
 def sweep_profile_along_edges(bm, edges, profile, close_caps=True, side_flip=False):
     """Sweep a closed 2D profile along a straight chain of edges.
 
@@ -575,5 +599,5 @@ def sweep_profile_along_edges(bm, edges, profile, close_caps=True, side_flip=Fal
             except ValueError:
                 pass
 
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    recalc_face_normals_component(bm, faces)
     return faces

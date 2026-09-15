@@ -8,6 +8,7 @@ from .door import register_door, unregister_door
 from .fill import register_fill, unregister_fill
 from .floor import register_floor, unregister_floor
 from .floorplan import register_floorplan, unregister_floorplan
+from .interior import register_interior, unregister_interior
 from .material import register_material, unregister_material
 from .multigroup import register_multigroup, unregister_multigroup
 from .railing import register_railing, unregister_railing
@@ -35,6 +36,7 @@ register_funcs = (
     register_floor,
     register_window,
     register_floorplan,
+    register_interior,
     register_stairs,
     register_roof,
     register_multigroup,
@@ -51,6 +53,7 @@ unregister_funcs = (
     unregister_floor,
     unregister_window,
     unregister_floorplan,
+    unregister_interior,
     unregister_stairs,
     unregister_roof,
     unregister_multigroup,

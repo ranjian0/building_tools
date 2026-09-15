@@ -584,21 +584,36 @@ seeded rotation reproducibility.
 
 ## Item 7: Interiors stack (#202 / #217)
 
-**Status (phase 1 complete, 2026-09):** double-shell interiors landed.
-`FloorProperty.wall_thickness` / `FloorOptions.wall_thickness` (default 0
-= single skin, byte-identical). `add_interior_shell` (floor_types):
-re-derives the footprint from the building top face, offsets it exactly
-via the item-4 machinery (`offset_polygons`), builds the inner wall tube
-+ one full-width walkable floor per storey (doubles as the storey
-ceiling); the top face is untouched so roofs keep working. The api runs
-it in a dedicated NON-normalizing edit session (`_edit_session(normalize=
-False)`): the skin is a disconnected component and the global recalc
-reorients it away from the rooms — the skin orients itself explicitly
-(`bm.normal_update()` + centroid test). Verified numerically: every
-inner face points at the room, floors face up, roofs apply, 117 tests
-green, corpus no-op. Remaining (phases 2-3): skeleton core/perimeter
-corridors, treemap rooms (`util_layout` groundwork), MST doors, window
-cuts through both shells.
+**Status (complete, 2026-09):** phases 1-3 landed.
+
+- Phase 1 (double shell): `wall_thickness` on FloorProperty/FloorOptions;
+  `add_interior_shell` builds the inner skin (exact mitered offset via
+  the item-4 machinery) + per-storey walkable floors; the top face stays
+  intact for roofs. Api adds it in a dedicated NON-normalizing session.
+- Phases 2-3 (partitions): `btools/utils/util_layout.py` -- squarified
+  treemaps (Bruls et al. 2000), shared-edge adjacency segments,
+  spanning-tree doors (minimum doors preserving reachability); pure
+  Python, headless-tested. New `btools/building/interior/` feature
+  (props/ops/types, registered, panel button, api runner
+  `apply_feature("interior", ...)`, drift-tested as the 10th feature
+  pair): TREEMAP mode (room grid + spanning doors, headers above
+  openings) and SKELETON mode (core/perimeter ring at min_corridor
+  depth -- the level-set offset). Inset keeps partitions off the inner
+  skin.
+- **Normal-orientation hardening (the deep fix)**: authored interior
+  geometry must never pass through a blanket recalc. (1)
+  `_normalize_normals` is now component-aware: main shell + closed
+  solids recalc + signed-volume flip; small OPEN components keep
+  authored winding (protects interiors across ALL later api ops).
+  (2) The three blanket `recalc_face_normals(bm.faces)` landmines are
+  scoped: sweep_profile_along_edges (ridge caps/gutters/railings) and
+  extrude_and_outset now use `recalc_face_normals_component`; verified
+  hash-identical on sweep-heavy presets (suburban-house). Full chain
+  (shell -> interior -> roof -> partitions) validated: every inner face
+  still points at the rooms.
+
+Remaining (follow-ups): window/door cuts through both shells, room
+program weights per preset (currently equal areas + room_count).
 
 **Goal.** Thick double-shell walls → skeleton corridors → treemap rooms →
 MST doors. Extends the phases in `202-217-interior-walls.md` with the

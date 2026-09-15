@@ -333,6 +333,23 @@ class FillComponentType(Enum):
     WINDOW = "WINDOW"
 
 
+class InteriorPartitionMode(Enum):
+    TREEMAP = "TREEMAP"
+    SKELETON = "SKELETON"
+
+
+@dataclass
+class InteriorOptions:
+    partition_mode: InteriorPartitionMode = InteriorPartitionMode.TREEMAP
+    room_count: int = 4
+    partition_thickness: float = 0.1
+    partition_height: float = 2.5
+    door_width: float = 0.9
+    door_height: float = 2.1
+    min_corridor: float = 1.0
+    inset: float = 0.0
+
+
 @dataclass
 class FillOptions:
     panel_fill: FillPanelOptions = field(default_factory=FillPanelOptions)

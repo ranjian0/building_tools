@@ -22,6 +22,7 @@ from btools.api.options import (
     FillOptions,
     FloorOptions,
     FloorplanOptions,
+    InteriorOptions,
     MultigroupOptions,
     RoofOptions,
     StairsOptions,
@@ -32,6 +33,7 @@ from btools.building.door import DoorProperty
 from btools.building.fill import FillProperty
 from btools.building.floor import FloorProperty
 from btools.building.floorplan import FloorplanProperty
+from btools.building.interior import InteriorProperty
 from btools.building.multigroup import MultigroupProperty
 from btools.building.roof import RoofProperty
 from btools.building.stairs import StairsProperty
@@ -41,6 +43,7 @@ PAIRS = [
     ("floorplan", FloorplanOptions, FloorplanProperty),
     ("floor", FloorOptions, FloorProperty),
     ("roof", RoofOptions, RoofProperty),
+    ("interior", InteriorOptions, InteriorProperty),
     ("door", DoorOptions, DoorProperty),
     ("window", WindowOptions, WindowProperty),
     ("multigroup", MultigroupOptions, MultigroupProperty),
@@ -92,6 +95,7 @@ REGISTER_ORDER = [
     btools.building.railing.WallFillProperty,
     btools.building.railing.RailProperty,
     FloorplanProperty,
+    InteriorProperty,
     FloorProperty,
     RoofProperty,
     DoorProperty,
@@ -188,7 +192,7 @@ ALWAYS_SKIP = {"name"}
 
 class TestOptionsDrift(unittest.TestCase):
     def test_pairs_declared(self):
-        self.assertEqual(len(PAIRS), 9, "every feature must be covered")
+        self.assertEqual(len(PAIRS), 10, "every feature must be covered")
 
     def test_no_drift(self):
         register_all()

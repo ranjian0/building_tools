@@ -162,6 +162,7 @@ class BTOOLS_PT_building_tools(bpy.types.Panel):
         col = layout.column(align=True)
         col.operator("btools.add_balcony")
         col.operator("btools.add_stairs")
+        col.operator("btools.add_partitions")
 
         col = layout.column(align=True)
         row = col.row(align=True)

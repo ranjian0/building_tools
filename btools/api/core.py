@@ -39,6 +39,8 @@ from ..building.floorplan.floorplan_types import (
     create_random_floorplan,
     create_rectangular_floorplan,
 )
+from ..building.interior import InteriorProperty
+from ..building.interior.interior_types import create_partitions
 from ..building.materialgroup import (
     MaterialGroup,
     add_faces_to_group,
@@ -76,6 +78,7 @@ from .options import (
     FillOptions,
     FloorOptions,
     FloorplanOptions,
+    InteriorOptions,
     MultigroupOptions,
     RoofOptions,
     StairsOptions,
@@ -135,22 +138,64 @@ def _target_context(obj):
         yield
 
 
+def _face_components(bm):
+    """Edge-connected face components of a bmesh."""
+    seen = set()
+    comps = []
+    for f in bm.faces:
+        if f in seen:
+            continue
+        comp = []
+        stack = [f]
+        seen.add(f)
+        while stack:
+            cur = stack.pop()
+            comp.append(cur)
+            for e in cur.edges:
+                for nf in e.link_faces:
+                    if nf not in seen:
+                        seen.add(nf)
+                        stack.append(nf)
+        comps.append(comp)
+    return comps
+
+
+def _component_is_closed(comp):
+    """Every edge of the component is shared by exactly two of its faces."""
+    faces = set(comp)
+    for f in comp:
+        for e in f.edges:
+            if len([nf for nf in e.link_faces if nf in faces]) != 2:
+                return False
+    return True
+
+
+def _signed_volume(faces):
+    volume = 0.0
+    for f in faces:
+        volume += f.calc_center_median().dot(f.normal) * f.calc_area()
+    return volume
+
+
 def _normalize_normals(bm):
     """Make all face normals consistent AND point outward.
 
-    recalc_face_normals only guarantees consistency: a solid that is already
-    consistently inverted (the floor op's per-face Z-flip hack inverts the
-    whole mesh) stays inverted, which is what makes preset windows render
-    inside-out and protrude beyond the walls. Measure the signed volume and
-    flip the entire solid when it is negative.
+    Component-aware: the main (shell) component and closed solids
+    (chimney boxes, ...) get recalc + signed-volume flip as before. Small
+    OPEN components keep their authored winding -- the interior skin is
+    deliberately wound to face the rooms, and a blanket recalc
+    reorients such disconnected components away from them (including in
+    later operations: roofs, windows, ...).
     """
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-
-    volume = 0.0
-    for f in bm.faces:
-        volume += f.calc_center_median().dot(f.normal) * f.calc_area()
-    if volume < 0.0:
-        bmesh.ops.reverse_faces(bm, faces=bm.faces)
+    comps = _face_components(bm)
+    if not comps:
+        return
+    main = max(comps, key=len)
+    for comp in comps:
+        if comp is main or _component_is_closed(comp):
+            bmesh.ops.recalc_face_normals(bm, faces=comp)
+            if _signed_volume(comp) < 0.0:
+                bmesh.ops.reverse_faces(bm, faces=comp)
 
 
 @contextmanager
@@ -425,6 +470,33 @@ def apply_roof(target, options) -> OpResult:
         return _error(feature, obj, exc)
 
 
+def apply_interior(target, options) -> OpResult:
+    feature = "interior"
+    obj = target.object
+    try:
+        from .validate import matgroup_report
+
+        with _edit_session(target, normalize=False) as (bm, faces):
+            # -- partitions need an upward-facing floor face
+            for f in faces:
+                if f.normal.z < 0:
+                    f.normal_flip()
+            if not all(round(f.normal.z, 1) for f in faces):
+                return _cancelled(feature, obj, "target faces are not upward facing")
+            with _prop_instance(InteriorProperty, "bt_api_interior") as prop:
+                _options_into_prop(prop, options)
+                with _target_context(obj):
+                    create_partitions(bm, faces, prop)
+        return OpResult(
+            "ok",
+            feature,
+            object_name=obj.name,
+            matgroup_counts=matgroup_report(obj)["groups"],
+        )
+    except Exception as exc:
+        return _error(feature, obj, exc)
+
+
 def apply_door(target, options) -> OpResult:
     return _apply_face_feature(
         "door",
@@ -502,6 +574,7 @@ FEATURES: dict[str, Callable[..., OpResult]] = {
     "floorplan": apply_floorplan,
     "floor": apply_floor,
     "roof": apply_roof,
+    "interior": apply_interior,
     "door": apply_door,
     "window": apply_window,
     "multigroup": apply_multigroup,
@@ -514,6 +587,7 @@ OPTION_TYPES: dict = {
     "floorplan": FloorplanOptions,
     "floor": FloorOptions,
     "roof": RoofOptions,
+    "interior": InteriorOptions,
     "door": DoorOptions,
     "window": WindowOptions,
     "multigroup": MultigroupOptions,
