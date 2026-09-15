@@ -21,6 +21,7 @@ import tools
 try:
     import test_api
     import test_api_options
+    import test_batch
     import test_facade
     import test_api_probe
     import test_floorplan
@@ -60,6 +61,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
     suite.addTests(loader.loadTestsFromModule(test_interiors))
     suite.addTests(loader.loadTestsFromModule(test_partitions))
+    suite.addTests(loader.loadTestsFromModule(test_batch))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
     suite.addTests(loader.loadTestsFromModule(test_facade))
     suite.addTests(loader.loadTestsFromModule(test_api_probe))

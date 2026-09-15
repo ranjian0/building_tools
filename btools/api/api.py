@@ -14,6 +14,12 @@ Example:
 Low-level runners live in `core.py`; validation helpers in `validate.py`.
 """
 
+from .batch import (  # noqa: F401 -- re-exported surface
+    batch_summary,
+    generate_batch,
+    resolve_building_plan,
+    resolve_roof_type,
+)
 from .checks import (  # noqa: F401 -- re-exported surface
     CHECK_KINDS,
     run_checks,

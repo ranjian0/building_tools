@@ -3,6 +3,7 @@ import bpy
 from .arch import ArchProperty
 from .array import ArrayProperty
 from .balcony import register_balcony, unregister_balcony
+from .batch import register_batch, unregister_batch
 from .customobj import register_custom, unregister_custom
 from .door import register_door, unregister_door
 from .fill import register_fill, unregister_fill
@@ -27,6 +28,7 @@ classes = (
 # -- ORDER MATTERS --
 register_funcs = (
     register_custom,
+    register_batch,
     register_material,
     register_removegeom,
     register_railing,
@@ -44,6 +46,7 @@ register_funcs = (
 
 unregister_funcs = (
     unregister_custom,
+    unregister_batch,
     unregister_material,
     unregister_removegeom,
     unregister_railing,

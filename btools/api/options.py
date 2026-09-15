@@ -333,6 +333,33 @@ class FillComponentType(Enum):
     WINDOW = "WINDOW"
 
 
+@dataclass
+class BatchOptions:
+    """Batch generation from footprint attributes (#214/#173).
+
+    Attribute names follow the OSM Simple-3D-Buildings vocabulary by
+    default (roof:shape, height, building:levels, roof:height,
+    roof:angle); every name is editable for BlenderGIS/shapefile
+    exports. Values resolve through: exact -> prefix -> substring
+    match (longest keys first)."""
+
+    roof_type_attr: str = "roof:shape"
+    height_attr: str = "height"
+    levels_attr: str = "building:levels"
+    roof_height_attr: str = "roof:height"
+    roof_angle_attr: str = "roof:angle"
+    floor_height_attr: str = "floor_height"
+
+    storey_height: float = 3.0  # fallback storey height (OSM convention)
+    default_floor_count: int = 2
+    default_roof_type: str = "HIP"
+    default_roof_height: float = 1.0
+
+    window_density: float = 0.0  # 0 = no window pass
+    seed: int = 0
+    dry_run: bool = False
+
+
 class InteriorPartitionMode(Enum):
     TREEMAP = "TREEMAP"
     SKELETON = "SKELETON"

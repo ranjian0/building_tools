@@ -726,6 +726,36 @@ completeness tracks Items 2/3.
 
 ---
 
+## Item 8: Batch / GIS pipeline (#214 / #173)
+
+**Status (core complete, 2026-09):** `btools/api/batch.py` +
+`btools/building/batch/` + `BatchOptions` (11th drift-tested api pair).
+`generate_batch(objects, options)` turns flat footprint objects into
+complete buildings via the scriptable api (footprint duplicated; source
+kept intact per #173). OSM Simple-3D-Buildings attribute vocabulary by
+default (roof:shape / height / building:levels / roof:height /
+roof:angle), every attribute name user-editable (BlenderGIS exports);
+roof families resolve exact -> prefix -> substring with specific keys
+first (hipped-and-gabled before hipped; short synonyms gable/hip/
+pyramid); unsupported shapes (skillion, onion, dome, ...) degrade to
+FLAT with a warning. Storeys: levels -> height // storey -> default.
+Roof pitch: roof:angle (degrees, ANGLE mode) over roof:height. Seeded
+window pass: draws keyed by face POSITION (indices go stale across
+rebuilds) with per-target re-location via the facade locator (every
+window re-splits the walls); decisions recorded on
+OpResult.decisions -- same seed, same decisions (the window op's strip
+geometry itself carries the documented bmesh nondeterminism).
+Operator `btools.batch_generate` (object mode, selected meshes,
+props-dialog with mapping/fallbacks/windows/dry-run) + panel button.
+Non-flat footprints cancel per-object with errors; dry_run reports the
+resolved plan without building. Live 8-building mixed block verified
+(8/8 built, windows placed, all valid; operator FINISHED).
+
+Remaining (follow-ups): preset-per-building-type selection (apartments
+-> apartment-block), roof:orientation ridge axis, block-median height
+imputation, CityJSON exporter via the matgroup layer,
+scripts/shapefile_to_blender.py helper.
+
 ## Consolidated effort / sequencing
 
 | # | Item | Issues | Effort (dev-days) | Depends on | Milestone |
