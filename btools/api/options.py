@@ -99,6 +99,7 @@ class FloorOptions:
     add_columns: bool = False
     slab_thickness: float = 0.2
     slab_outset: float = 0.1
+    wall_thickness: float = 0.0  # >0 creates the double-shell interior
 
     add_decoration: bool = False
     alternate_decoration: bool = False

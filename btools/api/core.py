@@ -30,7 +30,7 @@ from ..building.fill.fill_ops import validate_fill_faces
 from ..building.fill.fill_types import add_fill
 from ..building.floor import FloorProperty
 from ..building.floor.floor_ops import add_floor_matgroups
-from ..building.floor.floor_types import create_floors
+from ..building.floor.floor_types import add_interior_shell, create_floors
 from ..building.floorplan import FloorplanProperty
 from ..building.floorplan.floorplan_types import (
     create_circular_floorplan,
@@ -154,9 +154,13 @@ def _normalize_normals(bm):
 
 
 @contextmanager
-def _edit_session(target):
+def _edit_session(target, normalize=True):
     """Enter edit mode on the target object, yield (bm, faces), then flush and
-    return to object mode. Faces are picked by index; empty indices = all."""
+    return to object mode. Faces are picked by index; empty indices = all.
+
+    normalize=False keeps authored face winding (the interior skin is
+    wound to face the rooms; a global recalc would reorient the
+    disconnected component away from them)."""
     obj = target.object
     prev_active = bpy.context.view_layer.objects.active
 
@@ -201,7 +205,8 @@ def _edit_session(target):
         #    (per-face Z-flips, extrusions on inverted bases) leave mixed
         #    orientations behind, which is what makes windows render
         #    inside-out and protruding
-        _normalize_normals(bm)
+        if normalize:
+            _normalize_normals(bm)
         bmesh.update_edit_mesh(obj.data, loop_triangles=True)
         bpy.ops.object.mode_set(mode="OBJECT")
         bpy.context.view_layer.objects.active = prev_active
@@ -356,6 +361,7 @@ def apply_floor(target, options) -> OpResult:
     try:
         from .validate import matgroup_report
 
+        thickness = 0.0
         with _edit_session(target) as (bm, faces):
             zs = {round(v.co.z, 4) for f in faces for v in f.verts}
             if len(zs) != 1:
@@ -366,9 +372,21 @@ def apply_floor(target, options) -> OpResult:
                 )
             with _prop_instance(FloorProperty, "bt_api_floor") as prop:
                 _options_into_prop(prop, options)
+                thickness = getattr(prop, "wall_thickness", 0.0)
                 with _target_context(obj):
                     add_floor_matgroups(bpy.context, prop)
                     create_floors(bm, faces, prop)
+
+        if thickness and thickness > 0.0:
+            # -- the interior skin is authored winding (faces the rooms):
+            #    run it in a session WITHOUT the global normalizer, which
+            #    would reorient the disconnected component away from them
+            with _edit_session(target, normalize=False) as (bm, _faces):
+                with _prop_instance(FloorProperty, "bt_api_floor") as prop:
+                    _options_into_prop(prop, options)
+                    with _target_context(obj):
+                        add_interior_shell(bm, prop)
+
         return OpResult(
             "ok",
             feature,

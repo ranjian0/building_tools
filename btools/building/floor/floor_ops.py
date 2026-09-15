@@ -13,7 +13,7 @@ from ..materialgroup import (
     verify_matgroup_attribute_for_object,
 )
 from .floor_props import FloorProperty
-from .floor_types import create_floors
+from .floor_types import add_interior_shell, create_floors
 
 
 class BTOOLS_OT_add_floors(bpy.types.Operator):
@@ -57,6 +57,7 @@ def build(context, prop):
         else:
             all_faces = [f for f in bm.faces]
             create_floors(bm, all_faces, prop)
+        add_interior_shell(bm, prop)
         bmesh.update_edit_mesh(me, loop_triangles=True)
         return {"FINISHED"}
 

@@ -584,10 +584,26 @@ seeded rotation reproducibility.
 
 ## Item 7: Interiors stack (#202 / #217)
 
+**Status (phase 1 complete, 2026-09):** double-shell interiors landed.
+`FloorProperty.wall_thickness` / `FloorOptions.wall_thickness` (default 0
+= single skin, byte-identical). `add_interior_shell` (floor_types):
+re-derives the footprint from the building top face, offsets it exactly
+via the item-4 machinery (`offset_polygons`), builds the inner wall tube
++ one full-width walkable floor per storey (doubles as the storey
+ceiling); the top face is untouched so roofs keep working. The api runs
+it in a dedicated NON-normalizing edit session (`_edit_session(normalize=
+False)`): the skin is a disconnected component and the global recalc
+reorients it away from the rooms — the skin orients itself explicitly
+(`bm.normal_update()` + centroid test). Verified numerically: every
+inner face points at the room, floors face up, roofs apply, 117 tests
+green, corpus no-op. Remaining (phases 2-3): skeleton core/perimeter
+corridors, treemap rooms (`util_layout` groundwork), MST doors, window
+cuts through both shells.
+
 **Goal.** Thick double-shell walls → skeleton corridors → treemap rooms →
 MST doors. Extends the phases in `202-217-interior-walls.md` with the
-research-grounded room algorithm (squarified treemaps, Marson & Musse 2010;
-adjacency MST doors; Honeybee-style skeleton core/perimeter).
+research-grounded room algorithm (squarified treemaps, Marson & Musse
+2010; adjacency MST doors; Honeybee-style skeleton core/perimeter).
 
 **Current state.** Single-shell floorplans (`floorplan_ops.py:45-67`,
 `floor_types.py`); skeleton interior-offset capability noted in plan 202;

@@ -40,6 +40,16 @@ class FloorProperty(bpy.types.PropertyGroup):
         description="Outset of each slab",
     )
 
+    wall_thickness: FloatProperty(
+        name="Wall Thickness",
+        min=get_scaled_unit(0.0),
+        max=get_scaled_unit(1.0),
+        default=get_scaled_unit(0.0),
+        unit="LENGTH",
+        description="Double-shell interior: offset the inner walls by this "
+        "amount and add a floor per storey (0 keeps the single skin)",
+    )
+
     add_columns: BoolProperty(
         name="Add Columns", default=False, description="Add Columns"
     )
@@ -94,6 +104,10 @@ class FloorProperty(bpy.types.PropertyGroup):
         if self.add_slab == True:
             row.prop(self, "slab_thickness")
             row.prop(self, "slab_outset")
+
+        # Interior
+        row = layout.box()
+        row.prop(self, "wall_thickness")
 
         # Columns
         row = layout.box()

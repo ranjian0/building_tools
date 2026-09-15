@@ -25,6 +25,7 @@ try:
     import test_api_probe
     import test_floorplan
     import test_floors
+    import test_interiors
     import test_offsets
     import test_randomizer
     import test_roofs
@@ -56,6 +57,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_floors))
     suite.addTests(loader.loadTestsFromModule(test_offsets))
     suite.addTests(loader.loadTestsFromModule(test_floorplan))
+    suite.addTests(loader.loadTestsFromModule(test_interiors))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
     suite.addTests(loader.loadTestsFromModule(test_facade))
     suite.addTests(loader.loadTestsFromModule(test_api_probe))

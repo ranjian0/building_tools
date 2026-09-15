@@ -14,6 +14,8 @@ from ...utils import (
     filter_vertical_edges,
     get_top_faces,
     is_parallel,
+    offset_polygons,
+    skeletonize,
     vec_equal,
 )
 from ..materialgroup import MaterialGroup, add_faces_to_group
@@ -28,6 +30,95 @@ def create_floors(bm, faces, prop):
     add_faces_to_group(bm, slabs, MaterialGroup.SLABS)
     add_faces_to_group(bm, walls, MaterialGroup.WALLS)
     add_faces_to_group(bm, roof, MaterialGroup.ROOF)
+
+
+def add_interior_shell(bm, prop):
+    """Phase-1 interiors (#202): double-shell walls + per-storey floors.
+
+    Call AFTER create_floors (the footprint is re-derived from the
+    building's top face). The inner skin sits ``wall_thickness`` inward
+    (exact mitered offset from the straight skeleton); one full-width
+    floor face per storey is walkable and doubles as the storey ceiling
+    below. The top face is untouched so roofs keep working.
+
+    The api runs this in a NON-normalizing edit session: the skin is a
+    disconnected component and a global recalc would reorient it away
+    from the rooms; the ops path calls it after create_floors' recalc,
+    and the skin orients itself explicitly here.
+    """
+    thickness = getattr(prop, "wall_thickness", 0.0)
+    if thickness <= 0.0:
+        return
+
+    top_z = max(f.calc_center_median().z for f in bm.faces)
+    cands = [
+        f
+        for f in bm.faces
+        if f.normal.z > 0.9 and abs(f.calc_center_median().z - top_z) < 1e-4
+    ]
+    if not cands:
+        return
+    face = max(cands, key=lambda f: f.calc_area())
+
+    contour = _face_contour(face)
+    inner_walls, inner_floors = create_interior_shell(bm, contour, prop)
+    if not inner_walls:
+        return  # footprint too small for this thickness
+
+    # -- the skin is disconnected from the shell: orient it toward the
+    #    rooms explicitly (deterministic, independent of winding). Fresh
+    #    faces carry stale normals until updated.
+    bm.normal_update()
+    tube_center = calc_verts_median([v for f in inner_walls for v in f.verts])
+    for f in inner_walls:
+        if (f.calc_center_median() - tube_center).dot(f.normal) > 0.0:
+            f.normal_flip()
+
+    add_faces_to_group(bm, inner_walls, MaterialGroup.WALLS)
+    add_faces_to_group(bm, inner_floors, MaterialGroup.SLABS)
+
+
+def _face_contour(face):
+    """Clockwise (x, y) contour of a face via its loops (same ordering
+    convention the straight skeleton requires)."""
+    start = max(face.loops, key=lambda loop: loop.vert.co.to_tuple()[:2])
+    contour = []
+    loop = start
+    for _ in range(len(face.loops)):
+        contour.append((loop.vert.co.x, loop.vert.co.y))
+        loop = loop.link_loop_prev
+    return contour
+
+
+def create_interior_shell(bm, contour, prop):
+    """Inner wall tube + per-storey floor faces for a footprint contour."""
+    skeleton = skeletonize(contour, [])
+    rings = offset_polygons(skeleton, contour, prop.wall_thickness)
+    if not rings:
+        return [], []  # footprint too small for this thickness
+
+    slab_t = prop.slab_thickness if prop.add_slab else 0.0
+    step = slab_t + prop.floor_height
+    inner_walls, inner_floors = [], []
+
+    for ring in rings:
+        # -- one continuous inner tube per offset ring, spanning all
+        #    storey wall bands (the slab bands exist only as outset
+        #    rings outside the footprint)
+        n = len(ring)
+        z0, z1 = slab_t, prop.floor_count * step
+        bottom = [bm.verts.new((p.x, p.y, z0)) for p in ring]
+        top = [bm.verts.new((p.x, p.y, z1)) for p in ring]
+        for i in range(n):
+            j = (i + 1) % n
+            inner_walls.append(bm.faces.new((bottom[j], bottom[i], top[i], top[j])))
+
+    for k in range(prop.floor_count):
+        z = k * step + slab_t
+        loop = [bm.verts.new((x, y, z)) for x, y in contour]
+        inner_floors.append(bm.faces.new(reversed(loop)))
+
+    return inner_walls, inner_floors
 
 
 def extrude_slabs_and_floors(bm, faces, prop):
