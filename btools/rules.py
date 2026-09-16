@@ -16,6 +16,8 @@ placement and the confirmation channels (ascii / render / export)::
         ctx.export("house.glb")
 """
 
+import sys
+
 from .api import probe
 from .api.core import FaceTarget, options_from_dict
 from .api.select import select
@@ -166,6 +168,47 @@ class RuleContext:
                 self.objects.append(r.created_object)
         return results
 
+    def facade(self, rules, floor_count=None, floor_height=None, seed=None):
+        """Apply bay-grid facade rules to the current building.
+
+        rules: list of FacadeRule (btools.api.presets.FacadeRule). Returns
+        (summaries, failed_result_or_None)."""
+        from .api.facade import apply_facade_rules
+
+        rng = None
+        if seed is not None:
+            from btools.utils.randomizer import BToolsRandom
+
+            rng = BToolsRandom(str(seed))
+        summaries, failed = apply_facade_rules(
+            self.object_data(),
+            rules,
+            floor_count or 2,
+            floor_height or 3.0,
+            rng=rng,
+        )
+        self.warnings.extend(w for s in summaries for w in s.get("warnings", []))
+        return summaries, failed
+
+    def detail(self, level):
+        """Set the scene detail level (LOW / MEDIUM / HIGH)."""
+        from .utils import detail as _detail
+
+        _detail.register()
+        import bpy
+
+        bpy.context.scene.btools_detail_level = level
+
+    def validate(self, include_geometry=False):
+        """Validate the current building; returns the report dict."""
+        from .api.validate import validate_object
+
+        return validate_object(self.object_data(), include_geometry=include_geometry)
+
+    def select(self, name, **kw):
+        """World-space face selector (front_walls, walls, top_face, ...)."""
+        return select(self.object_data(), name, **kw)
+
     # ------------------------------------------------------------ rng / probes
 
     def rng(self, *path):
@@ -232,3 +275,19 @@ def _ground_floor_face(obj):
         if poly.area > best_area:
             best, best_area = i, poly.area
     return best
+
+
+def load_rule_module(path):
+    """Import a rule file as a module (shared by the CLI and the harness)."""
+    import importlib.util
+    import os
+
+    path = os.path.abspath(path)
+    if not os.path.isfile(path):
+        raise FileNotFoundError(path)
+    name = "btools_rule_" + os.path.splitext(os.path.basename(path))[0]
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod

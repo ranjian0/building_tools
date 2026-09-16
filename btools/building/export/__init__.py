@@ -72,6 +72,7 @@ def export_object(obj, filepath=None, export_format=None, semantic_slots=True):
             _default_directory(), obj.name + _EXTENSIONS[export_format]
         )
     filepath = os.path.abspath(filepath)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     dup = prepare_export_object(obj, semantic_slots=semantic_slots)
     try:

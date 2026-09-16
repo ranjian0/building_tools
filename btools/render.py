@@ -122,6 +122,8 @@ def render(path, engine=None, view="iso", resolution=(1280, 1280)):
 
     scene.render.resolution_x, scene.render.resolution_y = resolution
     scene.render.image_settings.file_format = "PNG"
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     scene.render.filepath = path
     bpy.ops.render.render(write_still=True)
     return used, path

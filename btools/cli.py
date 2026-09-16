@@ -125,6 +125,54 @@ def cmd_list_presets(args):
     return 0
 
 
+def cmd_examples(args):
+    from btools.examples import discover, write_manifest
+
+    if args.get("examples_command") == "index":
+        path, manifest = write_manifest()
+        print("manifest: %d examples -> %s" % (manifest["count"], path))
+        return 0
+
+    if args.get("examples_command") == "run":
+        ex_id = args["example_id"]
+        matches = [e for e in discover() if e.id == ex_id or e.id.endswith("." + ex_id)]
+        if not matches:
+            print("unknown example %r" % ex_id, file=sys.stderr)
+            return 1
+        ex = matches[0]
+        ctx = _ctx()
+        mod = _load_rule_module(ex.path)
+        mod.build(ctx)
+        failures = [r for r in ctx.results if not r.ok]
+        if failures:
+            for r in failures:
+                print(r.object_name, r.errors[:1], file=sys.stderr)
+            return 1
+        print("%s built: %s" % (ex.id, ", ".join(ctx.objects)))
+        return 0
+
+    # -- list
+    entries = []
+    for ex in discover():
+        if args.get("tag") and args["tag"] not in ex.tags:
+            continue
+        entries.append(
+            {
+                "id": ex.id,
+                "title": ex.title,
+                "tags": list(ex.tags),
+                "tier": ex.tier,
+                "path": os.path.relpath(ex.path),
+            }
+        )
+    if args.get("json"):
+        print(json.dumps(entries, indent=2))
+    else:
+        for e in entries:
+            print("%-40s %s" % (e["id"], e["title"]))
+    return 0
+
+
 def cmd_smoke(args):
     """Headless preset smoke: build + validate every bundled preset."""
     from btools.api.checks import run_checks
@@ -202,12 +250,24 @@ def main(argv=None):
 
     sub.add_parser("smoke", help="build + validate every preset")
 
+    ex_p = sub.add_parser("examples", help="bundled example rule files")
+    ex_sub = ex_p.add_subparsers(dest="examples_command")
+    ex_list = ex_sub.add_parser("list", help="list examples")
+    ex_list.add_argument("--json", action="store_true")
+    ex_list.add_argument("--tag", help="filter by tag")
+    ex_run = ex_sub.add_parser("run", help="run one example by id")
+    ex_run.add_argument("example_id")
+    ex_run.add_argument("--render", action="store_true")
+    ex_sub.add_parser("index", help="regenerate examples/manifest.json")
+
     args = parser.parse_args(argv)
     btools.ensure_registered()
 
     command = args.command
     args = vars(args)
     del args["command"]
+    if command == "examples":
+        return cmd_examples(args)
     handlers = {
         "run": cmd_run,
         "preset": cmd_preset,

@@ -20,6 +20,7 @@ try:
     import test_api_options
     import test_batch
     import test_cli
+    import test_examples
     import test_export
     import test_facade
     import test_api_probe
@@ -64,6 +65,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_batch))
     suite.addTests(loader.loadTestsFromModule(test_cli))
     suite.addTests(loader.loadTestsFromModule(test_export))
+    suite.addTests(loader.loadTestsFromModule(test_examples))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
     suite.addTests(loader.loadTestsFromModule(test_facade))
     suite.addTests(loader.loadTestsFromModule(test_api_probe))

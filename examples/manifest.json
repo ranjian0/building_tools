@@ -1,0 +1,398 @@
+{
+  "version": 1,
+  "count": 56,
+  "examples": [
+    {
+      "id": "civic.chapel",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.church",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.fire-station",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.hospital",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.library",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.museum",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.police-station",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.school",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.town-hall",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "civic.train-station",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.bank",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.car-showroom",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.corner-shop",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.diner",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.hotel",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.office-block",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.office-tower",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "commercial.supermarket",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "floorplans.circular-segments",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "floorplans.composite",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "floorplans.h-shaped",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "floorplans.random-seeded",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "floorplans.rectangular",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "house",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.barn",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.factory",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.freight-depot",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.garage",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.grain-silo",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.hangar",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.water-tower",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "industrial.workshop",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "pipelines.detail-levels",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "pipelines.osm-batch-block",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "pipelines.preset-baseline",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "pipelines.render-and-export",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "pipelines.seeded-variants",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.a-frame-cabin",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.apartment-block",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.courtyard-house",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.duplex",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.high-rise-tower",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.japanese-house",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.mediterranean-villa",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.modern-villa",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.nordic-cabin",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.student-housing",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.suburban-house",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "residential.victorian-townhouse",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "roofs.slope-height-default",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "roofs.slope-percentage",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "special.bell-tower",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "special.lighthouse",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "special.monument",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "special.ski-chalet",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    },
+    {
+      "id": "special.watchtower",
+      "title": "",
+      "tags": [],
+      "tier": "standard",
+      "render": false
+    }
+  ]
+}
