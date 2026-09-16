@@ -13,12 +13,18 @@ from btools.building.floorplan.floorplan_ops import build as floorplan_builder
 class TestFloor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        bpy.utils.register_class(FloorplanProperty)
+        try:
+            bpy.utils.register_class(FloorplanProperty)
+        except ValueError:
+            pass
         bpy.types.Scene.floorplan_prop = bpy.props.PointerProperty(
             type=FloorplanProperty
         )
 
-        bpy.utils.register_class(FloorProperty)
+        try:
+            bpy.utils.register_class(FloorProperty)
+        except ValueError:
+            pass
         bpy.types.Scene.floor_prop = bpy.props.PointerProperty(type=FloorProperty)
 
     @classmethod

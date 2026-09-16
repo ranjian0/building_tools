@@ -1,40 +1,46 @@
 # AGENTS.md
 
-Guide for AI coding agents working on **Building Tools** — a Blender addon
-(Python) for fast building modeling. Read this before making changes.
+Guide for AI coding agents working on **Building Tools** — a procedural
+building-generation package for Blender's Python API, distributed as the
+`building-tools` pip package and driven by AI agents through rule files.
+
+**Branch `feature/pip-package` pivoted the project to a pip package**
+(2.0.0a0): `bpy==5.1.2` is a hard dependency, the Blender addon UI is
+legacy (frozen at v1.0.13 releases), and the agent surface is
+`btools.api` + `btools run <rule.py>` + headless renders/exports.
 
 ## Project layout
 
 ```
-__init__.py            addon entry point (bl_info, panels, presets panel, version)
-btools/                addon package
-  api/                 scriptable control surface (the ONLY scripted path)
-    core.py            FaceTarget, feature runners, _edit_session, options_from_dict
-    options.py         typed dataclasses per feature (drift-tested vs props)
-    presets.py         BuildingPreset/FacadeRule schema + 8 bundled presets
-    result.py          OpResult dataclass (status, matgroup_counts, errors)
-    select.py          world-space face selectors (storey bands, group filters)
-    validate.py        matgroup/geometry/normal reports, validate_object()
-  building/<feature>/  one dir per feature: *_props.py, *_ops.py, *_types.py
+btools/                # THE pip package (installed as building-tools)
+  __init__.py          # version + register()/unregister() bootstrap
+  cli.py               # btools CLI (run/preset/list-presets/smoke)
+  rules.py             # RuleContext handed to rule files
+  render.py            # headless confirmation renders (engine fallback)
+  api/                 # scriptable surface (the ONLY stable path)
+    core.py            # FaceTarget, runners, _edit_session (normalize=...)
+    options.py         # typed dataclasses per feature (drift-tested)
+    presets.py         # 8 bundled presets + build_preset
+    batch.py           # generate_batch from footprint attributes
+    result.py          # OpResult dataclass (status, matgroups, errors)
+    select.py          # world-space face selectors
+    facade.py          # bay-grid facade layer
+    validate.py        # matgroup/geometry/normal reports
+    probe.py           # measurements, ASCII elevations, interpenetration
+    checks.py          # declarative preset checks
+    export/__init__.py # glb/fbx production export (semantic slots)
+  building/<feature>/  # one dir per feature: *_props.py, *_ops.py, *_types.py
     materialgroup.py   MaterialGroup enum, face-int-layer tagging, restore pass
     default_materials.py  BT_ PBR node materials per matgroup
     frame.py           shared frame-depth + sill/threshold helpers
-    generator.py       legacy random building generator (ops-based, not api)
-  utils/               shared helpers (bmesh, geometry, materialgroup wiring)
-  road/                road tool (legacy layout)
-tests/                 headless test suite (46 tests; runs via bpy module)
-scripts/               release zip + dev-install scripts
-.agent/tools/          Blender session toolkit (`bt` CLI) — see its README.md
-.agent/plans/          implementation plans for open issues/PRs
-.agent/reference/      golden corpus (JSON + 1280×1280 4-view composites)
-docs/                  Jekyll site (artist docs)
+    generator.py       legacy random building generator (api-adjacent)
+  utils/               shared helpers (bmesh, geometry, layout, randomizer)
+  road/                legacy road tool (unregistered, pending removal)
+.agent/                dev tooling: bt GUI sessions (legacy), plans, corpus
+docs/                  Jekyll site (artist docs) + RULES.md (rule vocabulary)
+examples/              example rule files
+tests/                 headless suite (runs via the bpy pip module)
 ```
-
-- The addon runs **inside Blender**; dev tooling runs outside it.
-- `bl_info` (root `__init__.py`) governs the Blender version range; the
-  `pyproject.toml` `requires-python` only constrains dev tooling.
-- Current dev target: Blender 5.1 at `/home/ranjian0/tools/blender-5.1.2-linux-x64/blender`
-  (override with `BT_BLENDER`), Python 3.13 in-session and in the venv.
 
 ## Environment & commands
 
@@ -176,115 +182,13 @@ r = build_preset(PRESETS["suburban-house"])
   via `build_preset(PRESETS[id])`. Facade rules use world-space selectors
   from `btools/api/select.py` (front_walls, ground_front_wall, etc.).
 
-### Import namespace (critical for tests)
+### Import namespace (resolved on the pip pivot)
 
-The addon is loaded under TWO names depending on context:
-- `building_tools` — via LoadModule in the test harness, or via bt reload
-- `btools` — via `sys.path` (repo root on path, plain package import)
-
-**Always use the namespace that matches your context.** In the just-test
-harness, `import btools.api.presets` works (the harness registers via
-LoadModule's `__main__` quirk). In bt sessions, use
-`building_tools.btools.api.presets`. Mixing namespaces creates duplicate
-PropertyGroup copies that break pointer-property resolution.
-
-## Building presets
-
-8 presets (suburban house, townhouse, apartment block, modern villa,
-mediterranean villa, corner shop, warehouse, office block) defined in
-`btools/api/presets.py`. Each composes floorplan + floors + roof + facade
-rules via the api. `build_preset(preset, floors, width_scale, depth_scale,
-assign_materials)` returns an OpResult with the created object.
-
-- Facade rules target world-space face selectors (see `btools/api/select.py`)
-  per storey; the api core handles mode transitions, index resolution, and
-  normal normalization.
-- `apply_default_materials(obj)` assigns BT_ PBR materials per matgroup;
-  called automatically when `assign_materials=True` (the default).
-- Preset thumbnails are rendered by `bt thumbs` into `btools/presets/thumbs/`.
-- Known addon flaws are documented per case in the reference corpus
-  (`multigroup_arch_broken`, `zero_width_window_fill`, etc.).
-
-## Adding a feature (conventions)
-
-1. `btools/building/<feature>/` — `*_props.py` (PropertyGroup + `init()`),
-   `*_ops.py` (operator; `build(context, prop)` reads edit-mode selection),
-   `*_types.py` (pure geometry: `create_*(bm, faces, prop)`).
-2. Register in `btools/building/register.py` (order matters) and add the
-   panel button in the root `__init__.py`.
-3. Tag every generated face with a `MaterialGroup`
-   (`add_faces_to_group` / `map_new_faces` decorator). Untagged faces fail
-   validation — this is the addon's core contract.
-4. Add an options dataclass in `btools/api/options.py`, a runner in
-   `btools/api/core.py` (see `_apply_face_feature`), and wire
-   `FEATURES`/`OPTION_TYPES`. The drift/round-trip tests
-   (`tests/test_api_options.py`) will enforce dataclass↔PropertyGroup parity.
-5. Add headless tests under `tests/` and register the module in
-   `tests/__main__.py`.
-
-### API runner pattern (for new features)
-
-New features should follow the `_apply_face_feature` pattern in
-`btools/api/core.py`:
-
-1. `_edit_session(target)` — enters edit mode, resolves faces by index,
-   sets selection flags (operator precondition), yields (bm, faces)
-2. Validate faces (bool or list per feature convention)
-3. `_prop_instance(prop_cls, "bt_api_<feature>")` — attach prop to scene
-4. `prop.init((w, h))` BEFORE `_options_into_prop(prop, options)` —
-   init sets ID-props (parent_height, restricted, etc.) that getters need
-5. `_target_context(obj)` — routes `bpy.context.object` to the target
-6. `create_fn(bm, valid, prop)` — call the geometry function
-7. `nulfaces → WALLS` — untagged faces default to WALLS
-8. `_normalize_normals(bm)` — recalc + signed-volume flip (see gotchas)
-
-The `_edit_session` finally block normalizes normals, flushes edit mesh,
-and returns to object mode.
-
-## Blender/Python gotchas (details in .agent/tools/README.md)
-
-### Mesh/normals
-- **Normal inversion**: the floor op's per-face Z-flip hack leaves the
-  whole solid consistently INVERTED. `recalc_face_normals` only makes
-  normals consistent — it does NOT flip an inverted solid. Use
-  `_normalize_normals` in api/core.py (recalc + signed-volume flip).
-- **BMesh element wrappers don't keep their bmesh alive** — hold the bmesh
-  in the calling frame.
-- **Fresh `bm.new() + from_mesh()` bmeshes have unset indices (all 0)** —
-  call `bm.faces.index_update()` before reading `f.index`.
-
-### Ops / properties
-- **Scripted `bpy.ops` resets operator props each call** — use the api
-  or the `build(context, prop)` pattern with scene-attached prop groups.
-- PropertyGroup getters reading ID-props (arch `parent_height`,
-  size_offset `restricted`) raise noisy KeyErrors until `init()` runs — the
-  api core calls `init()` before applying options.
-- Blender property ids can't start with `_`; pointer-property targets must
-  be registered before the groups referencing them.
-- `bpy.utils.previews` is a lazy submodule — `import bpy.utils.previews`
-  explicitly or `hasattr(bpy.utils, 'previews')` returns False.
-
-### Environment
-- **Stale installed addon**: `import building_tools` in headless scripts
-  resolves to `~/.config/blender/5.1/scripts/addons/building_tools/` (from
-  a previous `just dev`), NOT the working tree. Use `btools.*` imports with
-  `register_building()` for headless scripts, or ensure `bt reload` loaded
-  the current code.
-- `bpy.ops.uv.cube_project` and other UV ops crash headless — guard with
-  `bpy.app.background`.
-- `popup_message` crashes headless — `popup_message` already guards with
-  `bpy.app.background`.
-- The api core's `_edit_session` sets `bpy.app.background`-safe defaults:
-  no UV ops, no popups, no window-dependent calls.
-
-### Material groups
-- The face int layer `.bt_material_group_index` must exist BEFORE the edit
-  bmesh is created (values propagate to the bmesh layers).
-- Untagged faces carry -1 (the sentinel written by
-  `verify_matgroup_attribute_for_object`). `find_faces_without_matgroup`
-  re-tags them to WALLS.
-- `_base_nodes` in default_materials.py returns just the bsdf node (not a
-  tuple) — the tuple was a bug that crashed every PBR material creation.
+The addon-era dual namespace (building_tools vs btools) is gone: the
+suite imports `btools.*` only, `tests/__main__.py` registers via
+`btools.register()` (no more LoadModule), and per-test register_all()
+calls are now guarded no-ops. Keep it that way — re-introducing a second
+class identity was the source of three separate bugs.
 
 ## Plans & issue work
 

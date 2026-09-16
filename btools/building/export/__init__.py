@@ -56,8 +56,15 @@ def _default_directory():
     return tempfile.gettempdir()
 
 
-def export_object(obj, filepath=None, export_format="GLB", semantic_slots=True):
-    """Export one object as a production asset. Returns (ok, path, error)."""
+def export_object(obj, filepath=None, export_format=None, semantic_slots=True):
+    """Export one object as a production asset. Returns (ok, path, error).
+
+    export_format None infers GLB/FBX from the filepath extension."""
+    if export_format is None:
+        ext = os.path.splitext(filepath or "")[1].lower().lstrip(".")
+        export_format = {"glb": "GLB", "fbx": "FBX"}.get(ext)
+        if export_format is None and filepath:
+            return False, filepath, "cannot infer format from %r" % filepath
     if export_format not in _EXTENSIONS:
         return False, None, "unknown format %r" % export_format
     if filepath is None:

@@ -10,18 +10,16 @@ sys.path.insert(0, addon_dir)
 
 import bpy  # must precede bmesh/mathutils imports (also registers submodules)
 
-# -- clean slate: user prefs may auto-enable an old installed copy of the
-#    addon, whose registration would collide with the working tree
+# -- clean slate: factory settings + purge any stale copies of the package
 bpy.ops.wm.read_factory_settings(use_empty=True)
 for _mod in [m for m in sys.modules if "building_tools" in m or m == "btools"]:
     del sys.modules[_mod]
-
-import tools
 
 try:
     import test_api
     import test_api_options
     import test_batch
+    import test_cli
     import test_export
     import test_facade
     import test_api_probe
@@ -44,9 +42,10 @@ except Exception:
 
 
 def main():
-    # Load the addon module
-    tools.LoadModule(os.path.join(addon_dir, "__init__.py"))
-    print("-" * 70, end="\n\n")
+    # -- register everything the api needs (idempotent bootstrap)
+    import btools
+
+    btools.register()
 
     # initialize the test suite
     loader = unittest.TestLoader()
@@ -63,6 +62,7 @@ def main():
     suite.addTests(loader.loadTestsFromModule(test_interiors))
     suite.addTests(loader.loadTestsFromModule(test_partitions))
     suite.addTests(loader.loadTestsFromModule(test_batch))
+    suite.addTests(loader.loadTestsFromModule(test_cli))
     suite.addTests(loader.loadTestsFromModule(test_export))
     suite.addTests(loader.loadTestsFromModule(test_api_options))
     suite.addTests(loader.loadTestsFromModule(test_facade))

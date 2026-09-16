@@ -52,3 +52,11 @@ web-install-deps-linux:
     sudo apt-get update
     sudo apt-get install ruby ruby-dev rubygems
     sudo gem install bundler github-pages
+
+# headless preset smoke (pip-package replacement for bt smoke)
+smoke:
+    uv run btools smoke
+
+# render a confirmation view of the current/default scene
+render out="confirm.png" view="iso":
+    uv run btools preset suburban-house --render {{out}} --views {{view}}

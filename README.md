@@ -1,8 +1,54 @@
-# [Building Tools](https://ranjian0.github.io/building_tools/)
+
+# Building Tools 2.0 — pip package for AI agents
+
+> Procedural building generation on Blender's Python API — installable
+> with pip, driven by rule files, headless renders and production exports.
+
+## Quickstart (pip / agents)
+
+```bash
+pip install building-tools[bpy]
+```
+
+Write a rule file (`house.py`):
+
+```python
+def build(ctx):
+    ctx.floorplan(type="RECTANGULAR", width=10.0, length=8.0)
+    ctx.floors(floor_count=2, floor_height=3.0, wall_thickness=0.25)
+    ctx.interior(partition_mode="TREEMAP", room_count=4, inset=0.25)
+    ctx.windows(storeys=(1,), fill_type="GLASS_PANES")
+    ctx.roof(type="GABLE", height=1.8, add_gutters=True)
+    ctx.render("confirm.png", views=("front", "iso"))
+    ctx.export("house.glb")
+```
+
+Then:
+
+```bash
+btools run house.py --json
+```
+
+Same seed, same building. `--render` writes confirmation PNGs, `--export`
+writes production assets with semantic material slots (`BT_walls`,
+`BT_roof`, ...). Exit code is 0 iff every step succeeded — pipe the JSON
+summary straight into your agent loop.
+
+CLI reference: `btools --help`, `btools run --help`,
+`btools list-presets --json`, `btools smoke`.
+
+---
+
+# Building Tools 1.x — Blender addon (legacy)
 
 > ⚡️ Crazy fast way to model buildings in Blender!
 
 Artists should redirect to: https://ranjian0.github.io/building_tools/
+
+The 1.x addon UI is frozen at release v1.0.13 — install that release
+from the GitHub releases page if you want the Blender-side panel.
+Development continues on the pip package above.
+
 
 ## Table of contents
 
