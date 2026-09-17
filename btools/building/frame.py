@@ -14,6 +14,9 @@ def add_sill(bm, frame_faces, wall_normal, projection=0.075):
     Extends the lowest frame piece outward past the wall face.
     wall_normal points out of the wall (toward the viewer).
     """
+    frame_faces = [f for f in frame_faces if f.is_valid]
+    if not frame_faces:
+        return []
     bottom = min(frame_faces, key=lambda f: f.calc_center_median().z)
     offset = wall_normal * projection
     ret = bmesh.ops.extrude_face_region(bm, geom=[bottom])
@@ -26,6 +29,9 @@ def add_sill(bm, frame_faces, wall_normal, projection=0.075):
 
 def add_threshold(bm, frame_faces, wall_normal, projection=0.03):
     """Low threshold member at the door opening base."""
+    frame_faces = [f for f in frame_faces if f.is_valid]
+    if not frame_faces:
+        return []
     bottom = min(frame_faces, key=lambda f: f.calc_center_median().z)
     offset = wall_normal * projection
     ret = bmesh.ops.extrude_face_region(bm, geom=[bottom])
@@ -43,33 +49,37 @@ def add_frame_depth(
     if depth != 0.0:
         all_faces = door_faces + window_faces + arch_faces + frame_faces
 
-        def hash_face(f):
-            return hash(
-                (f.calc_perimeter(), f.calc_area(), f.calc_center_median().to_tuple(4))
-            )
+        # -- capture each face's expected resting position before the
+        #    extrude; matching by (perimeter, area, center) hash loses
+        #    faces to float32 rounding at the 4th decimal
+        categories = [door_faces, window_faces, arch_faces, frame_faces]
+        expected = [
+            [f.calc_center_median() + normal * depth for f in faces]
+            for faces in categories
+        ]
 
-        def hash_face_after(f):
-            return hash(
-                (
-                    f.calc_perimeter(),
-                    f.calc_area(),
-                    (f.calc_center_median() + normal * depth).to_tuple(4),
-                )
-            )
-
-        door_hashes = list(map(hash_face, door_faces))
-        window_hashes = list(map(hash_face, window_faces))
-        arch_hashes = list(map(hash_face, arch_faces))
-        frame_hashes = list(map(hash_face, frame_faces))
-
-        all_faces, surrounding_faces = extrude_face_region(
+        new_faces, surrounding_faces = extrude_face_region(
             bm, list(set(all_faces)), -depth, normal
         )
 
-        new_door_faces = [f for f in all_faces if hash_face_after(f) in door_hashes]
-        new_window_faces = [f for f in all_faces if hash_face_after(f) in window_hashes]
-        new_arch_faces = [f for f in all_faces if hash_face_after(f) in arch_hashes]
-        new_frame_faces = [f for f in all_faces if hash_face_after(f) in frame_hashes]
+        # -- nearest-centroid matching: every face moved by the same
+        #    offset, so each new face is closest to its own origin
+        remaining = list(new_faces)
+        matched = []
+        for positions in expected:
+            group = []
+            for exp in positions:
+                if not remaining:
+                    break
+                best = min(
+                    remaining,
+                    key=lambda nf: (nf.calc_center_median() - exp).length_squared,
+                )
+                remaining.remove(best)
+                group.append(best)
+            matched.append(group)
+
+        new_door_faces, new_window_faces, new_arch_faces, new_frame_faces = matched
 
         if depth < 0.0:
             return (

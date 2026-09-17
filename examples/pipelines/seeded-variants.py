@@ -4,9 +4,6 @@ TAGS = ("pipeline", "seed", "facade", "variations")
 
 def build(ctx):
     from btools.api.presets import BuildingPreset, FacadeRule
-    from btools.api.presets import PRESETS
-
-    base = dict(PRESETS["suburban-house"].__dict__)
     for seed in (1, 2, 3):
         preset = BuildingPreset(
             id="variant-%d" % seed,
@@ -23,6 +20,4 @@ def build(ctx):
                 ),
             ],
         )
-        from btools.api.presets import build_preset
-
-        build_preset(preset, seed="variant-%d" % seed)
+        ctx.preset(preset, seed="variant-%d" % seed)

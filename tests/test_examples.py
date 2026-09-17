@@ -30,6 +30,10 @@ def _run_example(ex):
 
         mod = _load_rule_module(ex.path)
     mod.build(ctx)
+    if not ctx.objects and not bpy.data.objects:
+        raise AssertionError(
+            "example built nothing — check for nested/shadowed build()"
+        )
     return ctx, mod
 
 

@@ -5,8 +5,7 @@ TIER = 'standard'
 
 
 def build(ctx):
-    def build(ctx):
-        ctx.floorplan(type="RECTANGULAR", width=24.0, length=12.0)
-        ctx.floors(floor_count=2, floor_height=3.4)
-        ctx.roof(type="FLAT", add_border=True)
-        ctx.windows(storeys=(0, 1), array={"count": 7})
+    ctx.floorplan(type="RECTANGULAR", width=24.0, length=12.0)
+    ctx.floors(floor_count=2, floor_height=3.4)
+    ctx.roof(type="FLAT", add_border=True)
+    ctx.windows(storeys=(0, 1), array={"count": 7})

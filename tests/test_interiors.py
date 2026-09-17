@@ -35,6 +35,30 @@ def group_faces(obj, group):
     return [p for p, tag in zip(obj.data.polygons, vals) if tag == gi]
 
 
+class TestRuleContextInterior(unittest.TestCase):
+    """ctx.interior after a roof must find the upward slab face (#218-class).
+
+    _ground_floor_face used to ignore face orientation and could hand the
+    interior op a vertical slab-band side face (watchtower example)."""
+
+    def test_interior_after_roof(self):
+        import btools
+
+        btools.ensure_registered()
+        clean_scene()
+        import btools.rules as rules_mod
+
+        ctx = rules_mod.RuleContext()
+        ctx.floorplan(type="RECTANGULAR", width=6.0, length=6.0)
+        ctx.floors(floor_count=2, floor_height=5.0)
+        ctx.roof(type="HIP", height=2.0, outset=0.6)
+        res = ctx.interior(partition_mode="SKELETON", min_corridor=2.0)
+        self.assertEqual(res.status, "ok", res.errors[:1])
+        # partitions are tagged into the walls group; the skeleton core
+        # adds interior faces beyond the 4 outer wall faces
+        self.assertGreater(res.matgroup_counts.get("walls", 0), 4)
+
+
 class TestInteriorShell(unittest.TestCase):
     def setUp(self):
         clean_scene()

@@ -186,6 +186,7 @@ class RuleContext:
             floor_count or 2,
             floor_height or 3.0,
             rng=rng,
+            record=lambda _feature, res: self._record(res),
         )
         self.warnings.extend(w for s in summaries for w in s.get("warnings", []))
         return summaries, failed
@@ -268,6 +269,8 @@ def _ground_floor_face(obj):
     best, best_area = None, 0.0
     for i, (poly, tag) in enumerate(zip(me.polygons, vals)):
         if tag != slab_idx:
+            continue
+        if poly.normal.z < 0.5:
             continue
         center = poly.center
         if center.z > 0.6:
