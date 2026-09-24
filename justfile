@@ -1,8 +1,17 @@
 # Building Tools task runner (https://github.com/casey/just)
 
+# absolute blender path: non-interactive shells (agents, scripts) don't source
+# the zshrc PATH export, so raw `blender` isn't resolvable there
+blender_bin := "$HOME/tools/blender-5.1.2-linux-x64/blender"
+
 # list available recipes
 default:
     @just --list
+
+# run blender with arbitrary args (headless or GUI), e.g.
+# `just blender -b --python-expr "import bpy; print(bpy.app.version_string)"`
+blender *ARGS:
+    {{blender_bin}} {{ARGS}}
 
 # create/sync the project venv (uv)
 sync:
